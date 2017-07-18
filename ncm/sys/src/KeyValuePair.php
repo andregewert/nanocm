@@ -30,6 +30,11 @@ final class KeyValuePair {
     /** @var mixed Wert */
     public $Value;
     
+    /**
+     * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
+     * @param string $key Schlüssel
+     * @param mixed $value Wert
+     */
     public function __construct(string $key = null, $value = null) {
         $this->key = $key;
         $this->value = $value;

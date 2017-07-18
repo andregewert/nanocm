@@ -19,6 +19,9 @@
 
 namespace Ubergeek\NanoCm;
 
+/**
+ * Basis-Anwendung für das Nano CM
+ */
 class NanoCmController extends \Ubergeek\Controller\HttpController {
     
     public function run() {

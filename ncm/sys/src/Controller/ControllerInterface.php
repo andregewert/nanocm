@@ -40,15 +40,15 @@ interface ControllerInterface {
     
     public function getContent(string $area = 'default') : string;
     
-    public function getParam(string $key, $default = null) : any;
+    public function getParam(string $key, $default = null);
     
     public function getParams() : array;
     
-    public function setParam(string $key, any $value);
+    public function setParam(string $key, $value);
     
-    public function setVar(string $key, any $value);
+    public function setVar(string $key, $value);
     
-    public function getVar(string $key, $default = null) : any;
+    public function getVar(string $key, $default = null);
     
     public function getVars() : array;
     
