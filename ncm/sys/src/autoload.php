@@ -17,10 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Zentrale Instanz des Content Managers instanziieren
+spl_autoload_register(function($class) {
+    $filename = preg_replace('/^Ubergeek/', '', str_replace('\\', DIRECTORY_SEPARATOR, $class));
+    $filename = __DIR__ . $filename . '.php';
 
-// Standard-Controller ausführen
-
-require 'ncm/sys/src/autoload.php';
-$var = new Ubergeek\NanoCm\NanoCmController();
-$var->execute();
+    if (!file_exists($filename)) {
+        throw new ErrorException('Class not found: ' . $class);
+    }
+    
+    require $filename;
+});

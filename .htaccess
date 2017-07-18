@@ -1,0 +1,38 @@
+#ErrorDocument  404  /404.html
+
+RewriteEngine On
+RewriteBase /
+
+#RewriteRule ^downloads/.*$ /index.php [R]
+#RewriteRule ^fotos/.*$ /index.php [R]
+#RewriteRule ^software/.*$ /index.php [R]
+
+# Downloads
+#RewriteCond %{REQUEST_URI} !^/downloads/download.php.*$
+#RewriteRule ^downloads/([^/]+)(/(.+))?$ /downloads/download.php?dir=$1&file=$3 [NC,L]
+
+# Gallery Rewriting
+#RewriteRule ^fotos/(index.html)?$ /fotos/index.php [L]
+#RewriteRule ^fotos/(.+)/(index.html)?$ /fotos/index.php?mode=album&album=$1 [L]
+#RewriteRule ^fotos/(.+)/index.js?$ /fotos/index.php?mode=photoboxprovider&album=$1 [L]
+#RewriteRule ^fotos/(.+)/slideshow.html?$ /fotos/index.php?mode=slideshow&album=$1 [L]
+#RewriteRule ^fotos/(.+)/(.+)\.html$ /fotos/index.php?mode=photo&album=$1&photo=$2 [L]
+
+# Weblog Rewriting
+#RewriteRule ^weblog/(index\.html)?$ /weblog/index.php [L]
+#RewriteRule ^weblog/tags/$ /weblog/index.php?type=tags&q=%{QUERY_STRING}
+#RewriteRule ^weblog/month/([^/]+)/([^/]+)$ /weblog/index.php?type=month&y=$1\&m=$2
+#RewriteRule ^weblog/article/([^/]+)(/.*)?$ /weblog/index.php?type=article&id=$1 [QSA]
+#RewriteRule ^weblog/feeds/articles.xml$ /weblog/index.php?type=feed
+#RewriteRule ^weblog/feeds/comments.xml$ /weblog/index.php?type=commentfeed
+#RewriteRule ^weblog/trackback/([^/]+)/(.+)$ /weblog/trackback.php?id=$1\&v=$2
+
+# Template-Dateien sollen nicht direkt aufgerufen werden können
+#RewriteCond %{REQUEST_FILENAME} -f
+#RewriteRule ^(.*)\.phtml$ /$1.html [NC,R]
+
+# Andere HTML-Seiten auf den DefaultController umleiten
+RewriteCond %{REQUEST_FILENAME} !-s
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^.*\.html$ /index.php [NC,L]

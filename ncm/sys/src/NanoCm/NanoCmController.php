@@ -17,10 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Zentrale Instanz des Content Managers instanziieren
+namespace Ubergeek\NanoCm;
 
-// Standard-Controller ausführen
+class NanoCmController extends \Ubergeek\Controller\HttpController {
+    
+    public function run() {
+        // Fehlerbehandlung
+        
+        // Request parsen
+        
+        // Passendes Modul ausführen
+        
+        // Content generieren
+        
+        // Content in Template einfügen
+        
+        // Content ausgeben
+    }
+    
+    protected function renderUserTemplate(string $tpl) {
+        // Prüfen: benutzerdefiniertes Template vorhanden?
+        // Dann: dieses rendern
+        // Andernfalls: System-Vorgabe rendern
+    }
 
-require 'ncm/sys/src/autoload.php';
-$var = new Ubergeek\NanoCm\NanoCmController();
-$var->execute();
+}

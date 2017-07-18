@@ -17,10 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Zentrale Instanz des Content Managers instanziieren
+namespace Ubergeek\NanoCm;
 
-// Standard-Controller ausführen
-
-require 'ncm/sys/src/autoload.php';
-$var = new Ubergeek\NanoCm\NanoCmController();
-$var->execute();
+/**
+ * Einfache, zentrale Verwaltung der NCM-Instanz
+ */
+class InstanceManager {
+    
+}
