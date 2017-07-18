@@ -22,5 +22,5 @@
 // Standard-Controller ausführen
 
 require 'ncm/sys/src/autoload.php';
-$var = new Ubergeek\NanoCm\NanoCmController();
+$var = new Ubergeek\NanoCm\NanoCmController(__DIR__);
 $var->execute();

@@ -36,6 +36,11 @@ abstract class HttpController implements ControllerInterface {
      * @var array Enthält benutzerdefinierte Variablen
      */
     protected $vars = array();
+    
+    /**
+     * @var string Seitentitel
+     */
+    protected $title = "Unknown page";
 
     /**
      * Fügt einem Inhaltsbereich den übergebenen Content hinzu
@@ -175,6 +180,14 @@ abstract class HttpController implements ControllerInterface {
         }
         $this->vars[$key] = $value;
     }
+    
+    public function setTitle(string $title) {
+        $this->title = $title;
+    }
+    
+    public function getTitle() : string {
+        return $this->title;
+    }
 
     public function init() {
         // Initialisierungsaufgaben durchführen
@@ -193,7 +206,10 @@ abstract class HttpController implements ControllerInterface {
             }
         }
         
-        // Content ausgeben
+        // Content ausgeben -> in Output buffer
         echo $this->getContent();
+        
+        // Gepufferten Inhalt in Frame-Template ausgeben
+        // ...
     }
 }

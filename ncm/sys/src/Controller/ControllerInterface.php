@@ -52,7 +52,9 @@ interface ControllerInterface {
     
     public function getVars() : array;
     
-    // Programm-Fluss
+    public function setTitle(string $title);
+    
+    public function getTitle() : string;
     
     public function init();
     
