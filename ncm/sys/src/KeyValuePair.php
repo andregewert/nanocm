@@ -17,30 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek\NanoCm;
+namespace Ubergeek;
 
-class NanoCmController extends \Ubergeek\Controller\HttpController {
+/**
+ * Bildet ein Schlüssel-Wert-Paar ab
+ */
+final class KeyValuePair {
     
-    public function run() {
-        // Fehlerbehandlung
-        
-        // Request parsen
-        
-        // Passendes Modul ausführen
-        
-        // Content generieren
-        
-        // Content in Template einfügen
-        
-        // Content ausgeben
-        
-        $this->setContent('Hallo Welt!');
-    }
-    
-    protected function renderUserTemplate(string $tpl) {
-        // Prüfen: benutzerdefiniertes Template vorhanden?
-        // Dann: dieses rendern
-        // Andernfalls: System-Vorgabe rendern
-    }
+    /** @var string Schlüssel */
+    public $Key;
 
+    /** @var mixed Wert */
+    public $Value;
+    
+    public function __construct(string $key = null, $value = null) {
+        $this->key = $key;
+        $this->value = $value;
+    }
 }

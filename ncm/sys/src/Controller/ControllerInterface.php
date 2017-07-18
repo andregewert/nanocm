@@ -19,18 +19,28 @@
 
 namespace Ubergeek\Controller;
 
+/**
+ * Einfaches Interface für einen Controller nach dem MVC-Schema
+ * 
+ * Das NanoCM ist darauf ausgelegt, ausschließlich über HTTP aufgerufen zu
+ * werden.
+ */
 interface ControllerInterface {
     public function addMeta(string $key, string $value);
     
     public function replaceMeta(string $key, string $value);
     
-    public function setContent(string $content);
+    public function getMetaData() : array;
     
-    public function addContent(string $content) : string;
+    public function getMeta(string $key) : array;
     
-    public function getContent() : string;
+    public function setContent(string $content, string $area = 'default');
     
-    public function getParam(string $key) : any;
+    public function addContent(string $content, string $area = 'default') : string;
+    
+    public function getContent(string $area = 'default') : string;
+    
+    public function getParam(string $key, $default = null) : any;
     
     public function getParams() : array;
     
@@ -38,7 +48,7 @@ interface ControllerInterface {
     
     public function setVar(string $key, any $value);
     
-    public function getVar(string $key) : any;
+    public function getVar(string $key, $default = null) : any;
     
     public function getVars() : array;
     
