@@ -17,26 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek;
+namespace Ubergeek\Log\Writer;
 
-/**
- * Bildet ein Schlüssel-Wert-Paar ab
- */
-final class KeyValuePair {
+class NullWriter implements WriterInterace {
     
-    /** @var string Schlüssel */
-    public $key;
-
-    /** @var mixed Wert */
-    public $value;
-    
-    /**
-     * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
-     * @param string $key Schlüssel
-     * @param mixed $value Wert
-     */
-    public function __construct(string $key = null, $value = null) {
-        $this->key = $key;
-        $this->value = $value;
-    }
 }

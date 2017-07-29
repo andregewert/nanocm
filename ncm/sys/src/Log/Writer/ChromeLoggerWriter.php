@@ -17,26 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek;
+namespace Ubergeek\Log\Writer;
 
-/**
- * Bildet ein Schlüssel-Wert-Paar ab
- */
-final class KeyValuePair {
+class ChromeLoggerWriter implements WriterInterface {
     
-    /** @var string Schlüssel */
-    public $key;
-
-    /** @var mixed Wert */
-    public $value;
+    private $chromeLogger;
     
-    /**
-     * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
-     * @param string $key Schlüssel
-     * @param mixed $value Wert
-     */
-    public function __construct(string $key = null, $value = null) {
-        $this->key = $key;
-        $this->value = $value;
+    public function __construct() {
+        $this->chromeLogger = new \Ubergeek\Log\ChromeLogger();
     }
+    
+    public function close() {
+        
+    }
+
+    public function flush() {
+        header(\Ubergeek\Log\ChromeLogger::HEADER_NAME . ': ' . $this->chromeLogger->createOutputString());
+    }
+
+    public function write(\Ubergeek\Log\Event $event) {
+        $this->chromeLogger->log($event->message, 'log');
+    }
+
 }

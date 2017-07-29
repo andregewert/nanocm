@@ -66,7 +66,7 @@ abstract class HttpController implements ControllerInterface {
         if (!is_array($this->headers)) {
             $this->headers = array();
         }
-        $this->headers[] = new \Ubergeek\KeyValuePair($key, $value);
+        array_push($this->headers, new \Ubergeek\KeyValuePair($key, $value));
     }
     
     /**
@@ -88,7 +88,7 @@ abstract class HttpController implements ControllerInterface {
         
         if (is_array($this->headers)) {
             foreach ($this->headers as $header) {
-                if ($header instanceof \Ubergeek\KeyValuePair && $header->Key == $key) {
+                if ($header instanceof \Ubergeek\KeyValuePair && $header->key == $key) {
                     $dummy[] = $header;
                 }
             }
@@ -151,7 +151,7 @@ abstract class HttpController implements ControllerInterface {
         
         $dummy = array();
         foreach ($this->headers as $header) {
-            if ($header instanceof \Ubergeek\KeyValuePair && $header->Key != $key) {
+            if ($header instanceof \Ubergeek\KeyValuePair && $header->key != $key) {
                 $dummy[] = $header;
             }
         }
@@ -202,7 +202,7 @@ abstract class HttpController implements ControllerInterface {
         $headers = $this->getMetaData();
         if (is_array($headers)) {
             foreach ($headers as $header) {
-                header($header->Key . ': ' . $header->Value);
+                header($header->key . ': ' . $header->value);
             }
         }
         

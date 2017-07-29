@@ -24,30 +24,45 @@ namespace Ubergeek\NanoCm;
  */
 class NanoCmController extends \Ubergeek\Controller\HttpController {
     
+    /** @var ContentManager Enthält eine Referenz auf den ContentManager */
+    var $cm;
+    
     /**
      * @var string Verweis auf das System-Verzeichnis des NanoCM
      */
-    var $sysdir;
+    private $sysdir;
     
     /**
      * @var string Verweis auf das öffentliche Verzeichnis (HTTP-ROOT)
      */
-    var $pubdir;
+    private $pubdir;
     
     /**
      * @var type Name des Seiten-Templates, in das der Inhalt eingeschlossen
      * werden soll
      */
-    var $frametpl;
+    private $frametpl;
     
-    var $sitedir;
+    private $sitedir;
+    
+    private $logger;
     
     public function __construct(string $pubdir) {
+        $this->cm = ContentManager::getInstance($pubdir);
+        
         $this->pubdir = $pubdir;
         $this->sysdir = $this->createPath(array($pubdir, 'ncm', 'sys'));
         $this->sitedir = $this->createPath(array($pubdir, 'site'));
-        echo "Pubdir: $this->pubdir<br>";
-        echo "Sysdir: $this->sysdir<br>";
+        
+        //echo "Pubdir: $this->pubdir<br>";
+        //echo "Sysdir: $this->sysdir<br>";
+        
+        // Datenbankverbindung herstellen
+        
+        // Optional: Wenn DB nicht vorhanden, auf Installer umleiten
+        
+        // Logging initialisieren
+
     }
     
     public function run() {
@@ -65,6 +80,13 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         
         $content = $this->renderUserTemplate('frame', 'page.phtml');
         $this->setContent($content);
+        
+        $this->cm->getLog()->debug('Testnachricht 1');
+        $this->cm->getLog()->flushWriters();
+        $this->cm->getLog()->closeWriters();
+        
+        //if ($this->cm->getLog()->has)
+        //$this->addMeta('X-ChromeLogger-Data', $this->logger->createOutputString());
     }
     
     protected function parseRequestUri() {
@@ -79,7 +101,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
             $category,
             $file
         ));
-        echo $fname . "<br>";
+        //echo $fname . "<br>";
         
         if (!file_exists($fname)) {
             $fname = $this->createPath(array(
@@ -89,7 +111,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
                 $file
             ));
         }
-        echo $fname . "<br>";
+        //echo $fname . "<br>";
         
         if (!file_exists($fname)) {
             throw new Exception("Template file not found: $category/$file");
