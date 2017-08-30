@@ -19,6 +19,18 @@
 
 namespace Ubergeek\Log\Writer;
 
-class NullWriter implements WriterInterace {
+class NullWriter implements WriterInterface {
     
+    public function close() {
+        
+    }
+
+    public function flush() {
+        
+    }
+
+    public function write(\Ubergeek\Log\Event $event) {
+        
+    }
+
 }

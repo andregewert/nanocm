@@ -19,6 +19,9 @@
 
 namespace Ubergeek\Log;
 
+/**
+ * Einfache Implementierung des Log-Interfaces
+ */
 class Logger implements LoggerInterface {
     const EMERG  = 0;
     const ALERT  = 1;
@@ -76,9 +79,6 @@ class Logger implements LoggerInterface {
         }
     }
 
-
-    // <editor-fold desc="LoggerInterface">
-
     public function debug($msg, \Exception $ex = null, array $backtrace = null, string $line = '') {
         if ($backtrace == null) {
             $backtrace = debug_backtrace();
@@ -94,6 +94,4 @@ class Logger implements LoggerInterface {
             }
         }
     }
-    
-    // </editor-fold>
 }

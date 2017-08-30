@@ -19,6 +19,9 @@
 
 namespace Ubergeek\Log\Writer;
 
+/**
+ * Beschreibt das Interface, das alle Writer-Implementierungen umsetzen müssen
+ */
 interface WriterInterface {
     /**
      * Schreibt das Ereignis

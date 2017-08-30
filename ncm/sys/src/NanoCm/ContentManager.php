@@ -29,10 +29,17 @@ use Ubergeek\Log;
  * @copyright (c) 2017, André Gewert
  */
 class ContentManager {
-    /** @var ContentManager Beinhaltet die ContentManager-Instanz */
+    
+    /**
+     * Beinhaltet die ContentManager-Instanz
+     * @var ContentManager
+     */
     private static $cm = null;
     
-    /** @var Log\Logger Log-Instanz */
+    /**
+     * Log-Instanz
+     * @var Log\Logger
+     */
     private $log;
     
     private function __construct($basepath) {

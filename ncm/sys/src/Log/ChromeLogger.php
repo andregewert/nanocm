@@ -26,26 +26,31 @@ class ChromeLogger {
     
     //log, warn, error, info, group, groupEnd, groupCollapsed, and table. 
     
-    /** @var string HTTP-Header-Name für die ChromeLogger-Ausgabe */
+    /**
+     * HTTP-Header-Name für die ChromeLogger-Ausgabe
+     * @var string
+     */
     const HEADER_NAME = 'X-ChromeLogger-Data';
     
     
-    // <editor-fold desc="Internal vars">
-    
-    /** @var string Versionsnummer dieser Klasse / Bibliothek */
+    /**
+     * Versionsnummer dieser Klasse / Bibliothek
+     * @var string
+     */
     private $version = '0.1';
     
-    /** @var array Bezeichner der generierten Protokoll-Spalten */
+    /**
+     * Bezeichner der generierten Protokoll-Spalten
+     * @var array
+     */
     private $columns = array('log', 'backtrace', 'type');
     
-    /** @var array Ein Array mit den einzelnen generierten Log-Ausgaben */
+    /**
+     * Ein Array mit den einzelnen generierten Log-Ausgaben
+     * @var array
+     */
     private $rows = array();
 
-    // </editor-fold>
-    
-    
-    // <editor-fold desc="Public functions">
-    
     /**
      * Erstellt den passend kodierten String, der per HTTP-Header "X-ChromeLogger-Data"
      * an den Browser gesendet werden soll
@@ -103,11 +108,6 @@ class ChromeLogger {
         $this->rows[] = array($this->convertVar($data), $trace, $type);
     }
     
-    // </editor-fold>
-    
-    
-    // <editor-fold desc="Internal methods">
-
     /**
      * Bereitet eine PHP-Variable für ChromeLogger-komforme JSON-Kodierung vor
      * @param mixed $var
@@ -119,6 +119,4 @@ class ChromeLogger {
         }
         return $var;
     }
-    
-    // </editor-fold>
 }

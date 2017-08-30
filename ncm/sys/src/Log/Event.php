@@ -20,28 +20,36 @@
 namespace Ubergeek\Log;
 
 class Event {
-    // <editor-fold desc="Public fields">
-
-    /** @var integer Log-Level */
+    /**
+     * Log-Level
+     * @var integer 
+     */
     public $level;
     
-    /** @var string Log-Nachricht */
+    /**
+     * Log-Nachricht
+     * @var string
+     */
     public $message;
     
-    /** @var \Exception Auslösende Exception, falls vorhanden */
+    /**
+     * Auslösende Exception, falls vorhanden
+     * @var \Exception
+     */
     public $exception;
     
-    /** @var array Stack-Trace, falls vorhanden */
+    /**
+     * Stack-Trace, falls vorhanden
+     * @var array
+     */
     public $backtrace;
     
-    /** @var string Informationen zur auslösenden Zeile, falls vorhanden */
+    /**
+     * Informationen zur auslösenden Zeile, falls vorhanden
+     * @var string
+     */
     public $line;
     
-    // </editor-fold>
-    
-    
-    // <editor-fold desc="Konstruktoren">
-
     /**
      * Erzeugt ein neues zu protokollierendes Ereignis
      * @param int $level Log-Level
@@ -58,6 +66,4 @@ class Event {
         $this->backtrace = $backtrace;
         $this->line = $line;
     }
-    
-    // </editor-fold>
 }

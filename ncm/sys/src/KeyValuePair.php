@@ -24,16 +24,22 @@ namespace Ubergeek;
  */
 final class KeyValuePair {
     
-    /** @var string Schlüssel */
+    /**
+     * Schlüssel
+     * @var string
+     */
     public $key;
 
-    /** @var mixed Wert */
+    /**
+     * Wert
+     * @var mixed
+     */
     public $value;
     
     /**
      * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
      * @param string $key Schlüssel
-     * @param mixed $value Wert
+     * @param object $value Wert
      */
     public function __construct(string $key = null, $value = null) {
         $this->key = $key;

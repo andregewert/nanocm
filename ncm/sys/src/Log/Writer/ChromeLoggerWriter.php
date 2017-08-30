@@ -19,6 +19,10 @@
 
 namespace Ubergeek\Log\Writer;
 
+/**
+ * Nutzt das ChromeLogger-Protokoll, um die Debug-Ausgabe per HTTP-Header an
+ * den Web-Browser zu übergeben
+ */
 class ChromeLoggerWriter implements WriterInterface {
     
     private $chromeLogger;

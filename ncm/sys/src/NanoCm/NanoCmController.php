@@ -24,22 +24,27 @@ namespace Ubergeek\NanoCm;
  */
 class NanoCmController extends \Ubergeek\Controller\HttpController {
     
-    /** @var ContentManager Enthält eine Referenz auf den ContentManager */
+    /**
+     * Enthält eine Referenz auf den ContentManager
+     * @var ContentManager
+     */
     var $cm;
     
     /**
-     * @var string Verweis auf das System-Verzeichnis des NanoCM
+     * Verweis auf das System-Verzeichnis des NanoCM
+     * @var string
      */
     private $sysdir;
     
     /**
-     * @var string Verweis auf das öffentliche Verzeichnis (HTTP-ROOT)
+     * Verweis auf das öffentliche Verzeichnis (HTTP-ROOT)
+     * @var string
      */
     private $pubdir;
     
     /**
-     * @var type Name des Seiten-Templates, in das der Inhalt eingeschlossen
-     * werden soll
+     * Name des Seiten-Templates, in das der Inhalt eingeschlossen werden soll
+     * @var string
      */
     private $frametpl;
     

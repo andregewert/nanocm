@@ -17,3 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+namespace Ubergeek\Log\Writer;
+
+class ControllerWriter implements WriterInterface {
+    
+    public function close() {
+        
+    }
+
+    public function flush() {
+        
+    }
+
+    public function write(\Ubergeek\Log\Event $event) {
+        
+    }
+
+}
