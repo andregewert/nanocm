@@ -79,7 +79,7 @@ class Logger implements LoggerInterface {
         }
     }
 
-    public function debug($msg, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function debug(string $msg, \Exception $ex = null, array $backtrace = null, string $line = '') {
         if ($backtrace == null) {
             $backtrace = debug_backtrace();
         }

@@ -66,6 +66,10 @@ class ContentManager {
         return self::$cm;
     }
     
+    /**
+     * Gibt die Referenz auf den verwendeten Logger zurück
+     * @return \Ubergeek\Log\Logger
+     */
     public function getLog() : Log\Logger {
         return $this->log;
     }

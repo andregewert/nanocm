@@ -28,7 +28,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * Enthält eine Referenz auf den ContentManager
      * @var ContentManager
      */
-    var $cm;
+    private $cm;
     
     /**
      * Verweis auf das System-Verzeichnis des NanoCM
@@ -48,10 +48,24 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      */
     private $frametpl;
     
+    /**
+     * Absoluter Pfad zum Verzeichnis mit Site-spezifischen Dateien
+     * @var string
+     */
     private $sitedir;
     
+    /**
+     * Optionale Logger-Instanz
+     * @var \Ubergeek\Log\Logger
+     */
     private $logger;
     
+    /**
+     * Dem Konstruktor wird lediglich der absolute Pfad zum öffentlichen
+     * Verzeichnis übergeben, also üblicherweise der Pfad, in dem die zentrale
+     * index.php liegt.
+     * @param string $pubdir
+     */
     public function __construct(string $pubdir) {
         $this->cm = ContentManager::getInstance($pubdir);
         
@@ -59,10 +73,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         $this->sysdir = $this->createPath(array($pubdir, 'ncm', 'sys'));
         $this->sitedir = $this->createPath(array($pubdir, 'site'));
         
-        //echo "Pubdir: $this->pubdir<br>";
-        //echo "Sysdir: $this->sysdir<br>";
-        
-        // Datenbankverbindung herstellen
+        // Datenbankverbindung herstellen (und testen!)
         
         // Optional: Wenn DB nicht vorhanden, auf Installer umleiten
         
@@ -70,6 +81,10 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
 
     }
     
+    /**
+     * Arbeitet den aktuellen Request ab und erzeugt eine entsprechende Antwort
+     * (Response)
+     */
     public function run() {
         // Fehlerbehandlung
         
@@ -83,15 +98,19 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         
         // Content ausgeben
         
-        $content = $this->renderUserTemplate('frame', 'page.phtml');
-        $this->setContent($content);
+        // Eigentlichen Inhalt rendern
+        try {
+            $this->setContent($this->renderUserTemplate('content', 'dummy.phtml'));
+        } catch (\Exception $ex) {
+            $this->setContent($this->renderUserTemplate('content', 'Exception.phtml'));
+        }
+        
+        // Äußeres Template rendern
+        $this->setContent($this->renderUserTemplate('frame', 'page.phtml'));
         
         $this->cm->getLog()->debug('Testnachricht 1');
         $this->cm->getLog()->flushWriters();
         $this->cm->getLog()->closeWriters();
-        
-        //if ($this->cm->getLog()->has)
-        //$this->addMeta('X-ChromeLogger-Data', $this->logger->createOutputString());
     }
     
     protected function parseRequestUri() {
@@ -106,7 +125,6 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
             $category,
             $file
         ));
-        //echo $fname . "<br>";
         
         if (!file_exists($fname)) {
             $fname = $this->createPath(array(
@@ -116,7 +134,6 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
                 $file
             ));
         }
-        //echo $fname . "<br>";
         
         if (!file_exists($fname)) {
             throw new Exception("Template file not found: $category/$file");
@@ -128,35 +145,12 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         ob_end_clean();
         return $c;
     }
-
-    /*
-    protected function renderUserTemplate(string $tpl) : string {
-        // Prüfen: benutzerdefiniertes Template vorhanden?
-        // Dann: dieses rendern
-        // Andernfalls: System-Vorgabe rendern
-        
-        if (file_exists($this->createPath(array(
-            $this->pubdir, $tpl
-        )))) {
-            ob_start();
-            include $this->createPath(array($this->pubdir, 'tpl', $tpl));
-            $c = ob_get_contents();
-            ob_end_clean();
-            return $c;
-        } else if (file_exists($this->createPath(array(
-            $this->sysdir, $tpl
-        )))) {
-            ob_start();
-            include $this->createPath(array($this->sysdir, 'tpl', $tpl));
-            $c = ob_get_contents();
-            ob_end_clean();
-            return $c;
-        }
-        throw new \Exception('Template not found: ' . $tpl);
-    }
-    */
+    
+    // <editor-fold desc="Interne Methoden">
     
     private function createPath(array $parts) : string {
         return join(DIRECTORY_SEPARATOR, $parts);
     }
+    
+    // </editor-fold>
 }

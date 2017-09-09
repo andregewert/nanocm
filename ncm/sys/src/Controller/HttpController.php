@@ -21,26 +21,33 @@ namespace Ubergeek\Controller;
 
 abstract class HttpController implements ControllerInterface {
     
+    // <editor-fold desc="Properties">
+    
     /**
-     * @var array Ein Array mit den zu sendenden HTTP-Headern; abgebildet als
-     * KeyValuePair
+     * Ein Array mit den zu sendenden HTTP-Headern; abgebildet als KeyValuePair
+     * @var array
      */
     protected $headers = array();
 
     /**
-     * @var array Enthält die generierten Inhalte
+     * Enthält die generierten Inhalte
+     * @var array
      */
     protected $contents = array();
     
     /**
-     * @var array Enthält benutzerdefinierte Variablen
+     * Enthält benutzerdefinierte Variablen
+     * @var array
      */
     protected $vars = array();
     
     /**
-     * @var string Seitentitel
+     * Seitentitel
+     * @var string
      */
     protected $title = "Unknown page";
+    
+    // </editor-fold>
 
     /**
      * Fügt einem Inhaltsbereich den übergebenen Content hinzu
@@ -189,11 +196,23 @@ abstract class HttpController implements ControllerInterface {
         return $this->title;
     }
 
+    /**
+     * Kann überschrieben werden, um in konkreten Implementierungen
+     * Initialisierungsaufgaben vor dem eigentlichen Programm-Ablauf
+     * durchzuführen
+     */
     public function init() {
         // Initialisierungsaufgaben durchführen
         // In der Basis-Implementierung passiert hier nicht viel
     }
 
+    /**
+     * Führt den Controller bzw. das eigentliche Programm aus.
+     * 
+     * Die Methode führt die eigentliche Anwendung aus. Dazu gehört, den
+     * aktuellen Request korrekt zu interpretieren und ein entsprechendes
+     * Ergebnis zusammen zu stellen.
+     */
     public final function execute() {
         $this->init();
         $this->run();
@@ -208,8 +227,5 @@ abstract class HttpController implements ControllerInterface {
         
         // Content ausgeben -> in Output buffer
         echo $this->getContent();
-        
-        // Gepufferten Inhalt in Frame-Template ausgeben
-        // ...
     }
 }

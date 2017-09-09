@@ -23,5 +23,12 @@ namespace Ubergeek\Log;
  * Bildet das Log-Interface ab, gegen das die Klassen programmiert werden sollen
  */
 interface LoggerInterface {
-    function debug($msg, \Exception $ex = null, array $backtrace = null, string $line = '');
+    /**
+     * Gibt eine Debug-Meldung an den Logger weiter
+     * @param string $msg
+     * @param \Exception $ex Optionale Referenz auf die auslösende Exception
+     * @param array $backtrace
+     * @param string $line
+     */
+    function debug(string $msg, \Exception $ex = null, array $backtrace = null, string $line = '');
 }
