@@ -17,17 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-spl_autoload_register(function($class) {
-    
-    // TODO Der Autoloader sollte erweitert werden um konfigurierbare
-    // Pfade mit entsprechenden Präfixes
-    
-    $filename = preg_replace('/^Ubergeek/', '', str_replace('\\', DIRECTORY_SEPARATOR, $class));
-    $filename = __DIR__ . $filename . '.php';
+namespace Ubergeek;
 
-    if (!file_exists($filename)) {
-        throw new ErrorException('Class not found: ' . $class);
-    }
-    
-    require $filename;
-});
+class NanoCm {
+
+    // <editor-fold desc="Constants">
+
+    const VAR_BASE_DIR = 'dummy test';
+
+    // </editor-fold>
+
+}

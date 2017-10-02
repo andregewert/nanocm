@@ -24,6 +24,13 @@ namespace Ubergeek\NanoCm;
  */
 class NanoCmController extends \Ubergeek\Controller\HttpController {
     
+    // <editor-fold desc="Constants">
+
+    const VAR_SYSDIR = 'system.sysdir';
+    
+    // </editor-fold>
+    
+    
     /**
      * Enthält eine Referenz auf den ContentManager
      * @var ContentManager
@@ -118,6 +125,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
     protected function parseRequestUri() {
         // ...
         // Anhand der Request-URI aufzurufendes Modul etc. ermitteln
+        // Passendes Datenmodell dafür entwickeln
     }
     
     /**
@@ -127,6 +135,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * @return string Inhalt des gerenderten Templates
      * @throws \Exception Exceptions, die bei der Ausführung des Templates
      *      geworfen werden, werden weitergeworfen
+     * @todo Prüfung, ob Templates in ZIP-Dateien verpackt verarbeitet werden können
      */
     protected function renderUserTemplate(string $file) : string {
         $fname = $this->createPath(array(
