@@ -60,6 +60,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      */
     private $logger;
     
+    
     /**
      * Dem Konstruktor wird lediglich der absolute Pfad zum öffentlichen
      * Verzeichnis übergeben, also üblicherweise der Pfad, in dem die zentrale
@@ -100,13 +101,14 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         
         // Eigentlichen Inhalt rendern
         try {
-            $this->setContent($this->renderUserTemplate('content', 'dummy.phtml'));
+            $content = $this->renderUserTemplate('test.phtml');
         } catch (\Exception $ex) {
-            $this->setContent($this->renderUserTemplate('content', 'Exception.phtml'));
+            $content = $this->renderUserTemplate('exception.phtml');
         }
+        $this->setContent($content);
         
         // Äußeres Template rendern
-        $this->setContent($this->renderUserTemplate('frame', 'page.phtml'));
+        $this->setContent($this->renderUserTemplate('page-standard.phtml'));
         
         $this->cm->getLog()->debug('Testnachricht 1');
         $this->cm->getLog()->flushWriters();
@@ -118,11 +120,18 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         // Anhand der Request-URI aufzurufendes Modul etc. ermitteln
     }
     
-    protected function renderUserTemplate(string $category, string $file) : string {
+    /**
+     * Rendert ein Template, das installations-spezifisch überschrieben werden
+     * kann.
+     * @param string $file Das zu rendernde Template (ohne Pfadangabe)
+     * @return string Inhalt des gerenderten Templates
+     * @throws \Exception Exceptions, die bei der Ausführung des Templates
+     *      geworfen werden, werden weitergeworfen
+     */
+    protected function renderUserTemplate(string $file) : string {
         $fname = $this->createPath(array(
             $this->sitedir,
             'tpl',
-            $category,
             $file
         ));
         
@@ -130,7 +139,6 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
             $fname = $this->createPath(array(
                 $this->sysdir,
                 'tpl',
-                $category,
                 $file
             ));
         }
@@ -140,9 +148,14 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         }
         
         ob_start();
-        include($fname);
-        $c = ob_get_contents();
-        ob_end_clean();
+        try {
+            include($fname);
+            $c = ob_get_contents();
+        } catch (\Exception $ex) {
+            throw $ex;
+        } finally {
+            ob_end_clean();
+        }
         return $c;
     }
     

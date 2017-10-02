@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title><?php echo htmlentities($this->getTitle()); ?></title>
+    </head>
+    <body>
+        <table border="1" width="100%">
+            <tr>
+                <th>Test-Template (Page)</th>
+            </tr>
+            <tr>
+                <td><?php echo $this->getContent(); ?></td>
+            </tr>
+        </table>        
+    </body>
+</html>

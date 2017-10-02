@@ -1,4 +1,3 @@
 /nbproject/
-/site/
 /ncm/sys/cache/
-/ncm/sys/db/
+/ncm/sys/db/site.sqlite
