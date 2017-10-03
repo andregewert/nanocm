@@ -33,7 +33,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
     
     /**
      * Enthält eine Referenz auf den ContentManager
-     * @var ContentManager
+     * @var \Ubergeek\NanoCm
      */
     private $cm;
     
@@ -75,7 +75,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * @param string $pubdir
      */
     public function __construct(string $pubdir) {
-        $this->cm = ContentManager::getInstance($pubdir);
+        $this->cm = \Ubergeek\NanoCm::getInstance($pubdir);
         
         $this->pubdir = $pubdir;
         $this->sysdir = $this->createPath(array($pubdir, 'ncm', 'sys'));
