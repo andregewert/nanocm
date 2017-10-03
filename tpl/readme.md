@@ -4,6 +4,4 @@ Dieses Verzeichnis kann verwendet werden, um benutzerdefinierte Templates zu def
 
 Wird hier ein Template mit gleichem Namen gefunden, so hat es Vorrang vor dem entsprechenden Standard-Template.
 
-##Idee
-
-Templates in einer definierten Struktur als einfach austauschbares ZIP-File bereitstellen.
+- Eventuell Pfad zum Template-Verzeichnis konfigurierbar machen?
