@@ -21,21 +21,15 @@ namespace Ubergeek\NanoCm;
 
 /**
  * Basis-Anwendung für das Nano CM
+ * @author agewert@ubergeek.de
  */
 class NanoCmController extends \Ubergeek\Controller\HttpController {
-    
-    // <editor-fold desc="Constants">
 
-    const VAR_SYSDIR = 'system.sysdir';
-    
-    // </editor-fold>
-    
-    
     /**
      * Enthält eine Referenz auf den ContentManager
      * @var \Ubergeek\NanoCm
      */
-    private $cm;
+    private $ncm;
     
     /**
      * Verweis auf das System-Verzeichnis des NanoCM
@@ -75,18 +69,13 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * @param string $pubdir
      */
     public function __construct(string $pubdir) {
-        $this->cm = \Ubergeek\NanoCm::getInstance($pubdir);
+        $this->ncm = \Ubergeek\NanoCm::getInstance($pubdir);
         
         $this->pubdir = $pubdir;
         $this->sysdir = $this->createPath(array($pubdir, 'ncm', 'sys'));
         $this->sitedir = $this->createPath(array($pubdir, 'site'));
         
-        // Datenbankverbindung herstellen (und testen!)
-        
-        // Optional: Wenn DB nicht vorhanden, auf Installer umleiten
-        
         // Logging initialisieren
-
     }
     
     /**
@@ -94,7 +83,10 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * (Response)
      */
     public function run() {
-        // Fehlerbehandlung
+        // Wenn Installation noch nicht konfiguriert: Einrichtungsassistenten
+        // ausführen
+        
+        // Datenbankverbindung herstellen (und testen!)
         
         // Request parsen
         
@@ -107,6 +99,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         // Content ausgeben
         
         // Eigentlichen Inhalt rendern
+        
         try {
             $content = $this->renderUserTemplate('test.phtml');
         } catch (\Exception $ex) {
@@ -117,9 +110,9 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         // Äußeres Template rendern
         $this->setContent($this->renderUserTemplate('page-standard.phtml'));
         
-        $this->cm->getLog()->debug('Testnachricht 1');
-        $this->cm->getLog()->flushWriters();
-        $this->cm->getLog()->closeWriters();
+        $this->ncm->getLog()->debug('Testnachricht 1');
+        $this->ncm->getLog()->flushWriters();
+        $this->ncm->getLog()->closeWriters();
     }
     
     protected function parseRequestUri() {
@@ -135,9 +128,12 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * @return string Inhalt des gerenderten Templates
      * @throws \Exception Exceptions, die bei der Ausführung des Templates
      *      geworfen werden, werden weitergeworfen
-     * @todo Prüfung, ob Templates in ZIP-Dateien verpackt verarbeitet werden können
+     * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
      */
     protected function renderUserTemplate(string $file) : string {
+        
+        // TODO Kontext-Objekt erstellen / deklarieren
+        
         $fname = $this->createPath(array(
             $this->sitedir,
             'tpl',
@@ -168,8 +164,15 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         return $c;
     }
     
+    
     // <editor-fold desc="Interne Methoden">
     
+    /**
+     * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
+     * zu einer Pfadangabe zusammen
+     * @param array $parts Pfadbestandteile
+     * @return string Der zusammengesetzte Pfad
+     */
     private function createPath(array $parts) : string {
         return join(DIRECTORY_SEPARATOR, $parts);
     }

@@ -82,4 +82,21 @@ class NanoCm {
     public function getLog() : Log\Logger {
         return $this->log;
     }
+    
+    /**
+     * Überprüft, ob die aktuelle NanoCM-Installation bereits korrekt
+     * konfiguriert ist. Wenn dies nicht der Fall ist, wird der Controller einen
+     * einfachen Konfigurations-Assistenten starten und die Datenbanken
+     * initialisieren.
+     * @todo Implementieren
+     * @return true, wenn die Installation korrekt konfiguriert ist
+     */
+    public function isNanoCmConfigured() : bool {
+        
+        // Prüfen, ob Datenbank vorhanden
+        
+        // Basiseinstellungen validieren
+        
+        return false;
+    }
 }
