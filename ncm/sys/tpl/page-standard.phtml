@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<?php
+    /**
+     * @var \Ubergeek\NanoCm\NanoCmController;
+     */
+    $c = $this;
+?>
 <html lange="de">
     <head>
         <meta charset="utf-8">        
@@ -51,6 +57,9 @@
             <hr>
             <footer>
                 <p>&copy; Andr&eacute; Gewert 2017</p>
+                <p>
+<?php echo $c->db()->getCopyrightNotice(); ?>
+                </p>
             </footer>
         </div>
         

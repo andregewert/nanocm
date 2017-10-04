@@ -29,39 +29,8 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * Enthält eine Referenz auf den ContentManager
      * @var \Ubergeek\NanoCm
      */
-    private $ncm;
-    
-    /**
-     * Verweis auf das System-Verzeichnis des NanoCM
-     * @var string
-     */
-    private $sysdir;
-    
-    /**
-     * Verweis auf das öffentliche Verzeichnis (HTTP-ROOT)
-     * @var string
-     */
-    private $pubdir;
-    
-    /**
-     * Name des Seiten-Templates, in das der Inhalt eingeschlossen werden soll
-     * @var string
-     */
-    private $frametpl;
-    
-    /**
-     * Absoluter Pfad zum Verzeichnis mit Site-spezifischen Dateien
-     * @var string
-     */
-    private $sitedir;
-    
-    /**
-     * Optionale Logger-Instanz
-     * @var \Ubergeek\Log\Logger
-     */
-    private $logger;
-    
-    
+    public $ncm;
+
     /**
      * Dem Konstruktor wird lediglich der absolute Pfad zum öffentlichen
      * Verzeichnis übergeben, also üblicherweise der Pfad, in dem die zentrale
@@ -70,12 +39,6 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      */
     public function __construct(string $pubdir) {
         $this->ncm = \Ubergeek\NanoCm::getInstance($pubdir);
-        
-        $this->pubdir = $pubdir;
-        $this->sysdir = $this->createPath(array($pubdir, 'ncm', 'sys'));
-        $this->sitedir = $this->createPath(array($pubdir, 'site'));
-        
-        // Logging initialisieren
     }
     
     /**
@@ -115,7 +78,11 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         $this->ncm->getLog()->closeWriters();
     }
     
-    protected function parseRequestUri() {
+    public function db() : DbMapper {
+        return $this->ncm->dbMapper;
+    }
+    
+    public function parseRequestUri() {
         // ...
         // Anhand der Request-URI aufzurufendes Modul etc. ermitteln
         // Passendes Datenmodell dafür entwickeln
@@ -130,19 +97,21 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      *      geworfen werden, werden weitergeworfen
      * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
      */
-    protected function renderUserTemplate(string $file) : string {
+    public function renderUserTemplate(string $file) : string {
         
         // TODO Kontext-Objekt erstellen / deklarieren
         
-        $fname = $this->createPath(array(
-            $this->sitedir,
+        // TODO Prüfen, ob ein spezielles Template-Verzeichnis konfiguriert ist
+        
+        $fname = $this->ncm->createPath(array(
+            $this->ncm->pubdir,
             'tpl',
             $file
         ));
         
         if (!file_exists($fname)) {
-            $fname = $this->createPath(array(
-                $this->sysdir,
+            $fname = $this->ncm->createPath(array(
+                $this->ncm->sysdir,
                 'tpl',
                 $file
             ));
@@ -152,6 +121,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
             throw new Exception("Template file not found: $category/$file");
         }
         
+        // Ermitteltes Template einbinden
         ob_start();
         try {
             include($fname);
@@ -161,21 +131,15 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         } finally {
             ob_end_clean();
         }
+        
         return $c;
     }
     
-    
-    // <editor-fold desc="Interne Methoden">
-    
     /**
-     * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
-     * zu einer Pfadangabe zusammen
-     * @param array $parts Pfadbestandteile
-     * @return string Der zusammengesetzte Pfad
+     * Bindet an Ort und Stelle ein Template ein
+     * @param string $file Relativer Pfad zum betreffenden Template
      */
-    private function createPath(array $parts) : string {
-        return join(DIRECTORY_SEPARATOR, $parts);
+    public function includeUserTemplate(string $file) {
+        echo $this->renderUserTemplate($file);
     }
-    
-    // </editor-fold>
 }

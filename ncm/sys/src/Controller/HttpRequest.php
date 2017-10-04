@@ -18,7 +18,21 @@
  */
 
 namespace Ubergeek\Controller;
+use Ubergeek\Net;
 
+/**
+ * Kapselt Informationen zu einen konkreten HTTP-Request
+ * @author agewert@ubergeek.de
+ */
 class HttpRequest {
-    // ...
+
+    /**
+     * Die angeforderte URL
+     * @var \Ubergeek\Net\Url
+     */
+    public $requestUri;
+    
+    public function __construct() {
+        $this->requestUri = new Url();
+    }
 }

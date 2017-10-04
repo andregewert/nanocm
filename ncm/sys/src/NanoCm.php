@@ -20,41 +20,92 @@
 namespace Ubergeek;
 use Ubergeek\Log;
 
-
+/**
+ * Basis-Logikklasse für das CMS
+ * @author agewert@ubergeek.de
+ */
 class NanoCm {
-
-    // <editor-fold desc="Constants">
-
-    /**
-     * Pfad zum Basisverzeichnis der Installation
-     */
-    const VAR_SYS_BASEDIR = 'sys.basedir';
+    
+    // <editor-fold desc="Internal properties">
     
     /**
-     * Pfad zum (installations-spezifischen) Template-Pfad.
-     * Hier sollten auch zugehörige Images, Scripte etc. liegen
+     * Beinhaltet die ContentManager-Instanz
+     * @var \Ubergeek\NanoCm
      */
-    const VAR_SYS_TPLDIR = 'sys.tpldir';
+    private static $cm = null;
+    
+    /**
+     * Handle für die Basis-Datenbank
+     * @var \PDO
+     */
+    public $basedb = null;
+    
+    /**
+     * Referenz auf eine Instanz der ORM-Klasse
+     * @var NanoCm\DbMapper
+     */
+    public $dbMapper = null;
     
     // </editor-fold>
     
     
-    /**
-     * Beinhaltet die ContentManager-Instanz
-     * @var ContentManager
-     */
-    private static $cm = null;
+    // <editor-fold desc="Public properties">
     
     /**
      * Log-Instanz
      * @var Log\Logger
      */
-    private $log;
+    public $log;
     
+    /**
+     * Absoluter Dateipfad zum öffentlichen Verzeichnis der Installationsbasis
+     * (in der Regel das Document Root)
+     * @var string
+     */
+    public $pubdir;
+    
+    /**
+     * Absoluter Dateipfad zum user-spezifischen Template-Pfad.
+     * Achtung: Dieses Verzeichnis kann optional über die Systemeinstellungen um
+     * einen weiteren Verzeichnisbestandteil ergänzt werden, um ohne Kopieren
+     * und Löschen von Dateien zwischen Templates hin- und hergeschaltet werden
+     * kann.
+     * @var string
+     */
+    public $tpldir;
+    
+    /**
+     * Absoluter Dateipfad zum NCM-Untervezeichnis
+     * @var string 
+     */
+    public $ncmdir;
+    
+    /**
+     * Absoluter Dateipfad zum Verzeichnis mit den Systemdateien des NCM
+     * @var string
+     */
+    public $sysdir;
+    
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="Internal methods">
+    
+    /**
+     * Dem Konstruktur muss der Pfad zur Installationsbasis übergeben werden.
+     * Der Konstruktor ist als private deklariert, da die Klasse als Singleton
+     * implementiert ist.
+     * @param string $basepath
+     */
     private function __construct($basepath) {
-        // TODO Pfade konfigurieren
-
-        // TODO Zugriff auf die Datenbank herstellen
+        // Pfade konfigurieren
+        $this->pubdir = $basepath;
+        $this->tpldir = $this->createPath(array($this->pubdir, 'tpl'));
+        $this->ncmdir = $this->createPath(array($this->pubdir, 'ncm'));
+        $this->sysdir = $this->createPath(array($this->pubdir, 'ncm', 'sys'));
+        
+        // Zugriff auf die Datenbank herstellen
+        $this->dbMapper = new NanoCm\DbMapper($this->getDbHandle());
         
         // TODO Instanziierung nur, wenn Logging eingeschaltet
         $this->log = new Log\Logger();
@@ -62,6 +113,29 @@ class NanoCm {
             new Log\Writer\ChromeLoggerWriter()
         );
     }
+    
+    /**
+     * Gibt das Datenbank-Handle für die Standard-System-Datenbank zurück
+     * @return \PDO
+     */
+    protected function getDbHandle() : \PDO {
+        if ($this->basedb == null) {
+            $this->basedb = new \PDO(
+                'sqlite:' . $this->createPath(array(
+                    $this->sysdir,
+                    'db',
+                    'site.sqlite'
+                ))
+            );
+            $this->basedb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        }
+        return $this->basedb;
+    }
+    
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="Public methods">
     
     /**
      * Gibt die (einzige) CM-Instanz zurück bzw erzeugt sie bei Bedarf
@@ -99,4 +173,26 @@ class NanoCm {
         
         return false;
     }
+    
+    /**
+     * Fügt eine URL (als String) zusammen
+     * @param array $parts Bestandteile
+     * @param bool $absolute Gibt an, ob die URL absolut (inklusive Protokoll
+     * und Hostname) sein soll
+     */
+    public function createUrl(array $parts, bool $absolute = false) : string {
+        // TODO Implementieren
+    }
+    
+    /**
+     * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
+     * zu einer Pfadangabe zusammen
+     * @param array $parts Pfadbestandteile
+     * @return string Der zusammengesetzte Pfad
+     */
+    public function createPath(array $parts) : string {
+        return join(DIRECTORY_SEPARATOR, $parts);
+    }
+    
+    // </editor-fold>
 }

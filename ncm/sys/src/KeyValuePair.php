@@ -22,7 +22,7 @@ namespace Ubergeek;
 /**
  * Bildet ein Schlüssel-Wert-Paar ab
  */
-final class KeyValuePair {
+class KeyValuePair {
     
     /**
      * Schlüssel
