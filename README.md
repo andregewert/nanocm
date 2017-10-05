@@ -14,7 +14,16 @@ Weitere Ziele bei der Entwicklung von NanoCM waren und sind:
 - Service-orientierte Architektur, die eine einfache Anbindung zusätzlicher Clients ermöglicht
 - Clean Code: Die PHP-Quellen sollen klar strukturiert und einfach wartbar sein
 
+#Mitmachen
+
+Der Autor freut sich über jede Person, die zu diesem Projekt beitragen möchte. Dafür ist das Code-Repository frei zugänglich; jede(r) kann also das Projekt klonen und Pull Request einreichen. Gerne kann vorab auch Kontakt zum Autor hergestellt werden, um Ideen, offene Baustellen usw. zu besprechen.
+
+Als Entwicklungsumgebung wird vom Autor Netbeans verwendet. Auch PHPStorm wurde getestet und eignet sich gut. Erfahrungsberichte mit anderen Entwicklungsumgebungen werden gerne entgegengenommen.
+
+// TODO Link auf das öffentliche Repo bereitstellen
+
 #Autor
+
 André Gewert  
 agewert@gmail.com  
 www.ubergeek.de

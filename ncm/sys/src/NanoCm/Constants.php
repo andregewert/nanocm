@@ -18,7 +18,6 @@
  */
 
 namespace Ubergeek\NanoCm;
-use Ubergeek\Log;
 
 /**
  * Enthält eine Reihe von Standard-Konstanten, um den Zugriff auf vordefinierte
@@ -37,6 +36,11 @@ abstract class Constants {
      * Relativer Pfad zum zu benutzenden HTML-Template
      */
     const SETTING_SYSTEM_TPLDIR = 'system.tpldir';
+    
+    /**
+     * Seitentitel
+     */
+    const SETTING_SYSTEM_PAGETITLE = 'system.pagetitle';
     
     /**
      * Copyright- bzw. Footer-Hinweis

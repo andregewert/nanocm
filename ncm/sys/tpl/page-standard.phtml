@@ -1,16 +1,13 @@
-<!DOCTYPE html>
 <?php
-    /**
-     * @var \Ubergeek\NanoCm\NanoCmController;
-     */
-    $c = $this;
+$this->setTitle($this->ncm->orm->getPageTitle());
 ?>
+<!DOCTYPE html>
 <html lange="de">
     <head>
         <meta charset="utf-8">        
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-        <title><?php echo htmlentities($this->getTitle()); ?></title>
+        <title><?php echo $this->html($this->getTitle()); ?></title>
         <style type="text/css">
             body {
                 padding-top: 3.5rem;
@@ -56,10 +53,7 @@
         <div class="container">
             <hr>
             <footer>
-                <p>&copy; Andr&eacute; Gewert 2017</p>
-                <p>
-<?php echo $c->db()->getCopyrightNotice(); ?>
-                </p>
+                <p><?php echo $this->html($this->ncm->orm->getCopyrightNotice()); ?></p>
             </footer>
         </div>
         

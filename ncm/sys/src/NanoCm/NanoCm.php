@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek;
+namespace Ubergeek\NanoCm;
 use Ubergeek\Log;
 
 /**
@@ -32,7 +32,12 @@ class NanoCm {
      * Beinhaltet die ContentManager-Instanz
      * @var \Ubergeek\NanoCm
      */
-    private static $cm = null;
+    private static $ncm = null;
+    
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="Public properties">
     
     /**
      * Handle für die Basis-Datenbank
@@ -44,13 +49,8 @@ class NanoCm {
      * Referenz auf eine Instanz der ORM-Klasse
      * @var NanoCm\DbMapper
      */
-    public $dbMapper = null;
-    
-    // </editor-fold>
-    
-    
-    // <editor-fold desc="Public properties">
-    
+    public $orm = null;
+
     /**
      * Log-Instanz
      * @var Log\Logger
@@ -105,7 +105,7 @@ class NanoCm {
         $this->sysdir = $this->createPath(array($this->pubdir, 'ncm', 'sys'));
         
         // Zugriff auf die Datenbank herstellen
-        $this->dbMapper = new NanoCm\DbMapper($this->getDbHandle());
+        $this->orm = new Orm($this->getDbHandle());
         
         // TODO Instanziierung nur, wenn Logging eingeschaltet
         $this->log = new Log\Logger();
@@ -142,11 +142,9 @@ class NanoCm {
      * @param string $basepath
      * @return \Ubergeek\NanoCm\ContentManager
      */
-    public static function getInstance(string $basepath) : NanoCm {
-        if (self::$cm == null) {
-            self::$cm = new NanoCm($basepath);
-        }
-        return self::$cm;
+    public static function createInstance(string $basepath) : NanoCm {
+        self::$ncm = new NanoCm($basepath);
+        return self::$ncm;
     }
     
     /**

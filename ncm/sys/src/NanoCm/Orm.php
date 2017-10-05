@@ -18,13 +18,12 @@
  */
 
 namespace Ubergeek\NanoCm;
-use Ubergeek\Log;
 
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.
  * @author agewert@ubergeek.de
  */
-class DbMapper {
+class Orm {
     
     /**
      * Handle für die Basis-Datenbank
@@ -107,6 +106,13 @@ class DbMapper {
      */
     public function getCopyrightNotice() {
         return $this->getSettingValue(Constants::SETTING_SYSTEM_COPYRIGHTNOTICE, '');
+    }
+    
+    /**
+     * Gibt den Standard-Seitentitel zurück
+     */
+    public function getPageTitle() {
+        return $this->getSettingValue(Constants::SETTING_SYSTEM_PAGETITLE);
     }
     
     // </editor-fold>

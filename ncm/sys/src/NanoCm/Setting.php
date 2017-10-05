@@ -18,7 +18,6 @@
  */
 
 namespace Ubergeek\NanoCm;
-use Ubergeek\Log;
 
 /**
  * Bildet einen Eintrag aus den nanocm-Systemeinstellungen ab

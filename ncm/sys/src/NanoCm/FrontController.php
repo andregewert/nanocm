@@ -23,11 +23,11 @@ namespace Ubergeek\NanoCm;
  * Basis-Anwendung für das Nano CM
  * @author agewert@ubergeek.de
  */
-class NanoCmController extends \Ubergeek\Controller\HttpController {
-
+class FrontController extends \Ubergeek\Controller\HttpController {
+    
     /**
      * Enthält eine Referenz auf den ContentManager
-     * @var \Ubergeek\NanoCm
+     * @var \Ubergeek\NanoCm\NanoCm
      */
     public $ncm;
 
@@ -38,7 +38,7 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      * @param string $pubdir
      */
     public function __construct(string $pubdir) {
-        $this->ncm = \Ubergeek\NanoCm::getInstance($pubdir);
+        $this->ncm = NanoCm::createInstance($pubdir);
     }
     
     /**
@@ -78,15 +78,13 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
         $this->ncm->getLog()->closeWriters();
     }
     
-    public function db() : DbMapper {
-        return $this->ncm->dbMapper;
-    }
-    
+    /*
     public function parseRequestUri() {
         // ...
         // Anhand der Request-URI aufzurufendes Modul etc. ermitteln
         // Passendes Datenmodell dafür entwickeln
     }
+    */
     
     /**
      * Rendert ein Template, das installations-spezifisch überschrieben werden
@@ -141,5 +139,15 @@ class NanoCmController extends \Ubergeek\Controller\HttpController {
      */
     public function includeUserTemplate(string $file) {
         echo $this->renderUserTemplate($file);
+    }
+    
+    /**
+     * Kodiert einen String für die HTML-Ausgabe.
+     * Der Eingabestring muss UTF8-kodiert sein.
+     * @param string $string
+     * @return HTML-kodierter String
+     */
+    public function html($string) : string {
+        return htmlentities($string, ENT_HTML5, 'utf-8');
     }
 }

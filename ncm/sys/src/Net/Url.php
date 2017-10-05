@@ -52,7 +52,7 @@ class Url {
 
     
     public function __construct(\Ubergeek\Controller\HttpRequest $httpRequest = null) {
-        if ($request == null) {
+        if ($httpRequest == null) {
             $this->protocol = (isset($_SERVER['HTTPS']))? 'https' : 'http';
             $this->host = $_SERVER['HTTP_HOST'];
             $this->document = $_SERVER['REQUEST_URI'];
@@ -66,7 +66,9 @@ class Url {
     
     public function getParams(string $separator = '?') : string {
         $arr = explode($separator, $this->document, 2);
-        if (count($arr) >= 2) return $arr[1];
+        if (count($arr) >= 2) {
+            return $arr[1];
+        }
         return '';
    }
 }
