@@ -19,6 +19,10 @@
 
 namespace Ubergeek\Net;
 
+/**
+ * Kapselt die Daten zu einer URL
+ * @author agewert@ubergeek.de
+ */
 class Url {
     
     /**
@@ -30,7 +34,6 @@ class Url {
      * Server-relative URLs
      */
     const TYPE_RELATIVE = 'relative';
-    
     
     /**
      * Das verwendete Protokoll: HTTP oder HTTPS
@@ -45,30 +48,90 @@ class Url {
     public $host;
     
     /**
+     * Explizit gennanter Port oder null
+     * @var integer
+     */
+    public $port;
+    
+    /**
      * Das vollständige angeforderte Dokument, inklusive eventueller Parameter
      * @var string
      */
     public $document;
 
-    
-    public function __construct(\Ubergeek\Controller\HttpRequest $httpRequest = null) {
-        if ($httpRequest == null) {
+    /**
+     * Wenn dem Konstruktor keine Request-URL übergeben wird, dann werden die
+     * Daten aus den Server-Superglobals gefüllt
+     * @param \Ubergeek\Controller\HttpRequest $httpRequest
+     */
+    public function __construct(string $requestUrl = null) {
+        if ($requestUrl == null) {
             $this->protocol = (isset($_SERVER['HTTPS']))? 'https' : 'http';
             $this->host = $_SERVER['HTTP_HOST'];
             $this->document = $_SERVER['REQUEST_URI'];
+        } else {
+            if (preg_match('/^((https?)\:\/\/)(([^\/\:]+)(\:(\d+))?)(.*)$/i', $requestUrl, $matches) !== false) {
+                $this->protocol = $matches[2];
+                $this->host = $matches[4];
+                $this->port = $matches[6];
+                $this->document = $matches[7];
+            } else {
+                throw new \Exception("Ungültige Request-URL übergeben!");
+            }
         }
     }
     
+    /**
+     * Gibt die vollständige angeforderte URL inklusive Protokoll, Port
+     * und Hostnamen als String zurück
+     * @return string Komplette angeforderte URL
+     */
+    public function getRequestUrl() : string {
+        $url = $this->protocol . '://' . $this->host;
+        if (!empty($this->port)) {
+            $url .= ':' . $this->port;
+        }
+        $url .= $this->document;
+        return $url;
+    }
+    
+    /**
+     * Gibt das angeforderte Dokument ohne URL-Parameter zurück
+     * @param string $separator
+     * @return string Angefordertes Dokument ohne URL-Parameter
+     */
     public function getBaseDocument(string $separator = '?') : string {
         $arr = explode($separator, $this->document, 2);
         return $arr[0];
     }
     
+    /**
+     * Gibt die in der URL enthaltenen Parameter als String zurück
+     * @param string $separator
+     * @return string URL-Parameter als String
+     */
     public function getParams(string $separator = '?') : string {
         $arr = explode($separator, $this->document, 2);
         if (count($arr) >= 2) {
             return $arr[1];
         }
         return '';
+   }
+
+   /**
+    * Gibt die in der URL enthaltenen Parameter in Form eines Arrays zurück
+    * @param string $paramSeparator Trennzeichen zwischen den Parametern
+    * @param string $valueSeparator Trennzeichen zwischen Parameternamen und Wert
+    * @param string $docSeparator Trennzeichen zwischen Dokument und Parameter-String
+    * @return array Zerlegte URL-Parameter
+    */
+   public function getParamsArray(string $paramSeparator = '&', string $valueSeparator = '=', string $docSeparator = '&') : array {
+       $params = array();
+       $string = $this->getParams($docSeparator);
+       foreach (explode($paramSeparator, $string) as $param) {
+           list($key, $value) = explode($valueSeparator, $param);
+           $params[$key] = $value;
+       }
+       return $params;
    }
 }

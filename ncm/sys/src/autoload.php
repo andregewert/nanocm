@@ -17,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * Eine simple Autoloader-Implementierung
+ * @todo Konfigurierbares Mapping von Namespaces auf Verzeichnisse implementieren
+ */
 spl_autoload_register(function($class) {
     
     // TODO Der Autoloader sollte erweitert werden um konfigurierbare

@@ -20,5 +20,36 @@
 namespace Ubergeek\Controller;
 
 class HttpResponse {
-    // ...
+
+    /**
+     * HTTP-Statuscode
+     * @var integer
+     */
+    var $statusCode = 200;
+    
+    /**
+     * Zusätzlich zu sendende HTTP-Header
+     * @var array
+     */
+    var $headers;
+
+    /**
+     * Der gesamte als Antwort zu sendende Text
+     * @var string
+     */
+    var $content;
+    
+    /**
+     * Gibt die bis hierher gesammelten HTTP-Header aus
+     */
+    public function sendHeaders() {
+        // TODO Implementieren
+    }
+    
+    /**
+     * Sendet den eigentlichen Antworttext
+     */
+    public function sendContent() {
+        // TODO Implementieren
+    }
 }

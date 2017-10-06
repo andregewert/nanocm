@@ -47,7 +47,25 @@ abstract class HttpController implements ControllerInterface {
      */
     protected $title = "Unknown page";
     
+    /**
+     * HTTP-Anfrage
+     * @var HttpRequest
+     */
+    protected $request;
+    
+    /**
+     * HTTP-Antwort
+     * @var HttpResponse
+     */
+    protected $response;
+    
     // </editor-fold>
+    
+    
+    public function __construct() {
+        $this->request = new HttpRequest();
+        $this->response = new HttpResponse();
+    }
 
     /**
      * Fügt einem Inhaltsbereich den übergebenen Content hinzu

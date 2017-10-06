@@ -38,6 +38,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * @param string $pubdir
      */
     public function __construct(string $pubdir) {
+        parent::__construct();
         $this->ncm = NanoCm::createInstance($pubdir);
     }
     

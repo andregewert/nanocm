@@ -32,7 +32,7 @@ class HttpRequest {
      */
     public $requestUri;
     
-    public function __construct() {
-        $this->requestUri = new Url();
+    public function __construct(string $requestUrl = null) {
+        $this->requestUri = new Net\Url($requestUrl);
     }
 }

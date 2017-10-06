@@ -86,6 +86,12 @@ class NanoCm {
      */
     public $sysdir;
     
+    /**
+     * Relative Basis-URL zur NanoCM-Installation
+     * @var string
+     */
+    public $relativeBaseUrl;
+    
     // </editor-fold>
     
     
@@ -103,6 +109,11 @@ class NanoCm {
         $this->tpldir = $this->createPath(array($this->pubdir, 'tpl'));
         $this->ncmdir = $this->createPath(array($this->pubdir, 'ncm'));
         $this->sysdir = $this->createPath(array($this->pubdir, 'ncm', 'sys'));
+        $this->relativeBaseUrl = substr($this->pubdir, strlen($_SERVER['DOCUMENT_ROOT']));
+        
+        if (empty($this->relativeBaseUrl)) {
+            $this->relativeBaseUrl = '/';
+        }
         
         // Zugriff auf die Datenbank herstellen
         $this->orm = new Orm($this->getDbHandle());
@@ -112,6 +123,9 @@ class NanoCm {
         $this->log->addWriter(
             new Log\Writer\ChromeLoggerWriter()
         );
+
+        //$this->log->debug($this->relativeBaseUrl);
+        //$this->log->debug($_SERVER['REQUEST_URI']);
     }
     
     /**
@@ -154,7 +168,7 @@ class NanoCm {
     public function getLog() : Log\Logger {
         return $this->log;
     }
-    
+
     /**
      * Überprüft, ob die aktuelle NanoCM-Installation bereits korrekt
      * konfiguriert ist. Wenn dies nicht der Fall ist, wird der Controller einen
