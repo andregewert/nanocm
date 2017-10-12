@@ -79,14 +79,6 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         $this->ncm->getLog()->closeWriters();
     }
     
-    /*
-    public function parseRequestUri() {
-        // ...
-        // Anhand der Request-URI aufzurufendes Modul etc. ermitteln
-        // Passendes Datenmodell dafür entwickeln
-    }
-    */
-    
     /**
      * Rendert ein Template, das installations-spezifisch überschrieben werden
      * kann.
@@ -117,7 +109,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         }
         
         if (!file_exists($fname)) {
-            throw new Exception("Template file not found: $category/$file");
+            throw new Exception("Template file not found: $file");
         }
         
         // Ermitteltes Template einbinden
