@@ -1,5 +1,13 @@
 <?php
-$this->setTitle($this->ncm->orm->getPageTitle());
+/* @var $fc Ubergeek\NanoCm\FrontController */
+$fc = $this;
+/* @var $ncm Ubergeek\NanoCm\NanoCm */
+$ncm = $this->ncm;
+/* @var $orm Ubergeek\NanoCm\Orm */
+$orm = $this->ncm->orm;
+
+
+$fc->setTitle($orm->getPageTitle());
 ?>
 <!DOCTYPE html>
 <html lange="de">

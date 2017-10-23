@@ -46,7 +46,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * Arbeitet den aktuellen Request ab und erzeugt eine entsprechende Antwort
      * (Response)
      */
-    public function run() {
+    public function run() {        
         // Wenn Installation noch nicht konfiguriert: Einrichtungsassistenten
         // ausführen
         
