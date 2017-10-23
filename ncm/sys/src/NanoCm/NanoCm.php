@@ -53,7 +53,7 @@ class NanoCm {
 
     /**
      * Log-Instanz
-     * @var Log\Logger
+     * @var Log\LoggerInterface
      */
     public $log;
     
@@ -165,7 +165,7 @@ class NanoCm {
      * Gibt die Referenz auf den verwendeten Logger zurück
      * @return \Ubergeek\Log\Logger
      */
-    public function getLog() : Log\Logger {
+    public function getLog() : Log\LoggerInterface {
         return $this->log;
     }
 

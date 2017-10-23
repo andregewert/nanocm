@@ -6,7 +6,10 @@ $ncm = $this->ncm;
 /* @var $orm Ubergeek\NanoCm\Orm */
 $orm = $this->ncm->orm;
 
+/* @var $log Ubergeek\Log\LoggerInterface */
+$log = $ncm->getLog();
 
+$log->debug("Hallo Welt!");
 $fc->setTitle($orm->getPageTitle());
 ?>
 <!DOCTYPE html>
