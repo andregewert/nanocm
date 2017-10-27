@@ -21,6 +21,24 @@ namespace Ubergeek\NanoCm;
 
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.
+ * 
+ * Alle Object-Relation-Mapping-Methoden für integrale Bestandteile des NanoCM
+ * werden in dieser Klasse zur Verfügung gestellt. Eine Instanz dieses ORM ist
+ * über den jeweiligen Controller in jedem Template zugänglich.
+ * 
+ * Optionale Zusatzmodule können ihre eigene Datenbank-Funktionalitäten über
+ * eigene Klassen-Instanzen bereitstellen.
+ * 
+ * Zu den Grundfunktionen des NanoCM gehören:
+ * 
+ * - Artikelverwaltung
+ * - Benutzerverwaltung
+ * - Verwaltung von Kommentaren und Trackbacks
+ * - Grundlegende Statistiken
+ * - Systemeinstellungen
+ * 
+ * Zu den optionalen Modulen gehört beispielsweise die Medienverwaltung.
+ * 
  * @author agewert@ubergeek.de
  */
 class Orm {
@@ -93,6 +111,99 @@ class Orm {
         $setting = $this->getSetting($name);
         if ($setting == null) return $default;
         return $setting->params;
+    }
+    
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="User">
+    
+    /**
+     * Durchsucht die Benutzerdatenbank nach flexiblen Filterkriterien
+     * @param array $filter = null
+     * @return array Liste der gefundenen Benutzerdatensätze
+     */
+    public function searchUsers(array $filter = null) {
+        // TODO Implementieren
+    }
+
+    /**
+     * Gibt - falls vorhanden - den Benutzer-Datensatz mit der angegebenen ID
+     * zurück
+     * 
+     * Kann der angefordrte Benutzer-Datensatz nicht gefunden werden, so wird
+     * NULL zurück gegeben.
+     * @param int $id
+     * @return User Gesuchter Benutzer-Datensatz oder NULL
+     */
+    public function getUserById(int $id) {
+        $stmt = $this->basedb->prepare('
+            SELECT * FROM User WHERE id = :userid
+        ');
+        $stmt->bindValue('userid', $id);
+        $stmt->execute();
+        
+        return User::fetchFromPdoStmt($stmt);
+    }
+    
+    /**
+     * Gibt - falls vorhanden - den Benutzer-Datensatz mit dem angegebenen
+     * Benutzernamen zurück
+     * 
+     * Kann der angeforderte Benutzer-Datensatz nicht gefunden werden, so wird
+     * NULL zurück gegeben.
+     * @param string $username
+     * @return User Gesuchter Benutzer-Datensatz oder NULL
+     */
+    public function getUserByUsername(string $username) {
+        $stmt = $this->basedb->prepare('
+            SELECT * FROM User WHERE username = :username
+        ');
+        $stmt->bindValue('userid', $username);
+        $stmt->execute();
+        
+        return User::fetchFromPdoStmt($stmt);
+    }
+
+    /**
+     * Gibt - sofern Benutzername und Passwort mit den Werten in der Datenbank
+     * übereinstimmen - den gesuchten Benutzer-Datensatz zurück
+     * 
+     * Kann der Datensatz nicht gefunden werden oder stimmen übergebenes und
+     * gespeichertes Passwort nicht überein, so wird NULL zurück gegeben. Der
+     * Grund für eine nicht erfolgreiche Abfrage wird nicht mitgeteilt.
+     * 
+     * @param string $username Gesuchter Benutzername
+     * @param string $passwd Eingegebenes bzw. bekanntes Passwort
+     * @return User Gesuchter Benutzer-Datensatz oder NULL
+     */
+    public function getUserByCredentials(string $username, string $passwd) {
+        // TODO Implementieren
+    }
+    
+    /**
+     * Speichert den übergebenen Benutzer-Datensatz in der Datenbank
+     * @param \Ubergeek\NanoCm\User $user
+     */
+    public function saveUser(User $user) {
+        // TODO Implementieren
+    }
+    
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="Article">
+    
+    public function searchArticles(array $filter = null) {
+        // TODO Implementieren
+    }
+    
+    public function getArticleById(int $id) {
+        // TODO Implementieren
+    }
+    
+    public function saveArticle(Article $article) {
+        // TODO Implementieren
     }
     
     // </editor-fold>

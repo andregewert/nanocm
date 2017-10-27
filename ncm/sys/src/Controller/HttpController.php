@@ -19,6 +19,10 @@
 
 namespace Ubergeek\Controller;
 
+/**
+ * Abstrakte Basisklasse für HTTP-Controller
+ * @todo Nutzung der Klassen HttpRequest und HttpResponse!
+ */
 abstract class HttpController implements ControllerInterface {
     
     // <editor-fold desc="Properties">
@@ -205,7 +209,7 @@ abstract class HttpController implements ControllerInterface {
         }
         $this->vars[$key] = $value;
     }
-    
+
     public function setTitle(string $title) {
         $this->title = $title;
     }
@@ -221,7 +225,7 @@ abstract class HttpController implements ControllerInterface {
      */
     public function init() {
         // Initialisierungsaufgaben durchführen
-        // In der Basis-Implementierung passiert hier nicht viel
+        // Die Basis-Implementierung ist leer
     }
 
     /**
