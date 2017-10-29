@@ -27,8 +27,8 @@ class Event {
     public $level;
     
     /**
-     * Log-Nachricht
-     * @var string
+     * Log-Nachricht (beliebige Daten!)
+     * @var mixed
      */
     public $message;
     
@@ -51,14 +51,20 @@ class Event {
     public $line;
     
     /**
+     * Schweregrad / Priorität des Events
+     * @var int
+     */
+    public $priority = 0;
+    
+    /**
      * Erzeugt ein neues zu protokollierendes Ereignis
      * @param int $level Log-Level
-     * @param string $message Nachricht
+     * @param mixed $message Nachricht oder Daten
      * @param \Exception $exception Auslösende Exception, falls vorhanden
      * @param array $backtrace Stack-Trace, falls vorhanden
      * @param string $line Auslösende Zeile, falls vorhanden
      */
-    public function __construct(int $level, string $message, \Exception $exception = null,
+    public function __construct(int $level, $message, \Exception $exception = null,
             array $backtrace = null, string $line = "") {
         $this->level = $level;
         $this->message = $message;

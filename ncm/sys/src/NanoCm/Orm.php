@@ -208,14 +208,27 @@ class Orm {
     /**
      * Durchsucht die Artikel nach bestimmten Filterkriterien
      * @param \Ubergeek\NanoCm\Article $filter Optionale Suchfilter
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel
+     * berücksichtig werden sollen
      * @param integer $limit Maximale Anzahl der zurück zu gebenden Artikel
      * @return array Ein Array mit den gefundenen Artikeln
      */
-    public function searchArticles(Article $filter = null, $limit = null) {
+    public function searchArticles(Article $filter = null, $releasedOnly = true, $limit = null) {
         $articles = array();
         
         $sql = 'SELECT * FROM Article WHERE 1 = 1 ';
+        
+        if ($releasedOnly) {
+            $sql .= '
+                AND (
+                    start_timestamp <= CURRENT_TIMESTAMP
+                    AND (stop_timestamp IS NULL OR stop_timestamp >= CURRENT_TIMESTAMP)
+                )
+            ';
+        }
+        
         // TODO Filterbedingungen einfügen
+        
         $sql .= 'ORDER BY publishing_timestamp DESC ';
         
         if ($limit !== null) {

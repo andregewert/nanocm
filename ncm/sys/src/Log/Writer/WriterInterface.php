@@ -21,6 +21,8 @@ namespace Ubergeek\Log\Writer;
 
 /**
  * Beschreibt das Interface, das alle Writer-Implementierungen umsetzen müssen
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2017-10-29
  */
 interface WriterInterface {
     /**
@@ -38,4 +40,10 @@ interface WriterInterface {
      * Schließt den Ausgabe-Stream, falls notwendig / möglich
      */
     public function close();
+    
+    /**
+     * Fügt dem Writer einen Filter hinzu
+     * @param \Ubergeek\Log\Filter\FilterInterface $filter Hinzuzufügender Filter
+     */
+    public function addFilter(\Ubergeek\Log\Filter\FilterInterface $filter);
 }

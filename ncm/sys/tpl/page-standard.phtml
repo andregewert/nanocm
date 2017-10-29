@@ -13,11 +13,10 @@ $log->debug("Hallo Welt!");
 $fc->setTitle($orm->getPageTitle());
 
 $user = $orm->getUserById(1);
-#$log->debug($user);
+$log->debug($user);
 
 $articles = $orm->searchArticles();
-#$log->debug($articles);
-var_dump($articles);
+$log->debug($articles);
 ?>
 <!DOCTYPE html>
 <html lange="de">

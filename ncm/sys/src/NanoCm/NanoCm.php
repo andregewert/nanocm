@@ -123,7 +123,9 @@ class NanoCm {
         
         // TODO Instanziierung nur, wenn Logging eingeschaltet        
         $this->log->addWriter(
-            new Log\Writer\ChromeLoggerWriter()
+            new Log\Writer\ChromeLoggerWriter(
+                new Log\Filter\PriorityFilter(\Ubergeek\Log\Logger::DEBUG, Log\Filter\PriorityFilter::OPERATOR_MIN)
+            )
         );
     }
     

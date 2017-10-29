@@ -19,18 +19,13 @@
 
 namespace Ubergeek\Log\Writer;
 
-class DboWriter implements WriterInterface {
-    
-    public function close() {
+/**
+ * Protokolliert Events in eine Datenbank-Tabelle
+ * @author André Gewert <agewert@ubergeek.de>
+ * @todo Implementieren
+ */
+class DboWriter extends AbstractWriter {
+    public function doWrite(\Ubergeek\Log\Event $event) {
         
     }
-
-    public function flush() {
-        
-    }
-
-    public function write(\Ubergeek\Log\Event $event) {
-        
-    }
-
 }

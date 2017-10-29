@@ -19,17 +19,13 @@
 
 namespace Ubergeek\Log\Writer;
 
-class ControllerWriter implements WriterInterface {
-    
-    public function close() {
-        
-    }
+/**
+ * ???
+ * @author André Gewert <agewert@ubergeek.de>
+ */
+class ControllerWriter extends AbstractWriter {
 
-    public function flush() {
-        
-    }
-
-    public function write(\Ubergeek\Log\Event $event) {
+    public function doWrite(\Ubergeek\Log\Event $event) {
         
     }
 

@@ -19,18 +19,23 @@
 
 namespace Ubergeek\Log\Writer;
 
+/**
+ * Der NullWriter protokolliert nichts, sondern kann verwendet werden, um eine
+ * "leere" Logger-Instanz zu konfigurieren, damit loggende Klassen nicht bei
+ * jedem Log-Aufruf überprüfen müssen, ob ein Logger vorhanden ist.
+ * @author André Gewert <agewert@ubergeek.de>
+ */
 class NullWriter implements WriterInterface {
     
     public function close() {
-        
     }
 
     public function flush() {
-        
     }
 
     public function write(\Ubergeek\Log\Event $event) {
-        
     }
 
+    public function addFilter(\Ubergeek\Log\Filter\FilterInterface $filter) {
+    }
 }

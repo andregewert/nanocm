@@ -19,7 +19,12 @@
 
 namespace Ubergeek\Log\Writer;
 
-class FileWriter implements WriterInterface {
+/**
+ * Protokolliert die übergebenen Events in eine Log-Datei
+ * @author André Gewert <agewert@ubergeek.de>
+ * @todo Implementieren
+ */
+class FileWriter extends AbstractWriter {
     
     public function close() {
         
@@ -29,7 +34,7 @@ class FileWriter implements WriterInterface {
         
     }
 
-    public function write(\Ubergeek\Log\Event $event) {
+    public function doWrite(\Ubergeek\Log\Event $event) {
         
     }
 

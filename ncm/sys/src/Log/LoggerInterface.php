@@ -23,12 +23,25 @@ namespace Ubergeek\Log;
  * Bildet das Log-Interface ab, gegen das die Klassen programmiert werden sollen
  */
 interface LoggerInterface {
+
+    function emerg($data, \Exception $ex = null, array $backtrace = null, string $line = '');
+    
+    function alert($data, \Exception $ex = null, array $backtrace = null, string $line = '');
+    
+    function crit($data, \Exception $ex = null, array $backtrace = null, string $line = '');
+    
+    function err($data, \Exception $ex = null, array $backtrace = null, string $line = '');
+    
+    function warn($data, \Exception $ex = null, array $backtrace = null, string $line = '');
+    
+    function notice($data, \Exception $ex = null, array $backtrace = null, string $line = '');
+    
     /**
      * Gibt eine Debug-Meldung an den Logger weiter
-     * @param string $msg
+     * @param $msg Zu protokollierende Nachricht oder Daten
      * @param \Exception $ex Optionale Referenz auf die auslösende Exception
-     * @param array $backtrace
-     * @param string $line
+     * @param array $backtrace Backtrace, falls vorhanden
+     * @param string $line Auslösende Codezeile
      */
-    function debug(string $msg, \Exception $ex = null, array $backtrace = null, string $line = '');
+    function debug($data, \Exception $ex = null, array $backtrace = null, string $line = '');
 }

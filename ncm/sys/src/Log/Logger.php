@@ -23,6 +23,7 @@ namespace Ubergeek\Log;
  * Einfache Implementierung des Log-Interfaces
  */
 class Logger implements LoggerInterface {
+    
     const EMERG  = 0;
     const ALERT  = 1;
     const CRIT   = 2;
@@ -31,13 +32,7 @@ class Logger implements LoggerInterface {
     const NOTICE = 5;
     const INFO   = 6;
     const DEBUG  = 7;
-    
-    // Writer -> Array
-    
-    // Methoden: log, debug etc. -> Mapping auf die Writer
-    
-    // Filter sind an die Writer gebunden
-    
+
     private $writers = array();
     
     /**
@@ -78,8 +73,8 @@ class Logger implements LoggerInterface {
             }
         }
     }
-
-    public function debug(string $msg, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    
+    public function log(int $priority, $data, \Exception $ex = null, array $backtrace = null, string $line = '') {
         if (!is_array($this->writers) || count($this->writers) == 0) return;
         
         if ($backtrace == null) {
@@ -89,9 +84,43 @@ class Logger implements LoggerInterface {
             $line = "unbekannt";
         }
         
-        $event = new Event(Logger::DEBUG, $msg, $ex, $backtrace, $line);
+        $event = new Event($priority, $data, $ex, $backtrace, $line);
+        $event->priority = $priority;
+        
         foreach ($this->writers as $writer) {
             $writer->write($event);
         }
+    }
+
+    public function emerg($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::EMERG, $data, $ex, $backtrace, $line);
+    }
+    
+    public function alert($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::ALERT, $data, $ex, $backtrace, $line);
+    }
+    
+    public function crit($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::CRIT, $data, $ex, $backtrace, $line);
+    }
+    
+    public function err($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::ERR, $data, $ex, $backtrace, $line);
+    }
+    
+    public function warn($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::WARN, $data, $ex, $backtrace, $line);
+    }
+    
+    public function notice($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::NOTICE, $data, $ex, $backtrace, $line);
+    }
+    
+    public function info($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::INFO, $data, $ex, $backtrace, $line);
+    }
+    
+    public function debug($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        $this->log(self::DEBUG, $data, $ex, $backtrace, $line);
     }
 }
