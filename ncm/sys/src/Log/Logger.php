@@ -80,6 +80,8 @@ class Logger implements LoggerInterface {
     }
 
     public function debug(string $msg, \Exception $ex = null, array $backtrace = null, string $line = '') {
+        if (!is_array($this->writers) || count($this->writers) == 0) return;
+        
         if ($backtrace == null) {
             $backtrace = debug_backtrace();
         }
@@ -88,10 +90,8 @@ class Logger implements LoggerInterface {
         }
         
         $event = new Event(Logger::DEBUG, $msg, $ex, $backtrace, $line);
-        if (is_array($this->writers)) {
-            foreach ($this->writers as $writer) {
-                $writer->write($event);
-            }
+        foreach ($this->writers as $writer) {
+            $writer->write($event);
         }
     }
 }

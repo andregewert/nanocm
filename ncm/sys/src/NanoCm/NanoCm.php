@@ -114,18 +114,17 @@ class NanoCm {
         if (empty($this->relativeBaseUrl)) {
             $this->relativeBaseUrl = '/';
         }
+
+        // Ein (leerer) Logger wird immer instanziiert
+        $this->log = new Log\Logger();
         
         // Zugriff auf die Datenbank herstellen
-        $this->orm = new Orm($this->getDbHandle());
+        $this->orm = new Orm($this->getDbHandle(), $this->log);
         
-        // TODO Instanziierung nur, wenn Logging eingeschaltet
-        $this->log = new Log\Logger();
+        // TODO Instanziierung nur, wenn Logging eingeschaltet        
         $this->log->addWriter(
             new Log\Writer\ChromeLoggerWriter()
         );
-
-        //$this->log->debug($this->relativeBaseUrl);
-        //$this->log->debug($_SERVER['REQUEST_URI']);
     }
     
     /**

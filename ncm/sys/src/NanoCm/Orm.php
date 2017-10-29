@@ -50,12 +50,23 @@ class Orm {
     private $basedb;
     
     /**
+     * Optionale Log-Instanz
+     * @var \Ubergeek\Log\LoggerInterface
+     */
+    private $log;
+    
+    /**
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
      * übergeben werden.
      * @param \PDO $dbhandle
      */
-    public function __construct(\PDO $dbhandle) {
+    public function __construct(\PDO $dbhandle, \Ubergeek\Log\LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
+        $this->log = $log;
+        
+        if ($this->log == null) {
+            $this->log = new \Ubergeek\Log\Logger();
+        }
     }
     
     
@@ -194,11 +205,39 @@ class Orm {
     
     // <editor-fold desc="Article">
     
-    public function searchArticles(array $filter = null) {
-        // TODO Implementieren
+    /**
+     * Durchsucht die Artikel nach bestimmten Filterkriterien
+     * @param \Ubergeek\NanoCm\Article $filter Optionale Suchfilter
+     * @param integer $limit Maximale Anzahl der zurück zu gebenden Artikel
+     * @return array Ein Array mit den gefundenen Artikeln
+     */
+    public function searchArticles(Article $filter = null, $limit = null) {
+        $articles = array();
+        
+        $sql = 'SELECT * FROM Article WHERE 1 = 1 ';
+        // TODO Filterbedingungen einfügen
+        $sql .= 'ORDER BY publishing_timestamp DESC ';
+        
+        if ($limit !== null) {
+            $sql .= ' LIMIT ' . intval($limit);
+        }
+        
+        $this->log->debug($sql);
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->execute();
+
+        while (($article = Article::fetchFromPdoStmt($stmt)) !== null) {
+            $articles[] = $article;
+        }
+
+        return $articles;
     }
     
     public function getArticleById(int $id) {
+        // TODO Implementieren
+    }
+    
+    public function getLatestArticles() {
         // TODO Implementieren
     }
     

@@ -110,4 +110,18 @@ class Article {
      */
     public $enableComments;
     
+    /**
+     * Erstellt ein Article-Objekt anhand des übergebenen PDO-Statements
+     * @param \PDOStatement $stmt
+     * @return Article
+     */
+    public final static function fetchFromPdoStmt(\PDOStatement $stmt) {
+        $stmt->setFetchMode(\PDO::FETCH_CLASS, __CLASS__);
+        
+        if (($article = $stmt->fetch()) !== false) {
+            return $article;
+        }
+        
+        return null;
+    }
 }
