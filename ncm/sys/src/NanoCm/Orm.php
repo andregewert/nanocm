@@ -247,11 +247,16 @@ class Orm {
     }
     
     public function getArticleById(int $id) {
-        // TODO Implementieren
+        // TODO implementieren
     }
     
-    public function getLatestArticles() {
-        // TODO Implementieren
+    /**
+     * Gibt die neuesten freigeschalteten Artikel zurück
+     * @param int $limit
+     * @return Article[]
+     */
+    public function getLatestArticles(int $limit = 5) {
+        return $this->searchArticles(null, true, $limit);
     }
     
     public function saveArticle(Article $article) {

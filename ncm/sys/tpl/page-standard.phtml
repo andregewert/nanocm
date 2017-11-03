@@ -15,7 +15,7 @@ $fc->setTitle($orm->getPageTitle());
 $user = $orm->getUserById(1);
 $log->debug($user);
 
-$articles = $orm->searchArticles();
+$articles = $orm->getLatestArticles();
 $log->debug($articles);
 ?>
 <!DOCTYPE html>

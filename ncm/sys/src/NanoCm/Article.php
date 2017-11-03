@@ -36,25 +36,25 @@ class Article {
      * Erstellungszeitpunkt
      * @var \DateTime
      */
-    public $creationTimestamp;
+    public $creation_timestamp;
     
     /**
      * Änderungs-Zeitpunkt
      * @var \DateTime
      */
-    public $modificationTimestamp;
+    public $modification_timestamp;
 
     /**
      * Benutzer-ID des Autors
      * @var integer
      */
-    public $authorId;
+    public $author_id;
     
     /**
      * Statuscode
      * @var integer
      */
-    public $statusCode;
+    public $status_code;
 
     /**
      * Artikelüberschrift
@@ -78,19 +78,19 @@ class Article {
      * Startzeitpunkt für die Freischaltung
      * @var \DateTime
      */
-    public $startTimestamp;
+    public $start_timestamp;
     
     /**
      * Endzeitpunkt für die Freischaltung
      * @var \DateTime
      */
-    public $stopTimestamp;
+    public $stop_timestamp;
     
     /**
      * Veröffentlichungszeitpunkt
      * @var \DateTime
      */
-    public $publishingTimestamp;
+    public $publishing_timestamp;
     
     /**
      * Freigabestatus der Trackback-Funktion für diesen Artikel
@@ -99,7 +99,7 @@ class Article {
      * Vorrang vor der artikel-bezogenen Einstellung.
      * @var bool
      */
-    public $enableTrackbacks;
+    public $enable_trackbacks;
     
     /**
      * Freigabestatus der Kommentar-Funktion für diesen Artikel
@@ -108,7 +108,7 @@ class Article {
      * Vorrang vor der artikel-bezogenen Einstellung.
      * @var bool
      */
-    public $enableComments;
+    public $enable_comments;
     
     /**
      * Erstellt ein Article-Objekt anhand des übergebenen PDO-Statements
@@ -116,12 +116,11 @@ class Article {
      * @return Article
      */
     public final static function fetchFromPdoStmt(\PDOStatement $stmt) {
-        $stmt->setFetchMode(\PDO::FETCH_CLASS, __CLASS__);
-        
-        if (($article = $stmt->fetch()) !== false) {
+        if (($article = $stmt->fetchObject(__CLASS__)) !== false) {
+            $article->creation_timestamp = new \DateTime($article->creation_timestamp);
+            $article->modification_timestamp = new \DateTime($article->modification_timestamp);
             return $article;
         }
-        
         return null;
     }
 }
