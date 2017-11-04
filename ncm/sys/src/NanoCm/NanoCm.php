@@ -207,5 +207,34 @@ class NanoCm {
         return join(DIRECTORY_SEPARATOR, $parts);
     }
     
+    /**
+     * Kodiert einen String für die HTML-Ausgabe.
+     * Der Eingabestring muss UTF8-kodiert sein.
+     * @param string $string
+     * @return HTML-kodierter String
+     */
+    public function htmlEncode($string) : string {
+        return htmlentities($string, ENT_HTML5, 'utf-8');
+    }
+    
+    /**
+     * Konvertiert einen Eingabestring mit Formatierungs-Auszeichnungen in das
+     * angegebene Zielformat
+     * 
+     * Die Konvertierung soll modular aufgebaut und konfigurierbar sein.
+     * Das Eingabeformat orientiert sich an Markdown, weicht aber in einigen
+     * Punkten davon ab. So ist beispielsweise kein eingebetteter HTML-Code
+     * erlaubt.
+     * 
+     * @param string $input Eingabestring
+     * @param string $targetFormat Das Zielformat
+     * @return string Der ins Ausgabeformat konvertierte String
+     */
+    public function convertFormattedText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
+        $classname = 'Ubergeek\NanoCm\ContentConverter\\' . ucfirst($targetFormat) . 'Converter';
+        $converter = new $classname();
+        return $converter->convertFormattedText($this, $input);
+    }
+    
     // </editor-fold>
 }

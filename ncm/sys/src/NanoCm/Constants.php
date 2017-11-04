@@ -29,21 +29,25 @@ abstract class Constants {
 
     /**
      * Systemsprache
+     * @var string
      */
     const SETTING_SYSTEM_LANG = 'system.lang';
     
     /**
      * Relativer Pfad zum zu benutzenden HTML-Template
+     * @var string
      */
     const SETTING_SYSTEM_TPLDIR = 'system.tpldir';
     
     /**
      * Seitentitel
+     * @var string
      */
     const SETTING_SYSTEM_PAGETITLE = 'system.pagetitle';
     
     /**
      * Copyright- bzw. Footer-Hinweis
+     * @var string
      */
     const SETTING_SYSTEM_COPYRIGHTNOTICE = 'system.copyrightnotice';
 
@@ -75,24 +79,45 @@ abstract class Constants {
     /**
      * Die absolute URL der Installationsbasis bzw. zum Wurzelverzeichnis.
      * Die URL ist absolut zum Server-Root.
+     * @var string
      */
     const VAR_URL_ROOT = 'url.root';
     
     /**
      * Die absolute URL zum Unterverzeichnis "ncm", in dem sich das vollständige
      * Content Management System befindet.
+     * @var string
      */
     const VAR_URL_NCM = 'url.ncm';
     
     /**
      * Der abolsute Dateipfad zur Installationsbasis
+     * @var string
      */
     const VAR_PATH_ROOT = 'path.root';
     
     /**
      * Der absolute Dateipfad zum Unterverzeichnis "ncm"
+     * @var string
      */
     const VAR_PATH_NCM = 'path.ncm';
+    
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="">
+
+    /**
+     * Ausgabeformat HTML
+     * @var string
+     */
+    const FORMAT_HTML = 'html';
+    
+    /**
+     * Ausgabeformat Text (unformatiert)
+     * @var string
+     */
+    const FORMAT_PLAINTEXT = "text";
     
     // </editor-fold>
     

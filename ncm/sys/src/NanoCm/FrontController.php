@@ -30,6 +30,13 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * @var \Ubergeek\NanoCm\NanoCm
      */
     public $ncm;
+    
+    /**
+     * Enthält eine Referenz auf die zuletzt aufgefangenge Exception.
+     * Kann im Template für die Fehlerausgabe verwendet werden.
+     * @var \Exception
+     */
+    public $exception;
 
     /**
      * Dem Konstruktor wird lediglich der absolute Pfad zum öffentlichen
@@ -65,16 +72,18 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         // Eigentlichen Inhalt rendern
         
         try {
-            $content = $this->renderUserTemplate('test.phtml');
+            // Startseite
+            $content = $this->renderUserTemplate('content-start.phtml');
         } catch (\Exception $ex) {
+            $this->exception = $ex;
             $content = $this->renderUserTemplate('exception.phtml');
         }
         $this->setContent($content);
         
         // Äußeres Template rendern
+        // TODO Exception handling ergänzen
         $this->setContent($this->renderUserTemplate('page-standard.phtml'));
         
-        $this->ncm->getLog()->debug('Testnachricht 1');
         $this->ncm->getLog()->flushWriters();
         $this->ncm->getLog()->closeWriters();
     }
@@ -109,7 +118,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         }
         
         if (!file_exists($fname)) {
-            throw new Exception("Template file not found: $file");
+            throw new \Exception("Template file not found: $file");
         }
         
         // Ermitteltes Template einbinden
@@ -140,7 +149,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * @param string $string
      * @return HTML-kodierter String
      */
-    public function html($string) : string {
-        return htmlentities($string, ENT_HTML5, 'utf-8');
+    public function htmlEncode($string) : string {
+        return $this->ncm->htmlEncode($string);
     }
 }
