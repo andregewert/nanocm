@@ -2,12 +2,16 @@
 /* @var $fc Ubergeek\NanoCm\FrontController */
 $fc = $this;
 ?>
-<h1>Fehler</h1>
+<div style="padding-top: 3.5em">
+    <div class="container">
+        <h1>Fehler</h1>
 
-<p>Huch, es ist ein scherwiegender Fehler aufgetreten. Bitte laden Sie die Seite
-    neu. Falls der Fehler bestehen sollte, wenden Sie sich gerne an den
-    Webseiten-Betreuer!</p>
+        <p>Huch, es ist ein scherwiegender Fehler aufgetreten.<br>
+            Bitte laden Sie die Seite neu. Falls der Fehler bestehen sollte,
+            wenden Sie sich gerne an den Webseiten-Betreuer!</p>
 
-<?php if ($fc->exception !== null) : ?>
-    <?php $fc->ncm->log->debug($fc->exception->getTraceAsString()); ?>
-<?php endif; ?>
+        <?php if ($fc->exception !== null) : ?>
+            <?php $fc->ncm->log->debug($fc->exception->getTraceAsString()); ?>
+        <?php endif; ?>
+    </div>
+</div>
