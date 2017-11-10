@@ -17,23 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek\Controller;
-use Ubergeek\Net;
+namespace Ubergeek\NanoCm\Module;
 
-/**
- * Kapselt Informationen zu einen konkreten HTTP-Request
- * @author agewert@ubergeek.de
- */
-class HttpRequest {
-
-    /**
-     * Die angeforderte URL
-     * @var \Ubergeek\Net\Url
-     */
-    public $requestUri;
+class DefaultModule {
     
-    public function __construct(string $requestUrl = null) {
-        $this->requestUri = new Net\Url($requestUrl);
+    public function runModule() {
+        
     }
-
+    
 }

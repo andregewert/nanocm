@@ -70,6 +70,22 @@ abstract class HttpController implements ControllerInterface {
         $this->request = new HttpRequest();
         $this->response = new HttpResponse();
     }
+    
+    /**
+     * Gibt den mit dieser HttpController-Instanz verbundenen HttpRequest zurück
+     * @return HttpRequest
+     */
+    public function getHttpRequest() {
+        return $this->request;
+    }
+    
+    /**
+     * Gibt die mit dieser HttpController-Instanz verbundene HttpResponse zurück
+     * @return HttpResponse
+     */
+    public function getHttpResponse() {
+        return $this->response;
+    }
 
     /**
      * Fügt einem Inhaltsbereich den übergebenen Content hinzu
@@ -159,16 +175,25 @@ abstract class HttpController implements ControllerInterface {
         return $_REQUEST;
     }
 
+    /**
+     * Gibt den Wert einer bestimmten Variablen zurück.
+     * Ist die Variable nicht gesetzt, wird der angegebene Default-Wert zurück
+     * gegeben.
+     * @param string $key
+     * @param mixed $default Vorgabewert, falls die Variable nicht gesetzt ist
+     * @return mixed
+     */
     public function getVar(string $key, $default = null) {
-        if (!is_array($this->vars)) {
-            return $default;
-        }
-        if (!array_key_exists($this->vars, $key)) {
+        if (!is_array($this->vars) || !array_key_exists($this->vars, $key)) {
             return $default;
         }
         return $this->vars[$key];
     }
 
+    /**
+     * Gibt ein Array mit allen definierten Variablen zurück
+     * @return array
+     */
     public function getVars(): array {
         return $this->vars;
     }

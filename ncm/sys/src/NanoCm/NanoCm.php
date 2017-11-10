@@ -47,7 +47,7 @@ class NanoCm {
     
     /**
      * Referenz auf eine Instanz der ORM-Klasse
-     * @var NanoCm\DbMapper
+     * @var Orm
      */
     public $orm = null;
 

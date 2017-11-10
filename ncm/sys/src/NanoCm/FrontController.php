@@ -37,6 +37,26 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * @var \Exception
      */
     public $exception;
+    
+    /**
+     * Zu renderndes Seiten-Template
+     * @var string
+     */
+    private $pageTemplate = 'page-standard.phtml';
+    
+    
+    // <editor-fold desc="Properties">
+
+    public function getPageTemplate() : string {
+        return $this->pageTemplate;
+    }
+    
+    public function setPageTemplate(string $template) {
+        $this->pageTemplate = $template;
+    }
+    
+    // </editor-fold>
+    
 
     /**
      * Dem Konstruktor wird lediglich der absolute Pfad zum öffentlichen
@@ -63,6 +83,8 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         
         // Passendes Modul ausführen
         
+        // Fallback-Modul ist immer DefaultModule
+        
         // Content generieren
         
         // Content in Template einfügen
@@ -71,10 +93,28 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         
         // Eigentlichen Inhalt rendern
         
+
+        // Eigentlicher Inhalt
         try {
-            // Startseite
-            $content = $this->renderUserTemplate('content-start.phtml');
-        } catch (\Exception $ex) {
+            $reqParts = $this->parseRequestUri();
+            switch ($reqParts) {
+                case 'admin':
+                    // Admin-Modul
+                    break;
+                
+                case 'soap':
+                    // SOAP-Schnittstelle
+                    break;
+                
+                case 'pages':
+                    // Frei definierbare Pages
+                    break;
+                
+                case 'weblog':
+                default:
+                    $content = $this->renderUserTemplate('content-start.phtml');
+            }
+        } catch (Exception $ex) {
             $this->exception = $ex;
             $content = $this->renderUserTemplate('exception.phtml');
         }
@@ -82,7 +122,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         
         // Äußeres Template rendern
         // TODO Exception handling ergänzen
-        $this->setContent($this->renderUserTemplate('page-standard.phtml'));
+        $this->setContent($this->renderUserTemplate($this->getPageTemplate()));
         
         $this->ncm->getLog()->flushWriters();
         $this->ncm->getLog()->closeWriters();
@@ -151,5 +191,25 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      */
     public function htmlEncode($string) : string {
         return $this->ncm->htmlEncode($string);
+    }
+    
+    /**
+     * Zerlegt den aktuellen HTTP-Request in seine Pfad-Bestandteile
+     * @return array
+     */
+    public function parseRequestUri() : array {
+        $abs = $this->getHttpRequest()->requestUri->getBaseDocument();
+        $rel = $this->ncm->relativeBaseUrl;
+        $res = substr($abs, strlen($rel));
+        
+        $parts = explode('/', $res);        
+        $dummy = array_shift($parts);
+        
+        if (preg_match('/\.([^\.]+)$/i', $dummy) == false) {
+            array_push($parts, $dummy);
+        }
+        
+        $this->ncm->log->debug($parts);
+        return $parts;
     }
 }
