@@ -29,7 +29,7 @@ namespace Ubergeek\NanoCm\Module;
  * ausführenden FrontController) zuzugreifen. Die Modul-Klasse selbst implementiert
  * außerdem das ControllerInterface.
  * 
- * Konkrete Module müssen demenstsprechend die zentrale run()-Methode
+ * Konkrete Module müssen dementsprechend die zentrale run()-Methode
  * implementieren. Außerdem kann die init()-Methode überschrieben werden.
  * Die Klasse AbstractModule besitzt eine einfache Implementierung der
  * execute()-Methode, die den über run() generieren Inhalt in ein
@@ -57,6 +57,12 @@ abstract class AbstractModule implements
      * @var string
      */
     const PAGE_STANDARD = 'page-standard.phtml';
+    
+    /**
+     * Vereinfachtes Template für das Setup
+     * @var string
+     */
+    const PAGE_SETUP = 'page-setup.phtml';
     
     /**
      * Kann genutzt werden, wenn der Seiteninhalt nicht in ein Seiten-Template
@@ -137,6 +143,10 @@ abstract class AbstractModule implements
 
     
     // <editor-fold desc="Grundlegende Ausgabe-Funktionalität">
+
+    public function getAction() {
+        return $this->getParam('action');
+    }
     
     /**
      * Gibt die BaseURL für die NCM-Installation zurück
@@ -251,6 +261,15 @@ abstract class AbstractModule implements
         }
         
         return $c;
+    }
+
+    /**
+     * Gibt die relativen (in Bezug nur NCM-Installation) URL-Bestandteile
+     * zurück
+     * @return string[]
+     */
+    public function getRelativeUrlParts() : array {
+        return $this->frontController->getRelativeUrlParts();
     }
 
     // </editor-fold>

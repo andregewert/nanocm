@@ -80,7 +80,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
             $this->ncm->getLog()->debug("Setup durchführen!");
         }
         
-        $reqParts = $this->parseRequestUri();
+        $reqParts = $this->getRelativeUrlParts();
         switch ($reqParts) {
             case 'admin':
                 // Admin-Modul
@@ -90,7 +90,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                 // SOAP-Schnittstelle
                 break;
 
-            case 'pages':
+            case 'page':
                 // Frei definierbare Pages
                 break;
 
@@ -114,21 +114,28 @@ class FrontController extends \Ubergeek\Controller\HttpController {
     
     /**
      * Zerlegt den aktuellen HTTP-Request in seine Pfad-Bestandteile
-     * @return array
+     * @return string[]
      */
-    public function parseRequestUri() : array {
+    public function getRelativeUrlParts() : array {
         $abs = $this->getHttpRequest()->requestUri->getBaseDocument();
         $rel = $this->ncm->relativeBaseUrl;
         $res = substr($abs, strlen($rel));
         
-        $parts = explode('/', $res);        
-        $dummy = array_shift($parts);
+        $this->ncm->log->debug($res);
         
-        if (preg_match('/\.([^\.]+)$/i', $dummy) == false) {
+        $parts = explode('/', $res);
+        
+        $dummy = array_pop($parts);
+        if (!empty($dummy)) {
             array_push($parts, $dummy);
         }
         
-        //$this->ncm->log->debug($parts);
+        if (preg_match('/\.([^\.]+)$/i', $dummy) == false) {
+            array_push($parts, 'index.php');
+        }
+        
+        $this->ncm->log->debug($parts);
+        $this->ncm->log->debug(basename($this->request->requestUri->document));
         return $parts;
     }
 }

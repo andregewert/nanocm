@@ -32,8 +32,31 @@ namespace Ubergeek\NanoCm\Module;
 class CoreModule extends AbstractModule {
     
     public function run() {
-        //$this->setPageTemplate(self::PAGE_NONE);
-        $content = $this->renderUserTemplate('content-start.phtml');
-        $this->setContent($content);
+        $parts = $this->getRelativeUrlParts();
+        $content = null;
+        
+        switch ($parts[0]) {
+            // Artikelansicht oder Archiv
+            case 'weblog':
+                if ($parts[1] == 'article') {
+                    $content = $this->renderUserTemplate('content-weblog-article.phtml');
+                } elseif ($parts[1] == 'archive') {
+                    $content = $this->renderUserTemplate('content-weblog-archive.phtml');
+                }
+                break;
+            
+            // Startseite
+            case 'index.php';
+                $content = $this->renderUserTemplate('content-start.phtml');
+                break;
+        }
+        
+        if ($content == null) {
+            http_response_code(404);
+            $this->setContent($this->renderUserTemplate('error-404.phtml'));
+        } else {
+            $this->setContent($content);
+        }
     }
+    
 }

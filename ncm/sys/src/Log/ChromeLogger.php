@@ -116,8 +116,7 @@ class ChromeLogger {
     protected function convertVar($var) {
         if (is_string($var)) {
             $var = array(str_replace(array("\n", "\r"), '', $var));
-        }
-        else if (!is_array($var)) {
+        } else {
             $var = array($var);
         }
         return $var;

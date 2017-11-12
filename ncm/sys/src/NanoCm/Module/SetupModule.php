@@ -38,6 +38,24 @@ class SetupModule extends AbstractModule {
     
     public function run() {
         // TODO implementieren
+        $this->setPageTemplate(self::PAGE_SETUP);
+        $content = null;
+        
+        if ($this->getAction() == 'save') {
+            // Datenbank erstellen
+            
+            // Grundlegende Konfiguration speichern
+            
+            // Redirect auf Startseite oder Anzeige einer Erfolgsmeldung
+            
+            $content = '';
+            
+        } else {
+            // TODO Dieses Template sollte im SYS-Verzeichnis liegen
+            $content = $this->renderUserTemplate('page-setup');
+        }
+        
+        $this->setContent($content);
     }
 
 }
