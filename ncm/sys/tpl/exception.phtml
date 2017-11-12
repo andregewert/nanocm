@@ -1,6 +1,9 @@
 <?php
 /* @var $fc Ubergeek\NanoCm\FrontController */
 $fc = $this;
+
+/* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
+$mod = $this;
 ?>
 <div style="padding-top: 3.5em">
     <div class="container">
@@ -10,8 +13,10 @@ $fc = $this;
             Bitte laden Sie die Seite neu. Falls der Fehler bestehen sollte,
             wenden Sie sich gerne an den Webseiten-Betreuer!</p>
 
-        <?php if ($fc->exception !== null) : ?>
-            <?php $fc->ncm->log->debug($fc->exception->getTraceAsString()); ?>
+        <?php if ($mod->exception !== null) : ?>
+            <?php // TODO Art der Fehlerausgabe sollte konfigurierbar sein! ?>
+            <pre><?php echo $mod->exception->getTraceAsString(); ?></pre>
+            <?php //$mod->debug($mod->exception->getTraceAsString()); ?>
         <?php endif; ?>
     </div>
 </div>

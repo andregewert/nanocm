@@ -4,35 +4,29 @@
  * Ob und wie eine Seitenleiste gefüllt wird, kann konfiguriert werden
  */
 
-/* @var $fc Ubergeek\NanoCm\FrontController */
-$fc = $this;
-/* @var $ncm Ubergeek\NanoCm\NanoCm */
-$ncm = $this->ncm;
-/* @var $orm Ubergeek\NanoCm\Orm */
-$orm = $this->ncm->orm;
-/* @var $log Ubergeek\Log\LoggerInterface */
-$log = $ncm->getLog();
-/* @var \Ubergeek\NanoCm\Article[] */
-$latestArticles = $orm->getLatestArticles();
+/* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
+$mod = $this;
+$mod->setTitle($mod->orm->getPageTitle());
 
-$fc->setTitle($orm->getPageTitle());
+/* @var \Ubergeek\NanoCm\Article[] */
+$latestArticles = $mod->orm->getLatestArticles();
 ?>
 
 <?php if (count($latestArticles) >= 1) : ?>
     <div class="jumbotron">
         <div class="container">
-            <h1 class="display-3"><a href="dummy"><?php echo $fc->htmlEncode($latestArticles[0]->headline); ?></a></h1>
+            <h1 class="display-3"><a href="dummy"><?php echo $mod->htmlEncode($latestArticles[0]->headline); ?></a></h1>
             <?php if (strlen($latestArticles[0]->teaser) > 0) : ?>
-                <?php echo $ncm->convertFormattedText($latestArticles[0]->teaser); ?>
+                <?php echo $mod->ncm->convertFormattedText($latestArticles[0]->teaser); ?>
             <?php endif; ?>
-            <?php echo $ncm->convertFormattedText($latestArticles[0]->content); ?>
+            <?php echo $mod->ncm->convertFormattedText($latestArticles[0]->content); ?>
             <p><a class="btn btn-primary btn-lg" href="#" role="button">Weiterlesen &raquo;</a></p>
         </div>
     </div>
 
     <div class="container">
         <p>
-            <?php var_dump($fc->parseRequestUri()); ?>
+            <?php //var_dump($fc->parseRequestUri()); ?>
         </p>
         <!-- Example row of columns -->
         <div class="row">

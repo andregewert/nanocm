@@ -130,21 +130,52 @@ class NanoCm {
     }
     
     /**
+     * Gibt den absoluten Namen der Site-spezifischen Datenbank-Datei zurück
+     * @return string Datenbank-Dateiname
+     */
+    private function getSiteDbFilename() : string {
+        $fname = $this->createPath(array(
+            $this->sysdir,
+            'db',
+            'site.sqlite'
+        ));
+        
+        $this->log->debug($fname);
+        return $fname;
+    }
+    
+    /**
      * Gibt das Datenbank-Handle für die Standard-System-Datenbank zurück
      * @return \PDO
      */
-    protected function getDbHandle() : \PDO {
+    private function getDbHandle() : \PDO {
         if ($this->basedb == null) {
             $this->basedb = new \PDO(
-                'sqlite:' . $this->createPath(array(
-                    $this->sysdir,
-                    'db',
-                    'site.sqlite'
-                ))
+                'sqlite:' . $this->getSiteDbFilename()
             );
             $this->basedb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
         return $this->basedb;
+    }
+    
+    /**
+     * Überprüft, ob in einer SQLite-Datenbank eine bestimmte Tabelle vorhanden
+     * ist
+     * @param \PDO $pdo Datenbank-Handle
+     * @param string $tableName Zu prüfender Tabellenname
+     * @return boolean true, wenn die genannte Tabelle vorhanden ist, ansonsten
+     *      false
+     */
+    private function isTableExisting(\PDO $pdo, string $tableName) {
+        $stmt = $pdo->prepare('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=:name ');
+        $stmt->bindValue('name', $tableName);
+        $stmt->execute();
+        
+        if (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $this->log->debug("Table $tableName is existing");
+            return true;
+        }
+        return false;
     }
     
     // </editor-fold>
@@ -181,10 +212,20 @@ class NanoCm {
     public function isNanoCmConfigured() : bool {
         
         // Prüfen, ob Datenbank vorhanden
+        if (!file_exists($this->getSiteDbFilename())) return false;
         
+        // Wenn Datenbank(-datei) vorhanden: prüfen, ob geforderte Tabellen
+        // vorhanden
+        $pdo = $this->getDbHandle();
+        if (!$this->isTableExisting($pdo, 'setting')) return false;
+
         // Basiseinstellungen validieren
+        // ...
         
-        return false;
+        // Eventuell auch die Datenbank-Version überprüfen?
+        // ...
+        
+        return true;
     }
     
     /**

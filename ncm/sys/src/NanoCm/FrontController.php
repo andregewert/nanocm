@@ -20,7 +20,16 @@
 namespace Ubergeek\NanoCm;
 
 /**
- * Basis-Anwendung für das Nano CM
+ * Basis-Anwendung für das Nano CM.
+ * 
+ * Der FrontController beinhalt nicht viel mehr als ein simples Routing auf
+ * passende Module, die jeweils eigene Controller-Implementierungen darstellen.
+ * 
+ * Die Modul-Struktur soll flexibel sein und die Entwicklung von neuen
+ * Funktionen erleichtern. Sie ist aber nicht darauf angelegt, ein
+ * Plugin-System darzustellen, bei dem jederzeit Erweiterungen nach Belieben
+ * installiert werden können.
+ * 
  * @author agewert@ubergeek.de
  */
 class FrontController extends \Ubergeek\Controller\HttpController {
@@ -30,33 +39,6 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * @var \Ubergeek\NanoCm\NanoCm
      */
     public $ncm;
-    
-    /**
-     * Enthält eine Referenz auf die zuletzt aufgefangenge Exception.
-     * Kann im Template für die Fehlerausgabe verwendet werden.
-     * @var \Exception
-     */
-    public $exception;
-    
-    /**
-     * Zu renderndes Seiten-Template
-     * @var string
-     */
-    private $pageTemplate = 'page-standard.phtml';
-    
-    
-    // <editor-fold desc="Properties">
-
-    public function getPageTemplate() : string {
-        return $this->pageTemplate;
-    }
-    
-    public function setPageTemplate(string $template) {
-        $this->pageTemplate = $template;
-    }
-    
-    // </editor-fold>
-    
 
     /**
      * Dem Konstruktor wird lediglich der absolute Pfad zum öffentlichen
@@ -93,104 +75,41 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         
         // Eigentlichen Inhalt rendern
         
-
-        // Eigentlicher Inhalt
-        try {
-            $reqParts = $this->parseRequestUri();
-            switch ($reqParts) {
-                case 'admin':
-                    // Admin-Modul
-                    break;
-                
-                case 'soap':
-                    // SOAP-Schnittstelle
-                    break;
-                
-                case 'pages':
-                    // Frei definierbare Pages
-                    break;
-                
-                case 'weblog':
-                default:
-                    $content = $this->renderUserTemplate('content-start.phtml');
-            }
-        } catch (Exception $ex) {
-            $this->exception = $ex;
-            $content = $this->renderUserTemplate('exception.phtml');
+        if (!$this->ncm->isNanoCmConfigured()) {
+            // TODO Setup-Modul ausführen
+            $this->ncm->getLog()->debug("Setup durchführen!");
         }
-        $this->setContent($content);
         
-        // Äußeres Template rendern
-        // TODO Exception handling ergänzen
-        $this->setContent($this->renderUserTemplate($this->getPageTemplate()));
+        $reqParts = $this->parseRequestUri();
+        switch ($reqParts) {
+            case 'admin':
+                // Admin-Modul
+                break;
+
+            case 'soap':
+                // SOAP-Schnittstelle
+                break;
+
+            case 'pages':
+                // Frei definierbare Pages
+                break;
+
+            case 'weblog':
+            default:
+                $module = new Module\CoreModule($this);
+        }
+
+        // TODO Exceptions vernünftig abfangen und darstellen!
+        try {
+            if ($module !== null) {
+                $module->execute();
+            }
+        } catch (\Exception $ex) {
+            // ...
+        }
         
         $this->ncm->getLog()->flushWriters();
         $this->ncm->getLog()->closeWriters();
-    }
-    
-    /**
-     * Rendert ein Template, das installations-spezifisch überschrieben werden
-     * kann.
-     * @param string $file Das zu rendernde Template (ohne Pfadangabe)
-     * @return string Inhalt des gerenderten Templates
-     * @throws \Exception Exceptions, die bei der Ausführung des Templates
-     *      geworfen werden, werden weitergeworfen
-     * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
-     */
-    public function renderUserTemplate(string $file) : string {
-        
-        // TODO Kontext-Objekt erstellen / deklarieren
-        
-        // TODO Prüfen, ob ein spezielles Template-Verzeichnis konfiguriert ist
-        
-        $fname = $this->ncm->createPath(array(
-            $this->ncm->pubdir,
-            'tpl',
-            $file
-        ));
-        
-        if (!file_exists($fname)) {
-            $fname = $this->ncm->createPath(array(
-                $this->ncm->sysdir,
-                'tpl',
-                $file
-            ));
-        }
-        
-        if (!file_exists($fname)) {
-            throw new \Exception("Template file not found: $file");
-        }
-        
-        // Ermitteltes Template einbinden
-        ob_start();
-        try {
-            include($fname);
-            $c = ob_get_contents();
-        } catch (\Exception $ex) {
-            throw $ex;
-        } finally {
-            ob_end_clean();
-        }
-        
-        return $c;
-    }
-    
-    /**
-     * Bindet an Ort und Stelle ein Template ein
-     * @param string $file Relativer Pfad zum betreffenden Template
-     */
-    public function includeUserTemplate(string $file) {
-        echo $this->renderUserTemplate($file);
-    }
-    
-    /**
-     * Kodiert einen String für die HTML-Ausgabe.
-     * Der Eingabestring muss UTF8-kodiert sein.
-     * @param string $string
-     * @return HTML-kodierter String
-     */
-    public function htmlEncode($string) : string {
-        return $this->ncm->htmlEncode($string);
     }
     
     /**
@@ -209,7 +128,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
             array_push($parts, $dummy);
         }
         
-        $this->ncm->log->debug($parts);
+        //$this->ncm->log->debug($parts);
         return $parts;
     }
 }

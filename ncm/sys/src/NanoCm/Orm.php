@@ -234,8 +234,7 @@ class Orm {
         if ($limit !== null) {
             $sql .= ' LIMIT ' . intval($limit);
         }
-        
-        $this->log->debug($sql);
+
         $stmt = $this->basedb->prepare($sql);
         $stmt->execute();
 

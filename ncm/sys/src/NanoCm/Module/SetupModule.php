@@ -20,20 +20,24 @@
 namespace Ubergeek\NanoCm\Module;
 
 /**
- * Kern(-Ausgabe-)modul des NanoCM.
+ * Kapselt ein einfaches Setup für die Ersteinrichtung des NanoCM.
  * 
- * Dieses Modul implementiert die Kern-Ausgabe-Funktionen des Content Managers.
- * Dazu gehören insbesondere die Startseite, die Darstellung einzelner Artikel
- * sowie das CMS-Archiv.
+ * Der zentrale FrontController prüft bei seiner Ausführung, ob bereits eine
+ * konfigurierte Datenbank vorhanden ist. Wenn das nicht der Fall ist, wird
+ * immer das SetupModule ausgeführt. Das Setup besteht aus einem simplen
+ * Formular, in das die grundlegendsten Einstellungen vorgenommen werden müssen.
+ * Das Setup erstreckt über lediglich eine einzelne Seite. Werden die Eingaben
+ * bestätigt, wird sofort die Datenbank erstellt und mit den gemachten Eingaben
+ * gefüllt. Ab diesem Zeitpunkt sollte das SetupModule nicht wieder aufgerufen
+ * werden (können).
  * 
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2017-11-12
  */
-class CoreModule extends AbstractModule {
+class SetupModule extends AbstractModule {
     
     public function run() {
-        //$this->setPageTemplate(self::PAGE_NONE);
-        $content = $this->renderUserTemplate('content-start.phtml');
-        $this->setContent($content);
+        // TODO implementieren
     }
+
 }

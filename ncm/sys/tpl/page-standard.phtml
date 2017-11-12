@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <?php
-    /* @var $fc Ubergeek\NanoCm\FrontController */
-    $fc = $this;
+    /* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
+    $mod = $this;
 ?>
 <html lange="de">
     <head>
         <meta charset="utf-8">        
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <base href="<?php echo $fc->ncm->relativeBaseUrl; ?>">
+        <base href="<?php echo $mod->getBaseUrl(); ?>">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-        <title><?php echo $fc->htmlEncode($fc->getTitle()); ?></title>
+        <title><?php echo $mod->htmlEncode($mod->getTitle()); ?></title>
         <style type="text/css">
             body {
                 padding-top: 3.5rem;
@@ -17,14 +17,14 @@
         </style>
     </head>
     <body>
-        <?php echo $fc->includeUserTemplate('navigation-main.phtml'); ?>
+        <?php echo $mod->includeUserTemplate('navigation-main.phtml'); ?>
         
-        <?php echo $fc->getContent(); ?>
+        <?php echo $mod->getContent(); ?>
         
         <div class="container">
             <hr>
             <footer>
-                <p><?php echo $fc->htmlEncode($fc->ncm->orm->getCopyrightNotice()); ?></p>
+                <p><?php echo $mod->htmlEncode($mod->ncm->orm->getCopyrightNotice()); ?></p>
             </footer>
         </div>
         
