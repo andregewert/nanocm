@@ -45,6 +45,29 @@ class CoreModule extends AbstractModule {
                 }
                 break;
             
+            // Anmeldung
+            case 'login.php':
+                if ($this->getAction() == 'login') {
+                    $success = $this->ncm->tryToLoginUser(
+                        $this->getParam('username', ''),
+                        $this->getParam('password', '')
+                    );
+                    if ($success) {
+                        $this->replaceMeta('location', 'index.php');
+                    } else {
+                        $content = $this->renderUserTemplate('error-login.phtml');
+                    }
+                } else {
+                    $content = $this->renderUserTemplate('content-login.phtml');
+                }
+                break;
+            
+            // Abmeldung
+            case 'logout.php':
+                $this->ncm->logoutUser();
+                $this->replaceMeta('location', 'index.php');
+                break;
+            
             // Startseite
             case 'index.php';
                 $content = $this->renderUserTemplate('content-start.phtml');

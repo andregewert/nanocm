@@ -1,0 +1,15 @@
+<?php
+    /* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
+    $mod = $this;
+    $mod->setTitle($mod->orm->getPageTitle() . ' - Anmeldung fehlgeschlagen');
+?>
+<div style="padding-top: 3.5em">
+    <div class="container">
+        <h1>Anmeldung fehlgeschlagen</h1>
+        <p>Die Anmeldung war nicht erfolgreich.</p>
+        <p><a href="/login.php">Erneut versuchen</a></p>
+        <?php
+            // TODO Passwort vergessen etc?
+        ?>
+    </div>
+</div>

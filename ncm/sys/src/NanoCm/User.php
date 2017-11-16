@@ -63,6 +63,12 @@ class User {
     public $lastname;
     
     /**
+     * Benutzername (Login-Name) des Benutzers
+     * @var string
+     */
+    public $username;
+    
+    /**
      * Einwegverschlüsseltes Benutzer-Passwort
      * @var string
      */
@@ -89,6 +95,14 @@ class User {
     
     // <editor-fold desc="Public methods">
 
+    /**
+     * Gibt den vollständigen Namen im Format Nachname, Vorname zurück
+     * @return string
+     */
+    public function getFullName() : string {
+        return $this->lastname . ', ' . $this->firstname;
+    }
+    
     /**
      * Erstellt ein User-Objekt anhand des übergebenen PDO-Statements
      * @param \PDOStatement $stmt

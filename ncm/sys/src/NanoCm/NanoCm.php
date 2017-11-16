@@ -50,6 +50,12 @@ class NanoCm {
      * @var Orm
      */
     public $orm = null;
+    
+    /**
+     * Session-Manager
+     * @var \Ubergeek\Session\SessionInterface
+     */
+    public $session = null;
 
     /**
      * Log-Instanz
@@ -127,6 +133,13 @@ class NanoCm {
                 new Log\Filter\PriorityFilter(\Ubergeek\Log\Logger::DEBUG, Log\Filter\PriorityFilter::OPERATOR_MIN)
             )
         );
+        
+        $this->session = new \Ubergeek\Session\SimpleSession('ncm');
+        $this->session->start();
+        
+        //$this->orm->setUserPasswordById(1, 'dummydumdum');
+        //$this->log->debug($this->tryLogin('agewert', 'dummydumdum'));
+        //$this->log->debug($this->getLoggedInUser());
     }
     
     /**
@@ -182,7 +195,7 @@ class NanoCm {
     
     
     // <editor-fold desc="Public methods">
-    
+
     /**
      * Gibt die (einzige) CM-Instanz zurück bzw erzeugt sie bei Bedarf
      * @param string $basepath
@@ -194,10 +207,52 @@ class NanoCm {
     }
     
     /**
+     * Gibt true zurück, wenn an der aktuellen NCM-Session ein Benutzer
+     * angemeldet ist.
+     * @return bool
+     */
+    public function isUserLoggedIn() : bool {
+        return $this->getLoggedInUser() != null;
+    }
+
+    /**
+     * Gibt - falls vorhanden - den angemeldeten Benutzer zurück.
+     * Ist aktuell kein Benutzer angemeldet, wird false zurück gegeben.
+     * @return User|null
+     */
+    public function getLoggedInUser() {
+        return $this->session->getVar('loggedInUser');
+    }
+    
+    /**
+     * Versucht, den angegebenen Benutzer mit einem bestimmten Passwort im
+     * Klartext anzumelden.
+     * @param string $username Benutzername
+     * @param string $passwdClear Das eingegebene Passwort im Klartext
+     * @return bool true, wenn der Anmeldevorgang erfolgreich war, ansonsten
+     *  false
+     */
+    public function tryToLoginUser(string $username, string $passwdClear) : bool {
+        $this->log->debug('Username: ' . $username);
+        $this->log->debug('Password: ' . $passwdClear);
+        
+        $user = $this->orm->getUserByCredentials($username, $passwdClear);
+        $this->session->setVar('loggedInUser', $user);
+        return $user != null;
+    }
+    
+    /**
+     * Meldet den aktuellen Benutzer von der Session ab
+     */
+    public function logoutUser() {
+        $this->session->setVar('loggedInUser', null);
+    }
+    
+    /**
      * Gibt die Referenz auf den verwendeten Logger zurück
      * @return \Ubergeek\Log\Logger
      */
-    public function getLog() : Log\LoggerInterface {
+    public function __getLog() : Log\LoggerInterface {
         return $this->log;
     }
 

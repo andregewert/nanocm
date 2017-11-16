@@ -128,6 +128,38 @@ class Orm {
     
     
     // <editor-fold desc="User">
+
+    /**
+     * Setzt das Passwort für einen bestimmten Benutzer
+     * @param int $id Benutzer-ID
+     * @param string $password Neues Passwort
+     * @return bool true bei Erfolg
+     */
+    public function setUserPasswordById(int $id, string $password) : bool {
+        $stmt = $this->basedb->prepare('
+            UPDATE user SET password = :password WHERE id = :id
+        ');
+        $stmt->bindValue('password', password_hash($password, PASSWORD_DEFAULT));
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
+    
+    /**
+     * Setzt das Passwort für einen bestimmten Benutzer
+     * @param string $username Benutzername
+     * @param string $password Neues Passwort
+     * @return bool true bei Erfolg
+     */
+    public function setUserPasswordByUsername(string $username, string $password) : bool {
+        $stmt = $this->basedb->prepare('
+            UPDATE user SET password = :password WHERE username = :username
+        ');
+        $stmt->bindValue('password', password_hash($password, PASSWORD_DEFAULT));
+        $stmt->bindValue('username', $username);
+        $stmt->execute();
+        return $stmt->rowCount() > 0;
+    }
     
     /**
      * Durchsucht die Benutzerdatenbank nach flexiblen Filterkriterien
@@ -144,13 +176,18 @@ class Orm {
      * 
      * Kann der angefordrte Benutzer-Datensatz nicht gefunden werden, so wird
      * NULL zurück gegeben.
-     * @param int $id
+     * @param int $id Benutzer-ID
+     * @param bool $includeInactive Auf true setzen, wenn auch inaktive Konten
+     *  berücksichtigt werden sollen
      * @return User Gesuchter Benutzer-Datensatz oder NULL
      */
-    public function getUserById(int $id) {
-        $stmt = $this->basedb->prepare('
-            SELECT * FROM User WHERE id = :userid
-        ');
+    public function getUserById(int $id, bool $includeInactive) {
+        $sql = 'SELECT * FROM User WHERE id = :userid ';
+        if (!$includeInactive) {
+            $sql .= 'AND status_code <> 9 ';
+        }
+        
+        $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('userid', $id);
         $stmt->execute();
         
@@ -163,14 +200,19 @@ class Orm {
      * 
      * Kann der angeforderte Benutzer-Datensatz nicht gefunden werden, so wird
      * NULL zurück gegeben.
-     * @param string $username
+     * @param string $username Benutzername
+     * @param bool $includeInactive Auf true setzen, wenn auch inaktive Konten
+     *  berücksichtigt werden sollen
      * @return User Gesuchter Benutzer-Datensatz oder NULL
      */
-    public function getUserByUsername(string $username) {
-        $stmt = $this->basedb->prepare('
-            SELECT * FROM User WHERE username = :username
-        ');
-        $stmt->bindValue('userid', $username);
+    public function getUserByUsername(string $username, bool $includeInactive) {
+        $sql = 'SELECT * FROM User WHERE username = :username ';
+        if (!$includeInactive) {
+            $sql .= 'AND status_code <> 9 ';
+        }
+        
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('username', $username);
         $stmt->execute();
         
         return User::fetchFromPdoStmt($stmt);
@@ -189,7 +231,11 @@ class Orm {
      * @return User Gesuchter Benutzer-Datensatz oder NULL
      */
     public function getUserByCredentials(string $username, string $passwd) {
-        // TODO Implementieren
+        $user = $this->getUserByUsername($username, false);
+        if ($user != null) {
+            if (password_verify($passwd, $user->password)) return $user;
+        }
+        return null;
     }
     
     /**

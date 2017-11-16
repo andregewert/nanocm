@@ -184,7 +184,7 @@ abstract class HttpController implements ControllerInterface {
      * @return mixed
      */
     public function getVar(string $key, $default = null) {
-        if (!is_array($this->vars) || !array_key_exists($this->vars, $key)) {
+        if (!is_array($this->vars) || !array_key_exists($key, $this->vars)) {
             return $default;
         }
         return $this->vars[$key];
@@ -209,7 +209,7 @@ abstract class HttpController implements ControllerInterface {
                 $dummy[] = $header;
             }
         }
-        $dummy[$key] = $value;
+        $dummy[] = new \Ubergeek\KeyValuePair($key, $value);
         $this->headers = $dummy;
     }
 

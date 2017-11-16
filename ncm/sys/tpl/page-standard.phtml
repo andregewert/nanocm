@@ -24,7 +24,13 @@
         <div class="container">
             <hr>
             <footer>
-                <p><?php echo $mod->htmlEncode($mod->ncm->orm->getCopyrightNotice()); ?></p>
+                <p><?php echo $mod->htmlEncode($mod->ncm->orm->getCopyrightNotice()); ?>&nbsp;&middot;
+                    <?php if ($mod->ncm->isUserLoggedIn()) : ?>
+                    <a href="/logout.php">Abmelden (<?php echo $mod->htmlEncode($mod->ncm->getLoggedInUser()->getFullName()); ?>)</a>
+                    <?php else : ?>
+                        <a href="/login.php">Anmelden</a>
+                    <?php endif; ?>
+                </p>
             </footer>
         </div>
         

@@ -108,8 +108,8 @@ class FrontController extends \Ubergeek\Controller\HttpController {
             // ...
         }
         
-        $this->ncm->getLog()->flushWriters();
-        $this->ncm->getLog()->closeWriters();
+        $this->ncm->log->flushWriters();
+        $this->ncm->log->closeWriters();
     }
     
     /**
