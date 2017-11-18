@@ -152,8 +152,6 @@ class NanoCm {
             'db',
             'site.sqlite'
         ));
-        
-        $this->log->debug($fname);
         return $fname;
     }
     
@@ -185,7 +183,6 @@ class NanoCm {
         $stmt->execute();
         
         if (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
-            $this->log->debug("Table $tableName is existing");
             return true;
         }
         return false;
@@ -233,9 +230,6 @@ class NanoCm {
      *  false
      */
     public function tryToLoginUser(string $username, string $passwdClear) : bool {
-        $this->log->debug('Username: ' . $username);
-        $this->log->debug('Password: ' . $passwdClear);
-        
         $user = $this->orm->getUserByCredentials($username, $passwdClear);
         $this->session->setVar('loggedInUser', $user);
         return $user != null;

@@ -322,10 +322,21 @@ class Orm {
     }
     
     /**
-     * Gibt den Standard-Seitentitel zurück
+     * Gibt den Standard-Seitentitel zurück.
+     * 
+     * Wenn der Seitentitel nicht ermittelt werden kann (weil beispielsweise
+     * noch keine Datenbank vorhanden ist), so wird ein Vorgabetitel zurück
+     * gegeben.
+     * @return string Seitentitel
      */
-    public function getPageTitle() {
-        return $this->getSettingValue(Constants::SETTING_SYSTEM_PAGETITLE);
+    public function getPageTitle() : string {
+        $title = 'NanoCM';
+        try {
+            $title = $this->getSettingValue(Constants::SETTING_SYSTEM_PAGETITLE);
+        } catch (\Exception $ex) {
+            $this->log->debug($ex);
+        }
+        return $title;
     }
     
     // </editor-fold>

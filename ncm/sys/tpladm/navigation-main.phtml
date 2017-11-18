@@ -1,0 +1,31 @@
+<?php
+    /* @var $fc \Ubergeek\NanoCm\FrontController */
+    $fc = $this;
+?>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/index.php">NanoCM</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/admin/index.php">Dashboard <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/articles/index.php">Artikel</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/users/index.php">Benutzer</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/stats/index.php">Statistiken</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/settings/index.php">Einstellungen</a>
+            </li>
+            <li class="nav-item"><a href="/logout.php" class="nav-link">Logout</a></li>
+        </ul>
+    </div>
+</nav>

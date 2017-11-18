@@ -24,13 +24,11 @@
         <div class="container">
             <hr>
             <footer>
-                <p><?php echo $mod->htmlEncode($mod->ncm->orm->getCopyrightNotice()); ?>&nbsp;&middot;
+                <p>NanoCM &copy; 2017 Andr&eacute; Gewert
                     <?php if ($mod->ncm->isUserLoggedIn()) : ?>
-                        <a href="/logout.php">Abmelden (<?php echo $mod->htmlEncode($mod->ncm->getLoggedInUser()->getFullName()); ?>)</a>&nbsp;&middot;
-                        <a href="/admin/index.php">Seite verwalten</a>
-                    <?php else : ?>
-                        <a href="/login.php">Anmelden</a>
-                    <?php endif; ?>
+                        &middot; <a href="/logout.php">Abmelden</a>
+                    <?php endif; ?> &middot;
+                    <a href="http://www.ubereek.de/">www.ubergeek.de</a>
                 </p>
             </footer>
         </div>

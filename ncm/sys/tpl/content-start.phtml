@@ -6,7 +6,6 @@
 
 /* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
 $mod = $this;
-$mod->setTitle($mod->orm->getPageTitle());
 
 /* @var \Ubergeek\NanoCm\Article[] */
 $latestArticles = $mod->orm->getLatestArticles();
@@ -25,9 +24,6 @@ $latestArticles = $mod->orm->getLatestArticles();
     </div>
 
     <div class="container">
-        <p>
-            <?php //var_dump($fc->parseRequestUri()); ?>
-        </p>
         <!-- Example row of columns -->
         <div class="row">
             <div class="col-md-4">

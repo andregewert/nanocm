@@ -39,14 +39,17 @@ class CoreModule extends AbstractModule {
             // Artikelansicht oder Archiv
             case 'weblog':
                 if ($parts[1] == 'article') {
+                    $this->setTitle($this->getPageTitle() . ' - Artikel');
                     $content = $this->renderUserTemplate('content-weblog-article.phtml');
                 } elseif ($parts[1] == 'archive') {
+                    $this->setTitle($this->getPageTitle() . ' - Archiv');
                     $content = $this->renderUserTemplate('content-weblog-archive.phtml');
                 }
                 break;
             
             // Anmeldung
             case 'login.php':
+                $this->setTitle($this->getPageTitle() . ' - Anmelden');
                 if ($this->getAction() == 'login') {
                     $success = $this->ncm->tryToLoginUser(
                         $this->getParam('username', ''),
@@ -70,11 +73,13 @@ class CoreModule extends AbstractModule {
             
             // Startseite
             case 'index.php';
+                $this->setTitle($this->getPageTitle());
                 $content = $this->renderUserTemplate('content-start.phtml');
                 break;
         }
         
         if ($content == null) {
+            $this->setTitle($this->getPageTitle() . ' - Seite nicht gefunden!');
             http_response_code(404);
             $this->setContent($this->renderUserTemplate('error-404.phtml'));
         } else {

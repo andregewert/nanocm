@@ -81,19 +81,27 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         }
         
         $reqParts = $this->getRelativeUrlParts();
-        switch ($reqParts) {
+        switch ($reqParts[0]) {
+            // Admin-Modul (Web-Interface)
             case 'admin':
-                // Admin-Modul
+                $module = new Module\AdminModule($this);
                 break;
 
+            // SOAP-Schnittstelle (für Remote-Administration)
             case 'soap':
-                // SOAP-Schnittstelle
                 break;
 
+            // Frei definierbare Pages
             case 'page':
-                // Frei definierbare Pages
+                $module = new Module\PageModule($this);
+                break;
+            
+            // Reines Testmodul
+            case 'test':
+                $module = new Module\TestModule($this);
                 break;
 
+            // Weblog / Kernfunktionen
             case 'weblog':
             default:
                 $module = new Module\CoreModule($this);
@@ -120,9 +128,6 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         $abs = $this->getHttpRequest()->requestUri->getBaseDocument();
         $rel = $this->ncm->relativeBaseUrl;
         $res = substr($abs, strlen($rel));
-        
-        $this->ncm->log->debug($res);
-        
         $parts = explode('/', $res);
         
         $dummy = array_pop($parts);
@@ -133,9 +138,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         if (preg_match('/\.([^\.]+)$/i', $dummy) == false) {
             array_push($parts, 'index.php');
         }
-        
-        $this->ncm->log->debug($parts);
-        $this->ncm->log->debug(basename($this->request->requestUri->document));
+
         return $parts;
     }
 }

@@ -124,6 +124,25 @@ abstract class AbstractModule implements
      */
     public $templateOptions = array();
     
+    /**
+     * Gibt den relativen Pfad zu den Templatedateien an
+     * @var string
+     */
+    public $templateDir = 'tpl';
+
+    /**
+     * Gibt an, ob die jeweiligen Templates (die im Systemverzeichnis abgelegt
+     * sind) auch durch installationsspezifische Versionen (die überhalb des
+     * NCM-Systemverzeichnisses abgelegt sind) überschrieben werden können.
+     * 
+     * Bei den Templates für den Administrationsbereich ist das bspw. nicht
+     * der Fall; hier sollen immer ausschließlich die vordefinierten
+     * Systemdateien verwendet werden.
+     * 
+     * @var bool
+     */
+    public $allowUserTemplates = true;
+    
     // </editor-fold>
     
     
@@ -154,6 +173,14 @@ abstract class AbstractModule implements
      */
     public function getBaseUrl() {
         return $this->ncm->relativeBaseUrl;
+    }
+
+    /**
+     * Gibt den Standardtitel der Seite / Installation zurück.
+     * @return string Seitentitel
+     */
+    public function getPageTitle() : string {
+        return $this->orm->getPageTitle();
     }
 
     /**
@@ -231,16 +258,18 @@ abstract class AbstractModule implements
      */
     public function renderUserTemplate(string $file) : string {
         
-        $fname = $this->ncm->createPath(array(
-            $this->ncm->pubdir,
-            'tpl',
-            $file
-        ));
+        if ($this->allowUserTemplates) {
+            $fname = $this->ncm->createPath(array(
+                $this->ncm->pubdir,
+                $this->templateDir,
+                $file
+            ));
+        }
         
-        if (!file_exists($fname)) {
+        if (!$this->allowUserTemplates || !file_exists($fname)) {
             $fname = $this->ncm->createPath(array(
                 $this->ncm->sysdir,
-                'tpl',
+                $this->templateDir,
                 $file
             ));
         }
@@ -262,7 +291,7 @@ abstract class AbstractModule implements
         
         return $c;
     }
-
+    
     /**
      * Gibt die relativen (in Bezug nur NCM-Installation) URL-Bestandteile
      * zurück
@@ -282,11 +311,12 @@ abstract class AbstractModule implements
         try {
             $this->init();
             $this->run();
+        } catch (\Ubergeek\NanoCm\Exception\AuthorizationException $ex) {
+            $this->exception = $ex;
+            $this->setContent($this->renderUserTemplate('exception-authorization.phtml'));
         } catch (\Exception $ex) {
             $this->exception = $ex;
-            $this->setContent(
-                $this->renderUserTemplate('exception.phtml')
-            );
+            $this->setContent($this->renderUserTemplate('exception.phtml'));
         }
 
         // Äußeres Template rendern
