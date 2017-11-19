@@ -55,36 +55,36 @@ class FrontController extends \Ubergeek\Controller\HttpController {
      * Arbeitet den aktuellen Request ab und erzeugt eine entsprechende Antwort
      * (Response)
      */
-    public function run() {        
-        // Wenn Installation noch nicht konfiguriert: Einrichtungsassistenten
-        // ausführen
-        
-        // Datenbankverbindung herstellen (und testen!)
-        
-        // Request parsen
-        
-        // Passendes Modul ausführen
-        
-        // Fallback-Modul ist immer DefaultModule
-        
-        // Content generieren
-        
-        // Content in Template einfügen
-        
-        // Content ausgeben
-        
-        // Eigentlichen Inhalt rendern
-        
+    public function run() {
+        // TODO Generisches Mapping von URL-Strings auf Modulnamen
+
+        // TODO Gegebenenfalls Setup-Modul ausführen
         if (!$this->ncm->isNanoCmConfigured()) {
-            // TODO Setup-Modul ausführen
             $this->ncm->getLog()->debug("Setup durchführen!");
         }
         
-        $reqParts = $this->getRelativeUrlParts();
-        switch ($reqParts[0]) {
+        $moduleName = null;
+        switch ($this->getRelativeUrlPart(0)) {
             // Admin-Modul (Web-Interface)
             case 'admin':
-                $module = new Module\AdminModule($this);
+                switch ($this->getRelativeUrlPart(1)) {
+                    case 'articles':
+                        $moduleName = 'AdminArticlesModule';
+                        break;
+                    case 'users':
+                        $moduleName = 'AdminUsersModule';
+                        break;
+                    case 'stats':
+                        $moduleName = 'AdminStatsModule';
+                        break;
+                    case 'settings':
+                        $moduleName = 'AdminSettingsModule';
+                        break;
+                    case '':
+                    case 'index.php':
+                        $moduleName = 'AdminDashboardModule';
+                        break;
+                }
                 break;
 
             // SOAP-Schnittstelle (für Remote-Administration)
@@ -93,27 +93,29 @@ class FrontController extends \Ubergeek\Controller\HttpController {
 
             // Frei definierbare Pages
             case 'page':
-                $module = new Module\PageModule($this);
+                $moduleName = 'PageModule';
                 break;
             
             // Reines Testmodul
             case 'test':
-                $module = new Module\TestModule($this);
+                $moduleName = 'TestModule';
                 break;
 
             // Weblog / Kernfunktionen
             case 'weblog':
             default:
-                $module = new Module\CoreModule($this);
+                $moduleName = 'CoreModule';
         }
 
         // TODO Exceptions vernünftig abfangen und darstellen!
         try {
-            if ($module !== null) {
+            if ($moduleName !== null) {
+                $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
+                $module = new $moduleName($this);
                 $module->execute();
             }
         } catch (\Exception $ex) {
-            // ...
+            var_dump($ex);
         }
         
         $this->ncm->log->flushWriters();
@@ -140,5 +142,13 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         }
 
         return $parts;
+    }
+    
+    public function getRelativeUrlPart(int $idx) : string {
+        $parts = $this->getRelativeUrlParts();
+        if (count($parts) > $idx) {
+            return $parts[$idx];
+        }
+        return '';
     }
 }

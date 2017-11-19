@@ -241,14 +241,6 @@ class NanoCm {
     public function logoutUser() {
         $this->session->setVar('loggedInUser', null);
     }
-    
-    /**
-     * Gibt die Referenz auf den verwendeten Logger zurück
-     * @return \Ubergeek\Log\Logger
-     */
-    public function __getLog() : Log\LoggerInterface {
-        return $this->log;
-    }
 
     /**
      * Überprüft, ob die aktuelle NanoCM-Installation bereits korrekt
@@ -295,16 +287,6 @@ class NanoCm {
      */
     public function createPath(array $parts) : string {
         return join(DIRECTORY_SEPARATOR, $parts);
-    }
-    
-    /**
-     * Kodiert einen String für die HTML-Ausgabe.
-     * Der Eingabestring muss UTF8-kodiert sein.
-     * @param string $string
-     * @return HTML-kodierter String
-     */
-    public function htmlEncode($string) : string {
-        return htmlentities($string, ENT_HTML5, 'utf-8');
     }
     
     /**

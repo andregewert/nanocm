@@ -1,6 +1,9 @@
 <?php
-    /* @var $fc \Ubergeek\NanoCm\FrontController */
-    $fc = $this;
+    /* @var $mod \Ubergeek\NanoCm\Module\AbstractAdminModule */
+    $mod = $this;
+    
+    $current = $mod->getRelativeUrlPart(1);
+    $mod->log->debug($current);
 ?>
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" href="/index.php">NanoCM</a>
@@ -10,19 +13,19 @@
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="/admin/index.php">Dashboard <span class="sr-only">(current)</span></a>
+            <li class="nav-item<?php if ($current == '' || $current == 'index.php') echo ' active'; ?>">
+                <a class="nav-link" href="/admin/index.php">Dashboard</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item<?php if ($current == 'articles') echo ' active'; ?>">
                 <a class="nav-link" href="/admin/articles/index.php">Artikel</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item<?php if ($current == 'users') echo ' active'; ?>">
                 <a class="nav-link" href="/admin/users/index.php">Benutzer</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item<?php if ($current == 'stats') echo ' active'; ?>">
                 <a class="nav-link" href="/admin/stats/index.php">Statistiken</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item<?php if ($current == 'settings') echo ' active'; ?>">
                 <a class="nav-link" href="/admin/settings/index.php">Einstellungen</a>
             </li>
             <li class="nav-item"><a href="/logout.php" class="nav-link">Logout</a></li>

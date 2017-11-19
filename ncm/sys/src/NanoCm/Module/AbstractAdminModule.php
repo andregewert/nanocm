@@ -17,22 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek\NanoCm\ContentConverter;
-use Ubergeek\NanoCm\Util;
+namespace Ubergeek\NanoCm\Module;
+use Ubergeek\NanoCm\UserType;
+use Ubergeek\NanoCm\Exception;
 
 /**
- * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach
- * HTML
+ * Basisklasse für Administrations-Module
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-04
+ * @created 2017-11-19
  */
-class HtmlConverter extends DecoratedContentConverter {
-    
-    public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input): string {
-        if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
-        }
-        return '<p>' . Util::htmlEncode($input) . '</p>';
-    }
+abstract class AbstractAdminModule extends AbstractModule {
 
+    /**
+     * Überprüft auf grundlegende Zugriffsberechtigung auf den
+     * Administrationsbereiche
+     * @throws Exception\AuthorizationException
+     */
+    public function init() {
+        if ($this->ncm->isUserLoggedIn() && $this->ncm->getLoggedInUser()->usertype >= UserType::EDITOR) {
+            $this->templateDir = 'tpladm';
+            $this->allowUserTemplates = false;
+            $this->setPageTemplate('page-admin.phtml');
+        } else {
+            throw new Exception\AuthorizationException("Authentifizierung notwendig!");
+        }
+    }
+    
 }

@@ -43,7 +43,7 @@ abstract class Constants {
      * Seitentitel
      * @var string
      */
-    const SETTING_SYSTEM_PAGETITLE = 'system.pagetitle';
+    const SETTING_SYSTEM_SITETITLE = 'system.pagetitle';
     
     /**
      * Copyright- bzw. Footer-Hinweis

@@ -48,7 +48,8 @@ namespace Ubergeek\NanoCm\Module;
  * @created 2017-11-11
  */
 abstract class AbstractModule implements
-    \Ubergeek\Controller\ControllerInterface, \Ubergeek\Log\LoggerInterface {
+    \Ubergeek\Controller\ControllerInterface,
+    \Ubergeek\Log\LoggerInterface {
 
     // <editor-fold desc="Constants">
     
@@ -176,11 +177,11 @@ abstract class AbstractModule implements
     }
 
     /**
-     * Gibt den Standardtitel der Seite / Installation zurück.
+     * Gibt den Standardtitel der Site zurück.
      * @return string Seitentitel
      */
-    public function getPageTitle() : string {
-        return $this->orm->getPageTitle();
+    public function getSiteTitle() : string {
+        return $this->orm->getSiteTitle();
     }
 
     /**
@@ -236,7 +237,8 @@ abstract class AbstractModule implements
      * @return HTML-kodierter String
      */
     public function htmlEncode($string) : string {
-        return $this->ncm->htmlEncode($string);
+        //return $this->ncm->htmlEncode($string);
+        return \Ubergeek\NanoCm\Util::htmlEncode($string);
     }
     
     /**
@@ -300,6 +302,14 @@ abstract class AbstractModule implements
     public function getRelativeUrlParts() : array {
         return $this->frontController->getRelativeUrlParts();
     }
+    
+    public function getRelativeUrlPart(int $idx) : string {
+        $parts = $this->getRelativeUrlParts();
+        if (count($parts) > $idx) {
+            return $parts[$idx];
+        }
+        return '';
+    }
 
     // </editor-fold>
     
@@ -317,6 +327,13 @@ abstract class AbstractModule implements
         } catch (\Exception $ex) {
             $this->exception = $ex;
             $this->setContent($this->renderUserTemplate('exception.phtml'));
+        }
+        
+        // Wenn kein Modul einen Inhalt generiert hat, Fehler 404 anzeigen
+        if (strlen($this->getContent()) == 0) {
+            $this->setTitle($this->getSiteTitle() . ' - Seite nicht gefunden!');
+            http_response_code(404);
+            $this->setContent($this->renderUserTemplate('error-404.phtml'));
         }
 
         // Äußeres Template rendern

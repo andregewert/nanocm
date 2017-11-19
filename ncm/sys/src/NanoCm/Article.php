@@ -26,6 +26,8 @@ namespace Ubergeek\NanoCm;
  */
 class Article {
     
+    // <editor-fold desc="Properties">
+    
     /**
      * Eindeutige ID des Artikels
      * @var integer
@@ -110,6 +112,11 @@ class Article {
      */
     public $enable_comments;
     
+    // </editor-fold>
+    
+    
+    // <editor-fold desc="Methods">
+    
     /**
      * Erstellt ein Article-Objekt anhand des übergebenen PDO-Statements
      * @param \PDOStatement $stmt
@@ -123,4 +130,10 @@ class Article {
         }
         return null;
     }
+    
+    public final function getArticleUrl() : string {
+        return '/weblog/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
+    }
+    
+    // </editor-fold>
 }

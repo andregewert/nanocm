@@ -14,7 +14,7 @@ $latestArticles = $mod->orm->getLatestArticles();
 <?php if (count($latestArticles) >= 1) : ?>
     <div class="jumbotron">
         <div class="container">
-            <h1 class="display-3"><a href="dummy"><?php echo $mod->htmlEncode($latestArticles[0]->headline); ?></a></h1>
+            <h1 class="display-3"><a href="<?php echo $mod->htmlEncode($latestArticles[0]->getArticleUrl()); ?>"><?php echo $mod->htmlEncode($latestArticles[0]->headline); ?></a></h1>
             <?php if (strlen($latestArticles[0]->teaser) > 0) : ?>
                 <?php echo $mod->ncm->convertFormattedText($latestArticles[0]->teaser); ?>
             <?php endif; ?>

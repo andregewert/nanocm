@@ -18,34 +18,18 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
-use Ubergeek\NanoCm\Exception;
 
-class AdminModule extends AbstractModule {
-    
-    public function init() {
-        // TODO Benutzertypen festlegen und an dieser Stelle auf "Admin" prüfen
-        if ($this->ncm->isUserLoggedIn()) {
-            $this->templateDir = 'tpladm';
-            $this->allowUserTemplates = false;
-        } else {
-            throw new Exception\AuthorizationException("Authentifizierung notwendig!");
-        }
-    }
+/**
+ * Startseite des Administrationsbereiches
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2017-11-19
+ */
+class AdminDashboardModule extends AbstractAdminModule {
     
     public function run() {
-        $this->setPageTemplate('page-admin.phtml');
-        
-        $content = null;
-        
+        $this->setTitle($this->getSiteTitle() . ' - Seite verwalten');
         $content = $this->renderUserTemplate('content-dashboard.phtml');
-        
-        if ($content == null) {
-            $this->setTitle($this->getPageTitle() . ' - Seite nicht gefunden!');
-            http_response_code(404);
-            $this->setContent($this->renderUserTemplate('error-404.phtml'));
-        } else {
-            $this->setContent($content);
-        }
+        $this->setContent($content);
     }
     
 }

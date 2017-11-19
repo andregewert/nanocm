@@ -18,6 +18,7 @@
  */
 
 namespace Ubergeek\NanoCm;
+use Ubergeek\NanoCm\StatusCode;
 
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.
@@ -184,7 +185,7 @@ class Orm {
     public function getUserById(int $id, bool $includeInactive) {
         $sql = 'SELECT * FROM User WHERE id = :userid ';
         if (!$includeInactive) {
-            $sql .= 'AND status_code <> 9 ';
+            $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
         }
         
         $stmt = $this->basedb->prepare($sql);
@@ -208,7 +209,7 @@ class Orm {
     public function getUserByUsername(string $username, bool $includeInactive) {
         $sql = 'SELECT * FROM User WHERE username = :username ';
         if (!$includeInactive) {
-            $sql .= 'AND status_code <> 9 ';
+            $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
         }
         
         $stmt = $this->basedb->prepare($sql);
@@ -270,10 +271,11 @@ class Orm {
                     start_timestamp <= CURRENT_TIMESTAMP
                     AND (stop_timestamp IS NULL OR stop_timestamp >= CURRENT_TIMESTAMP)
                 )
-            ';
+                AND status_code = ' . StatusCode::ACTIVE . ' ';
         }
         
         // TODO Filterbedingungen einfügen
+        // ...
         
         $sql .= 'ORDER BY publishing_timestamp DESC ';
         
@@ -329,10 +331,10 @@ class Orm {
      * gegeben.
      * @return string Seitentitel
      */
-    public function getPageTitle() : string {
+    public function getSiteTitle() : string {
         $title = 'NanoCM';
         try {
-            $title = $this->getSettingValue(Constants::SETTING_SYSTEM_PAGETITLE);
+            $title = $this->getSettingValue(Constants::SETTING_SYSTEM_SITETITLE);
         } catch (\Exception $ex) {
             $this->log->debug($ex);
         }

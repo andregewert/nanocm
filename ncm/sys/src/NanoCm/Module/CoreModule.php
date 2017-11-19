@@ -33,23 +33,24 @@ class CoreModule extends AbstractModule {
     
     public function run() {
         $parts = $this->getRelativeUrlParts();
-        $content = null;
+        $content = '';
         
         switch ($parts[0]) {
+            
             // Artikelansicht oder Archiv
             case 'weblog':
                 if ($parts[1] == 'article') {
-                    $this->setTitle($this->getPageTitle() . ' - Artikel');
+                    $this->setTitle($this->getSiteTitle() . ' - Artikel');
                     $content = $this->renderUserTemplate('content-weblog-article.phtml');
                 } elseif ($parts[1] == 'archive') {
-                    $this->setTitle($this->getPageTitle() . ' - Archiv');
+                    $this->setTitle($this->getSiteTitle() . ' - Archiv');
                     $content = $this->renderUserTemplate('content-weblog-archive.phtml');
                 }
                 break;
             
             // Anmeldung
             case 'login.php':
-                $this->setTitle($this->getPageTitle() . ' - Anmelden');
+                $this->setTitle($this->getSiteTitle() . ' - Anmelden');
                 if ($this->getAction() == 'login') {
                     $success = $this->ncm->tryToLoginUser(
                         $this->getParam('username', ''),
@@ -73,18 +74,12 @@ class CoreModule extends AbstractModule {
             
             // Startseite
             case 'index.php';
-                $this->setTitle($this->getPageTitle());
+                $this->setTitle($this->getSiteTitle());
                 $content = $this->renderUserTemplate('content-start.phtml');
                 break;
+            
         }
-        
-        if ($content == null) {
-            $this->setTitle($this->getPageTitle() . ' - Seite nicht gefunden!');
-            http_response_code(404);
-            $this->setContent($this->renderUserTemplate('error-404.phtml'));
-        } else {
-            $this->setContent($content);
-        }
+
+        $this->setContent($content);
     }
-    
 }

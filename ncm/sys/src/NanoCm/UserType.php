@@ -17,22 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek\NanoCm\ContentConverter;
-use Ubergeek\NanoCm\Util;
+namespace Ubergeek\NanoCm;
 
 /**
- * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach
- * HTML
+ * Definiert die unterschiedlichen Benutzerkonten-Type
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-04
+ * @created 2017-11-19
  */
-class HtmlConverter extends DecoratedContentConverter {
+final class UserType {
     
-    public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input): string {
-        if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
-        }
-        return '<p>' . Util::htmlEncode($input) . '</p>';
-    }
+    /**
+     * Gastzugang / kein Zugang zum Administrationsbereich
+     * @var integer
+     */
+    const GUEST = 0;
+    
+    /**
+     * Autor bzw. Redakteur; eingeschränkter Zugang zum Administrationsbereich
+     * @var integer
+     */
+    const EDITOR = 100;
 
+    /**
+     * Administrator mit vollständigem Zugang zum Administrationsbereich
+     * @var integer
+     */
+    const ADMIN = 500;
+    
 }

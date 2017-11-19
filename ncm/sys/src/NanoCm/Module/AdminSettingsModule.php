@@ -17,22 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Ubergeek\NanoCm\ContentConverter;
-use Ubergeek\NanoCm\Util;
+namespace Ubergeek\NanoCm\Module;
 
 /**
- * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach
- * HTML
+ * Verwaltung von Systemeinstellungen
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-04
+ * @created 2017-11-19
  */
-class HtmlConverter extends DecoratedContentConverter {
+class AdminSettingsModule extends AbstractAdminModule {
     
-    public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input): string {
-        if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
-        }
-        return '<p>' . Util::htmlEncode($input) . '</p>';
+    public function run() {
+        
     }
 
 }
