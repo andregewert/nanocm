@@ -60,9 +60,9 @@ class FrontController extends \Ubergeek\Controller\HttpController {
 
         // TODO Gegebenenfalls Setup-Modul ausführen
         if (!$this->ncm->isNanoCmConfigured()) {
-            $this->ncm->getLog()->debug("Setup durchführen!");
+            $this->ncm->log->debug("Setup durchführen!");
         }
-        
+
         $moduleName = null;
         switch ($this->getRelativeUrlPart(0)) {
             // Admin-Modul (Web-Interface)
@@ -70,6 +70,9 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                 switch ($this->getRelativeUrlPart(1)) {
                     case 'articles':
                         $moduleName = 'AdminArticlesModule';
+                        break;
+                    case 'pages':
+                        $moduleName = 'AdminPagesModule';
                         break;
                     case 'users':
                         $moduleName = 'AdminUsersModule';
@@ -103,18 +106,22 @@ class FrontController extends \Ubergeek\Controller\HttpController {
 
             // Weblog / Kernfunktionen
             case 'weblog':
-            default:
                 $moduleName = 'CoreModule';
         }
 
-        // TODO Exceptions vernünftig abfangen und darstellen!
+        // Als Fallback immer auf das Kernmodul gehen
+        if ($moduleName == null) {
+            $moduleName = 'CoreModule';
+        }
+
+        // TODO Exceptions besser / vernünftig darstellen!
         try {
-            if ($moduleName !== null) {
                 $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
                 $module = new $moduleName($this);
                 $module->execute();
-            }
         } catch (\Exception $ex) {
+            http_response_code(500);
+            $this->setTitle($this->ncm->orm->getSiteTitle() . ' - Systemfehler!');
             var_dump($ex);
         }
         

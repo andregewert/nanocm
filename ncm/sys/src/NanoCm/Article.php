@@ -126,6 +126,7 @@ class Article {
         if (($article = $stmt->fetchObject(__CLASS__)) !== false) {
             $article->creation_timestamp = new \DateTime($article->creation_timestamp);
             $article->modification_timestamp = new \DateTime($article->modification_timestamp);
+            $article->publishing_timestamp = new \DateTime($article->publishing_timestamp);
             return $article;
         }
         return null;

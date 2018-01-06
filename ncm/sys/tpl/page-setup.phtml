@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <?php
-    /* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
-    $mod = $this;
+    /* @var $this \Ubergeek\NanoCm\Module\SetupModule */
 ?>
-<html lange="de">
+<html lang="de">
     <head>
         <meta charset="utf-8">        
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <base href="<?php echo $mod->getBaseUrl(); ?>">
+        <base href="<?php echo $this->getBaseUrl(); ?>">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-        <title><?php echo $mod->htmlEncode($mod->getTitle()); ?></title>
+        <title><?php echo $this->htmlEncode($this->getTitle()); ?></title>
         <style type="text/css">
             body {
                 padding-top: 3.5rem;
@@ -19,7 +18,7 @@
     <body>
 
         <main role="main" class="container">
-            <?php echo $mod->getContent(); ?>
+            <?php echo $this->getContent(); ?>
         </main>
         
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

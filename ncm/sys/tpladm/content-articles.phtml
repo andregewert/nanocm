@@ -1,9 +1,12 @@
 <?php
-    /* @var $mod Ubergeek\NanoCm\Module\AdminModul */
-    $mod = $this;
+    /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
 ?>
 <div class="container">
     <h1>Artikel</h1>
+
+    <p>
+        <a name="" id="" class="btn btn-primary" href="#" role="button" title="Artikel hinzuf&uuml;gen">+</a>
+    </p>
 
     <table class="table table-bordered table-sm">
         <thead>
@@ -15,6 +18,22 @@
                 <th>Status</th>
             </tr>
         </thead>
-
+        <tbody>
+            <?php if (is_array($this->articles) && count($this->articles) > 0) : ?>
+                <?php foreach ($this->articles as $article) : ?>
+                    <tr>
+                        <td><?php echo $this->htmlEncode($article->id); ?></td>
+                        <td><?php echo $this->htmlEncode($article->headline); ?></td>
+                        <td><?php echo $this->htmlEncode($article->author_id); ?></td>
+                        <td><?php echo $this->htmlEncode($article->publishing_timestamp->format('Y-m-d')); ?></td>
+                        <td><?php echo $this->htmlEncode($article->status_code); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <tr>
+                    <td colspan="5">Keine Artikel gefunden</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
     </table>
 </div>

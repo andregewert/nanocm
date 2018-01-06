@@ -30,7 +30,10 @@ namespace Ubergeek\NanoCm\Module;
  * @created 2017-11-12
  */
 class CoreModule extends AbstractModule {
-    
+
+    /** @var bool Gibt an, ob es beim letzten Login-Versuch einen Fehler gegeben hat */
+    public $loginError = false;
+
     public function run() {
         $parts = $this->getRelativeUrlParts();
         $content = '';
@@ -59,11 +62,10 @@ class CoreModule extends AbstractModule {
                     if ($success) {
                         $this->replaceMeta('location', 'index.php');
                     } else {
-                        $content = $this->renderUserTemplate('error-login.phtml');
+                        $this->loginError = true;
                     }
-                } else {
-                    $content = $this->renderUserTemplate('content-login.phtml');
                 }
+                $content = $this->renderUserTemplate('content-login.phtml');
                 break;
             
             // Abmeldung

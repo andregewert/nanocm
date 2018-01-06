@@ -21,13 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 $font-headlines:    Fira Sans, Helvetica, sans-serif;
 $font-text:         Georgia, Times, serif;
+$background-color:  #fff;
 $primary-color:     #555;
 
 body {
-  font: 95% $font-text;
+  font-family: $font-text;
+  font-size: 80%;
   color: $primary-color;
+  background-color: $background-color;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font: $font-headlines;
+    font-family: $font-headlines;
 }

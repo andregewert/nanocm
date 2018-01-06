@@ -18,6 +18,7 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\NanoCm\Article;
 
 /**
  * Verwaltung der Artikel
@@ -47,10 +48,13 @@ class AdminArticlesModule extends AbstractAdminModule {
         $content = '';
         
         $this->log->debug($this->getRelativeUrlPart(2));
+        $this->setTitle($this->getSiteTitle() . ' - Artikel verwalten');
         
         switch ($this->getRelativeUrlPart(2)) {
             case 'index.php':
             case '':
+                $filter = new Article();
+                $this->articles = $this->orm->searchArticles($filter, false, 20);
                 $content = $this->renderUserTemplate('content-articles.phtml');
                 break;
         }

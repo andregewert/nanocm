@@ -20,8 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Author     : André Gewert <agewert@ubergeek.de>
 */
 body {
-  font: 95% Georgia, Times, serif;
-  color: #555; }
+  font-family: Georgia, Times, serif;
+  font-size: 80%;
+  color: #555;
+  background-color: #fff; }
 
 h1, h2, h3, h4, h5, h6 {
-  font: Fira Sans, Helvetica, sans-serif; }
+  font-family: Fira Sans, Helvetica, sans-serif; }
