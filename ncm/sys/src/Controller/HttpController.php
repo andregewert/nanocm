@@ -64,8 +64,11 @@ abstract class HttpController implements ControllerInterface {
     protected $response;
     
     // </editor-fold>
-    
-    
+
+
+    /**
+     * HttpController constructor.
+     */
     public function __construct() {
         $this->request = new HttpRequest();
         $this->response = new HttpResponse();
@@ -91,8 +94,9 @@ abstract class HttpController implements ControllerInterface {
      * Fügt einem Inhaltsbereich den übergebenen Content hinzu
      * @param string $content Hinzuzufügender Inhalte
      * @param string $area Name des Inhaltsbereichs
+     * @return string
      */
-    public function addContent(string $content, string $area = 'default'): string {
+    public function addContent(string $content, string $area = 'default') : string {
         if (!is_array($this->contents)) {
             $this->contents = array();
         }
@@ -100,6 +104,7 @@ abstract class HttpController implements ControllerInterface {
             $this->contents[$area] = '';
         }
         $this->contents[$area] .= $content;
+        return $this->contents[$area];
     }
 
     /**
@@ -158,7 +163,7 @@ abstract class HttpController implements ControllerInterface {
      * Gibt den Wert eines externen Parameters zurück
      * @param string $key Parameter-Name
      * @param mixed $default Vorgabewert, falls der Parameter nicht übergeben wurde
-     * @return Wert des Parameters
+     * @return mixed Wert des Parameters
      */
     public function getParam(string $key, $default = null) {
         if (!is_array($_REQUEST) || !array_key_exists($key, $_REQUEST)) {
@@ -198,6 +203,10 @@ abstract class HttpController implements ControllerInterface {
         return $this->vars;
     }
 
+    /**
+     * @param string $key
+     * @param string $value
+     */
     public function replaceMeta(string $key, string $value) {
         if (!is_array($this->headers)) {
             $this->headers = array();
@@ -213,6 +222,10 @@ abstract class HttpController implements ControllerInterface {
         $this->headers = $dummy;
     }
 
+    /**
+     * @param string $content
+     * @param string $area
+     */
     public function setContent(string $content, string $area = 'default') {
         if (!is_array($this->contents)) {
             $this->contents = array();
@@ -221,6 +234,10 @@ abstract class HttpController implements ControllerInterface {
         $this->contents[$area] = $content;
     }
 
+    /**
+     * @param string $key
+     * @param $value
+     */
     public function setParam(string $key, $value) {
         if (!is_array($_REQUEST)) {
             $_REQUEST = array();
@@ -228,6 +245,10 @@ abstract class HttpController implements ControllerInterface {
         $_REQUEST[$key] = $value;
     }
 
+    /**
+     * @param string $key
+     * @param $value
+     */
     public function setVar(string $key, $value) {
         if (!is_array($this->vars)) {
             $this->vars = array();
@@ -235,10 +256,16 @@ abstract class HttpController implements ControllerInterface {
         $this->vars[$key] = $value;
     }
 
+    /**
+     * @param string $title
+     */
     public function setTitle(string $title) {
         $this->title = $title;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getTitle() : string {
         return $this->title;
     }
