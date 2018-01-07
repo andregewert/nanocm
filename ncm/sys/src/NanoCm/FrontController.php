@@ -117,7 +117,10 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         // TODO Exceptions besser / vernünftig darstellen!
         try {
                 $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
+
+                /* @var $module \Ubergeek\NanoCm\Module\AbstractModule */
                 $module = new $moduleName($this);
+
                 $module->execute();
         } catch (\Exception $ex) {
             http_response_code(500);

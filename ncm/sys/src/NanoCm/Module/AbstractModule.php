@@ -229,21 +229,21 @@ abstract class AbstractModule implements
     public function setContentType(string $contentType) {
         $this->replaceMeta('content-type', $contentType);
     }
-    
+
     /**
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
      * @param string $string
-     * @return HTML-kodierter String
+     * @return string HTML-kodierter String
      */
     public function htmlEncode($string) : string {
-        //return $this->ncm->htmlEncode($string);
         return \Ubergeek\NanoCm\Util::htmlEncode($string);
     }
-    
+
     /**
      * Bindet an Ort und Stelle ein Template ein
      * @param string $file Relativer Pfad zum betreffenden Template
+     * @throws \Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
      */
     public function includeUserTemplate(string $file) {
         echo $this->renderUserTemplate($file);
@@ -259,7 +259,9 @@ abstract class AbstractModule implements
      * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
      */
     public function renderUserTemplate(string $file) : string {
-        
+        $fname = '';
+        $c = '';
+
         if ($this->allowUserTemplates) {
             $fname = $this->ncm->createPath(array(
                 $this->ncm->pubdir,
@@ -345,7 +347,7 @@ abstract class AbstractModule implements
     }
     
     public function addContent(string $content, string $area = 'default'): string {
-        $this->frontController->addContent($content, $area);
+        return $this->frontController->addContent($content, $area);
     }
 
     public function addMeta(string $key, string $value) {

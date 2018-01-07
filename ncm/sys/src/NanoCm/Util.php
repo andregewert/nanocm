@@ -25,12 +25,12 @@ namespace Ubergeek\NanoCm;
  * @created 2017-11-19
  */
 final class Util {
-    
+
     /**
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
      * @param string $string
-     * @return HTML-kodierter String
+     * @return string HTML-kodierter String
      */
     public static function htmlEncode(string $string) : string {
         return htmlentities($string, ENT_HTML5, 'utf-8');

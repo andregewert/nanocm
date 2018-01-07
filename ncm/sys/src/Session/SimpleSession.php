@@ -27,7 +27,8 @@ namespace Ubergeek\Session;
 class SimpleSession implements SessionInterface {
 
     private $namespace;
-    
+    private $id;
+
     public function __construct($namespace = 'default', $name = null) {
         if ($name != null) {
             session_name($name);

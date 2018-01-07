@@ -62,7 +62,8 @@ class Url {
     /**
      * Wenn dem Konstruktor keine Request-URL übergeben wird, dann werden die
      * Daten aus den Server-Superglobals gefüllt
-     * @param \Ubergeek\Controller\HttpRequest $httpRequest
+     * @param string|null $requestUrl
+     * @throws \Exception Wenn die übergebene URL nicht geparst werden kann
      */
     public function __construct(string $requestUrl = null) {
         if ($requestUrl == null) {

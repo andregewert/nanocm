@@ -30,7 +30,7 @@ abstract class AbstractWriter implements WriterInterface {
     /**
      * Dem Konstruktor können ein Filter oder ein Array mit mehreren Filtern
      * übergeben werden
-     * @param \Ubergeek\Log\Writer\Filter\FilterInterface|mixed $filters
+     * @param \Ubergeek\Log\Filter\FilterInterface|mixed $filters
      */
     public function __construct($filters = null) {
         if (is_array($filters)) {

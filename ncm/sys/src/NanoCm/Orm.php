@@ -18,7 +18,6 @@
  */
 
 namespace Ubergeek\NanoCm;
-use Ubergeek\NanoCm\StatusCode;
 
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.
@@ -55,11 +54,12 @@ class Orm {
      * @var \Ubergeek\Log\LoggerInterface
      */
     private $log;
-    
+
     /**
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
      * übergeben werden.
      * @param \PDO $dbhandle
+     * @param \Ubergeek\Log\LoggerInterface|null $log
      */
     public function __construct(\PDO $dbhandle, \Ubergeek\Log\LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
@@ -101,7 +101,7 @@ class Orm {
      * zweiten Parameter bestimmt werden, welcher Wert in diesem Fall zurück
      * gegeben werden soll.
      * @param string $name Name der gesuchten Einstellung
-     * @param type $default Optionaler Standard-Rückgabewert
+     * @param mixed $default Optionaler Standard-Rückgabewert
      * @return mixed Der gesuchte Wert oder der vorgegebene Standard-Wert
      */
     public function getSettingValue(string $name, $default = null) {
@@ -116,7 +116,7 @@ class Orm {
      * zweiten Parameter bestimmt werden, welcher Wert in diesem Fall zurück
      * gegeben werden soll.
      * @param string $name Name der gesuchten Einstellung
-     * @param type $default Optionaler Standard-Rückgabewert
+     * @param mixed $default Optionaler Standard-Rückgabewert
      * @return mixed Der gesuchte Wert oder der vorgegebene Standard-Wert
      */
     public function getSettingParams(string $name, $default = null) {
@@ -161,7 +161,7 @@ class Orm {
         $stmt->execute();
         return $stmt->rowCount() > 0;
     }
-    
+
     /**
      * Durchsucht die Benutzerdatenbank nach flexiblen Filterkriterien
      * @param array $filter = null
@@ -169,6 +169,7 @@ class Orm {
      */
     public function searchUsers(array $filter = null) {
         // TODO Implementieren
+        return array();
     }
 
     /**
@@ -274,8 +275,10 @@ class Orm {
                 AND status_code = ' . StatusCode::ACTIVE . ' ';
         }
         
-        // TODO Filterbedingungen einfügen
-        // ...
+        // Filterbedingungen einfügen
+        if (is_array($filter)) {
+            // TODO implementieren
+        }
         
         $sql .= 'ORDER BY publishing_timestamp DESC ';
         

@@ -38,7 +38,7 @@ interface LoggerInterface {
     
     /**
      * Gibt eine Debug-Meldung an den Logger weiter
-     * @param $msg Zu protokollierende Nachricht oder Daten
+     * @param mixed $data Zu protokollierende Nachricht oder Daten
      * @param \Exception $ex Optionale Referenz auf die auslösende Exception
      * @param array $backtrace Backtrace, falls vorhanden
      * @param string $line Auslösende Codezeile

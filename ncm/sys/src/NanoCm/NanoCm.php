@@ -30,7 +30,7 @@ class NanoCm {
     
     /**
      * Beinhaltet die ContentManager-Instanz
-     * @var \Ubergeek\NanoCm
+     * @var \Ubergeek\NanoCm\NanoCm
      */
     private static $ncm = null;
     
@@ -196,7 +196,7 @@ class NanoCm {
     /**
      * Gibt die (einzige) CM-Instanz zurück bzw erzeugt sie bei Bedarf
      * @param string $basepath
-     * @return \Ubergeek\NanoCm\ContentManager
+     * @return \Ubergeek\NanoCm\NanoCm
      */
     public static function createInstance(string $basepath) : NanoCm {
         self::$ncm = new NanoCm($basepath);
@@ -268,12 +268,13 @@ class NanoCm {
         
         return true;
     }
-    
+
     /**
      * Fügt eine URL (als String) zusammen
      * @param array $parts Bestandteile
      * @param bool $absolute Gibt an, ob die URL absolut (inklusive Protokoll
      * und Hostname) sein soll
+     * @return string
      */
     public function createUrl(array $parts, bool $absolute = false) : string {
         // TODO Implementieren
@@ -304,8 +305,14 @@ class NanoCm {
      */
     public function convertFormattedText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
         $classname = 'Ubergeek\NanoCm\ContentConverter\\' . ucfirst($targetFormat) . 'Converter';
-        $converter = new $classname();
-        return $converter->convertFormattedText($this, $input);
+
+        if (class_exists($classname)
+            && array_key_exists('Ubergeek\NanoCm\ContentConverter\ContentConverterInterface', class_implements($classname))) {
+            /* @var $converter \Ubergeek\NanoCm\ContentConverter\ContentConverterInterface */
+            $converter = new $classname();
+            return $converter->convertFormattedText($this, $input);
+        }
+        return '';
     }
     
     // </editor-fold>

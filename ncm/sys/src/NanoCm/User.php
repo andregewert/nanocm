@@ -109,9 +109,7 @@ class User {
      * @return User
      */
     public final static function fetchFromPdoStmt(\PDOStatement $stmt) {
-        $stmt->setFetchMode(\PDO::FETCH_CLASS, __CLASS__);
-        
-        if (($user = $stmt->fetch()) !== false) {
+        if (($user = $stmt->fetchObject(__CLASS__)) !== false) {
             $user->creation_timestamp = new \DateTime($user->creation_timestamp);
             $user->modification_timestamp = new \DateTime($user->modification_timestamp);
             if ($user->last_login_timestamp == '') {

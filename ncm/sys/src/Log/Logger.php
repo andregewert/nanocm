@@ -46,7 +46,7 @@ class Logger implements LoggerInterface {
                 $this->addWriter($writer);
             }
         } elseif ($writers instanceof Writer\WriterInterface) {
-            $this->addWriter($writer);
+            $this->addWriter($writers);
         }
     }
     

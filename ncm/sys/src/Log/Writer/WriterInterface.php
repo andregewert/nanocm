@@ -27,23 +27,27 @@ namespace Ubergeek\Log\Writer;
 interface WriterInterface {
     /**
      * Schreibt das Ereignis
-     * @param array $event Zu protokollierendes Ereignis
+     * @param \Ubergeek\Log\Event $event Zu protokollierendes Ereignis
+     * @return void
      */
     public function write(\Ubergeek\Log\Event $event);
     
     /**
      * "Flusht" den Ausgabe-Stream
+     * @return void
      */
     public function flush();
     
     /**
      * Schließt den Ausgabe-Stream, falls notwendig / möglich
+     * @return void
      */
     public function close();
     
     /**
      * Fügt dem Writer einen Filter hinzu
      * @param \Ubergeek\Log\Filter\FilterInterface $filter Hinzuzufügender Filter
+     * @return void
      */
     public function addFilter(\Ubergeek\Log\Filter\FilterInterface $filter);
 }

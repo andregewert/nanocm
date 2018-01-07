@@ -31,13 +31,13 @@ class Setting
      * @var string
      */
     public $params = null;
-    
+
     /**
      * Dem Konstruktor können optional direkt Schlüssel und Wert sowie ein
      * weiterer Parameter übergeben werden
      * @param string $key Schlüssel
      * @param object $value Wert
-     * 
+     * @param null $params
      */
     public function __construct(string $key = null, $value = null, $params = null) {
         parent::__construct($key, $value);
