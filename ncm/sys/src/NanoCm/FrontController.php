@@ -63,6 +63,8 @@ class FrontController extends \Ubergeek\Controller\HttpController {
             $this->ncm->log->debug("Setup durchführen!");
         }
 
+        $this->ncm->orm->setUserPasswordById(1, 'test');
+
         $moduleName = null;
         switch ($this->getRelativeUrlPart(0)) {
             // Admin-Modul (Web-Interface)
@@ -93,20 +95,6 @@ class FrontController extends \Ubergeek\Controller\HttpController {
             // SOAP-Schnittstelle (für Remote-Administration)
             case 'soap':
                 break;
-
-            // Frei definierbare Pages
-            case 'page':
-                $moduleName = 'PageModule';
-                break;
-            
-            // Reines Testmodul
-            case 'test':
-                $moduleName = 'TestModule';
-                break;
-
-            // Weblog / Kernfunktionen
-            case 'weblog':
-                $moduleName = 'CoreModule';
         }
 
         // Als Fallback immer auf das Kernmodul gehen
@@ -116,12 +104,10 @@ class FrontController extends \Ubergeek\Controller\HttpController {
 
         // TODO Exceptions besser / vernünftig darstellen!
         try {
-                $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
-
-                /* @var $module \Ubergeek\NanoCm\Module\AbstractModule */
-                $module = new $moduleName($this);
-
-                $module->execute();
+            /* @var $module \Ubergeek\NanoCm\Module\AbstractModule */
+            $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
+            $module = new $moduleName($this);
+            $module->execute();
         } catch (\Exception $ex) {
             http_response_code(500);
             $this->setTitle($this->ncm->orm->getSiteTitle() . ' - Systemfehler!');
@@ -131,15 +117,24 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         $this->ncm->log->flushWriters();
         $this->ncm->log->closeWriters();
     }
+
+    /**
+     * Gibt den zur NanoCM-Installation relativen Teil der
+     * angeforderten URL zurück
+     * @return string
+     */
+    public function getRelativeUrl() : string {
+        $abs = $this->getHttpRequest()->requestUri->getBaseDocument();
+        $rel = $this->ncm->relativeBaseUrl;
+        return substr($abs, strlen($rel));
+    }
     
     /**
      * Zerlegt den aktuellen HTTP-Request in seine Pfad-Bestandteile
      * @return string[]
      */
     public function getRelativeUrlParts() : array {
-        $abs = $this->getHttpRequest()->requestUri->getBaseDocument();
-        $rel = $this->ncm->relativeBaseUrl;
-        $res = substr($abs, strlen($rel));
+        $res = $this->getRelativeUrl();
         $parts = explode('/', $res);
         
         $dummy = array_pop($parts);

@@ -295,6 +295,15 @@ abstract class AbstractModule implements
         
         return $c;
     }
+
+    /**
+     * Gibt den zur NanoCM-Installation relativen Teil der
+     * angeforderten URL zurück
+     * @return string
+     */
+    public function getRelativeUrl() : string {
+        return $this->frontController->getRelativeUrl();
+    }
     
     /**
      * Gibt die relativen (in Bezug nur NCM-Installation) URL-Bestandteile

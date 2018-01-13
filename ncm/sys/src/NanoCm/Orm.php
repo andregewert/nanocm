@@ -42,7 +42,9 @@ namespace Ubergeek\NanoCm;
  * @author agewert@ubergeek.de
  */
 class Orm {
-    
+
+    // <editor-fold desc="Properties">
+
     /**
      * Handle für die Basis-Datenbank
      * @var \PDO
@@ -54,6 +56,8 @@ class Orm {
      * @var \Ubergeek\Log\LoggerInterface
      */
     private $log;
+
+    // </editor-fold>
 
     /**
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
@@ -138,7 +142,7 @@ class Orm {
      */
     public function setUserPasswordById(int $id, string $password) : bool {
         $stmt = $this->basedb->prepare('
-            UPDATE user SET password = :password WHERE id = :id
+            UPDATE user SET password = :password, modification_timestamp = CURRENT_TIMESTAMP WHERE id = :id
         ');
         $stmt->bindValue('password', password_hash($password, PASSWORD_DEFAULT));
         $stmt->bindValue('id', $id);
@@ -154,7 +158,7 @@ class Orm {
      */
     public function setUserPasswordByUsername(string $username, string $password) : bool {
         $stmt = $this->basedb->prepare('
-            UPDATE user SET password = :password WHERE username = :username
+            UPDATE user SET password = :password, modification_timestamp = CURRENT_TIMESTAMP WHERE username = :username
         ');
         $stmt->bindValue('password', password_hash($password, PASSWORD_DEFAULT));
         $stmt->bindValue('username', $username);
@@ -264,7 +268,7 @@ class Orm {
     public function searchArticles(Article $filter = null, $releasedOnly = true, $limit = null) {
         $articles = array();
         
-        $sql = 'SELECT * FROM Article WHERE 1 = 1 ';
+        $sql = 'SELECT * FROM article WHERE 1 = 1 ';
         
         if ($releasedOnly) {
             $sql .= '
@@ -289,20 +293,36 @@ class Orm {
         $stmt = $this->basedb->prepare($sql);
         $stmt->execute();
 
-        while (($article = Article::fetchFromPdoStmt($stmt)) !== null) {
+        while (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
             $articles[] = $article;
         }
 
         return $articles;
     }
-    
-    public function getArticleById(int $id) {
-        // TODO implementieren
+
+    /**
+     * Liest den Artikel mit der angegebenen ID aus und gibt ein entsprechendes Objekt
+     * oder null zurück.
+     * @param int $id ID des angeforderten Artikels
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel berücksichtigt werden sollen
+     * @return Article|null
+     */
+    public function getArticleById(int $id, bool $releasedOnly = true) {
+        $sql = 'SELECT * FROM article WHERE id = :id ';
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = ' . StatusCode::ACTIVE;
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+
+        return Article::fetchFromPdoStatement($stmt);
     }
     
     /**
      * Gibt die neuesten freigeschalteten Artikel zurück
-     * @param int $limit
+     * @param int $limit Maximale Anzahl zurückzugebender Artikel
      * @return Article[]
      */
     public function getLatestArticles(int $limit = 5) {
@@ -313,6 +333,80 @@ class Orm {
         // TODO Implementieren
     }
     
+    // </editor-fold>
+
+
+    // <editor-fold desc="Page">
+
+    /**
+     * Durchsucht die Pages nach verschiedenen Filterkriterien
+     * @param array $filter
+     * @param bool $releasedOnly
+     * @param integer|null $limit
+     * @return Page[]
+     */
+    public function searchPages($filter = null, bool $releasedOnly = true, $limit = null) {
+        $pages = array();
+
+        $sql = 'SELECT * FROM page WHERE 1 = 1 ' ;
+
+        if ($releasedOnly) {
+            $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
+        }
+
+        if ($limit !== null) {
+            $limit = intval($limit);
+            $sql .= " LIMIT $limit ";
+        }
+
+        $sql .= 'ORDER BY url ASC ';
+
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->execute();
+
+        while (($page = Page::fetchFromPdoStatement($stmt)) !== false) {
+            $pages[] = $page;
+        }
+
+        return $pages;
+    }
+
+    /**
+     * Liest die Page mit der angegebenen ID aus und gibt ein entsprechendes Objekt zurück
+     * @param integer $id ID der gesuchten Page
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Pages berücksichtigt werden sollen
+     * @return Page|null
+     */
+    public function getPageById(int $id, bool $releasedOnly = true) {
+        $sql = 'SELECT * FROM page WHERE id = :id ';
+        if ($releasedOnly) {
+            $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
+        }
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        return Page::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Liest die Page mit der angegebenen URL aus und gibt ein entsprechendes Objekt zurück
+     * @param string $url URL der gesuchten Page
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Pages berücksichtigt werden sollen
+     * @return Page|null
+     */
+    public function getPageByUrl(string $url, bool $releasedOnly = true) {
+        $sql = 'SELECT * FROM page WHERE url = :url ';
+        if ($releasedOnly) {
+            $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
+        }
+        $this->log->debug($sql);
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('url', $url);
+        $this->log->debug($url);
+        $stmt->execute();
+        return Page::fetchFromPdoStatement($stmt);
+    }
+
     // </editor-fold>
     
     

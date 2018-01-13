@@ -18,6 +18,8 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\Page;
 
 /**
  * Kern(-Ausgabe-)modul des NanoCM.
@@ -27,12 +29,24 @@ namespace Ubergeek\NanoCm\Module;
  * sowie das CMS-Archiv.
  * 
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-12
  */
 class CoreModule extends AbstractModule {
 
+    // <editor-fold desc="Properties">
+
     /** @var bool Gibt an, ob es beim letzten Login-Versuch einen Fehler gegeben hat */
     public $loginError = false;
+
+    /** @var Page Gegebenenfalls anzuzeigende Seite */
+    public $page = null;
+
+    /** @var Article Gegebenenfalls anzuzeigender Weblog-Artikel */
+    public $article = null;
+
+    // </editor-fold>
+
 
     public function run() {
         $parts = $this->getRelativeUrlParts();
@@ -43,8 +57,12 @@ class CoreModule extends AbstractModule {
             // Artikelansicht oder Archiv
             case 'weblog':
                 if ($parts[1] == 'article') {
-                    $this->setTitle($this->getSiteTitle() . ' - Artikel');
-                    $content = $this->renderUserTemplate('content-weblog-article.phtml');
+                    $this->log->debug($parts[2]);
+                    $this->article = $this->orm->getArticleById(intval($parts[2]));
+                    if ($this->article !== null) {
+                        $this->setTitle($this->getSiteTitle() . ' - ' . $this->article->headline);
+                        $content = $this->renderUserTemplate('content-weblog-article.phtml');
+                    }
                 } elseif ($parts[1] == 'archive') {
                     $this->setTitle($this->getSiteTitle() . ' - Archiv');
                     $content = $this->renderUserTemplate('content-weblog-archive.phtml');
@@ -79,7 +97,15 @@ class CoreModule extends AbstractModule {
                 $this->setTitle($this->getSiteTitle());
                 $content = $this->renderUserTemplate('content-start.phtml');
                 break;
-            
+
+            // Frei definiertbare Pages
+            default:
+                $this->page = $this->orm->getPageByUrl($this->getRelativeUrl());
+                if ($this->page !== null) {
+                    $this->setTitle($this->getSiteTitle() . ' - ' . $this->page->headline);
+                    $this->log->debug($this->page);
+                    $content = $this->renderUserTemplate('content-page.phtml');
+                }
         }
 
         $this->setContent($content);

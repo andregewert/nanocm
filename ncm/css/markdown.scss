@@ -20,13 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 $font-headlines:    Fira Sans, Helvetica, sans-serif;
-$font-text:         Georgia, Times, serif;
+$font-text:         Noto Serif, Georgia, Times, serif;
 $background-color:  #fff;
 $primary-color:     #555;
 
 body {
   font-family: $font-text;
-  font-size: 80%;
+  font-size: 85%;
   color: $primary-color;
   background-color: $background-color;
 }

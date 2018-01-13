@@ -1,9 +1,8 @@
 <?php
-    /* @var $mod \Ubergeek\NanoCm\Module\AbstractModule */
-    $mod = $this;
+    /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 ?>
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="/"><?php echo $mod->htmlEncode($mod->getSiteTitle()); ?></a>
+    <a class="navbar-brand" href="/"><?php echo $this->htmlEncode($this->getSiteTitle()); ?></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -14,10 +13,16 @@
                 <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
+                <a class="nav-link" href="/weblog/archiv/">Weblog-Archiv</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link disabled" href="#">Disabled</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/meta/kontakt.html">Kontakt</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/meta/datenschutz.html">Datenschutz</a>
             </li>
             <!--
             <li class="nav-item dropdown">
@@ -29,7 +34,7 @@
                 </div>
             </li>
             -->
-            <li class="nav-item"><a href="#" class="nav-link">Login</a></li>
+            <li class="nav-item"><a href="/login.php" class="nav-link">Login</a></li>
         </ul>
         <form class="form-inline my-2 my-lg-0">
             <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">

@@ -22,6 +22,7 @@ namespace Ubergeek\NanoCm;
 /**
  * Bildet einen NCM-Artikel ab
  * @author agewert@ubergeek.de
+ * @package Ubergeek\NanoCm
  * @created 2017-10-27
  */
 class Article {
@@ -122,7 +123,9 @@ class Article {
      * @param \PDOStatement $stmt
      * @return Article
      */
-    public final static function fetchFromPdoStmt(\PDOStatement $stmt) {
+    public static function fetchFromPdoStatement(\PDOStatement $stmt) {
+        /* @var $article \Ubergeek\NanoCm\Article */
+
         if (($article = $stmt->fetchObject(__CLASS__)) !== false) {
             $article->creation_timestamp = new \DateTime($article->creation_timestamp);
             $article->modification_timestamp = new \DateTime($article->modification_timestamp);
@@ -132,7 +135,7 @@ class Article {
         return null;
     }
     
-    public final function getArticleUrl() : string {
+    public function getArticleUrl() : string {
         return '/weblog/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
     }
     

@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Author     : André Gewert <agewert@ubergeek.de>
 */
 body {
-  font-family: Georgia, Times, serif;
-  font-size: 80%;
+  font-family: Noto Serif, Georgia, Times, serif;
+  font-size: 85%;
   color: #555;
   background-color: #fff; }
 
