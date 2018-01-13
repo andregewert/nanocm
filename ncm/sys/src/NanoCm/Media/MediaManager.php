@@ -33,6 +33,7 @@ namespace Ubergeek\NanoCm\Media;
  * Cloud-Anbieter laden, skalieren und anschneiden.)
  * 
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-04
  */
 class MediaManager {

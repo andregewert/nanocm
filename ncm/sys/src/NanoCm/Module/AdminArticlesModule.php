@@ -23,6 +23,7 @@ use Ubergeek\NanoCm\Article;
 /**
  * Verwaltung der Artikel
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-19
  */
 class AdminArticlesModule extends AbstractAdminModule {

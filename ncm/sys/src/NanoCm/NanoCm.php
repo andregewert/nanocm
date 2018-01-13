@@ -22,7 +22,9 @@ use Ubergeek\Log;
 
 /**
  * Basis-Logikklasse für das CMS
- * @author agewert@ubergeek.de
+ * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
+ * @todo Lokalisierungsoptionen implementieren
  */
 class NanoCm {
     
@@ -127,7 +129,7 @@ class NanoCm {
         // Zugriff auf die Datenbank herstellen
         $this->orm = new Orm($this->getDbHandle(), $this->log);
         
-        // TODO Instanziierung nur, wenn Logging eingeschaltet        
+        // TODO Instanziierung nur, wenn Logging eingeschaltet
         $this->log->addWriter(
             new Log\Writer\ChromeLoggerWriter(
                 new Log\Filter\PriorityFilter(\Ubergeek\Log\Logger::DEBUG, Log\Filter\PriorityFilter::OPERATOR_MIN)
@@ -136,10 +138,6 @@ class NanoCm {
         
         $this->session = new \Ubergeek\Session\SimpleSession('ncm');
         $this->session->start();
-        
-        //$this->orm->setUserPasswordById(1, 'dummydumdum');
-        //$this->log->debug($this->tryLogin('agewert', 'dummydumdum'));
-        //$this->log->debug($this->getLoggedInUser());
     }
     
     /**

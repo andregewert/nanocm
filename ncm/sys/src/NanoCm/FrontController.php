@@ -63,28 +63,21 @@ class FrontController extends \Ubergeek\Controller\HttpController {
             $this->ncm->log->debug("Setup durchführen!");
         }
 
-        $this->ncm->orm->setUserPasswordById(1, 'test');
-
         $moduleName = null;
         switch ($this->getRelativeUrlPart(0)) {
             // Admin-Modul (Web-Interface)
             case 'admin':
                 switch ($this->getRelativeUrlPart(1)) {
                     case 'articles':
-                        $moduleName = 'AdminArticlesModule';
-                        break;
+                    case 'comments':
                     case 'pages':
-                        $moduleName = 'AdminPagesModule';
-                        break;
                     case 'users':
-                        $moduleName = 'AdminUsersModule';
-                        break;
+                    case 'media':
                     case 'stats':
-                        $moduleName = 'AdminStatsModule';
-                        break;
                     case 'settings':
-                        $moduleName = 'AdminSettingsModule';
+                        $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
                         break;
+
                     case '':
                     case 'index.php':
                         $moduleName = 'AdminDashboardModule';
@@ -97,7 +90,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                 break;
         }
 
-        // Als Fallback immer auf das Kernmodul gehen
+        // Im Standardfall im auf das Kernmodul gehen
         if ($moduleName == null) {
             $moduleName = 'CoreModule';
         }

@@ -45,6 +45,7 @@ namespace Ubergeek\NanoCm\Module;
  * Verhalten zu ändern und beispielsweise einen eigenen Logger zu konfigurieren.
  * 
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-11
  */
 abstract class AbstractModule implements

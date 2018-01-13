@@ -24,6 +24,7 @@ use Ubergeek\NanoCm\Exception;
 /**
  * Basisklasse für Administrations-Module
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-19
  */
 abstract class AbstractAdminModule extends AbstractModule {

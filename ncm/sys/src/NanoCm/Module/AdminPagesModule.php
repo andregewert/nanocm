@@ -21,15 +21,18 @@ namespace Ubergeek\NanoCm\Module;
 /**
  * Verwaltung der frei definierbaren Seiten
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2018-01-07
  */
 class AdminPagesModule extends AbstractAdminModule {
 
+    /** @var string Generierter Content */
+    private $content;
+
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Seiten verwalten');
-        $content = $this->renderUserTemplate('content-pages.phtml');
-        //$content = 'test';
-        $this->setContent($content);
+        $this->content = $this->renderUserTemplate('content-pages.phtml');
+        $this->setContent($this->content);
     }
 
 }

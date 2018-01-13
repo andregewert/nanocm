@@ -22,12 +22,17 @@ namespace Ubergeek\NanoCm\Module;
 /**
  * Verwaltung von Systemeinstellungen
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-19
  */
 class AdminSettingsModule extends AbstractAdminModule {
-    
+
+    /** @var string Generierter Content */
+    private $content;
+
     public function run() {
-        
+        $this->content = $this->renderUserTemplate('content-settings.phtml');
+        $this->setContent($this->content);
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/**
  * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace Ubergeek\NanoCm\Module;
@@ -22,12 +22,17 @@ namespace Ubergeek\NanoCm\Module;
 /**
  * Verwaltung der Benutzerkonten
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-19
  */
 class AdminUsersModule extends AbstractAdminModule {
-    
+
+    /** @var string Generierter Content */
+    private $content;
+
     public function run() {
-        
+        $this->content = $this->renderUserTemplate('content-users.phtml');
+        $this->setContent($this->content);
     }
 
 }

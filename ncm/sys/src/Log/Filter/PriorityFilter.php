@@ -40,7 +40,11 @@ class PriorityFilter implements FilterInterface {
         $this->priority = $priority;
         $this->operator = $operator;
     }
-    
+
+    /**
+     * @param \Ubergeek\Log\Event $event
+     * @return bool
+     */
     public function filter(\Ubergeek\Log\Event $event): bool {
         if ($event == null) return false;
         if ($this->operator == self::OPERATOR_EQUAL && $event->priority == $this->priority) {

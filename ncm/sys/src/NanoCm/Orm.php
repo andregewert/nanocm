@@ -39,7 +39,9 @@ namespace Ubergeek\NanoCm;
  * 
  * Zu den optionalen Modulen gehört beispielsweise die Medienverwaltung.
  * 
- * @author agewert@ubergeek.de
+ * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
+ * @todo Caching / Converting eventuell in die Controller-Klassen verschieben
  */
 class Orm {
 
@@ -56,6 +58,12 @@ class Orm {
      * @var \Ubergeek\Log\LoggerInterface
      */
     private $log;
+
+    /**
+     * Cache für den User-ID-Converter
+     * @var User[]
+     */
+    private static $userCache;
 
     // </editor-fold>
 
@@ -438,5 +446,48 @@ class Orm {
         return $title;
     }
     
+    // </editor-fold>
+
+
+    // <editor-fold desc="Converter methods">
+
+
+    /**
+     * Konvertiert eine Benutzer-ID in den zugehörigen Anzeigenamen
+     * @param int $userId
+     * @return string
+     */
+    public function convertUserIdToName(int $userId) : string {
+        $user = $this->getCachedUser($userId);
+        if ($user == null) return '';
+        return $user->getFullName();
+    }
+
+    /**
+     * Gibt einen ggf. gecachten Benutzer-Datensatz zurück.
+     *
+     * Dieser Cache wird für Konvertierungen im User Interface verwendet und berücksichtigt auch immer alle
+     * Benutzer-Datensätze unabhängig von ihrem Status.
+     * Alle anderen Funktionen sollten Benutzerdatensätze grundsätzlich in "Echtzeit" überprüfen,
+     * d. h. immer aktuelle Informationen aus der Datenbank beziehen.
+     * @param int $userId
+     * @return User|null
+     */
+    public function getCachedUser(int $userId) {
+        if (!is_array(self::$userCache)) {
+            self::$userCache = array();
+        }
+        if (array_key_exists($userId, self::$userCache)) {
+            $this->log->debug("Found user id $userId in cache");
+            return self::$userCache[$userId];
+        }
+
+        $user = $this->getUserById($userId, true);
+        if ($user == null) return null;
+
+        self::$userCache[$userId] = $user;
+        return $user;
+    }
+
     // </editor-fold>
 }

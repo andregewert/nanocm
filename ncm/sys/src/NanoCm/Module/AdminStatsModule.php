@@ -22,12 +22,17 @@ namespace Ubergeek\NanoCm\Module;
 /**
  * Einfache Statistiken für das CMS
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-19
  */
 class AdminStatsModule extends AbstractAdminModule {
-    
+
+    /** @var string Generierter Content */
+    private $content;
+
     public function run() {
-        
+        $this->content = $this->renderUserTemplate('content-stats.phtml');
+        $this->setContent($this->content);
     }
 
 }

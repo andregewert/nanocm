@@ -18,6 +18,7 @@
  */
 
 namespace Ubergeek\Log\Filter;
+use Ubergeek\Log\Event;
 
 /**
  * Interface für Event-Filter.
@@ -29,15 +30,15 @@ namespace Ubergeek\Log\Filter;
  * @created 2017-10-29
  */
 interface FilterInterface {
-    
+
     /**
      * Filtert das übergebene Logging-Event.
      * Soll das Event protokolliert werden, gibt die Methode true zurück. Wenn
      * die Methode false zurück gibt, soll das Event vom Writer ignoriert
      * werden.
-     * @param \Ubergeek\Log\Event $event
+     * @param Event $event
      * @return bool true, wenn das Event protokolliert werden soll
      */
-    public function filter(\Ubergeek\Log\Event $event);
-    
+    public function filter(Event $event) : bool;
+
 }

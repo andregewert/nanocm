@@ -32,15 +32,18 @@ namespace Ubergeek\NanoCm\Module;
  * werden (können).
  * 
  * @author André Gewert <agewert@ubergeek.de>
+ * @package Ubergeek\NanoCm
  * @created 2017-11-12
  */
 class SetupModule extends AbstractModule {
-    
+
+    /** @var string Generierter Content */
+    private $content = null;
+
     public function run() {
         // TODO implementieren
         $this->setPageTemplate(self::PAGE_SETUP);
-        $content = null;
-        
+
         if ($this->getAction() == 'save') {
             // Datenbank erstellen
             
@@ -48,14 +51,14 @@ class SetupModule extends AbstractModule {
             
             // Redirect auf Startseite oder Anzeige einer Erfolgsmeldung
             
-            $content = '';
+            $this->content = '';
             
         } else {
             // TODO Dieses Template sollte im SYS-Verzeichnis liegen
-            $content = $this->renderUserTemplate('page-setup');
+            $this->content = $this->renderUserTemplate('page-setup');
         }
         
-        $this->setContent($content);
+        $this->setContent($this->content);
     }
 
 }

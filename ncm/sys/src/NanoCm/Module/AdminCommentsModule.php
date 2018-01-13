@@ -1,7 +1,8 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +15,25 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace Ubergeek\NanoCm\Module;
 
 /**
- * Startseite des Administrationsbereiches
+ * Verwaltung der Benutzerkonten
  * @author André Gewert <agewert@ubergeek.de>
  * @package Ubergeek\NanoCm
- * @created 2017-11-19
+ * @created 2018-01-13
  */
-class AdminDashboardModule extends AbstractAdminModule {
+class AdminCommentsModule extends AbstractAdminModule {
 
-    /** @var string Generierter Content  */
+    /** @var string Generierter Content */
     private $content;
 
     public function run() {
-        $this->setTitle($this->getSiteTitle() . ' - Seite verwalten');
-        $this->content = $this->renderUserTemplate('content-dashboard.phtml');
+        $this->content = $this->renderUserTemplate('content-comments.phtml');
         $this->setContent($this->content);
     }
-    
+
 }

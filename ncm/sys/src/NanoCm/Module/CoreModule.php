@@ -36,6 +36,9 @@ class CoreModule extends AbstractModule {
 
     // <editor-fold desc="Properties">
 
+    /** @var string Generierter Content */
+    private $content = '';
+
     /** @var bool Gibt an, ob es beim letzten Login-Versuch einen Fehler gegeben hat */
     public $loginError = false;
 
@@ -50,8 +53,7 @@ class CoreModule extends AbstractModule {
 
     public function run() {
         $parts = $this->getRelativeUrlParts();
-        $content = '';
-        
+
         switch ($parts[0]) {
             
             // Artikelansicht oder Archiv
@@ -61,11 +63,11 @@ class CoreModule extends AbstractModule {
                     $this->article = $this->orm->getArticleById(intval($parts[2]));
                     if ($this->article !== null) {
                         $this->setTitle($this->getSiteTitle() . ' - ' . $this->article->headline);
-                        $content = $this->renderUserTemplate('content-weblog-article.phtml');
+                        $this->content = $this->renderUserTemplate('content-weblog-article.phtml');
                     }
                 } elseif ($parts[1] == 'archive') {
                     $this->setTitle($this->getSiteTitle() . ' - Archiv');
-                    $content = $this->renderUserTemplate('content-weblog-archive.phtml');
+                    $this->content = $this->renderUserTemplate('content-weblog-archive.phtml');
                 }
                 break;
             
@@ -83,7 +85,7 @@ class CoreModule extends AbstractModule {
                         $this->loginError = true;
                     }
                 }
-                $content = $this->renderUserTemplate('content-login.phtml');
+                $this->content = $this->renderUserTemplate('content-login.phtml');
                 break;
             
             // Abmeldung
@@ -95,7 +97,7 @@ class CoreModule extends AbstractModule {
             // Startseite
             case 'index.php';
                 $this->setTitle($this->getSiteTitle());
-                $content = $this->renderUserTemplate('content-start.phtml');
+                $this->content = $this->renderUserTemplate('content-start.phtml');
                 break;
 
             // Frei definiertbare Pages
@@ -104,10 +106,10 @@ class CoreModule extends AbstractModule {
                 if ($this->page !== null) {
                     $this->setTitle($this->getSiteTitle() . ' - ' . $this->page->headline);
                     $this->log->debug($this->page);
-                    $content = $this->renderUserTemplate('content-page.phtml');
+                    $this->content = $this->renderUserTemplate('content-page.phtml');
                 }
         }
 
-        $this->setContent($content);
+        $this->setContent($this->content);
     }
 }
