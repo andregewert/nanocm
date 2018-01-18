@@ -18,6 +18,7 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\NanoCm\Setting;
 
 /**
  * Verwaltung von Systemeinstellungen
@@ -30,8 +31,24 @@ class AdminSettingsModule extends AbstractAdminModule {
     /** @var string Generierter Content */
     private $content;
 
+    /** @var \Ubergeek\NanoCm\Setting */
+    protected $setting;
+
+    /** @var \Ubergeek\NanoCm\Setting[] */
+    protected $settings;
+
     public function run() {
-        $this->content = $this->renderUserTemplate('content-settings.phtml');
+        $this->setTitle($this->getSiteTitle() . ' - Einstellungen verwalten');
+
+        switch ($this->getRelativeUrlPart(2)) {
+            case 'index.php':
+            case '':
+                $filter = new Setting();
+                $this->settings = $this->orm->searchSettings($filter, 20);
+                $this->content = $this->renderUserTemplate('content-settings.phtml');
+                break;
+        }
+
         $this->setContent($this->content);
     }
 

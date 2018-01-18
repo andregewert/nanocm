@@ -43,4 +43,15 @@ class Setting
         parent::__construct($key, $value);
         $this->params = $params;
     }
+
+    public static function fetchFromPdoStatement(\PDOStatement $stmt) {
+        if (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $setting = new Setting();
+            $setting->key = $row['name'];
+            $setting->value = $row['setting'];
+            $setting->params = $row['params'];
+            return $setting;
+        }
+        return null;
+    }
 }

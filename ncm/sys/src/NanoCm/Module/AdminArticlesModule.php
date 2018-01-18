@@ -34,24 +34,28 @@ class AdminArticlesModule extends AbstractAdminModule {
      * Die gefundenen Artikel-Datensätze
      * @var \Ubergeek\NanoCm\Article[]
      */
-    var $articles;
+    protected $articles;
     
     /**
      * Wenn ein einzelner Artikel bearbeitet wird: der Artikel-Datensatz
      * @var \Ubergeek\NanoCm\Article
      */
-    var $article;
+    protected $article;
     
     // </editor-fold>
     
     
     public function run() {
         $content = '';
-        
-        $this->log->debug($this->getRelativeUrlPart(2));
         $this->setTitle($this->getSiteTitle() . ' - Artikel verwalten');
         
         switch ($this->getRelativeUrlPart(2)) {
+            case 'edit':
+                $articleId = intval($this->getRelativeUrlPart(3));
+                $this->article = $this->orm->getArticleById($articleId);
+                $content = $this->renderUserTemplate('content-articles-edit.phtml');
+                break;
+
             case 'index.php':
             case '':
                 $filter = new Article();

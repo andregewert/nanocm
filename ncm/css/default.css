@@ -19,3 +19,107 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Created on : 03.10.2017, 21:55:30
     Author     : André Gewert <agewert@ubergeek.de>
 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Fira Sans, Arial, Helvetica, sans-serif;
+  font-size: 85%;
+  color: #333;
+  background-color: #fff; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Fira Sans, Helvetica, sans-serif; }
+
+a {
+  text-decoration: none;
+  color: #3e6e9b; }
+
+a:hover {
+  text-decoration: underline;
+  color: #2d5072; }
+
+nav.main {
+  background-color: aliceblue;
+  border-bottom: solid silver 1px; }
+
+nav.main img {
+  margin: 0.5em 0 0.5em 1em;
+  vertical-align: middle; }
+
+nav.main ul {
+  list-style: none;
+  list-style-position: inside;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0; }
+
+nav.main ul li {
+  list-style: none;
+  list-style-position: inside;
+  display: inline-block;
+  float: left; }
+
+nav.main ul li a {
+  display: block;
+  text-decoration: none;
+  color: #777;
+  font-weight: bold;
+  font-size: 1.0rem;
+  padding: 0.5em 0.8em; }
+
+nav.main ul li a:hover,
+nav.main ul li.active a {
+  color: #333; }
+
+div.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 30px; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  margin: 2em 0; }
+
+table.list {
+  width: 100%;
+  border-collapse: collapse; }
+
+table.list td,
+table.list th {
+  border: solid silver 1px; }
+
+table.list th {
+  background-color: aliceblue;
+  text-align: left; }
+
+a.button {
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #3e6e9b;
+  border-width: 1px;
+  background-color: #3e6e9b;
+  display: inline-block;
+  color: white;
+  padding: 0.5em 1em;
+  text-decoration: none !important; }
+
+a.button:hover {
+  background-color: #2d5072; }
+
+a.button-secondary {
+  background-color: white;
+  color: #3e6e9b;
+  border-color: #3e6e9b; }
+
+a.button-secondary:hover {
+  border-color: #2d5072;
+  color: #2d5072;
+  background-color: white; }
+
+div.toolbar {
+  margin: 1.5em 0;
+  border-bottom: solid silver 1px;
+  padding: 0 0 0.5em 0; }

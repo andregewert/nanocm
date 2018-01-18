@@ -1,43 +1,39 @@
 <?php
-    /* @var $mod \Ubergeek\NanoCm\Module\AbstractAdminModule */
-    $mod = $this;
-    
-    $current = $mod->getRelativeUrlPart(1);
-    $mod->log->debug($current);
-?>
-<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="/index.php">NanoCM</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    /* @var $this \Ubergeek\NanoCm\Module\AbstractAdminModule */
 
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item<?php if ($current == '' || $current == 'index.php') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/index.php">Dashboard</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'articles') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/articles/index.php">Artikel</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'comments') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/comments/index.php">Kommentare</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'pages') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/pages/index.php">Seiten</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'users') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/users/index.php">Benutzer</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'media') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/media/index.php">Medien</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'stats') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/stats/index.php">Statistiken</a>
-            </li>
-            <li class="nav-item<?php if ($current == 'settings') echo ' active'; ?>">
-                <a class="nav-link" href="/admin/settings/index.php">Einstellungen</a>
-            </li>
-            <li class="nav-item"><a href="/logout.php" class="nav-link">Logout</a></li>
-        </ul>
-    </div>
+    $current = $this->getRelativeUrlPart(1);
+    $this->log->debug($current);
+?>
+<nav class="main">
+    <a class="logo" href="/admin/index.php">
+        <img src="/ncm/img/nanocm-logo.png" alt="NanoCM" title="NanoCM" width="120" />
+    </a>
+
+    <ul class="navbar">
+        <li class="nav-item<?php if ($current == '' || $current == 'index.php') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/index.php">Dashboard</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'articles') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/articles/index.php">Artikel</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'comments') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/comments/index.php">Kommentare</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'pages') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/pages/index.php">Seiten</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'users') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/users/index.php">Benutzer</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'media') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/media/index.php">Medien</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'stats') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/stats/index.php">Statistiken</a>
+        </li>
+        <li class="nav-item<?php if ($current == 'settings') echo ' active'; ?>">
+            <a class="nav-link" href="/admin/settings/index.php">Einstellungen</a>
+        </li>
+        <li class="nav-item"><a href="/logout.php" class="nav-link">Logout</a></li>
+    </ul>
 </nav>

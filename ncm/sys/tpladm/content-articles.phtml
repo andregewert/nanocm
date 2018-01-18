@@ -5,13 +5,26 @@
     <form>
         <h1>Artikel</h1>
 
-        <p>
-            <a name="" id="" class="btn btn-primary" href="#" role="button" title="Artikel hinzuf&uuml;gen">+ Neu</a>
-            <a name="" id="" class="btn btn-primary" href="#" role="button" title="Ausgew&auml;hlten Artikel bearbeiten">Bearbeiten</a>
-            <a name="" id="" class="btn btn-secondary" href="#" role="button" title="Ausgew&auml;hlte Artikel l&ouml;schen">L&ouml;schen</a>
-        </p>
+        <div class="toolbar">
+            <span class="left">
+                <a name="" id="" class="button" href="#" role="button" title="Artikel hinzuf&uuml;gen">+ Neu</a>
+                <a name="" id="" class="button" href="#" role="button" title="Ausgew&auml;hlten Artikel bearbeiten">Bearbeiten</a>
+                <a name="" id="" class="button button-secondary" href="#" role="button" title="Ausgew&auml;hlte Artikel l&ouml;schen">L&ouml;schen</a>
+            </span>
+            <span class="right" style="float: right">
+                <label>Suche</label>
+                <input type="text" />
 
-        <table class="table table-bordered table-sm">
+                <label>Status</label>
+                <select>
+                    <option value="">- Alle -</option>
+                </select>
+
+                <input type="button" class="button" value="Aktualisieren" />
+            </span>
+        </div>
+
+        <table class="list">
             <thead>
                 <tr>
                     <th>#</th>
@@ -28,10 +41,10 @@
                             <td style="text-align: center">
                                 <input type="checkbox" value="<?php echo $article->id; ?>" style="text-align: center">
                             </td>
-                            <td><?php echo $this->htmlEncode($article->headline); ?></td>
+                            <td><a href="/admin/articles/edit/<?php echo $article->id; ?>"><?php echo $this->htmlEncode($article->headline); ?></a></td>
                             <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id)); ?></td>
                             <td><?php echo $this->htmlEncode($article->publishing_timestamp->format('Y-m-d')); ?></td>
-                            <td><?php echo $this->htmlEncode($article->status_code); ?></td>
+                            <td><?php echo $this->htmlEncode($this->orm->convertStatusId($article->status_code)); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else : ?>

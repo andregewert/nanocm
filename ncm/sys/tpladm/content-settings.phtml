@@ -1,3 +1,45 @@
 <div class="container">
-    <h1>Einstellungen</h1>
+    <form>
+        <h1>Einstellungen</h1>
+
+        <div class="toolbar">
+            <span class="left">
+                <a name="" id="" class="button" href="#" role="button" title="Einstellung hinzuf&uuml;gen">+ Neu</a>
+                <a name="" id="" class="button" href="#" role="button" title="Ausgew&auml;hlte Einstellung bearbeiten">Bearbeiten</a>
+                <a name="" id="" class="button button-secondary" href="#" role="button" title="Ausgew&auml;hlte Einstellungen l&ouml;schen">L&ouml;schen</a>
+            </span>
+            <span class="right" style="float: right">
+                <label>Suche</label>
+                <input type="text" />
+
+                <input type="button" class="button" value="Aktualisieren" />
+            </span>
+        </div>
+
+        <table class="list">
+            <thead>
+            <tr>
+                <th>Einstellung</th>
+                <th>Wert</th>
+                <th>Parameter</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php if (is_array($this->settings) && count($this->settings) > 0) : ?>
+                <?php foreach ($this->settings as $setting) : ?>
+                    <?php $this->log->debug($setting); ?>
+                    <tr>
+                        <td><?php echo $this->htmlEncode($setting->key); ?></td>
+                        <td><?php echo $this->htmlEncode($setting->value); ?></td>
+                        <td><?php echo $this->htmlEncode($setting->params); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <tr>
+                    <td colspan="3">Keine Einstellungen gefunden</td>
+                </tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </form>
 </div>

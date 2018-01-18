@@ -136,6 +136,36 @@ class Orm {
         if ($setting == null) return $default;
         return $setting->params;
     }
+
+    /**
+     * Durchsucht die Systemeinstellungen und gibt ein Array mit den gefundenen
+     * Datensätzen zurück
+     * @param Setting|null $filter
+     * @param integer $limit
+     * @return Setting[]
+     */
+    public function searchSettings(Setting $filter = null, $limit = null) {
+        $settings = array();
+
+        $sql = 'SELECT * FROM setting WHERE 1 = 1 ';
+
+        // TODO Filter auswerten
+
+        $sql .= ' ORDER BY name ASC ';
+
+        if ($limit !== null) {
+            $sql .= ' LIMIT ' . intval($limit);
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->execute();
+
+        while (($setting = Setting::fetchFromPdoStatement($stmt)) !== null) {
+            $settings[] = $setting;
+        }
+
+        return $settings;
+    }
     
     // </editor-fold>
     
@@ -461,6 +491,16 @@ class Orm {
         $user = $this->getCachedUser($userId);
         if ($user == null) return '';
         return $user->getFullName();
+    }
+
+    public function convertStatusId($statusId) : string {
+        switch ($statusId) {
+            case 0:
+                return 'Online';
+            case 9:
+                return 'Gesperrt';
+        }
+        return 'Unbekannt';
     }
 
     /**

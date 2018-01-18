@@ -19,3 +19,139 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Author     : André Gewert <agewert@ubergeek.de>
 */
 
+$font-headlines:    Fira Sans, Helvetica, sans-serif;
+$font-text:         Fira Sans, Arial, Helvetica, sans-serif;
+$background-color:  #fff;
+$primary-color:     #333;
+$primary-color-inactive: #777;
+$link-color:        #3e6e9b;
+$link-color-alt:    #2d5072;
+$button-color-bg:   #3e6e9b;
+$button-color-fg:   white;
+$button-color-bg-alt: #2d5072;
+$nav-color-bg:      aliceblue;
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: $font-text;
+    font-size: 85%;
+    color: $primary-color;
+    background-color: $background-color;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-headlines;
+}
+
+a {
+    text-decoration: none;
+    color: $link-color;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: $link-color-alt;
+}
+
+nav.main {
+    background-color: $nav-color-bg;
+    border-bottom: solid silver 1px;
+}
+
+nav.main img {
+    margin: 0.5em 0 0.5em 1em;
+    vertical-align: middle;
+}
+
+nav.main ul {
+    list-style: none;
+    list-style-position: inside;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+}
+
+nav.main ul li {
+    list-style: none;
+    list-style-position: inside;
+    display: inline-block;
+    float: left;
+}
+
+nav.main ul li a {
+    display: block;
+    text-decoration: none;
+    color: $primary-color-inactive;
+    font-weight: bold;
+    font-size: 1.0rem;
+    padding: 0.5em 0.8em;
+}
+
+nav.main ul li a:hover,
+nav.main ul li.active a {
+    color: $primary-color;
+}
+
+div.container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    margin: 2em 0;
+}
+
+table.list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.list td,
+table.list th {
+    border: solid silver 1px;
+}
+
+table.list th {
+    background-color: $nav-color-bg;
+    text-align: left;
+}
+
+a.button {
+    border-radius: 4px;
+    border-style: solid;
+    border-color: $button-color-bg;
+    border-width: 1px;
+    background-color: $button-color-bg;
+    display: inline-block;
+    color: $button-color-fg;
+    padding: 0.5em 1em;
+    text-decoration: none !important;
+}
+
+a.button:hover {
+    background-color: $button-color-bg-alt;
+}
+
+a.button-secondary {
+    background-color: white;
+    color: $button-color-bg;
+    border-color: $button-color-bg;
+}
+
+a.button-secondary:hover {
+    border-color: $button-color-bg-alt;
+    color: $button-color-bg-alt;
+    background-color: white;
+}
+
+div.toolbar {
+    margin: 1.5em 0;
+    border-bottom: solid silver 1px;
+    padding: 0 0 0.5em 0;
+}
