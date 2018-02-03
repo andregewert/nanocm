@@ -50,16 +50,32 @@ class AdminArticlesModule extends AbstractAdminModule {
         $this->setTitle($this->getSiteTitle() . ' - Artikel verwalten');
         
         switch ($this->getRelativeUrlPart(2)) {
+            // AJAX-Aufrufe
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/html');
+
+                switch ($this->getRelativeUrlPart(3)) {
+                    // Artikelliste
+                    case 'list':
+                    default:
+                        $filter = new Article();
+                        $filter->status_code = $this->getParam('status');
+                        $this->articles = $this->orm->searchArticles($filter, false, 20);
+                        $content = $this->renderUserTemplate('content-articles-list.phtml');
+                }
+                break;
+
+            // Einzelnen Artikel bearbeiten
             case 'edit':
                 $articleId = intval($this->getRelativeUrlPart(3));
                 $this->article = $this->orm->getArticleById($articleId);
                 $content = $this->renderUserTemplate('content-articles-edit.phtml');
                 break;
 
+            // Übersichtsseite
             case 'index.php':
             case '':
-                $filter = new Article();
-                $this->articles = $this->orm->searchArticles($filter, false, 20);
                 $content = $this->renderUserTemplate('content-articles.phtml');
                 break;
         }

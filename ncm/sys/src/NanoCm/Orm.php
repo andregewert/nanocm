@@ -300,10 +300,11 @@ class Orm {
      * @param \Ubergeek\NanoCm\Article $filter Optionale Suchfilter
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel
      * berücksichtig werden sollen
-     * @param integer $limit Maximale Anzahl der zurück zu gebenden Artikel
+     * @param integer|null $page Angeforderte Seite
+     * @param integer|null $limit Maximale Anzahl der zurück zu gebenden Artikel
      * @return array Ein Array mit den gefundenen Artikeln
      */
-    public function searchArticles(Article $filter = null, $releasedOnly = true, $limit = null) {
+    public function searchArticles(Article $filter = null, $releasedOnly = true, $page = null, $limit = null) {
         $articles = array();
         
         $sql = 'SELECT * FROM article WHERE 1 = 1 ';
@@ -323,7 +324,8 @@ class Orm {
         }
         
         $sql .= 'ORDER BY publishing_timestamp DESC ';
-        
+
+        // Aufteilung in Seiten
         if ($limit !== null) {
             $sql .= ' LIMIT ' . intval($limit);
         }

@@ -19,11 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Created on : 03.10.2017, 21:55:30
     Author     : André Gewert <agewert@ubergeek.de>
 */
+/* <editor-fold desc="Basis elements"> */
+html {
+  font-size: 85%; }
+
 body {
   margin: 0;
   padding: 0;
   font-family: Fira Sans, Arial, Helvetica, sans-serif;
-  font-size: 85%;
+  /*font-size: 85%;*/
   color: #333;
   background-color: #fff; }
 
@@ -38,6 +42,8 @@ a:hover {
   text-decoration: underline;
   color: #2d5072; }
 
+/* </editor-fold> */
+/* </editor-fold desc="Navigation elements"> */
 nav.main {
   background-color: aliceblue;
   border-bottom: solid silver 1px; }
@@ -65,17 +71,67 @@ nav.main ul li a {
   text-decoration: none;
   color: #777;
   font-weight: bold;
-  font-size: 1.0rem;
+  font-size: 1.2rem;
   padding: 0.5em 0.8em; }
 
 nav.main ul li a:hover,
 nav.main ul li.active a {
   color: #333; }
 
+/* </editor-fold> */
+/* <editor-fold desc="Buttons"> */
+input, select, option, textarea {
+  font-size: 1rem; }
+
+a.button,
+input.button {
+  border-radius: 4px;
+  border-style: solid;
+  border-color: #3e6e9b;
+  border-width: 1px;
+  background-color: #3e6e9b;
+  display: inline-block;
+  color: white;
+  padding: 0.5em 1em;
+  text-decoration: none !important;
+  cursor: pointer; }
+
+a.button:hover,
+input.button:hover {
+  background-color: #2d5072; }
+
+a.button-secondary,
+input.button-secondary {
+  background-color: white;
+  color: #3e6e9b;
+  border-color: #3e6e9b; }
+
+a.button-secondary:hover,
+input.button-secondary:hover {
+  border-color: #2d5072;
+  color: #2d5072;
+  background-color: white; }
+
+a.button.disabled,
+input.button[disabled] {
+  background-color: #666;
+  color: #ccc; }
+
+/* </editor-fold> */
+/* <editor-fold desc="Misc elements"> */
 div.container {
   max-width: 1140px;
   margin: 0 auto;
-  padding: 0 30px; }
+  padding: 0 30px;
+  clear-after: both; }
+
+div.toolbar {
+  margin: 1.5em 0;
+  border-bottom: solid silver 1px;
+  padding: 0 0 0.5em 0; }
+
+div.toolbar .spaceleft {
+  margin-left: 1em; }
 
 hr {
   border: 0;
@@ -95,31 +151,30 @@ table.list th {
   background-color: aliceblue;
   text-align: left; }
 
-a.button {
-  border-radius: 4px;
-  border-style: solid;
-  border-color: #3e6e9b;
-  border-width: 1px;
-  background-color: #3e6e9b;
-  display: inline-block;
-  color: white;
-  padding: 0.5em 1em;
-  text-decoration: none !important; }
+.placeholder {
+  position: relative; }
 
-a.button:hover {
-  background-color: #2d5072; }
+.placeholder .blanker {
+  display: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  background-image: url("/ncm/img/spin.gif");
+  background-repeat: no-repeat;
+  background-position: center; }
 
-a.button-secondary {
-  background-color: white;
-  color: #3e6e9b;
-  border-color: #3e6e9b; }
+.placeholder.loading .blanker {
+  display: block; }
 
-a.button-secondary:hover {
-  border-color: #2d5072;
-  color: #2d5072;
-  background-color: white; }
+.placeholder.loading .content {
+  opacity: 0.4; }
 
-div.toolbar {
-  margin: 1.5em 0;
-  border-bottom: solid silver 1px;
-  padding: 0 0 0.5em 0; }
+img.spinner {
+  vertical-align: middle;
+  margin-right: 1em;
+  opacity: 0; }
+
+img.spinner.loading {
+  opacity: 1; }
+
+/* </editor-fold> */

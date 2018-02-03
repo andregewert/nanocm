@@ -31,11 +31,17 @@ $button-color-fg:   white;
 $button-color-bg-alt: #2d5072;
 $nav-color-bg:      aliceblue;
 
+/* <editor-fold desc="Basis elements"> */
+
+html {
+    font-size: 85%;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: $font-text;
-    font-size: 85%;
+    /*font-size: 85%;*/
     color: $primary-color;
     background-color: $background-color;
 }
@@ -53,6 +59,11 @@ a:hover {
     text-decoration: underline;
     color: $link-color-alt;
 }
+
+/* </editor-fold> */
+
+
+/* </editor-fold desc="Navigation elements"> */
 
 nav.main {
     background-color: $nav-color-bg;
@@ -85,7 +96,7 @@ nav.main ul li a {
     text-decoration: none;
     color: $primary-color-inactive;
     font-weight: bold;
-    font-size: 1.0rem;
+    font-size: 1.2rem;
     padding: 0.5em 0.8em;
 }
 
@@ -94,10 +105,74 @@ nav.main ul li.active a {
     color: $primary-color;
 }
 
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Buttons"> */
+
+input, select, option, textarea {
+    font-size: 1rem;
+}
+
+a.button,
+input.button {
+    border-radius: 4px;
+    border-style: solid;
+    border-color: $button-color-bg;
+    border-width: 1px;
+    background-color: $button-color-bg;
+    display: inline-block;
+    color: $button-color-fg;
+    padding: 0.5em 1em;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+a.button:hover,
+input.button:hover {
+    background-color: $button-color-bg-alt;
+}
+
+a.button-secondary,
+input.button-secondary {
+    background-color: white;
+    color: $button-color-bg;
+    border-color: $button-color-bg;
+}
+
+a.button-secondary:hover,
+input.button-secondary:hover {
+    border-color: $button-color-bg-alt;
+    color: $button-color-bg-alt;
+    background-color: white;
+}
+
+a.button.disabled,
+input.button[disabled] {
+    background-color: #666;
+    color: #ccc;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Misc elements"> */
+
 div.container {
     max-width: 1140px;
     margin: 0 auto;
     padding: 0 30px;
+    clear-after: both;
+}
+
+div.toolbar {
+    margin: 1.5em 0;
+    border-bottom: solid silver 1px;
+    padding: 0 0 0.5em 0;
+}
+
+div.toolbar .spaceleft {
+    margin-left: 1em;
 }
 
 hr {
@@ -122,36 +197,36 @@ table.list th {
     text-align: left;
 }
 
-a.button {
-    border-radius: 4px;
-    border-style: solid;
-    border-color: $button-color-bg;
-    border-width: 1px;
-    background-color: $button-color-bg;
-    display: inline-block;
-    color: $button-color-fg;
-    padding: 0.5em 1em;
-    text-decoration: none !important;
+.placeholder {
+    position: relative;
 }
 
-a.button:hover {
-    background-color: $button-color-bg-alt;
+.placeholder .blanker {
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-image: url("/ncm/img/spin.gif");
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
-a.button-secondary {
-    background-color: white;
-    color: $button-color-bg;
-    border-color: $button-color-bg;
+.placeholder.loading .blanker {
+    display: block;
 }
 
-a.button-secondary:hover {
-    border-color: $button-color-bg-alt;
-    color: $button-color-bg-alt;
-    background-color: white;
+.placeholder.loading .content {
+    opacity: 0.4;
 }
 
-div.toolbar {
-    margin: 1.5em 0;
-    border-bottom: solid silver 1px;
-    padding: 0 0 0.5em 0;
+img.spinner {
+    vertical-align: middle;
+    margin-right: 1em;
+    opacity: 0;
 }
+
+img.spinner.loading {
+    opacity: 1;
+}
+
+/* </editor-fold> */
