@@ -1,8 +1,44 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
+
+// TODO Anzeige von Freigabe-Status und Zeitpunkt der letzten Speicherung
+
+// TODO Automatisches Speichern
+
+// TODO Toolbar für den Editor (um Funktions-Platzhalter dialoggestützt einzufügen)
+
+// TODO Emoji-Keyboard anzeigen
+
 ?>
 <div class="container">
     <form>
         <h1>Artikel bearbeiten</h1>
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_save" class="button" href="#" role="button" title="Artikel speichern">Speichern</a>
+                <a id="button_preview" class="button" href="#" role="button" title="Artikelvorschau &ouml;ffnen">Vorschau</a>
+                <a id="button_preview" class="button button-secondary" href="/admin/articles" role="button" title="Bearbeitung abbrechen">Abbrechen</a>
+            </span>
+            <span class="right" style="float: right; vertical-align: middle">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+
+                <!--<input type="button" class="button spaceleft" value="Aktualisieren" id="button_refresh" />-->
+                <a id="button_publish" class="button" href="#" role="button" title="&Auml;nderungen speichern und Artikel freischalten">Freischalten</a>
+            </span>
+        </div>
+
+        <div class="editform">
+            <div class="row">
+                <input class="big" type="text" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" />
+            </div>
+            <div class="row">
+                <textarea style="height: 36rem"><?php echo $this->htmlEncode($this->article->content); ?></textarea>
+            </div>
+
+            <div class="row">
+                <input type="text" placeholder="Schlagworte (mit Komma getrennt)" />
+            </div>
+        </div>
     </form>
 </div>

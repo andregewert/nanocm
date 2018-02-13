@@ -78,8 +78,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                         $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
                         break;
 
-                    case '':
-                    case 'index.php':
+                    default:
                         $moduleName = 'AdminDashboardModule';
                         break;
                 }

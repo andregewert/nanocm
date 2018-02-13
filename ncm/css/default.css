@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Created on : 03.10.2017, 21:55:30
     Author     : André Gewert <agewert@ubergeek.de>
 */
+/*$font-text:         Fira Sans, Roboto, DejaVu Sans Condensed, Lato, Trebuchet MS, Helvetica, Arial, sans-serif;*/
 /* <editor-fold desc="Basis elements"> */
 html {
   font-size: 85%; }
@@ -26,13 +27,13 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: Fira Sans, Arial, Helvetica, sans-serif;
+  font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
   /*font-size: 85%;*/
   color: #333;
   background-color: #fff; }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: Fira Sans, Helvetica, sans-serif; }
+  font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif; }
 
 a {
   text-decoration: none;
@@ -81,7 +82,14 @@ nav.main ul li.active a {
 /* </editor-fold> */
 /* <editor-fold desc="Buttons"> */
 input, select, option, textarea {
-  font-size: 1rem; }
+  font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4em;
+  box-sizing: border-box; }
+
+textarea {
+  font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+  font-size: 1.1rem; }
 
 a.button,
 input.button {
@@ -94,7 +102,8 @@ input.button {
   color: white;
   padding: 0.5em 1em;
   text-decoration: none !important;
-  cursor: pointer; }
+  cursor: pointer;
+  line-height: 1.4em; }
 
 a.button:hover,
 input.button:hover {
@@ -116,6 +125,18 @@ a.button.disabled,
 input.button[disabled] {
   background-color: #666;
   color: #ccc; }
+
+/* </editor-fold> */
+/* <editor-fold desc="Form elements"> */
+div.row + div.row {
+  margin-top: 1rem; }
+
+.editform input,
+.editform textarea {
+  width: 100%; }
+
+input.big {
+  font-size: 2rem; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Misc elements"> */

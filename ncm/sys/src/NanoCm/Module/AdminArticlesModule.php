@@ -34,13 +34,13 @@ class AdminArticlesModule extends AbstractAdminModule {
      * Die gefundenen Artikel-Datensätze
      * @var \Ubergeek\NanoCm\Article[]
      */
-    protected $articles;
+    public $articles;
     
     /**
      * Wenn ein einzelner Artikel bearbeitet wird: der Artikel-Datensatz
      * @var \Ubergeek\NanoCm\Article
      */
-    protected $article;
+    public $article;
     
     // </editor-fold>
     

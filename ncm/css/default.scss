@@ -19,8 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Author     : André Gewert <agewert@ubergeek.de>
 */
 
-$font-headlines:    Fira Sans, Helvetica, sans-serif;
-$font-text:         Fira Sans, Arial, Helvetica, sans-serif;
+$font-headlines:    Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
+$font-text:         Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
+/*$font-text:         Fira Sans, Roboto, DejaVu Sans Condensed, Lato, Trebuchet MS, Helvetica, Arial, sans-serif;*/
+$font-monospace:    Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
 $background-color:  #fff;
 $primary-color:     #333;
 $primary-color-inactive: #777;
@@ -111,7 +113,15 @@ nav.main ul li.active a {
 /* <editor-fold desc="Buttons"> */
 
 input, select, option, textarea {
+    font-family: $font-text;
     font-size: 1rem;
+    line-height: 1.4em;
+    box-sizing: border-box;
+}
+
+textarea {
+    font-family: $font-monospace;
+    font-size: 1.1rem;
 }
 
 a.button,
@@ -126,6 +136,7 @@ input.button {
     padding: 0.5em 1em;
     text-decoration: none !important;
     cursor: pointer;
+    line-height: 1.4em;
 }
 
 a.button:hover,
@@ -151,6 +162,27 @@ a.button.disabled,
 input.button[disabled] {
     background-color: #666;
     color: #ccc;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Form elements"> */
+
+.editform .row {
+}
+
+div.row + div.row {
+    margin-top: 1rem;
+}
+
+.editform input,
+.editform textarea {
+    width: 100%;
+}
+
+input.big {
+    font-size: 2rem;
 }
 
 /* </editor-fold> */
