@@ -43,8 +43,11 @@ class AdminArticlesModule extends AbstractAdminModule {
     public $article;
     
     // </editor-fold>
-    
-    
+
+
+    /**
+     * @throws \Exception
+     */
     public function run() {
         $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Artikel verwalten');
