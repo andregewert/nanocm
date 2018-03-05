@@ -43,4 +43,20 @@ class Tag {
 
     // </editor-fold>
 
+
+    // <editor-fold desc="Methods">
+
+    /**
+     * Erstellt ein Tag-Objekt anhand des übergebenen PDO-Statements
+     * @param \PDOStatement $stmt
+     * @return Tag|null
+     */
+    public static function fetchFromPdoStatement(\PDOStatement $stmt) {
+        if (($tag = $stmt->fetchObject(__CLASS__)) !== false) {
+            return $tag;
+        }
+        return null;
+    }
+
+    // </editor-fold>
 }

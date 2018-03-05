@@ -95,7 +95,7 @@ class UserListItem {
     // <editor-fold desc="Methods">
 
     /**
-     * Erstellt ein UserList-Objekt aus dem übergebenen PDO-Statement
+     * Erstellt ein UserList-Objekt anhand des übergebenen PDO-Statements
      * @param \PDOStatement $stmt
      * @return UserListItem|null
      */
@@ -105,7 +105,7 @@ class UserListItem {
         if (($userListItem = $stmt->fetchObject(__CLASS__)) !== false) {
             $userListItem->creation_timestamp = new \DateTime($userListItem->creation_timestamp);
             $userListItem->modification_timestamp = new \DateTime($userListItem->modification_timestamp);
-            retunr $userListItem;
+            return $userListItem;
         }
         return null;
     }

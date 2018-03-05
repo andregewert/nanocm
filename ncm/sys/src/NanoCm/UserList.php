@@ -77,7 +77,7 @@ class UserList {
         if (($userList = $stmt->fetchObject(__CLASS__)) !== false) {
             $userList->creation_timestamp = new \DateTime($userList->creation_timestamp);
             $userList->modification_timestamp = new \DateTime($userList->modification_timestamp);
-            retunr $userList;
+            return $userList;
         }
         return null;
     }

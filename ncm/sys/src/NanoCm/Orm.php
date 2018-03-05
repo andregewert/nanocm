@@ -250,7 +250,7 @@ class Orm {
      * @return User Gesuchter Benutzer-Datensatz oder NULL
      */
     public function getUserByUsername(string $username, bool $includeInactive) {
-        $sql = 'SELECT * FROM User WHERE username = :username ';
+        $sql = 'SELECT * FROM user WHERE username = :username ';
         if (!$includeInactive) {
             $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
         }
@@ -291,7 +291,87 @@ class Orm {
     }
     
     // </editor-fold>
-    
+
+
+    // <editor-fold desc="Tag">
+
+    /**
+     * Gibt eine Liste aller definierten Schlagworte zurück
+     * @return Tag[]
+     */
+    public function getTags() {
+        $tags = array();
+
+        $sql = 'SELECT * FROM tag ORDER BY title ASC';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->execute();
+
+        while (($tag = Tag::fetchFromPdoStatement($stmt)) !== null) {
+            $tags[] = $tag;
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Gibt ein Array mit den Tags (in Form von Strings) zurück,
+     * die einem bestimmten Artikel zugeordnet sind
+     * @param $articleId Artikel-ID
+     * @return string[] Array der zugewiesenen Tags
+     */
+    public function getTagsByArticleId($articleId) {
+        $tags = array();
+
+        $sql = 'SELECT tag.title FROM tag_article LEFT JOIN tag
+                ON tag.id = tag_article.tag_id
+                WHERE tag_article.article_id = :article_id';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('article_id', $articleId);
+        $stmt->execute();
+
+        while (($tag = $stmt->fetchColumn()) !== false) {
+            $tags[] = $tag;
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Weist die übergebenen Tags einem bestimmten Artikel zu
+     *
+     * Die zuzuweisenden Tags werden lediglich als Strings übergeben,
+     * nicht etwa als Tag-Objekte.
+     * @param $articleId Artikel-ID
+     * @param string[] $tags Liste der zuzuweisenden Tags
+     * @return void
+     */
+    public function assignTagsToArticle($articleId, array $tags) {
+        $existingTags = $this->getTagsByArticleId($articleId);
+        $toInsert = array_diff($tags, $existingTags);
+        $toDelete = array_diff($existingTags, $tags);
+
+        foreach ($toInsert as $insert) {
+
+        }
+
+        foreach ($toDelete as $delete) {
+
+        }
+    }
+
+    public function assignTagToArticle($articleId, string $tag) {
+        //$sql = 'REPLACE INTO tag_article () VALUES (:article_id, :tag_id) ';
+    }
+
+    public function saveTag(string $tag) {
+        $sql = 'REPLACE INTO tag (title) VALUES (:tag) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('tag', $tag);
+        $stmt->execute();
+    }
+
+    // </editor-fold>
+
     
     // <editor-fold desc="Article">
     
