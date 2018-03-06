@@ -141,7 +141,7 @@ class Orm {
      * Durchsucht die Systemeinstellungen und gibt ein Array mit den gefundenen
      * Datensätzen zurück
      * @param Setting|null $filter
-     * @param integer $limit
+     * @param int $limit
      * @return Setting[]
      */
     public function searchSettings(Setting $filter = null, $limit = null) {
@@ -351,23 +351,105 @@ class Orm {
         $toDelete = array_diff($existingTags, $tags);
 
         foreach ($toInsert as $insert) {
-
+            $this->log->debug("Assigning tag $insert");
+            $this->assignTagToArticle($articleId, $insert);
         }
 
         foreach ($toDelete as $delete) {
-
+            $this->log->debug("Unassign tag $delete");
+            $this->unassignTagFromArticle($articleId, $delete);
         }
     }
 
-    public function assignTagToArticle($articleId, string $tag) {
-        //$sql = 'REPLACE INTO tag_article () VALUES (:article_id, :tag_id) ';
+    /**
+     * Weist das übergebene Schlagwort einem bestimmten Artikel hinzu
+     * @param int $articleId Artikel-ID
+     * @param string $title Zuzuweisendes Schlagwort
+     * @return void
+     */
+    public function assignTagToArticle(int $articleId, string $title) {
+        $tagId = $this->saveTag($title);
+        if ($tagId > 0) {
+            $this->assignTagIdToArticle($articleId, $tagId);
+        }
     }
 
-    public function saveTag(string $tag) {
-        $sql = 'REPLACE INTO tag (title) VALUES (:tag) ';
+    /**
+     * Ordnet das Schlagwort mit der angegebenen ID einem Artikel hinzu
+     * @param int $articleId Artikel-ID
+     * @param int $tagId Tag-ID
+     * @return void
+     */
+    public function assignTagIdToArticle(int $articleId, int $tagId) {
+        $sql = 'REPLACE INTO tag_article (article_id, tag_id) VALUES (:article_id, :tag_id)';
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('tag', $tag);
+        $stmt->bindValue('article_id', $articleId);
+        $stmt->bindValue('tag_id', $tagId);
         $stmt->execute();
+    }
+
+    /**
+     * Entfernt (falls vorhanden) die Zuweisung eines Schlagwortes von einem
+     * bestimmten Artikel
+     * @param int $articleId Artikel-ID
+     * @param string $title Schlagwort
+     * @return void
+     */
+    public function unassignTagFromArticle(int $articleId, string $title) {
+        $tagId = $this->getTagIdByTitle($title);
+        $this->unassignTagIdFromArticle($articleId, $tagId);
+    }
+
+    /**
+     * Entfernt (falls vorhanden) die Zuweisung des Schlagwortes mit der angegebenen ID
+     * von einem bestimmten Artikel
+     * @param int $articleId Artikel-ID
+     * @param int $tagId Tag-ID
+     * @return void
+     */
+    public function unassignTagIdFromArticle(int $articleId, int $tagId) {
+        $sql = 'DELETE FROM tag_article WHERE article_id = :article_id AND tag_id = :tag_id';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('article_id', $articleId);
+        $stmt->bindValue('tag_id', $tagId);
+        $stmt->execute();
+    }
+
+    /**
+     * Speichert ein Schlagwort in der Datenbank und gibt die Datensatz-ID zurück
+     *
+     * Wenn die Datensatz-ID nicht korrekt ermittelt werden kann
+     * (mögliche Gründe?), so wird 0 zurück gegeben.
+     * @param string $title
+     * @return int
+     */
+    public function saveTag(string $title) {
+        $sql = 'REPLACE INTO tag (title) VALUES (:title) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('title', $title);
+        $stmt->execute();
+
+        return $this->getTagIdByTitle($title);
+    }
+
+    /**
+     * Ermittelt die Datensatz-ID für das angegebene Schlagwort.
+     *
+     * Wenn die ID nicht ermittelt werden kann (etwa weil das Schlagwort
+     * nicht in der Datenbank vorhanden ist), so wird null zurück
+     * gegeben.
+     * @param string $title Gesuchtes Schlagwort
+     * @return int|null
+     */
+    public function getTagIdByTitle(string $title) {
+        $sql = 'SELECT id FROM tag WHERE title = :title ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('title', $title);
+        $stmt->execute();
+        $id = $stmt->fetchColumn();
+
+        if ($id === false) return null;
+        return $id;
     }
 
     // </editor-fold>
@@ -380,8 +462,8 @@ class Orm {
      * @param \Ubergeek\NanoCm\Article $filter Optionale Suchfilter
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel
      * berücksichtig werden sollen
-     * @param integer|null $page Angeforderte Seite
-     * @param integer|null $limit Maximale Anzahl der zurück zu gebenden Artikel
+     * @param int|null $page Angeforderte Seite
+     * @param int|null $limit Maximale Anzahl der zurück zu gebenden Artikel
      * @return array Ein Array mit den gefundenen Artikeln
      */
     public function searchArticles(Article $filter = null, $releasedOnly = true, $page = null, $limit = null) {
@@ -448,9 +530,71 @@ class Orm {
     public function getLatestArticles(int $limit = 5) {
         return $this->searchArticles(null, true, $limit);
     }
-    
+
+    /**
+     * Speichert einen Artikel in der Datenbank
+     * @param Article $article Artikeldaten
+     * @return int Datensatz-ID
+     * @todo Zugriffsrechte prüfen
+     */
     public function saveArticle(Article $article) {
-        // TODO Implementieren
+        // Artikel aktualisieren
+        if ($article->id > 0) {
+            $this->updateArticle($article);
+        }
+
+        // Artikel hinzufügen
+        else {
+            $this->insertArticle($article);
+        }
+
+        return $article->id;
+    }
+
+    /**
+     * Aktualisiert einen Artikel-Datensatz.
+     *
+     * Wichtig: Der Freigabe-Status wird über die Update-Methode niemals
+     * verändert! Die Veröffentlichung und das Löschen eines Artikels muss
+     * (gegebenenfalls im Anschluss an das eigentliche Speichern) über
+     * separate Methodenaufrufe erfolgen!
+     *
+     * @param Article $article
+     */
+    private function updateArticle(Article $article) {
+        $this->log->debug("Artikel aktualisieren");
+        $this->log->debug($article);
+
+        $sql = 'UPDATE article SET 
+                    modification_timestamp = CURRENT_TIMESTAMP,
+                    headline = :headline,
+                    teaser = :teaser,
+                    content = :content,
+                    start_timestamp = :start_timestamp,
+                    stop_timestamp = :stop_timestamp,
+                    enable_trackbacks = :enable_trackbacks,
+                    enable_comments = :enable_comments 
+                WHERE
+                    id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('headline', $article->headline);
+        $stmt->bindValue('teaser', $article->teaser);
+        $stmt->bindValue('content', $article->content);
+        $stmt->bindValue('start_timestamp', $article->start_timestamp);
+        $stmt->bindValue('stop_timestamp', $article->stop_timestamp);
+        $stmt->bindValue('enable_trackbacks', $article->enable_trackbacks);
+        $stmt->bindValue('enable_comments', $article->enable_comments);
+        $stmt->bindValue('id', $article->id);
+        $stmt->execute();
+
+        // TODO Verknüpfte Daten speichern (Tags)
+    }
+
+    private function insertArticle(Article $article) {
+        $this->log->debug("Artikel hinzufügen");
+        $this->log->debug($article);
+
+        $sql = '';
     }
     
     // </editor-fold>
@@ -462,7 +606,7 @@ class Orm {
      * Durchsucht die Pages nach verschiedenen Filterkriterien
      * @param array $filter
      * @param bool $releasedOnly
-     * @param integer|null $limit
+     * @param int|null $limit
      * @return Page[]
      */
     public function searchPages($filter = null, bool $releasedOnly = true, $limit = null) {
@@ -493,7 +637,7 @@ class Orm {
 
     /**
      * Liest die Page mit der angegebenen ID aus und gibt ein entsprechendes Objekt zurück
-     * @param integer $id ID der gesuchten Page
+     * @param int $id ID der gesuchten Page
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Pages berücksichtigt werden sollen
      * @return Page|null
      */

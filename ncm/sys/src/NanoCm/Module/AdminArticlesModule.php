@@ -59,6 +59,19 @@ class AdminArticlesModule extends AbstractAdminModule {
                 $this->setContentType('text/html');
 
                 switch ($this->getRelativeUrlPart(3)) {
+                    // Artikel speichern
+                    case 'save':
+                        // TODO implementieren
+                        $this->setContentType('text/javascript');
+                        $article = $this->createArticleFromRequest();
+                        $id = $this->orm->saveArticle($article);
+
+                        // saveArticle
+                        $content = json_encode(array(
+                            'id'    => $id
+                        ));
+                        break;
+
                     // Artikelliste
                     case 'list':
                     default:
@@ -73,6 +86,9 @@ class AdminArticlesModule extends AbstractAdminModule {
             case 'edit':
                 $articleId = intval($this->getRelativeUrlPart(3));
                 $this->article = $this->orm->getArticleById($articleId);
+                if ($this->article == null) {
+                    $this->article = new Article();
+                }
                 $content = $this->renderUserTemplate('content-articles-edit.phtml');
                 break;
 
@@ -85,5 +101,48 @@ class AdminArticlesModule extends AbstractAdminModule {
         
         $this->setContent($content);
     }
+
+
+    // <editor-fold desc="Internal methods">
+
+    private function createArticleFromRequest() {
+        $article = new Article();
+        $id = intval($this->getParam('id'));
+        $oldArticle = null;
+
+        if ($id > 0) {
+            $oldArticle = $this->orm->getArticleById($id);
+        }
+
+        if ($oldArticle !== null) {
+            $article->id = $id;
+            $article->creation_timestamp = $oldArticle->creation_timestamp;
+            $article->author_id = $oldArticle->author_id;
+            $article->status_code = $oldArticle->status_code;
+            $article->start_timestamp = $oldArticle->start_timestamp;
+            $article->stop_timestamp = $oldArticle->stop_timestamp;
+            $article->publishing_timestamp = $oldArticle->publishing_timestamp;
+        }
+
+        //$article->status_code = $this->getParam('status_code', 0);
+        // -> Status sollte immer separat (und alleine) gesetzt werden
+
+        $article->headline = $this->getParam('headline', '');
+        $article->teaser = $this->getParam('teaser', '');
+        $article->content = $this->getParam('content', '');
+        if (!empty($this->getParam('start_timestamp'))) {
+            $article->start_timestamp = new \DateTime($this->getParam('start_timestamp'));
+        }
+        if (!empty($this->getParam('stop_timestamp'))) {
+            $article->stop_timestamp = new \DateTime($this->getParam('stop_timestamp'));
+        }
+        $article->enable_trackbacks = intval($this->getParam('enable_trackbacks')) == 1;
+        $article->enable_comments = intval($this->getParam('enable_comments')) == 1;
+
+        $this->log->debug($article);
+        return $article;
+    }
+
+    // </editor-fold>
 
 }

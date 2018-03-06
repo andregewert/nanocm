@@ -30,10 +30,13 @@ final class Util {
     /**
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
-     * @param string $string
+     * @param string|null $string
      * @return string HTML-kodierter String
      */
-    public static function htmlEncode(string $string) : string {
+    public static function htmlEncode($string) : string {
+        if (empty($string)) {
+            $string = '';
+        }
         return htmlentities($string, ENT_HTML5, 'utf-8');
     }
     

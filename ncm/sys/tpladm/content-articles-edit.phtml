@@ -12,13 +12,17 @@
 ?>
 <div class="container">
     <form>
-        <h1>Artikel bearbeiten</h1>
+        <?php if ($this->article->id > 0) : ?>
+            <h1>Artikel bearbeiten</h1>
+        <?php else : ?>
+            <h1>Artikel hinzuf&uuml;gen</h1>
+        <?php endif; ?>
 
         <div class="toolbar">
             <span class="left">
-                <a id="button_save" class="button" href="#" role="button" title="Artikel speichern">Speichern</a>
-                <a id="button_preview" class="button" href="#" role="button" title="Artikelvorschau &ouml;ffnen">Vorschau</a>
-                <a id="button_preview" class="button button-secondary" href="/admin/articles" role="button" title="Bearbeitung abbrechen">Abbrechen</a>
+                <a id="button_save" class="button" href="javascript:void(0);" role="button" title="Artikel speichern">Speichern</a>
+                <a id="button_preview" class="button" href="javascript:void(0);" role="button" title="Artikelvorschau &ouml;ffnen">Vorschau</a>
+                <a id="button_cancel" class="button button-secondary" href="javascript:void(0);" role="button" title="Bearbeitung abbrechen">Abbrechen</a>
             </span>
             <span class="right" style="float: right; vertical-align: middle">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
@@ -28,17 +32,115 @@
             </span>
         </div>
 
+        <input type="hidden" id="input_article_id" name="article[id]" value="<?php echo $this->article->id; ?>" />
+
         <div class="editform">
             <div class="row">
-                <input class="big" type="text" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" />
+                <input class="big" type="text" id="input_article_headline" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" />
             </div>
             <div class="row">
-                <textarea style="height: 36rem"><?php echo $this->htmlEncode($this->article->content); ?></textarea>
+                <textarea style="height: 36rem" id="input_article_content"><?php echo $this->htmlEncode($this->article->content); ?></textarea>
             </div>
 
             <div class="row">
-                <input type="text" placeholder="Schlagworte (mit Komma getrennt)" />
+                <input type="text" id="input_article_tags" placeholder="Schlagworte (mit Komma getrennt)" />
             </div>
         </div>
     </form>
 </div>
+
+<script type="text/javascript">
+    var articlesEdit = (function ArticlesEdit() {
+        var page = this;
+
+        page.isBusy = false;
+        page.autoSaveTimer = null;
+
+        page.showLoadingIndicator = function() {
+            $('#toolbar_spinner').addClass('loading');
+            page.isBusy = true;
+        };
+
+        page.hideLoadingIndicator = function() {
+            $('#toolbar_spinner').removeClass('loading');
+            page.isBusy = false;
+        };
+
+        page.saveArticle = function() {
+            page.showLoadingIndicator();
+
+            $.ajax('/admin/articles/ajax/save', {
+                cache:      false,
+                type:       'POST',
+                dataType:   'JSON',
+                data:       {
+                    id:                     $('#input_article_id').val(),
+                    headline:               $('#input_article_headline').val(),
+                    teaser:                 '',
+                    content:                $('#input_article_content').val(),
+                    start_timestamp:        '',
+                    stop_timestamp:         '',
+                    publishing_timestamp:   '',
+                    enable_trackbacks:      1,
+                    enable_comments:        1,
+                    tags:                   $('#input_article_tags').val()
+                }
+            }).done(function(data) {
+                // ID zurückschreiben
+                // Anzeige (Freigabe-)Status aktualisieren
+                // Anzeige letzter Speicherzeitpunkt aktualisieren
+            }).always(function() {
+                page.hideLoadingIndicator();
+            });
+        };
+
+        page.autoSaveArticle = function() {
+            // Soll sich das automatische Speichern vom manuellen
+            // Speichern unterscheiden?
+            if (page.isBusy) {
+                console.log("Page is busy - skip auto saving");
+            } else {
+                console.log("Autosave");
+                page.saveArticle();
+            }
+        };
+
+        page.openPreview = function() {
+            // TODO implementieren
+            alert('Vorschau öffnen');
+        };
+
+        page.cancelEdit = function() {
+            if (confirm('Wollen Sie die Seite wirklich verlassen? Nicht gemachte Änderungen gehen verloren!')) {
+                // Redirect auf Artikel-Übersicht
+                // Letzte Suchparameter sollten beibehalten werden!
+                // TODO implementieren
+                window.location.href = '/admin/articles/';
+            }
+        };
+
+        // Event handler setzen
+
+        /*
+        $(window).on('beforeunload', function() {
+            console.log('beforeunload');
+            return confirm('Wollen Sie die Seite wirklich verlassen? Nicht gemachte Änderungen gehen verloren!');
+        });
+        */
+
+        $('#button_save').click(function() {
+            page.saveArticle();
+        });
+
+        $('#button_cancel').click(function() {
+            page.cancelEdit();
+        });
+
+        $('#button_preview').click(function() {
+            page.openPreview();
+        });
+
+        // TODO Autosave sollte konfigurierbar sein
+        //page.autoSaveTimer = window.setInterval(page.autoSaveArticle, 60000);
+    })();
+</script>
