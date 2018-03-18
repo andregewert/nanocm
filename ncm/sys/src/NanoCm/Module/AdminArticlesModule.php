@@ -19,6 +19,7 @@
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\Tag;
 
 /**
  * Verwaltung der Artikel
@@ -138,7 +139,7 @@ class AdminArticlesModule extends AbstractAdminModule {
         }
         $article->enable_trackbacks = intval($this->getParam('enable_trackbacks')) == 1;
         $article->enable_comments = intval($this->getParam('enable_comments')) == 1;
-
+        $article->tags = Tag::splitTagsString($this->getParam('tags'));
         $this->log->debug($article);
         return $article;
     }

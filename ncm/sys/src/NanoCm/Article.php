@@ -112,6 +112,12 @@ class Article {
      * @var bool
      */
     public $enable_comments;
+
+    /**
+     * Ein Array mit den zugewiesenen Schlagworten
+     * @var string[]
+     */
+    public $tags;
     
     // </editor-fold>
     

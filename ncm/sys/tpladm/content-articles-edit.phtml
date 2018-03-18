@@ -43,7 +43,7 @@
             </div>
 
             <div class="row">
-                <input type="text" id="input_article_tags" placeholder="Schlagworte (mit Komma getrennt)" />
+                <input type="text" id="input_article_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php echo $this->htmlEncode(join(', ', $this->article->tags)); ?>" />
             </div>
         </div>
     </form>

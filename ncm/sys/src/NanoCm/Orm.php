@@ -350,6 +350,9 @@ class Orm {
         $toInsert = array_diff($tags, $existingTags);
         $toDelete = array_diff($existingTags, $tags);
 
+        $this->log->debug($toInsert);
+        $this->log->debug($toDelete);
+
         foreach ($toInsert as $insert) {
             $this->log->debug("Assigning tag $insert");
             $this->assignTagToArticle($articleId, $insert);
@@ -368,9 +371,11 @@ class Orm {
      * @return void
      */
     public function assignTagToArticle(int $articleId, string $title) {
-        $tagId = $this->saveTag($title);
-        if ($tagId > 0) {
-            $this->assignTagIdToArticle($articleId, $tagId);
+        if (!empty(trim($title))) {
+            $tagId = $this->saveTag($title);
+            if ($tagId > 0) {
+                $this->assignTagIdToArticle($articleId, $tagId);
+            }
         }
     }
 
@@ -442,9 +447,9 @@ class Orm {
      * @return int|null
      */
     public function getTagIdByTitle(string $title) {
-        $sql = 'SELECT id FROM tag WHERE title = :title ';
+        $sql = 'SELECT id FROM tag WHERE LOWER(title) = :title ';
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('title', $title);
+        $stmt->bindValue('title', mb_strtolower($title));
         $stmt->execute();
         $id = $stmt->fetchColumn();
 
@@ -496,6 +501,7 @@ class Orm {
         $stmt->execute();
 
         while (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
+            $article->tags = $this->getTagsByArticleId($article->id);
             $articles[] = $article;
         }
 
@@ -519,7 +525,10 @@ class Orm {
         $stmt->bindValue('id', $id);
         $stmt->execute();
 
-        return Article::fetchFromPdoStatement($stmt);
+        if (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
+            $article->tags = $this->getTagsByArticleId($article->id);
+        }
+        return $article;
     }
     
     /**
@@ -588,6 +597,7 @@ class Orm {
         $stmt->execute();
 
         // TODO Verknüpfte Daten speichern (Tags)
+        $this->assignTagsToArticle($article->id, $article->tags);
     }
 
     private function insertArticle(Article $article) {

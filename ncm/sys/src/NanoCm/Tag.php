@@ -58,5 +58,22 @@ class Tag {
         return null;
     }
 
+    /**
+     * Zerlegt einen String in einzelne Tags und gibt diese in einem
+     * String-Array zurück.
+     * @param string $tags
+     * @return string[]
+     */
+    public static function splitTagsString($tags) {
+        $result = array();
+        if (trim($tags) != '') {
+            foreach (preg_split('/\s*,\s*/i', $tags) as $tag) {
+                $tag = trim($tag);
+                if (!empty($tag)) $result[] = $tag;
+            }
+        }
+        return $result;
+    }
+
     // </editor-fold>
 }
