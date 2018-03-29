@@ -44,7 +44,7 @@ a:hover {
   color: #2d5072; }
 
 /* </editor-fold> */
-/* </editor-fold desc="Navigation elements"> */
+/* <editor-fold desc="Navigation elements"> */
 nav.main {
   background-color: aliceblue;
   border-bottom: solid silver 1px; }
@@ -85,11 +85,17 @@ input, select, option, textarea {
   font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
   font-size: 1rem;
   line-height: 1.4em;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  border-color: #ddd;
+  border-style: solid;
+  border-width: 1px; }
 
 textarea {
   font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
-  font-size: 1.1rem; }
+  font-size: 1.1rem;
+  border-color: #ddd;
+  border-style: solid;
+  border-width: 1px; }
 
 a.button,
 input.button {
@@ -100,7 +106,7 @@ input.button {
   background-color: #3e6e9b;
   display: inline-block;
   color: white;
-  padding: 0.5em 1em;
+  padding: 0.4em 1em;
   text-decoration: none !important;
   cursor: pointer;
   line-height: 1.4em; }
@@ -125,6 +131,11 @@ a.button.disabled,
 input.button[disabled] {
   background-color: #666;
   color: #ccc; }
+
+a.button img,
+a.button-secondary img {
+  vertical-align: middle;
+  margin: 0 4px 0 0; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Form elements"> */
@@ -157,7 +168,7 @@ div.toolbar .spaceleft {
 hr {
   border: 0;
   height: 1px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
   margin: 2em 0; }
 
 table.list {
@@ -171,6 +182,32 @@ table.list th {
 table.list th {
   background-color: aliceblue;
   text-align: left; }
+
+.imgtoolbar {
+  background-color: #f8f8f8;
+  padding: 0.2em 0.5em;
+  border-color: #ddd;
+  border-style: solid;
+  border-width: 0 0 1px 0; }
+
+.imgtoolbar a.button {
+  background-color: transparent;
+  color: black;
+  vertical-align: center;
+  font-size: 0.9rem;
+  padding: 6px;
+  line-height: 1em;
+  border-color: transparent; }
+
+.imgtoolbar a.button:hover {
+  border-color: #3e6e9b; }
+
+.imgtoolbar a.button img {
+  vertical-align: middle;
+  margin: 0 0 0 0; }
+
+.imgtoolbar a.button span {
+  padding: 0 0 0 4px; }
 
 .placeholder {
   position: relative; }

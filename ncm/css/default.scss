@@ -32,6 +32,8 @@ $button-color-bg:   #3e6e9b;
 $button-color-fg:   white;
 $button-color-bg-alt: #2d5072;
 $nav-color-bg:      aliceblue;
+$toolbar-bg:        #f8f8f8;
+$border-color:      #ddd;
 
 /* <editor-fold desc="Basis elements"> */
 
@@ -65,7 +67,7 @@ a:hover {
 /* </editor-fold> */
 
 
-/* </editor-fold desc="Navigation elements"> */
+/* <editor-fold desc="Navigation elements"> */
 
 nav.main {
     background-color: $nav-color-bg;
@@ -117,11 +119,17 @@ input, select, option, textarea {
     font-size: 1rem;
     line-height: 1.4em;
     box-sizing: border-box;
+    border-color: $border-color;
+    border-style: solid;
+    border-width: 1px;
 }
 
 textarea {
     font-family: $font-monospace;
     font-size: 1.1rem;
+    border-color: $border-color;
+    border-style: solid;
+    border-width: 1px;
 }
 
 a.button,
@@ -133,7 +141,7 @@ input.button {
     background-color: $button-color-bg;
     display: inline-block;
     color: $button-color-fg;
-    padding: 0.5em 1em;
+    padding: 0.4em 1em;
     text-decoration: none !important;
     cursor: pointer;
     line-height: 1.4em;
@@ -162,6 +170,12 @@ a.button.disabled,
 input.button[disabled] {
     background-color: #666;
     color: #ccc;
+}
+
+a.button img,
+a.button-secondary img {
+    vertical-align: middle;
+    margin: 0 4px 0 0;
 }
 
 /* </editor-fold> */
@@ -227,6 +241,37 @@ table.list th {
 table.list th {
     background-color: $nav-color-bg;
     text-align: left;
+}
+
+.imgtoolbar {
+    background-color: $toolbar-bg;
+    padding: 0.2em 0.5em;
+    border-color: $border-color;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+}
+
+.imgtoolbar a.button  {
+    background-color: transparent;
+    color: black;
+    vertical-align: center;
+    font-size: 0.9rem;
+    padding: 6px;
+    line-height: 1em;
+    border-color: transparent;
+}
+
+.imgtoolbar a.button:hover {
+    border-color: $button-color-bg;
+}
+
+.imgtoolbar a.button img  {
+    vertical-align: middle;
+    margin: 0 0 0 0;
+}
+
+.imgtoolbar a.button span {
+    padding: 0 0 0 4px;
 }
 
 .placeholder {
