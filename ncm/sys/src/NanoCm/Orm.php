@@ -1,11 +1,12 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,8 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 namespace Ubergeek\NanoCm;
@@ -514,6 +516,7 @@ class Orm {
      * @param int $id ID des angeforderten Artikels
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel berücksichtigt werden sollen
      * @return Article|null
+     * @todo Verknüpfte komplexe Daten (Autor etc.) müssen auch ausgelesen werden
      */
     public function getArticleById(int $id, bool $releasedOnly = true) {
         $sql = 'SELECT * FROM article WHERE id = :id ';
@@ -526,6 +529,7 @@ class Orm {
         $stmt->execute();
 
         if (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
+            $this->log->debug("Stop timestamp is: " . $article->stop_timestamp);
             $article->tags = $this->getTagsByArticleId($article->id);
         }
         return $article;
@@ -717,7 +721,6 @@ class Orm {
 
     // <editor-fold desc="Converter methods">
 
-
     /**
      * Konvertiert eine Benutzer-ID in den zugehörigen Anzeigenamen
      * @param int $userId
@@ -727,16 +730,6 @@ class Orm {
         $user = $this->getCachedUser($userId);
         if ($user == null) return '';
         return $user->getFullName();
-    }
-
-    public function convertStatusId($statusId) : string {
-        switch ($statusId) {
-            case 0:
-                return 'Online';
-            case 9:
-                return 'Gesperrt';
-        }
-        return 'Unbekannt';
     }
 
     /**

@@ -1,11 +1,12 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,8 +14,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 namespace Ubergeek\NanoCm;
@@ -136,6 +138,10 @@ class Article {
             $article->creation_timestamp = new \DateTime($article->creation_timestamp);
             $article->modification_timestamp = new \DateTime($article->modification_timestamp);
             $article->publishing_timestamp = new \DateTime($article->publishing_timestamp);
+            $article->start_timestamp = new \DateTime($article->start_timestamp);
+            if ($article->stop_timestamp != null) {
+                $article->stop_timestamp = new \DateTime($article->stop_timestamp);
+            }
             return $article;
         }
         return null;

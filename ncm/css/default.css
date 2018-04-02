@@ -82,28 +82,10 @@ nav.main ul li.active a {
 
 /* </editor-fold> */
 /* <editor-fold desc="Buttons"> */
-input, select, option, textarea {
-  font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
-  font-size: 1rem;
-  line-height: 1.4em;
-  box-sizing: border-box;
-  border-color: #ddd;
-  border-style: solid;
-  border-width: 1px; }
-
-textarea {
-  font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
-  font-size: 1.1rem;
-  border-color: #ddd;
-  border-style: solid;
-  border-width: 1px; }
-
 a.button,
 input.button {
   border-radius: 4px;
-  border-style: solid;
-  border-color: #3e6e9b;
-  border-width: 1px;
+  border: 1px solid #3e6e9b;
   background-color: #3e6e9b;
   display: inline-block;
   color: white;
@@ -140,6 +122,19 @@ a.button-secondary img {
 
 /* </editor-fold> */
 /* <editor-fold desc="Form elements"> */
+input, select, option, textarea {
+  font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4em;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  background-color: white; }
+
+textarea {
+  font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+  font-size: 1.1rem;
+  border: 1px solid #ddd; }
+
 .editform {
   position: relative;
   margin: -1px;
@@ -154,7 +149,8 @@ div.row + div.row {
   margin-top: 1rem; }
 
 .editform input,
-.editform textarea {
+.editform textarea,
+.editform select {
   width: 100%; }
 
 .editform_sidebar_right {
@@ -168,6 +164,11 @@ div.row + div.row {
   border-right-width: 1px;
   height: 100%;
   margin: 0; }
+
+.editform_sidebar_right input,
+.editform_sidebar_right textarea,
+.editform_sidebar_right select {
+  width: auto; }
 
 input.big {
   font-size: 2rem; }
@@ -194,12 +195,14 @@ div.toolbar .spaceleft {
 hr {
   border: 0;
   height: 1px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
   margin: 2em 0; }
 
 table.list {
   width: 100%;
-  border-collapse: collapse; }
+  border-collapse: collapse;
+  margin-top: 1em;
+  margin-bottom: 1em; }
 
 table.list td,
 table.list th {
@@ -212,9 +215,8 @@ table.list th {
 .imgtoolbar {
   background-color: #f8f8f8;
   padding: 0.2em 0.5em;
-  border-color: #ddd;
-  border-style: solid;
-  border-width: 0 0 1px 0; }
+  border: 0 solid #ddd;
+  border-bottom-width: 1px; }
 
 .imgtoolbar a.button {
   background-color: transparent;
@@ -253,9 +255,7 @@ table.list th {
   height: 100%;
   width: 100%;
   position: absolute;
-  background-image: url("/ncm/img/spin.gif");
-  background-repeat: no-repeat;
-  background-position: center; }
+  background: url("/ncm/img/spin.gif") no-repeat center; }
 
 .placeholder.loading .blanker {
   display: block; }

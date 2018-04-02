@@ -1,4 +1,6 @@
-<?php /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */ ?>
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
+
+use Ubergeek\NanoCm\StatusCode; ?>
 <div class="container">
     <form>
         <h1>Artikel verwalten</h1>
@@ -20,8 +22,9 @@
                 <label for="select_status" class="spaceleft">Status</label>
                 <select id="select_status">
                     <option value="">- Alle -</option>
-                    <option value="1">Online</option>
-                    <option value="9">Gesperrt</option>
+                    <?php foreach ($this->availableStatusCodes as $code) : ?>
+                        <option value="<?php echo $code; ?>"><?php echo StatusCode::convertStatusId($code); ?></option>
+                    <?php endforeach; ?>
                 </select>
 
                 <input type="button" class="button spaceleft" value="Aktualisieren" id="button_refresh" />

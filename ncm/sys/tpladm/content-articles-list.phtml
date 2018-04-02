@@ -1,4 +1,7 @@
-<?php /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */ ?>
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
 <table class="list">
     <thead>
     <tr>
@@ -19,7 +22,7 @@
                 <td><a href="/admin/articles/edit/<?php echo $article->id; ?>"><?php echo $this->htmlEncode($article->headline); ?></a></td>
                 <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id)); ?></td>
                 <td><?php echo $this->htmlEncode($article->publishing_timestamp->format('Y-m-d')); ?></td>
-                <td><?php echo $this->htmlEncode($this->orm->convertStatusId($article->status_code)); ?></td>
+                <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($article->status_code)); ?></td>
             </tr>
         <?php endforeach; ?>
     <?php else : ?>

@@ -1,6 +1,8 @@
 <?php
     /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
 
+    use Ubergeek\NanoCm\StatusCode;
+
     // TODO Anzeige von Freigabe-Status und Zeitpunkt der letzten Speicherung
 
     // TODO Auslagern der Javascript-Quellen in separate Dateien
@@ -31,7 +33,41 @@
 
         <div class="editform">
             <div class="editform_sidebar_right" id="article_settings_sidebar">
-                Test
+                <p>
+                    <label>Freigabestatus</label>
+                    <select id="select_status">
+                        <?php foreach ($this->availableStatusCodes as $code) : ?>
+                            <option value="<?php echo $code; ?>"<?php if ($this->article->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </p>
+                <p>
+                    <label>Startdatum</label>
+                    <input type="date" id="input_article_start_date" value="<?php echo $this->article->start_timestamp->format('Y-m-d'); ?>" />
+                    <input type="time" id="input_article_start_time" value="<?php echo $this->article->start_timestamp->format('H:i'); ?>" />
+                </p>
+                <p>
+                    <label>Enddatum</label>
+                    <input type="datetime-local" id="input_article_stop_timestamp" value="<?php if ($this->article->stop_timestamp instanceof \DateTime) echo $this->article->stop_timestamp->format('Y-m-d H:i'); ?>" />
+                </p>
+                <p>
+                    <label>Ver&ouml;ffentlichungsdatum</label>
+                    <input type="datetime-local" id="input_article_publishing_timestamp" value="<?php echo $this->article->publishing_timestamp->format('Y-m-d H:i'); ?>" />
+                </p>
+                <p>
+                    <label for="input_article_enable_comments">Kommentare zulasen</label>
+                    <input type="checkbox" value="1" id="input_article_enable_comments"<?php if ($this->article->enable_comments) echo ' checked="checked"'; ?> />
+                </p>
+                <p>
+                    <label for="input_article_enable_trackbacks">Trackbacks zulassen
+                        <input type="checkbox" value="1" id="input_article_enable_trackbacks"<?php if ($this->article->enable_trackbacks) echo ' checked="checked"'; ?> />
+                    </label>
+                </p>
+                <p>
+                    <label>Autor</label>
+                    <?php echo $this->htmlEncode($this->article->author_id); ?>
+                    <?php // TODO Autor-Auswahl per Popup oder Selectbox? ?>
+                </p>
             </div>
 
             <div class="row">
@@ -47,6 +83,11 @@
                 <span class="imgtoolbar_popupbutton">
                     <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
                         <ul style="list-style: none; padding: 0; margin: 0">
+                            <?php foreach ($this->availableSpecialChars as $char => $desc) : ?>
+                                <li style="display: inline-block; text-align: center; vertical-align: center; width: 1.4em; height: 1.2em; float: left; font-size: 2rem">
+                                    <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#' . $char . ';'; ?>');" style="text-decoration: none; padding: 2px" title="<?php echo $this->htmlEncode($desc); ?>"><?php echo '&#' . $char . ';'; ?></a>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </span>
                     <a class="button" title="Sonderzeichen einf&uuml;gen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_letter_omega.png" /></a>

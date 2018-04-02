@@ -1,11 +1,12 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -13,12 +14,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
 
 /**
@@ -42,7 +45,39 @@ class AdminArticlesModule extends AbstractAdminModule {
      * @var \Ubergeek\NanoCm\Article
      */
     public $article;
-    
+
+    /**
+     * Die für Artikel-Datensätze verfügbaren Statuscodes
+     * @var int[]
+     */
+    public $availableStatusCodes = array(
+        StatusCode::ACTIVE,
+        StatusCode::REVIEW_REQUIRED,
+        StatusCode::LOCKED
+    );
+
+    /**
+     * Definiert die Sonderzeichen, die über das virtuelle Keyboard eingefügt werden können
+     * @var array
+     */
+    public $availableSpecialChars = array(
+        160     => 'Geschütztes Leerzeichen',
+        8201    => 'Schmales Leerzeichen',
+        8239    => 'Schmales geschütztes Leerzeichen',
+        8211    => 'Halbgeviertstrich',
+        8212    => 'Geviertstrich',
+        187     => 'Guillemets',
+        171     => 'Guillemets',
+        8250    => 'Guillemets 2',
+        8249    => 'Guillemets 2',
+        8222    => 'Anführungszeichen',
+        8220    => 'Anführungszeichen',
+        8218    => 'Anführungszeichen 2',
+        8216    => 'Anführungszeichen 2',
+        8226    => 'Bullet',
+        183     => 'Mittelpunkt'
+    );
+
     // </editor-fold>
 
 

@@ -117,30 +117,10 @@ nav.main ul li.active a {
 
 /* <editor-fold desc="Buttons"> */
 
-input, select, option, textarea {
-    font-family: $font-text;
-    font-size: 1rem;
-    line-height: 1.4em;
-    box-sizing: border-box;
-    border-color: $border-color;
-    border-style: solid;
-    border-width: 1px;
-}
-
-textarea {
-    font-family: $font-monospace;
-    font-size: 1.1rem;
-    border-color: $border-color;
-    border-style: solid;
-    border-width: 1px;
-}
-
 a.button,
 input.button {
     border-radius: 4px;
-    border-style: solid;
-    border-color: $button-color-bg;
-    border-width: 1px;
+    border: 1px solid $button-color-bg;
     background-color: $button-color-bg;
     display: inline-block;
     color: $button-color-fg;
@@ -186,6 +166,21 @@ a.button-secondary img {
 
 /* <editor-fold desc="Form elements"> */
 
+input, select, option, textarea {
+    font-family: $font-text;
+    font-size: 1rem;
+    line-height: 1.4em;
+    box-sizing: border-box;
+    border: 1px solid $border-color;
+    background-color: white;
+}
+
+textarea {
+    font-family: $font-monospace;
+    font-size: 1.1rem;
+    border: 1px solid $border-color;
+}
+
 .editform {
     position: relative;
     margin: -1px;
@@ -203,7 +198,8 @@ div.row + div.row {
 }
 
 .editform input,
-.editform textarea {
+.editform textarea,
+.editform select {
     width: 100%;
 }
 
@@ -218,6 +214,12 @@ div.row + div.row {
     border-right-width: 1px;
     height: 100%;
     margin: 0;
+}
+
+.editform_sidebar_right input,
+.editform_sidebar_right textarea,
+.editform_sidebar_right select {
+    width: auto;
 }
 
 input.big {
@@ -260,6 +262,8 @@ hr {
 table.list {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 table.list td,
@@ -275,9 +279,8 @@ table.list th {
 .imgtoolbar {
     background-color: $toolbar-bg;
     padding: 0.2em 0.5em;
-    border-color: $border-color;
-    border-style: solid;
-    border-width: 0 0 1px 0;
+    border: 0 solid $border-color;
+    border-bottom-width: 1px;
 }
 
 .imgtoolbar a.button  {
@@ -324,9 +327,7 @@ table.list th {
     height: 100%;
     width: 100%;
     position: absolute;
-    background-image: url("/ncm/img/spin.gif");
-    background-repeat: no-repeat;
-    background-position: center;
+    background: url("/ncm/img/spin.gif") no-repeat center;
 }
 
 .placeholder.loading .blanker {
