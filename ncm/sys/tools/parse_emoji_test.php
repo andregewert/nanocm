@@ -21,11 +21,16 @@
 
 /**
  * Soll die Emoji-Testdatei parsen, um daraus eine PHP-Datenstruktur zu erstellen,
- * die für das Emoji-Virtual-Keyboard verwendet wird
+ * die für das Emoji-Virtual-Keyboard verwendet wird.
+ *
+ * Eine Blacklist der nicht auszuwertenden Emojis wird nicht an dieser Stelle
+ * implementiert, da der Betreuer einer konkreten Installation auch ohne Update
+ * der Definitionsdatei in der Lage sein soll, das Emoji-Keyboard anzupassen.
+ *
+ * Auf diese Weise ist es möglich, bei einem Update des Unicode-Standards das
+ * passende Test-File unverändert zu parsen, damit die Emoji-Definitionsdatei
+ * zu aktualisieren und dennoch eine individuelle Blacklist beizubehalten.
  */
-
-// TODO Black List implementieren
-// TODO Eventuell kann man auch die Beschreibung noch übernehmen und als Tooltip verwenden?
 
 class ParseEmojiTestFile {
     public function parseFile(string $filename) : array {
@@ -38,14 +43,15 @@ class ParseEmojiTestFile {
                     if (preg_match('/^\# group\: (.+)$/i', $line, $matches) != 0) {
                         $group = $matches[1];
                         $result[$group] = array();
-                    } elseif (preg_match('/^(.+)\;(.+)\#.*$/', $line, $matches) != 0) {
+                    } elseif (preg_match('/^(.+)\;(.+)\#\s+\S+\s+(.*)$/', $line, $matches) != 0) {
                         $codes = explode(' ', trim($matches[1]));
                         $fq = trim($matches[2]) == 'fully-qualified';
+                        $desc = trim($matches[3]);
 
                         if ($fq && $group !== null) {
-                            $code = array_pop($codes);
-                            if (!in_array($code, $result[$group])) {
-                                $result[$group][] = $code;
+                            $code = '&#x' . join(';&#x', $codes) . ';';
+                            if (!in_array($code, array_keys($result[$group]))) {
+                                $result[$group][$code] = array('code' => $code, 'description' => $desc);
                             }
                         }
                     }

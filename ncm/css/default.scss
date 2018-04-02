@@ -36,6 +36,7 @@ $button-color-fg:   white;
 $button-color-bg-alt: #2d5072;
 $nav-color-bg:      aliceblue;
 $toolbar-bg:        #f8f8f8;
+$toolbar-bg-header: #ddd;
 $border-color:      #ddd;
 $border-color-heavy: silver;
 
@@ -316,6 +317,40 @@ table.list th {
     top: 2em;
     background-color: $toolbar-bg;
     border: 1px solid $border-color;
+}
+
+.imgtoolbar_popup label {
+    display: block;
+    background-color: $toolbar-bg-header;
+    clear: both;
+    line-height: 2em;
+}
+
+ul.imgtoolbar_keyboard {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.imgtoolbar_keyboard li {
+    display: inline-block;
+    text-align: center;
+    vertical-align: center;
+    width: 1.4em;
+    float: left;
+    font-size: 2rem;
+}
+
+ul.imgtoolbar_keyboard li a {
+    display: block;
+    text-decoration: none;
+    padding: 2px;
+    border: 1px solid transparent;
+}
+
+ul.imgtoolbar_keyboard li a:hover {
+    border-radius: 2px;
+    border: 1px $border-color solid;
 }
 
 .placeholder {

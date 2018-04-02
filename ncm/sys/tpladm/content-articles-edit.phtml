@@ -82,10 +82,10 @@
                 <!-- TODO Sonderzeichen-Auswahl -->
                 <span class="imgtoolbar_popupbutton">
                     <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
-                        <ul style="list-style: none; padding: 0; margin: 0">
+                        <ul class="imgtoolbar_keyboard">
                             <?php foreach ($this->availableSpecialChars as $char => $desc) : ?>
-                                <li style="display: inline-block; text-align: center; vertical-align: center; width: 1.4em; height: 1.2em; float: left; font-size: 2rem">
-                                    <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#' . $char . ';'; ?>');" style="text-decoration: none; padding: 2px" title="<?php echo $this->htmlEncode($desc); ?>"><?php echo '&#' . $char . ';'; ?></a>
+                                <li>
+                                    <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#' . $char . ';'; ?>');" title="<?php echo $this->htmlEncode($desc); ?>"><?php echo '&#' . $char . ';'; ?></a>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -101,11 +101,11 @@
                     <span class="imgtoolbar_popup" style="width: 450px; height: 220px; overflow: auto">
 
                         <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $codes) : ?>
-                            <label class="small" style="display: block; background-color: darkgrey; clear: both"><?php echo \Ubergeek\NanoCm\Util::htmlEncode($group); ?></label>
-                            <ul style="list-style: none; padding: 0; margin: 0">
+                            <label class="small"><?php echo \Ubergeek\NanoCm\Util::htmlEncode($group); ?></label>
+                            <ul class="imgtoolbar_keyboard">
                                 <?php foreach ($codes as $code) : ?>
-                                    <li style="display: inline-block; text-align: center; vertical-align: center; width: 1.4em; height: 1.2em; float: left; font-size: 2rem">
-                                        <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#x' . $code . ';'; ?>');" style="text-decoration: none; padding: 2px"><?php echo '&#x' . $code . ';'; ?></a>
+                                    <li>
+                                        <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo $code->code; ?>');" title="<?php echo $this->htmlEncode($code->description); ?>"><?php echo $code->code; ?></a>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
