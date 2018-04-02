@@ -2,9 +2,9 @@
  * NanoCM
  * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,8 +12,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
 function Ncm() {
@@ -34,7 +35,35 @@ function Ncm() {
         );
     };
 
-    console.log('ncm');
+    // Standard-DHTML-Elemente initialisieren
+    $(document).ready(function() {
+
+        // Popup-Buttons initialisieren
+        $('.imgtoolbar_popupbutton').each(function() {
+            var button = $(this);
+            var buttonTimer;
+
+            $(this).find('a').click(function() {
+                $(button).find('.imgtoolbar_popup').toggle();
+            });
+
+            $(button).mouseout(function() {
+                if ($(button).is(':visible')) {
+                    buttonTimer = window.setTimeout(function () {
+                        $(button).find('.imgtoolbar_popup').hide();
+                    }, 800);
+                }
+            });
+
+            $(button).mouseover(function() {
+                if (buttonTimer != null) {
+                    window.clearTimeout(buttonTimer);
+                }
+            });
+        });
+
+    });
+
 }
 
 var ncm = new Ncm();

@@ -140,12 +140,34 @@ a.button-secondary img {
 
 /* </editor-fold> */
 /* <editor-fold desc="Form elements"> */
+.editform {
+  position: relative;
+  margin: -1px;
+  padding: 0;
+  border: solid transparent 1px; }
+
+.editform .row {
+  margin-top: 1em;
+  margin-bottom: 1em; }
+
 div.row + div.row {
   margin-top: 1rem; }
 
 .editform input,
 .editform textarea {
   width: 100%; }
+
+.editform_sidebar_right {
+  display: none;
+  position: absolute;
+  width: 400px;
+  right: 0;
+  background-color: #f8f8f8;
+  border: 0 solid silver;
+  border-left-width: 1px;
+  border-right-width: 1px;
+  height: 100%;
+  margin: 0; }
 
 input.big {
   font-size: 2rem; }
@@ -159,9 +181,12 @@ div.container {
   clear-after: both; }
 
 div.toolbar {
-  margin: 1.5em 0;
+  margin: 1.5em 0 0 0;
   border-bottom: solid silver 1px;
   padding: 0 0 0.5em 0; }
+
+footer {
+  border-top: solid silver 1px; }
 
 div.toolbar .spaceleft {
   margin-left: 1em; }
@@ -169,7 +194,7 @@ div.toolbar .spaceleft {
 hr {
   border: 0;
   height: 1px;
-  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
   margin: 2em 0; }
 
 table.list {
@@ -209,6 +234,16 @@ table.list th {
 
 .imgtoolbar a.button span {
   padding: 0 0 0 4px; }
+
+.imgtoolbar_popupbutton {
+  position: relative; }
+
+.imgtoolbar_popup {
+  display: none;
+  position: absolute;
+  top: 2em;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd; }
 
 .placeholder {
   position: relative; }

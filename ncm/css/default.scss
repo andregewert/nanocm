@@ -37,6 +37,7 @@ $button-color-bg-alt: #2d5072;
 $nav-color-bg:      aliceblue;
 $toolbar-bg:        #f8f8f8;
 $border-color:      #ddd;
+$border-color-heavy: silver;
 
 /* <editor-fold desc="Basis elements"> */
 
@@ -185,7 +186,16 @@ a.button-secondary img {
 
 /* <editor-fold desc="Form elements"> */
 
+.editform {
+    position: relative;
+    margin: -1px;
+    padding: 0;
+    border: solid transparent 1px;
+}
+
 .editform .row {
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 div.row + div.row {
@@ -195,6 +205,19 @@ div.row + div.row {
 .editform input,
 .editform textarea {
     width: 100%;
+}
+
+.editform_sidebar_right {
+    display: none;
+    position: absolute;
+    width: 400px;
+    right: 0;
+    background-color: $toolbar-bg;
+    border: 0 solid $border-color-heavy;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    height: 100%;
+    margin: 0;
 }
 
 input.big {
@@ -214,9 +237,13 @@ div.container {
 }
 
 div.toolbar {
-    margin: 1.5em 0;
-    border-bottom: solid silver 1px;
+    margin: 1.5em 0 0 0;
+    border-bottom: solid $border-color-heavy 1px;
     padding: 0 0 0.5em 0;
+}
+
+footer {
+    border-top: solid $border-color-heavy 1px;
 }
 
 div.toolbar .spaceleft {
@@ -274,6 +301,18 @@ table.list th {
 
 .imgtoolbar a.button span {
     padding: 0 0 0 4px;
+}
+
+.imgtoolbar_popupbutton {
+    position: relative;
+}
+
+.imgtoolbar_popup {
+    display: none;
+    position: absolute;
+    top: 2em;
+    background-color: $toolbar-bg;
+    border: 1px solid $border-color;
 }
 
 .placeholder {

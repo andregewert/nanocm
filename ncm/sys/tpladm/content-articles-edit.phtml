@@ -1,14 +1,9 @@
 <?php
-/* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
+    /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
 
-// TODO Anzeige von Freigabe-Status und Zeitpunkt der letzten Speicherung
+    // TODO Anzeige von Freigabe-Status und Zeitpunkt der letzten Speicherung
 
-// TODO Automatisches Speichern
-
-// TODO Toolbar für den Editor (um Funktions-Platzhalter dialoggestützt einzufügen)
-
-// TODO Emoji-Keyboard anzeigen
-
+    // TODO Auslagern der Javascript-Quellen in separate Dateien
 ?>
 <div class="container">
     <form>
@@ -17,6 +12,7 @@
         <?php else : ?>
             <h1>Artikel hinzuf&uuml;gen</h1>
         <?php endif; ?>
+        <input type="hidden" id="input_article_id" name="article[id]" value="<?php echo $this->article->id; ?>" />
 
         <div class="toolbar">
             <span class="left">
@@ -26,26 +22,57 @@
             </span>
             <span class="right" style="float: right; vertical-align: middle">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
-                <a id="button_settings" class="button" href="javascript:void(0)" title="Artikeleinstellungen anzeigen">
+                <a id="button_toggle_settings" class="button" href="javascript:void(0)" title="Artikeleinstellungen anzeigen">
                     <img src="/ncm/img/fatcow/16/cog.png" width="16" height="16" />Einstellungen
                 </a>
                 <a id="button_publish" class="button" href="javascript:void(0)" title="&Auml;nderungen speichern und Artikel freischalten">Freischalten</a>
             </span>
         </div>
 
-        <input type="hidden" id="input_article_id" name="article[id]" value="<?php echo $this->article->id; ?>" />
-
         <div class="editform">
+            <div class="editform_sidebar_right" id="article_settings_sidebar">
+                Test
+            </div>
+
             <div class="row">
                 <input class="big" type="text" id="input_article_headline" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" />
             </div>
 
-            <div class="imgtoolbar">
-                <!-- TODO Emoji-Tastatur öffnen -->
-                <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/emotion_amazing.png" /></a>
+            <div class="row imgtoolbar" style="margin-bottom: -1em">
+                <a class="button" title="Fett" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
+                <a class="button" title="Kursiv" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
+                <a class="button" title="Unterstrichen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
+
+                <!-- TODO Sonderzeichen-Auswahl -->
+                <span class="imgtoolbar_popupbutton">
+                    <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
+                        <ul style="list-style: none; padding: 0; margin: 0">
+                        </ul>
+                    </span>
+                    <a class="button" title="Sonderzeichen einf&uuml;gen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_letter_omega.png" /></a>
+                </span>
 
                 <!-- TODO Dialogfenster für Bildauswahl öffnen -->
                 <a class="button" title="Bild einf&uuml;gen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
+
+                <!-- TODO Emoji-Tastatur stylen und erweitern; Gruppierung über Tabs o. ä. -->
+                <span class="imgtoolbar_popupbutton">
+                    <span class="imgtoolbar_popup" style="width: 450px; height: 220px; overflow: auto">
+
+                        <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $codes) : ?>
+                            <label class="small" style="display: block; background-color: darkgrey; clear: both"><?php echo \Ubergeek\NanoCm\Util::htmlEncode($group); ?></label>
+                            <ul style="list-style: none; padding: 0; margin: 0">
+                                <?php foreach ($codes as $code) : ?>
+                                    <li style="display: inline-block; text-align: center; vertical-align: center; width: 1.4em; height: 1.2em; float: left; font-size: 2rem">
+                                        <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#x' . $code . ';'; ?>');" style="text-decoration: none; padding: 2px"><?php echo '&#x' . $code . ';'; ?></a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endforeach; ?>
+
+                    </span>
+                    <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/emotion_amazing.png" /></a>
+                </span>
             </div>
 
             <div class="row">
@@ -60,7 +87,7 @@
 </div>
 
 <script type="text/javascript">
-    var articlesEdit = (function ArticlesEdit() {
+    var articlesEdit = new (function ArticlesEdit() {
         var page = this;
 
         page.isBusy = false;
@@ -74,6 +101,44 @@
         page.hideLoadingIndicator = function() {
             $('#toolbar_spinner').removeClass('loading');
             page.isBusy = false;
+        };
+
+        page.toggleSettings = function() {
+            if ($('#article_settings_sidebar').is(':visible')) {
+                $('#article_settings_sidebar').hide();
+            } else {
+                $('#article_settings_sidebar').show();
+            }
+        };
+
+        page.surroundSelectionWith = function(content) {
+            // TODO implementieren
+        };
+
+        page.insertTextAtCaret = function(content) {
+            var textArea = document.getElementById('input_article_content');
+
+            // IE
+            if (document.selection) {
+                textArea.focus();
+                var sel = document.selection.createRange();
+                sel.text = content;
+            }
+
+            // Others
+            else if (textArea.selectionStart || textArea.selectionStart === '0') {
+                var startPos = textArea.selectionStart;
+                var endPos = textArea.selectionEnd;
+                var scrollTop = textArea.scrollTop;
+                textArea.value = textArea.value.substring(0, startPos) + content + textArea.value.substring(endPos, textArea.value.length);
+                textArea.focus();
+                textArea.selectionStart = startPos + content.length;
+                textArea.selectionEnd = startPos + content.length;
+            }
+            else {
+                textArea.value += content;
+                textArea.focus();
+            }
         };
 
         page.saveArticle = function() {
@@ -148,6 +213,10 @@
 
         $('#button_preview').click(function() {
             page.openPreview();
+        });
+
+        $('#button_toggle_settings').click(function() {
+            page.toggleSettings();
         });
 
         // TODO Autosave sollte konfigurierbar sein
