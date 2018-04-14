@@ -98,19 +98,17 @@
 
                 <!-- TODO Emoji-Tastatur stylen und erweitern; Gruppierung über Tabs o. ä. -->
                 <span class="imgtoolbar_popupbutton">
-                    <span class="imgtoolbar_popup" style="width: 450px; height: 220px; overflow: auto">
-
-                        <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $codes) : ?>
+                    <span class="imgtoolbar_popup" style="width: 500px; height: 320px; overflow: auto">
+                        <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $emojis) : ?>
                             <label class="small"><?php echo \Ubergeek\NanoCm\Util::htmlEncode($group); ?></label>
                             <ul class="imgtoolbar_keyboard">
-                                <?php foreach ($codes as $code) : ?>
-                                    <li>
-                                        <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo $code->code; ?>');" title="<?php echo $this->htmlEncode($code->description); ?>"><?php echo $code->code; ?></a>
+                                <?php foreach ($emojis as $emoji) : ?>
+                                    <li class="tone_<?php echo $this->htmlEncode($emoji->tone); ?>">
+                                        <a style="font-family: 'Apple Color Emoji';" href="javascript:articlesEdit.insertTextAtCaret('<?php echo $emoji->html; ?>');" title="<?php echo $this->htmlEncode($emoji->description); ?>"><?php echo $emoji->html; ?></a>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endforeach; ?>
-
                     </span>
                     <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/emotion_amazing.png" /></a>
                 </span>

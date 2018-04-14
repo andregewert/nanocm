@@ -73,13 +73,32 @@ final class Util {
         foreach (array_keys($emojis) as $group) {
             $emojis[$group] = (array)$emojis[$group];
 
-            foreach ($blacklist as $code) {
-                $codes = explode(' ', $code);
-                $cmpstr = '&#x' . join(';&#x', $codes) . ';';
-
-                if (in_array($cmpstr, array_keys($emojis[$group]))) {
-                    unset($emojis[$group][$cmpstr]);
+            foreach ($blacklist as $blacklistKey) {
+                $emojiKeys = array_keys($emojis[$group]);
+                $wildcard = null;
+                if (substr($blacklistKey, -1) == '*') {
+                    $wildcard = 'begin';
+                    $blacklistKey = substr($blacklistKey, 0, -1);
+                } elseif (substr($blacklistKey, 0, 1) == '*') {
+                    $wildcard = 'end';
+                    $blacklistKey = substr($blacklistKey, 1);
                 }
+
+                foreach ($emojiKeys as $emojiKey) {
+                    if (
+                        $blacklistKey == $emojiKey
+                        || ($wildcard == 'begin' && substr($emojiKey, 0, strlen($blacklistKey)) == $blacklistKey)
+                        || ($wildcard == 'end' && substr($emojiKey, -strlen($blacklistKey)) == $blacklistKey)
+                    ) {
+                        unset($emojis[$group][$emojiKey]);
+                    }
+                }
+
+                /*
+                if (in_array($blacklistKey, array_keys($emojis[$group]))) {
+                    unset($emojis[$group][$blacklistKey]);
+                }
+                */
             }
         }
         return $emojis;

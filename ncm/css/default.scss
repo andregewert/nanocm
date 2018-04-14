@@ -336,7 +336,7 @@ ul.imgtoolbar_keyboard li {
     display: inline-block;
     text-align: center;
     vertical-align: center;
-    width: 1.4em;
+    width: 1.8em;
     float: left;
     font-size: 2rem;
 }
@@ -346,6 +346,7 @@ ul.imgtoolbar_keyboard li a {
     text-decoration: none;
     padding: 2px;
     border: 1px solid transparent;
+    white-space: nowrap;
 }
 
 ul.imgtoolbar_keyboard li a:hover {

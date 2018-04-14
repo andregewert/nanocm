@@ -44,14 +44,35 @@ class ParseEmojiTestFile {
                         $group = $matches[1];
                         $result[$group] = array();
                     } elseif (preg_match('/^(.+)\;(.+)\#\s+\S+\s+(.*)$/', $line, $matches) != 0) {
-                        $codes = explode(' ', trim($matches[1]));
+
+                        $codes = trim($matches[1]);
                         $fq = trim($matches[2]) == 'fully-qualified';
                         $desc = trim($matches[3]);
 
                         if ($fq && $group !== null) {
-                            $code = '&#x' . join(';&#x', $codes) . ';';
-                            if (!in_array($code, array_keys($result[$group]))) {
-                                $result[$group][$code] = array('code' => $code, 'description' => $desc);
+                            if (!in_array($codes, array_keys($result[$group]))) {
+                                $chars = explode(' ', $codes);
+                                $html = '&#x' . join(';&#x', $chars) . ';';
+                                $tone = '';
+
+                                if (in_array('1F3FB', $chars)) {
+                                    $tone = 'light';
+                                } elseif (in_array('1F3FC', $chars)) {
+                                    $tone = 'mediumlight';
+                                } elseif (in_array('1F3FD', $chars)) {
+                                    $tone = 'medium';
+                                } elseif (in_array('1F3FE', $chars)) {
+                                    $tone = 'mediumdark';
+                                } elseif (in_array('1F3FF', $chars)) {
+                                    $tone = 'dark';
+                                }
+
+                                $result[$group][$codes] = array(
+                                    'code'              => $codes,
+                                    'html'              => $html,
+                                    'description'       => $desc,
+                                    'tone'              => $tone
+                                );
                             }
                         }
                     }
