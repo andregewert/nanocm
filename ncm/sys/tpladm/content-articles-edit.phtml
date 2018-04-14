@@ -75,9 +75,9 @@
             </div>
 
             <div class="row imgtoolbar" style="margin-bottom: -1em">
-                <a class="button" title="Fett" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
-                <a class="button" title="Kursiv" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
-                <a class="button" title="Unterstrichen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
+                <a class="button" title="Fett" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('**', '**');"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
+                <a class="button" title="Kursiv" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('*', '*');"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
+                <a class="button" title="Unterstrichen" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('_', '_');"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
 
                 <!-- TODO Sonderzeichen-Auswahl -->
                 <span class="imgtoolbar_popupbutton">
@@ -150,8 +150,36 @@
             }
         };
 
-        page.surroundSelectionWith = function(content) {
-            // TODO implementieren
+        page.surroundSelectionWith = function(contentBefore, contentAfter) {
+            var textArea = document.getElementById('input_article_content');
+            textArea.focus();
+
+            if (textArea.setSelectionRange) {
+                var c = textArea.scrollTop;
+                var e = textArea.selectionStart;
+                var f = textArea.selectionEnd;
+
+                textArea.value = textArea.value.substring(0, textArea.selectionStart)
+                    + contentBefore
+                    + textArea.value.substring(textArea.selectionStart, textArea.selectionEnd)
+                    + contentAfter
+                    + textArea.value.substring(textArea.selectionEnd, textArea.value.length);
+                textArea.selectionStart = e;
+                textArea.selectionEnd = f + contentBefore.length + contentAfter.length;
+                textArea.scrollTop = c;
+            } else {
+                if (document.selection && document.selection.createRange) {
+                    textArea.focus();
+                    var b = document.selection.createRange();
+                    if (b.text != "") {
+                        b.text = contentBefore + b.text + contentAfter;
+                    } else {
+                        //b.text = contentBefore + "REPLACE" + contentAfter;
+                        console.log('???');
+                    }
+                    textArea.focus();
+                }
+            }
         };
 
         page.insertTextAtCaret = function(content) {
@@ -168,7 +196,6 @@
             else if (textArea.selectionStart || textArea.selectionStart === '0') {
                 var startPos = textArea.selectionStart;
                 var endPos = textArea.selectionEnd;
-                var scrollTop = textArea.scrollTop;
                 textArea.value = textArea.value.substring(0, startPos) + content + textArea.value.substring(endPos, textArea.value.length);
                 textArea.focus();
                 textArea.selectionStart = startPos + content.length;
