@@ -45,9 +45,9 @@ class Article {
     
     /**
      * Änderungs-Zeitpunkt
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $modification_timestamp;
+    public $modification_timestamp = null;
 
     /**
      * Benutzer-ID des Autors
@@ -81,21 +81,21 @@ class Article {
 
     /**
      * Startzeitpunkt für die Freischaltung
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $start_timestamp;
+    public $start_timestamp = null;
     
     /**
      * Endzeitpunkt für die Freischaltung
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $stop_timestamp;
+    public $stop_timestamp = null;
     
     /**
      * Veröffentlichungszeitpunkt
-     * @var \DateTime
+     * @var \DateTime|null
      */
-    public $publishing_timestamp;
+    public $publishing_timestamp = null;
     
     /**
      * Freigabestatus der Trackback-Funktion für diesen Artikel

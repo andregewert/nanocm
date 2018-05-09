@@ -42,31 +42,36 @@
                     </select>
                 </p>
                 <p>
-                    <label>Startdatum</label>
+                    <label title="Zeitpunkt der Freischaltung / Anzeige">Startdatum</label>
                     <input type="date" id="input_article_start_date" value="<?php echo $this->article->start_timestamp->format('Y-m-d'); ?>" />
                     <input type="time" id="input_article_start_time" value="<?php echo $this->article->start_timestamp->format('H:i'); ?>" />
                 </p>
                 <p>
-                    <label>Enddatum</label>
-                    <input type="datetime-local" id="input_article_stop_timestamp" value="<?php if ($this->article->stop_timestamp instanceof \DateTime) echo $this->article->stop_timestamp->format('Y-m-d H:i'); ?>" />
+                    <label title="Zeitpunkt der Anzeige-Abschaltung / Deaktivierung">Enddatum</label>
+                    <input type="date" id="input_article_stop_date" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('Y-m-d'); ?>" />
+                    <input type="time" id="input_article_stop_time" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('H:i'); ?>" />
                 </p>
                 <p>
-                    <label>Ver&ouml;ffentlichungsdatum</label>
-                    <input type="datetime-local" id="input_article_publishing_timestamp" value="<?php echo $this->article->publishing_timestamp->format('Y-m-d H:i'); ?>" />
+                    <label title="Offizieller Zeitpunkt der Veröffentlichung">Ver&ouml;ffentlichungsdatum</label>
+                    <input type="date" id="input_article_publishing_date" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('Y-m-d'); ?>" />
+                    <input type="time" id="input_article_publishing_time" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('H:i'); ?>"
                 </p>
                 <p>
-                    <label for="input_article_enable_comments">Kommentare zulasen</label>
+                    <label title="Kommentierung dieses Artikel zulassen" for="input_article_enable_comments">Kommentare zulasen</label>
                     <input type="checkbox" value="1" id="input_article_enable_comments"<?php if ($this->article->enable_comments) echo ' checked="checked"'; ?> />
                 </p>
                 <p>
-                    <label for="input_article_enable_trackbacks">Trackbacks zulassen
-                        <input type="checkbox" value="1" id="input_article_enable_trackbacks"<?php if ($this->article->enable_trackbacks) echo ' checked="checked"'; ?> />
-                    </label>
+                    <label title="Empfang von Trackbacks für diesen Artikel zulassen" for="input_article_enable_trackbacks">Trackbacks zulassen</label>
+                    <input type="checkbox" value="1" id="input_article_enable_trackbacks"<?php if ($this->article->enable_trackbacks) echo ' checked="checked"'; ?> />
                 </p>
                 <p>
-                    <label>Autor</label>
-                    <?php echo $this->htmlEncode($this->article->author_id); ?>
-                    <?php // TODO Autor-Auswahl per Popup oder Selectbox? ?>
+                    <label title="Autor des Artikels">Autor</label>
+                    <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id)); ?>
+                    <?php // TODO Autor-Auswahl per Popup oder Selectbox? -> zumindest Admins sollten einen Autoren auswählen können ?>
+                </p>
+                <p>
+                    <label title="Haupt-Illustration für diesen Artikel">Artikelbild</label>
+                    <!-- Hier sollte pro Artikel ein Eintrag aus der Mediendatenbank auswählbar sein; die Verwendung und der Zuschnitt erfolgen je nach Ansicht / Template automatisch -->
                 </p>
             </div>
 
@@ -104,7 +109,7 @@
                             <ul class="imgtoolbar_keyboard">
                                 <?php foreach ($emojis as $emoji) : ?>
                                     <li class="tone_<?php echo $this->htmlEncode($emoji->tone); ?>">
-                                        <a style="font-family: 'Apple Color Emoji';" href="javascript:articlesEdit.insertTextAtCaret('<?php echo $emoji->html; ?>');" title="<?php echo $this->htmlEncode($emoji->description); ?>"><?php echo $emoji->html; ?></a>
+                                        <a style="font-family: Roboto, 'Apple Color Emoji';" href="javascript:articlesEdit.insertTextAtCaret('<?php echo $emoji->html; ?>');" title="<?php echo $this->htmlEncode($emoji->description); ?>"><?php echo $emoji->html; ?></a>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
@@ -219,11 +224,11 @@
                     headline:               $('#input_article_headline').val(),
                     teaser:                 '',
                     content:                $('#input_article_content').val(),
-                    start_timestamp:        '',
-                    stop_timestamp:         '',
-                    publishing_timestamp:   '',
-                    enable_trackbacks:      1,
-                    enable_comments:        1,
+                    start_timestamp:        $('#input_article_start_date').val() + ' ' + $('#input_article_start_time').val(),
+                    stop_timestamp:         $('#input_article_stop_date').val() + $('#input_article_stop_time').val(),
+                    publishing_timestamp:   $('#input_article_publishing_date').val() + ' ' + $('#input_article_publishing_time').val(),
+                    enable_trackbacks:      $('#input_article_enable_trackbacks').prop('checked'),
+                    enable_comments:        $('#input_article_enable_comments').prop('checked'),
                     tags:                   $('#input_article_tags').val()
                 }
             }).done(function(data) {

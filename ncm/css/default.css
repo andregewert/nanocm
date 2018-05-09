@@ -163,12 +163,21 @@ div.row + div.row {
   border-left-width: 1px;
   border-right-width: 1px;
   height: 100%;
-  margin: 0; }
+  margin: 0;
+  padding: 0 1rem; }
 
 .editform_sidebar_right input,
 .editform_sidebar_right textarea,
 .editform_sidebar_right select {
   width: auto; }
+
+.editform_sidebar_right label {
+  display: inline-block;
+  width: 35%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: text-bottom; }
 
 input.big {
   font-size: 2rem; }
@@ -195,7 +204,7 @@ div.toolbar .spaceleft {
 hr {
   border: 0;
   height: 1px;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
   margin: 2em 0; }
 
 table.list {

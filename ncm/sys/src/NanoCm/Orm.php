@@ -585,6 +585,7 @@ class Orm {
                     content = :content,
                     start_timestamp = :start_timestamp,
                     stop_timestamp = :stop_timestamp,
+                    publishing_timestamp = :publishing_timestamp,
                     enable_trackbacks = :enable_trackbacks,
                     enable_comments = :enable_comments 
                 WHERE
@@ -593,8 +594,21 @@ class Orm {
         $stmt->bindValue('headline', $article->headline);
         $stmt->bindValue('teaser', $article->teaser);
         $stmt->bindValue('content', $article->content);
-        $stmt->bindValue('start_timestamp', $article->start_timestamp);
-        $stmt->bindValue('stop_timestamp', $article->stop_timestamp);
+        if ($article->start_timestamp != null) {
+            $stmt->bindValue('start_timestamp', $article->start_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('start_timestamp', null);
+        }
+        if ($article->stop_timestamp != null) {
+            $stmt->bindValue('stop_timestamp', $article->stop_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('stop_timestamp', null);
+        }
+        if ($article->publishing_timestamp != null) {
+            $stmt->bindValue('publishing_timestamp', $article->publishing_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('publishing_timestamp', null);
+        }
         $stmt->bindValue('enable_trackbacks', $article->enable_trackbacks);
         $stmt->bindValue('enable_comments', $article->enable_comments);
         $stmt->bindValue('id', $article->id);

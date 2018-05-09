@@ -172,8 +172,8 @@ class AdminArticlesModule extends AbstractAdminModule {
         if (!empty($this->getParam('stop_timestamp'))) {
             $article->stop_timestamp = new \DateTime($this->getParam('stop_timestamp'));
         }
-        $article->enable_trackbacks = intval($this->getParam('enable_trackbacks')) == 1;
-        $article->enable_comments = intval($this->getParam('enable_comments')) == 1;
+        $article->enable_trackbacks = $this->getParam('enable_trackbacks') == 'true';
+        $article->enable_comments = $this->getParam('enable_comments') == 'true';
         $article->tags = Tag::splitTagsString($this->getParam('tags'));
         $this->log->debug($article);
         return $article;

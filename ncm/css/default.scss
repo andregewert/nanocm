@@ -215,12 +215,22 @@ div.row + div.row {
     border-right-width: 1px;
     height: 100%;
     margin: 0;
+    padding: 0 1rem;
 }
 
 .editform_sidebar_right input,
 .editform_sidebar_right textarea,
 .editform_sidebar_right select {
     width: auto;
+}
+
+.editform_sidebar_right label {
+    display: inline-block;
+    width: 35%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: text-bottom;
 }
 
 input.big {
