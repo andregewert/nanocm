@@ -182,7 +182,7 @@ class Orm {
      */
     public function setUserPasswordById(int $id, string $password) : bool {
         $stmt = $this->basedb->prepare('
-            UPDATE user SET password = :password, modification_timestamp = CURRENT_TIMESTAMP WHERE id = :id
+            UPDATE user SET password = :password, modification_timestamp = datetime(CURRENT_TIMESTAMP, \'localtime\') WHERE id = :id
         ');
         $stmt->bindValue('password', password_hash($password, PASSWORD_DEFAULT));
         $stmt->bindValue('id', $id);
@@ -198,7 +198,7 @@ class Orm {
      */
     public function setUserPasswordByUsername(string $username, string $password) : bool {
         $stmt = $this->basedb->prepare('
-            UPDATE user SET password = :password, modification_timestamp = CURRENT_TIMESTAMP WHERE username = :username
+            UPDATE user SET password = :password, modification_timestamp = datetime(CURRENT_TIMESTAMP, \'localtime\') WHERE username = :username
         ');
         $stmt->bindValue('password', password_hash($password, PASSWORD_DEFAULT));
         $stmt->bindValue('username', $username);
@@ -352,9 +352,6 @@ class Orm {
         $toInsert = array_diff($tags, $existingTags);
         $toDelete = array_diff($existingTags, $tags);
 
-        $this->log->debug($toInsert);
-        $this->log->debug($toDelete);
-
         foreach ($toInsert as $insert) {
             $this->log->debug("Assigning tag $insert");
             $this->assignTagToArticle($articleId, $insert);
@@ -481,8 +478,8 @@ class Orm {
         if ($releasedOnly) {
             $sql .= '
                 AND (
-                    start_timestamp <= CURRENT_TIMESTAMP
-                    AND (stop_timestamp IS NULL OR stop_timestamp >= CURRENT_TIMESTAMP)
+                    start_timestamp <= datetime(CURRENT_TIMESTAMP, \'localtime\')
+                    AND (stop_timestamp IS NULL OR stop_timestamp >= datetime(CURRENT_TIMESTAMP, \'localtime\'))
                 )
                 AND status_code = ' . StatusCode::ACTIVE . ' ';
         }
@@ -492,7 +489,7 @@ class Orm {
             // TODO implementieren
         }
         
-        $sql .= 'ORDER BY publishing_timestamp DESC ';
+        $sql .= 'ORDER BY start_timestamp DESC ';
 
         // Aufteilung in Seiten
         if ($limit !== null) {
@@ -506,6 +503,8 @@ class Orm {
             $article->tags = $this->getTagsByArticleId($article->id);
             $articles[] = $article;
         }
+
+        $this->log->debug($sql);
 
         return $articles;
     }
@@ -529,7 +528,6 @@ class Orm {
         $stmt->execute();
 
         if (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
-            $this->log->debug("Stop timestamp is: " . $article->stop_timestamp);
             $article->tags = $this->getTagsByArticleId($article->id);
         }
         return $article;
@@ -558,7 +556,7 @@ class Orm {
 
         // Artikel hinzufügen
         else {
-            $this->insertArticle($article);
+            $article->id = $this->insertArticle($article);
         }
 
         return $article->id;
@@ -575,11 +573,14 @@ class Orm {
      * @param Article $article
      */
     private function updateArticle(Article $article) {
-        $this->log->debug("Artikel aktualisieren");
+        $this->log->debug("Update article");
         $this->log->debug($article);
 
+        $article->modification_timestamp = new \DateTime();
+
         $sql = 'UPDATE article SET 
-                    modification_timestamp = CURRENT_TIMESTAMP,
+                    modification_timestamp = datetime(CURRENT_TIMESTAMP, \'localtime\'),
+                    status_code = :status_code,
                     headline = :headline,
                     teaser = :teaser,
                     content = :content,
@@ -591,6 +592,7 @@ class Orm {
                 WHERE
                     id = :id ';
         $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $article->status_code);
         $stmt->bindValue('headline', $article->headline);
         $stmt->bindValue('teaser', $article->teaser);
         $stmt->bindValue('content', $article->content);
@@ -614,15 +616,63 @@ class Orm {
         $stmt->bindValue('id', $article->id);
         $stmt->execute();
 
-        // TODO Verknüpfte Daten speichern (Tags)
+        // Verknüpfte Daten speichern
         $this->assignTagsToArticle($article->id, $article->tags);
     }
 
+    /**
+     * Speichert den übergebenen Artikel als neuen Datensatz
+     * @param Article $article Der zu speichernde Artikel
+     * @return int Die generierte Artikel-ID
+     */
     private function insertArticle(Article $article) {
-        $this->log->debug("Artikel hinzufügen");
+        $this->log->debug("Add article");
         $this->log->debug($article);
 
-        $sql = '';
+        // Grundlegende Validierung
+        if ($article->start_timestamp == null) {
+            $article->start_timestamp = new \DateTime();
+        }
+        $article->modification_timestamp = new \DateTime();
+
+        $sql = 'INSERT INTO article (
+                  creation_timestamp, modification_timestamp, author_id,
+                  status_code, headline, teaser, content, start_timestamp,
+                  stop_timestamp, publishing_timestamp, enable_trackbacks,
+                  enable_comments
+              ) VALUES (
+                  datetime(CURRENT_TIMESTAMP, \'localtime\'), datetime(CURRENT_TIMESTAMP, \'localtime\'), :author_id,
+                  :status_code, :headline, :teaser, :content, :start_timestamp,
+                  :stop_timestamp, :publishing_timestamp, :enable_trackbacks,
+                  :enable_comments
+              ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('author_id', $article->author_id);
+        $stmt->bindValue('status_code', $article->status_code);
+        $stmt->bindValue('headline', $article->headline);
+        $stmt->bindValue('teaser', $article->teaser);
+        $stmt->bindValue('content', $article->content);
+        $stmt->bindValue('start_timestamp', $article->start_timestamp->format('Y-m-d H:i'));
+        if ($article->stop_timestamp != null) {
+            $stmt->bindValue('stop_timestamp', $article->stop_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('stop_timestamp', null);
+        }
+        if ($article->publishing_timestamp != null) {
+            $stmt->bindValue('publishing_timestamp', $article->publishing_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('publishing_timestamp', null);
+        }
+        $stmt->bindValue('enable_trackbacks', ($article->enable_trackbacks)? 1 : 0);
+        $stmt->bindValue('enable_comments', ($article->enable_comments)? 1 : 0);
+        $stmt->execute();
+
+        $article->id = $this->basedb->lastInsertId('id');
+
+        // Verknüpfte Daten speichern
+        $this->assignTagsToArticle($article->id, $article->tags);
+
+        return $article->id;
     }
     
     // </editor-fold>
@@ -691,10 +741,8 @@ class Orm {
         if ($releasedOnly) {
             $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
         }
-        $this->log->debug($sql);
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('url', $url);
-        $this->log->debug($url);
         $stmt->execute();
         return Page::fetchFromPdoStatement($stmt);
     }
@@ -725,7 +773,7 @@ class Orm {
         try {
             $title = $this->getSettingValue(Constants::SETTING_SYSTEM_SITETITLE);
         } catch (\Exception $ex) {
-            $this->log->debug($ex);
+            $this->log->warn($ex);
         }
         return $title;
     }
@@ -761,7 +809,6 @@ class Orm {
             self::$userCache = array();
         }
         if (array_key_exists($userId, self::$userCache)) {
-            $this->log->debug("Found user id $userId in cache");
             return self::$userCache[$userId];
         }
 

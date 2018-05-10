@@ -11,6 +11,7 @@
 
         <?php if ($this->exception !== null) : ?>
             <?php // TODO Art der Fehlerausgabe sollte konfigurierbar sein! ?>
+            <strong><?php echo $this->htmlEncode($this->exception->getMessage()); ?></strong>
             <pre><?php echo $this->exception->getTraceAsString(); ?></pre>
             <?php $this->debug($this->exception->getTrace()); ?>
         <?php endif; ?>

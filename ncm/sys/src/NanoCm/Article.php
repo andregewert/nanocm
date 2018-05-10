@@ -137,11 +137,15 @@ class Article {
         if (($article = $stmt->fetchObject(__CLASS__)) !== false) {
             $article->creation_timestamp = new \DateTime($article->creation_timestamp);
             $article->modification_timestamp = new \DateTime($article->modification_timestamp);
-            $article->publishing_timestamp = new \DateTime($article->publishing_timestamp);
             $article->start_timestamp = new \DateTime($article->start_timestamp);
+            if ($article->publishing_timestamp != null) {
+                $article->publishing_timestamp = new \DateTime($article->publishing_timestamp);
+            }
             if ($article->stop_timestamp != null) {
                 $article->stop_timestamp = new \DateTime($article->stop_timestamp);
             }
+            $article->enable_trackbacks = $article->enable_trackbacks == 1;
+            $article->enable_comments = $article->enable_comments == 1;
             return $article;
         }
         return null;

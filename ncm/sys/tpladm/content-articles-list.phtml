@@ -10,7 +10,8 @@
         <th style="text-align: center"><input type="checkbox" class="selectall" /></th>
         <th>Titel</th>
         <th>Autor</th>
-        <th>Publiziert</th>
+        <th>Startdatum</th>
+        <th>Pub.-Datum</th>
         <th>Status</th>
     </tr>
     </thead>
@@ -23,7 +24,12 @@
                 </td>
                 <td><a href="/admin/articles/edit/<?php echo $article->id; ?>"><?php echo $this->htmlEncode($article->headline); ?></a></td>
                 <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id)); ?></td>
-                <td><?php echo $this->htmlEncode($article->publishing_timestamp->format('Y-m-d')); ?></td>
+                <td><?php echo $article->start_timestamp->format('Y-m-d H:i'); ?></td>
+                <td>
+                    <?php if ($article->publishing_timestamp != null) : ?>
+                        <?php echo $this->htmlEncode($article->publishing_timestamp->format('Y-m-d')); ?>
+                    <?php endif; ?>
+                </td>
                 <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($article->status_code)); ?></td>
             </tr>
         <?php endforeach; ?>

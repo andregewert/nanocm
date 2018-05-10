@@ -21,6 +21,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\Constants;
+use Ubergeek\NanoCm\Setting;
 use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
 
@@ -58,7 +60,7 @@ class AdminArticlesModule extends AbstractAdminModule {
 
     /**
      * Definiert die Sonderzeichen, die über das virtuelle Keyboard eingefügt werden können
-     * @var array
+     * @var string[]
      */
     public $availableSpecialChars = array(
         160     => 'Geschütztes Leerzeichen',
@@ -97,15 +99,10 @@ class AdminArticlesModule extends AbstractAdminModule {
                 switch ($this->getRelativeUrlPart(3)) {
                     // Artikel speichern
                     case 'save':
-                        // TODO implementieren
                         $this->setContentType('text/javascript');
                         $article = $this->createArticleFromRequest();
-                        $id = $this->orm->saveArticle($article);
-
-                        // saveArticle
-                        $content = json_encode(array(
-                            'id'    => $id
-                        ));
+                        $this->orm->saveArticle($article);
+                        $content = json_encode($article);
                         break;
 
                     // Artikelliste
@@ -121,9 +118,11 @@ class AdminArticlesModule extends AbstractAdminModule {
             // Einzelnen Artikel bearbeiten
             case 'edit':
                 $articleId = intval($this->getRelativeUrlPart(3));
-                $this->article = $this->orm->getArticleById($articleId);
+                if ($articleId > 0) {
+                    $this->article = $this->orm->getArticleById($articleId, false);
+                }
                 if ($this->article == null) {
-                    $this->article = new Article();
+                    $this->article = $this->createEmptyArticle();
                 }
                 $content = $this->renderUserTemplate('content-articles-edit.phtml');
                 break;
@@ -141,13 +140,33 @@ class AdminArticlesModule extends AbstractAdminModule {
 
     // <editor-fold desc="Internal methods">
 
-    private function createArticleFromRequest() {
+    /**
+     * Erstellt ein neues Artikelmodell und füllt die wichtigsten Daten mit sinnvollen Vorgaben
+     * @return Article
+     */
+    private function createEmptyArticle() : Article {
+        $article = new Article();
+
+        $article->author_id = $this->ncm->getLoggedInUser()->id;
+        $article->status_code = StatusCode::LOCKED;
+        $article->start_timestamp = new \DateTime('now');
+        $article->enable_comments = $this->ncm->orm->getSettingValue(Constants::SETTING_SYSTEM_ENABLECOMMENTS, true);
+        $article->enable_trackbacks = $this->ncm->orm->getSettingValue(Constants::SETTING_SYSTEM_ENABLETRACKBACKS, true);
+
+        return $article;
+    }
+
+    /**
+     * Erstellt ein Artikelmodell und füllt es mit den Daten aus dem aktuellen Request
+     * @return Article
+     */
+    private function createArticleFromRequest() : Article {
         $article = new Article();
         $id = intval($this->getParam('id'));
         $oldArticle = null;
 
         if ($id > 0) {
-            $oldArticle = $this->orm->getArticleById($id);
+            $oldArticle = $this->orm->getArticleById($id, false);
         }
 
         if ($oldArticle !== null) {
@@ -160,9 +179,9 @@ class AdminArticlesModule extends AbstractAdminModule {
             $article->publishing_timestamp = $oldArticle->publishing_timestamp;
         }
 
-        //$article->status_code = $this->getParam('status_code', 0);
-        // -> Status sollte immer separat (und alleine) gesetzt werden
-
+        // TODO Es muss noch entschieden werden, ob der Autor nach Belieben angegeben werden kann
+        $article->author_id = $this->getParam('author_id', 0);
+        $article->status_code = $this->getParam('status_code', StatusCode::LOCKED);
         $article->headline = $this->getParam('headline', '');
         $article->teaser = $this->getParam('teaser', '');
         $article->content = $this->getParam('content', '');
@@ -172,6 +191,16 @@ class AdminArticlesModule extends AbstractAdminModule {
         if (!empty($this->getParam('stop_timestamp'))) {
             $article->stop_timestamp = new \DateTime($this->getParam('stop_timestamp'));
         }
+        if (!empty($this->getParam('publishing_timestamp'))) {
+            $this->log->debug('Nicht leeren Publishing timestamp übernehmen: ' . $this->getParam('publishing_timestamp'));
+            $article->publishing_timestamp = new \DateTime($this->getParam('publishing_timestamp'));
+        }
+
+        if ($article->status_code == StatusCode::ACTIVE && $article->publishing_timestamp == null) {
+            $this->log->debug('Bei Veröffentlichung den Publishing timestamp auf NOW setzen');
+            $article->publishing_timestamp = new \DateTime();
+        }
+
         $article->enable_trackbacks = $this->getParam('enable_trackbacks') == 'true';
         $article->enable_comments = $this->getParam('enable_comments') == 'true';
         $article->tags = Tag::splitTagsString($this->getParam('tags'));

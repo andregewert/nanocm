@@ -65,6 +65,7 @@ final class Util {
      *
      * @return array
      * @todo Eventuell die gesamte Emoji-Funktionalität in eine separate Klasse verschieben
+     * @todo Für bessere Kompatibilität optional auf eine Minimal-Whitelist umstellbar machen
      */
     public static function getEmojiDictionary() {
         $emojis = (array)json_decode(file_get_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'emoji-list.json'));

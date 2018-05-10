@@ -22,6 +22,7 @@ namespace Ubergeek\NanoCm;
 /**
  * Enthält eine Reihe von Standard-Konstanten, um den Zugriff auf vordefinierte
  * System-Variablen und -Einstellungen zu erleichtern
+ * TODO Muss besser gelöst werden
  */
 abstract class Constants {
     
@@ -50,6 +51,18 @@ abstract class Constants {
      * @var string
      */
     const SETTING_SYSTEM_COPYRIGHTNOTICE = 'system.copyrightnotice';
+
+    /**
+     * Gibt an, ob die Kommentierung von Artikel möglich sein soll
+     * @var string
+     */
+    const SETTING_SYSTEM_ENABLECOMMENTS = 'system.enablecomments';
+
+    /**
+     * Gibt an, ob die Trackback-Funktion aktiv sein soll
+     * @var string
+     */
+    const SETTING_SYSTEM_ENABLETRACKBACKS = 'system.enabletrackbacks';
 
 //    /**
 //     * Anzeigename / Realname des Webmaster
@@ -105,7 +118,7 @@ abstract class Constants {
     // </editor-fold>
     
     
-    // <editor-fold desc="">
+    // <editor-fold desc="Für Convert-Funktionalität">
 
     /**
      * Ausgabeformat HTML

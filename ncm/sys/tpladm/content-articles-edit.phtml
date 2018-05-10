@@ -14,7 +14,7 @@
         <?php else : ?>
             <h1>Artikel hinzuf&uuml;gen</h1>
         <?php endif; ?>
-        <input type="hidden" id="input_article_id" name="article[id]" value="<?php echo $this->article->id; ?>" />
+        <input type="hidden" id="input_article_id" value="<?php echo intval($this->article->id); ?>" />
 
         <div class="toolbar">
             <span class="left">
@@ -35,7 +35,7 @@
             <div class="editform_sidebar_right" id="article_settings_sidebar">
                 <p>
                     <label>Freigabestatus</label>
-                    <select id="select_status">
+                    <select id="input_article_status_code" tabindex="0">
                         <?php foreach ($this->availableStatusCodes as $code) : ?>
                             <option value="<?php echo $code; ?>"<?php if ($this->article->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
                         <?php endforeach; ?>
@@ -43,65 +43,74 @@
                 </p>
                 <p>
                     <label title="Zeitpunkt der Freischaltung / Anzeige">Startdatum</label>
-                    <input type="date" id="input_article_start_date" value="<?php echo $this->article->start_timestamp->format('Y-m-d'); ?>" />
-                    <input type="time" id="input_article_start_time" value="<?php echo $this->article->start_timestamp->format('H:i'); ?>" />
+                    <input type="date" id="input_article_start_date" value="<?php if ($this->article->start_timestamp != null) echo $this->article->start_timestamp->format('Y-m-d'); ?>" tabindex="0" />
+                    <input type="time" id="input_article_start_time" value="<?php if ($this->article->start_timestamp != null) echo $this->article->start_timestamp->format('H:i'); ?>" tabindex="0" />
                 </p>
                 <p>
                     <label title="Zeitpunkt der Anzeige-Abschaltung / Deaktivierung">Enddatum</label>
-                    <input type="date" id="input_article_stop_date" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('Y-m-d'); ?>" />
-                    <input type="time" id="input_article_stop_time" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('H:i'); ?>" />
+                    <input type="date" id="input_article_stop_date" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('Y-m-d'); ?>" tabindex="0" />
+                    <input type="time" id="input_article_stop_time" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('H:i'); ?>" tabindex="0" />
                 </p>
                 <p>
                     <label title="Offizieller Zeitpunkt der Veröffentlichung">Ver&ouml;ffentlichungsdatum</label>
-                    <input type="date" id="input_article_publishing_date" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('Y-m-d'); ?>" />
-                    <input type="time" id="input_article_publishing_time" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('H:i'); ?>"
+                    <input type="date" id="input_article_publishing_date" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('Y-m-d'); ?>" tabindex="0" />
+                    <input type="time" id="input_article_publishing_time" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('H:i'); ?>" tabindex="0" />
                 </p>
                 <p>
                     <label title="Kommentierung dieses Artikel zulassen" for="input_article_enable_comments">Kommentare zulasen</label>
-                    <input type="checkbox" value="1" id="input_article_enable_comments"<?php if ($this->article->enable_comments) echo ' checked="checked"'; ?> />
+                    <input type="checkbox" value="1" id="input_article_enable_comments"<?php if ($this->article->enable_comments) echo ' checked="checked"'; ?> tabindex="0" />
                 </p>
                 <p>
                     <label title="Empfang von Trackbacks für diesen Artikel zulassen" for="input_article_enable_trackbacks">Trackbacks zulassen</label>
-                    <input type="checkbox" value="1" id="input_article_enable_trackbacks"<?php if ($this->article->enable_trackbacks) echo ' checked="checked"'; ?> />
+                    <input type="checkbox" value="1" id="input_article_enable_trackbacks"<?php if ($this->article->enable_trackbacks) echo ' checked="checked"'; ?> tabindex="0" />
                 </p>
                 <p>
                     <label title="Autor des Artikels">Autor</label>
-                    <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id)); ?>
+                    <?php if ($this->article->author_id != null) : ?>
+                        <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id)); ?>
+                    <?php endif; ?>
+                    <input type="hidden" id="input_article_author_id" value="<?php echo intval($this->article->author_id); ?>" />
                     <?php // TODO Autor-Auswahl per Popup oder Selectbox? -> zumindest Admins sollten einen Autoren auswählen können ?>
                 </p>
                 <p>
                     <label title="Haupt-Illustration für diesen Artikel">Artikelbild</label>
                     <!-- Hier sollte pro Artikel ein Eintrag aus der Mediendatenbank auswählbar sein; die Verwendung und der Zuschnitt erfolgen je nach Ansicht / Template automatisch -->
                 </p>
+                <hr>
+                <p>
+                    <label title="Zeitpunkt der letzten Speicherung">Zuletzt gespeichert</label>
+                    <input type="date" readonly="readonly" id="input_article_modification_date" value="<?php if ($this->article->modification_timestamp != null) echo $this->article->modification_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
+                    <input type="time" readonly="readonly" id="input_article_modification_time" value="<?php if ($this->article->modification_timestamp != null) echo $this->article->modification_timestamp->format('H:i'); ?>" tabindex="-1" />
+                </p>
             </div>
 
             <div class="row">
-                <input class="big" type="text" id="input_article_headline" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" />
+                <input class="big" type="text" id="input_article_headline" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" autofocus="autofocus" tabindex="0" />
             </div>
 
             <div class="row imgtoolbar" style="margin-bottom: -1em">
-                <a class="button" title="Fett" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('**', '**');"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
-                <a class="button" title="Kursiv" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('*', '*');"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
-                <a class="button" title="Unterstrichen" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('_', '_');"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
+                <a class="button" title="Fett" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('**', '**');" tabindex="10"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
+                <a class="button" title="Kursiv" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('*', '*');" tabindex="10"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
+                <a class="button" title="Unterstrichen" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('_', '_');" tabindex="10"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
 
-                <!-- TODO Sonderzeichen-Auswahl -->
+                <!-- Sonderzeichen einfügen -->
                 <span class="imgtoolbar_popupbutton">
                     <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
                         <ul class="imgtoolbar_keyboard">
                             <?php foreach ($this->availableSpecialChars as $char => $desc) : ?>
                                 <li>
-                                    <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#' . $char . ';'; ?>');" title="<?php echo $this->htmlEncode($desc); ?>"><?php echo '&#' . $char . ';'; ?></a>
+                                    <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#' . $char . ';'; ?>');" title="<?php echo $this->htmlEncode($desc); ?>" tabindex="9"><?php echo '&#' . $char . ';'; ?></a>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     </span>
-                    <a class="button" title="Sonderzeichen einf&uuml;gen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/text_letter_omega.png" /></a>
+                    <a class="button" title="Sonderzeichen einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_letter_omega.png" /></a>
                 </span>
 
                 <!-- TODO Dialogfenster für Bildauswahl öffnen -->
-                <a class="button" title="Bild einf&uuml;gen" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
+                <a class="button" title="Bild einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
 
-                <!-- TODO Emoji-Tastatur stylen und erweitern; Gruppierung über Tabs o. ä. -->
+                <!-- Emoji-Tastatur -->
                 <span class="imgtoolbar_popupbutton">
                     <span class="imgtoolbar_popup" style="width: 500px; height: 320px; overflow: auto">
                         <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $emojis) : ?>
@@ -109,22 +118,22 @@
                             <ul class="imgtoolbar_keyboard">
                                 <?php foreach ($emojis as $emoji) : ?>
                                     <li class="tone_<?php echo $this->htmlEncode($emoji->tone); ?>">
-                                        <a style="font-family: Roboto, 'Apple Color Emoji';" href="javascript:articlesEdit.insertTextAtCaret('<?php echo $emoji->html; ?>');" title="<?php echo $this->htmlEncode($emoji->description); ?>"><?php echo $emoji->html; ?></a>
+                                        <a style="font-family: Roboto, 'Apple Color Emoji';" href="javascript:articlesEdit.insertTextAtCaret('<?php echo $emoji->html; ?>');" title="<?php echo $this->htmlEncode($emoji->description); ?>" tabindex="9"><?php echo $emoji->html; ?></a>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endforeach; ?>
                     </span>
-                    <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/emotion_amazing.png" /></a>
+                    <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/emotion_amazing.png" /></a>
                 </span>
             </div>
 
             <div class="row">
-                <textarea style="height: 36rem" id="input_article_content"><?php echo $this->htmlEncode($this->article->content); ?></textarea>
+                <textarea style="height: 36rem" id="input_article_content" tabindex="0"><?php echo $this->htmlEncode($this->article->content); ?></textarea>
             </div>
 
             <div class="row">
-                <input type="text" id="input_article_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php echo $this->htmlEncode(join(', ', $this->article->tags)); ?>" />
+                <input type="text" id="input_article_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php if (is_array($this->article->tags)) echo $this->htmlEncode(join(', ', $this->article->tags)); ?>" tabindex="0" />
             </div>
         </div>
     </form>
@@ -221,12 +230,14 @@
                 dataType:   'JSON',
                 data:       {
                     id:                     $('#input_article_id').val(),
+                    author_id:              $('#input_article_author_id').val(),
+                    status_code:            $('#input_article_status_code').val(),
                     headline:               $('#input_article_headline').val(),
                     teaser:                 '',
                     content:                $('#input_article_content').val(),
-                    start_timestamp:        $('#input_article_start_date').val() + ' ' + $('#input_article_start_time').val(),
-                    stop_timestamp:         $('#input_article_stop_date').val() + $('#input_article_stop_time').val(),
-                    publishing_timestamp:   $('#input_article_publishing_date').val() + ' ' + $('#input_article_publishing_time').val(),
+                    start_timestamp:        ($('#input_article_start_date').val() + ' ' + $('#input_article_start_time').val()).trim(),
+                    stop_timestamp:         ($('#input_article_stop_date').val() + ' ' + $('#input_article_stop_time').val()).trim(),
+                    publishing_timestamp:   ($('#input_article_publishing_date').val() + ' ' + $('#input_article_publishing_time').val()).trim(),
                     enable_trackbacks:      $('#input_article_enable_trackbacks').prop('checked'),
                     enable_comments:        $('#input_article_enable_comments').prop('checked'),
                     tags:                   $('#input_article_tags').val()
@@ -235,6 +246,26 @@
                 // ID zurückschreiben
                 // Anzeige (Freigabe-)Status aktualisieren
                 // Anzeige letzter Speicherzeitpunkt aktualisieren
+
+                console.log(data);
+
+                $('#input_article_id').val(data.id);
+                if (data.publishing_timestamp != null) {
+                    $('#input_article_publishing_date').val(data.publishing_timestamp.date.substr(0, 10));
+                    $('#input_article_publishing_time').val(data.publishing_timestamp.date.substr(11, 5));
+                } else {
+                    $('#input_article_publishing_date').val('');
+                    $('#input_article_publishing_time').val('');
+                }
+                if (data.modification_timestamp != null) {
+                    $('#input_article_modification_date').val(data.modification_timestamp.date.substr(0, 10));
+                    $('#input_article_modification_time').val(data.modification_timestamp.date.substr(11, 5));
+                } else {
+                    $('#input_article_modification_date').val('');
+                    $('#input_article_modification_time').val('');
+                }
+
+
             }).always(function() {
                 page.hideLoadingIndicator();
             });
@@ -280,6 +311,13 @@
 
         $('#button_cancel').click(function() {
             page.cancelEdit();
+        });
+
+        $('#button_publish').click(function() {
+            if (confirm('Wollen Sie den Artikel wirklich freigeben?')) {
+                $('#input_article_status_code').val(0);
+                page.saveArticle();
+            }
         });
 
         $('#button_preview').click(function() {
