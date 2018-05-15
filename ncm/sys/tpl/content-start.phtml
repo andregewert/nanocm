@@ -18,7 +18,7 @@ $latestArticles = $this->orm->getLatestArticles();
                 <?php echo $this->ncm->convertFormattedText($latestArticles[0]->teaser); ?>
             <?php endif; ?>
             <?php echo $this->ncm->convertFormattedText($latestArticles[0]->content); ?>
-            <p><a class="btn btn-primary btn-lg" href="#" role="button">Weiterlesen &raquo;</a></p>
+            <p><a class="btn btn-primary btn-lg" href="<?php echo $this->htmlEncode($latestArticles[0]->getArticleUrl()); ?>" role="button">Weiterlesen &raquo;</a></p>
         </div>
     </div>
 

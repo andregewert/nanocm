@@ -22,16 +22,16 @@
  * @todo Konfigurierbares Mapping von Namespaces auf Verzeichnisse implementieren
  */
 spl_autoload_register(function($class) {
-    
+
     // TODO Der Autoloader sollte erweitert werden um konfigurierbare
     // Pfade mit entsprechenden Präfixes
-    
+
     $filename = preg_replace('/^Ubergeek/', '', str_replace('\\', DIRECTORY_SEPARATOR, $class));
     $filename = __DIR__ . $filename . '.php';
 
     if (!file_exists($filename)) {
         throw new ErrorException('Class not found: ' . $class);
     }
-    
+
     require $filename;
 });

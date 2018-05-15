@@ -18,6 +18,7 @@
  */
 
 namespace Ubergeek\NanoCm\ContentConverter;
+use Ubergeek\MarkupParser\MarkupParser;
 use Ubergeek\NanoCm\Util;
 
 /**
@@ -29,10 +30,20 @@ use Ubergeek\NanoCm\Util;
 class HtmlConverter extends DecoratedContentConverter {
     
     public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input): string {
+
+        /*
         if ($this->decoratedConverter !== null) {
             $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
         }
         return '<p>' . Util::htmlEncode($input) . '</p>';
+        */
+
+        if ($this->decoratedConverter !== null) {
+            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
+        }
+
+        $parser = new MarkupParser();
+        return $parser->parse($input);
     }
 
 }
