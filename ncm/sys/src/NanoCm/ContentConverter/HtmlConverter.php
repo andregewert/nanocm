@@ -31,12 +31,9 @@ class HtmlConverter extends DecoratedContentConverter {
     
     public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input): string {
 
-        /*
-        if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
-        }
-        return '<p>' . Util::htmlEncode($input) . '</p>';
-        */
+        // TODO Blog-weite Definition von Abkürzungen implementieren
+
+        // TODO Unterschiedliche Converter definieren für Artikel-Texte und Kommentare
 
         if ($this->decoratedConverter !== null) {
             $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
