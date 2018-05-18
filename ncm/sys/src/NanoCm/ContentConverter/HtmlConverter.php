@@ -29,17 +29,23 @@ use Ubergeek\NanoCm\Util;
  */
 class HtmlConverter extends DecoratedContentConverter {
     
-    public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input): string {
+    public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input, array $options = array()): string {
 
         // TODO Blog-weite Definition von Abkürzungen implementieren
 
         // TODO Unterschiedliche Converter definieren für Artikel-Texte und Kommentare
 
         if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input);
+            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input, $options);
         }
 
         $parser = new MarkupParser();
+        foreach ($options as $key => $value) {
+            if ($key == 'converter.html.idPrefix') {
+                $parser->idPrefix = $value;
+            }
+        }
+        
         return $parser->parse($input);
     }
 

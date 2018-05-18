@@ -28,9 +28,13 @@ namespace Ubergeek\MarkupParser;
  * Die Ersetzung von Inline-Images funktioniert nach Markdown-Syntax. Für komplexere Image-Einbettungen inklusive
  * Bild-Unterschrift u. ä. sollen andere ContentConverter-Klassen verwendet werden.
  *
+ * Bis auf Tabellen unterstützt der Parse aktuell alle wichtigen (bzw. geplanten) Features, ist also vorerst
+ * vollständig.
+ *
  * @author agewert@ubergeek.de
  * @package Ubergeek\MarkupParser
  * @created 2018-05-15
+ * @todo Alle generierten Klassen etc. konfigurierbar machen!
  */
 class MarkupParser {
 
@@ -51,6 +55,11 @@ class MarkupParser {
     public $enableLinks = true;
 
     /**
+     * @var string Für generierte IDs (bspw. bei Fußzeilne) zu verwendendes Präfix
+     */
+    public $idPrefix = '';
+
+    /**
      * @var bool Gibt an, ob (Pseudo-)Anführungszeichen durch typografisch korrekte Anführungszeichen ersetzt werden
      * sollen
      */
@@ -61,7 +70,30 @@ class MarkupParser {
 
     // <editor-fold desc="Internal properties">
 
+    /**
+     * Eine Liste aller deklarierten Abkürzungen.
+     * Dieses Array kann auch mit den Methoden addAbbreviation() und addAbbreviations() gefüllt werden.
+     * @var array
+     * @see extractAbbreviations
+     * @see addAbbreviation
+     * @see addAbbreviations
+     */
     protected $abbreviations = array();
+
+    /**
+     * Eine Liste aller deklarierten Fußnoten
+     * @var array
+     * @see extractFootnotes
+     * @see replaceFootnoteReferences
+     * @see createFootnotes
+     */
+    protected $footnotes = array();
+
+    /**
+     * Eine Liste aller gefundenen absoluten HTTP- und HTTPS-URLs
+     * @var array
+     */
+    protected $links = array();
 
     // </editor-fold>
 
@@ -77,8 +109,14 @@ class MarkupParser {
     public function parse(string $input) : string {
         $output = "";
 
+        // Absolute HTTP/HTTPS-Links extrahieren
+        $this->extractAbsoluteLinks($input);
+
         // Abkürzungen extrahieren
         $input = $this->extractAbbreviations($input);
+
+        // Fußnoten-Deklarationen extrahieren
+        $input = $this->extractFootnotes($input);
 
         // Basis-Formatierung
         $input = trim($input);
@@ -93,11 +131,14 @@ class MarkupParser {
             $output .= $this->parseBlock($block);
         }
 
-        // Nicht markierte Links etc. ersetzen
-        // ...
-
         // Abkürzungen ersetzen
         $output = $this->replaceAbbreviations($output);
+
+        // Fußnoten-Referenzen ersetzen
+        $output = $this->replaceFootnoteReferences($output);
+
+        // Fußnotenverzeichnis erstellen
+        $output .= $this->createFootnotes();
 
         return $output;
     }
@@ -133,6 +174,20 @@ class MarkupParser {
     // <editor-fold desc="Internal methods">
 
     /**
+     * Versucht, alle absoluten HTTP-/HTTPS-Links im Ausgangstext zu finden und sammelt sie in einer internen Property
+     * @param string $input
+     * @return void
+     */
+    protected function extractAbsoluteLinks(string $input) {
+        preg_match_all('/https?\:\/\/[^\s\)]+/i', $input, $matches);
+        foreach ($matches[0] as $match) {
+            if (!in_array(mb_strtolower($match), $this->links)) {
+                array_push($this->links, mb_strtolower($match));
+            }
+        }
+    }
+
+    /**
      * Extrahiert aus dem Ausgangstext Abkürzungs-Deklarationen.
      * Die gefundenen Abkürzungen werden aus dem Markup-Text gestrichen (sie sollen nicht direkt sichtbar sein) und in
      * einer internen Property gesammelt. Durch Aufruf der Methode replaceAbbreviations() können die gesammelten
@@ -146,6 +201,67 @@ class MarkupParser {
             $this->abbreviations[$matches[1]] = htmlspecialchars(trim($matches[2]));
             return '';
         }, $input);
+        return $output;
+    }
+
+    /**
+     * Extrahiert aus dem Ausgangstext Fußnoten-Deklarationen.
+     * Die gefundenen Fußnoten werden aus dem Markup-Text gestrichen und in einer internen Property gesammelt.
+     * Durch Aufruf von createFootnotes() wird eine formatierte Fußnoten-Liste erstellt und an das fertige Dokument
+     * angehängt. Die Fußnoten-Referenzen werden durch Aufruf von replaceFootnoteReferences() durch Links auf diese
+     * Liste ersetzt.
+     * @param string $input Der ungeparste Ausgangstext
+     * @return string Der Markup-Text OHNE die Fußnoten-Deklarationen
+     */
+    protected function extractFootnotes(string $input) : string {
+        $output = preg_replace_callback('/^\[\^(\d+?)\]\:\s+(.+?)$/ims', function($matches) {
+            $idx = intval($matches[1]);
+            $content = htmlspecialchars(trim($matches[2]));
+            $this->footnotes[$idx] = $content;
+            return '';
+        }, $input);
+        return $output;
+    }
+
+    /**
+     * Ersetzt in dem vorgeparsten Dokument enthaltene Fußnoten-Referenzen durch Links
+     * @param string $input Vorgeparster Text
+     * @param string $prefix Optionales Präfix für die generiertes Links und Anker
+     * @return string Den ersetzten Text
+     */
+    protected function replaceFootnoteReferences(string $input, string $prefix = '') : string {
+        $output = preg_replace_callback('/\[\^(\d+?)\]/i', function($matches) {
+            $idx = intval($matches[1]);
+            $idFnRef = 'fnref:' . $this->idPrefix . $idx;
+            $idFn = 'fn:' . $this->idPrefix . $idx;
+            return "<sup id=\"$idFnRef\"><a href=\"#$idFn\" class=\"footnote-ref\" role=\"doc-noteref\">$idx</a></sup>";
+        }, $input);
+        return $output;
+    }
+
+    /**
+     * Erstellt eine Liste aller vorab extrahierten Fußnoten.
+     * @return string Eine Fußnoten-Liste in Form von HTML-Code
+     */
+    protected function createFootnotes() : string {
+        $output = '';
+        if (count($this->footnotes) > 0) {
+            $output .= "<div class=\"footnotes\" role=\"doc-endnotes\">\n";
+            $output .= "<hr>\n";
+            $output .= "<ol>\n";
+            foreach ($this->footnotes as $idx => $content) {
+                $idFnRef = 'fnref:' . $this->idPrefix . $idx;
+                $idFn = 'fn:' . $this->idPrefix . $idx;
+
+                $output .= "<li id=\"$idFn\" role='doc-endnote'>\n";
+                $output .= "<p>" . $this->parseInlineElements($content) . "&nbsp;";
+                $output .= "<a href=\"#$idFnRef\" class=\"footnote-backref\" role=\"doc-backlink\">&#8617;</a>";
+                $output .= "</p>\n";
+                $output .= "</li>\n";
+            }
+            $output .= "</ol>\n";
+            $output .= "</div>\n";
+        }
         return $output;
     }
 
@@ -214,14 +330,25 @@ class MarkupParser {
         // TODO Tables
 
         // Einfache Listen
-        elseif (preg_match('/^\s*(\-|#)/i', $input, $matches) === 1) {
+        elseif (preg_match('/^\s*(\-|#)\s+/i', $input, $matches) === 1) {
             $output = "<ul>\n";
-            foreach (preg_split('/^\s*(\-|#)\s*/ims', $input) as $item) {
+            foreach (preg_split('/^\s*(\-|#)\s+/ims', $input) as $item) {
                 if (mb_strlen(trim($item)) > 0) {
                     $output .= '<li>' . $this->parseInlineElements($item) . "</li>\n";
                 }
             }
             $output .= "</ul>\n";
+        }
+
+        // Nummerierte Listen
+        elseif (preg_match('/^\s*(\d+)\.\s+/i', $input, $matches) === 1) {
+            $output = "<ol start=\"" . intval($matches[1]) . "\">\n";
+            foreach (preg_split('/^\s*(\d+\.)\s*/ims', $input) as $item) {
+                if (mb_strlen(trim($item)) > 0) {
+                    $output .= '<li>' . $this->parseInlineElements($item) . "</li>\n";
+                }
+            }
+            $output .= "</ol>\n";
         }
 
         // Text-Absätze
@@ -247,10 +374,9 @@ class MarkupParser {
         $input = preg_replace('/\$(.+?)\$/i', "<var>$1</var>", $input);
         $input = preg_replace('/\^(.+?)\^/i', "<sup>$1</sup>", $input);
         $input = preg_replace('/\|(.+?)\|/i', "<span class=\"smallcaps\">$1</span>", $input);
-        //$input = preg_replace('/\\\(.+?)\//i', "<sub>$1</sub>", $input);
+        $input = preg_replace('/°(.+?)°/i', "<sub>$1</sub>", $input);
 
-        // TODO Subscript
-
+        // Keyboard shortcuts
         $input = preg_replace_callback('/\{(.*?)\}/', function($matches) {
             $codes = array();
             foreach (preg_split('/\s+/', $matches[1]) as $part) {
@@ -281,8 +407,7 @@ class MarkupParser {
         // Links ersetzen
         $input = $this->parseInlineLinks($input);
 
-        // TODO Footnotes
-        // ...
+        // TODO Evtl. Fußnoten-Referenzen an dieser Stelle ersetzen?
 
         return $input;
     }
@@ -297,11 +422,21 @@ class MarkupParser {
      * @see enableLinks
      */
     protected function parseInlineLinks(string $input) : string {
-        // TODO Link-Ersetzung implementieren
+        $pattern = '/\[([^\]]+)\]\(([^\s\)]+)(\s+[^\)]+)?\)/i';
         if ($this->enableLinks) {
-            // ...
+            $input = preg_replace_callback($pattern, function($matches) {
+                if (count($matches) > 3 && strlen($matches[3]) > 0) {
+                    $o = "<a href=\"$matches[2]\" title=\"$matches[3]\">$matches[1]</a>";
+                } else {
+                    $o = "<a href=\"$matches[2]\">$matches[1]</a>";
+                }
+                return $o;
+            }, $input);
         } else {
             // Wenn Verlinkung deaktiviert ist, müssen dennoch benannte Links durch das Label ersetzt werden
+            $input = preg_replace_callback($pattern, function($matches) {
+                return $matches[1];
+            }, $input);
         }
         return $input;
     }
