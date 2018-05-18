@@ -38,9 +38,26 @@ class AdminSettingsModule extends AbstractAdminModule {
     protected $settings;
 
     public function run() {
-        $this->setTitle($this->getSiteTitle() . ' - Einstellungen verwalten');
+        $this->content = '';
+        $this->setTitle($this->getSiteTitle() . ' - Erweiterte Einstellungen verwalten');
 
         switch ($this->getRelativeUrlPart(2)) {
+            // AJAX-Aufrufe
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/html');
+
+                switch ($this->getRelativeUrlPart(3)) {
+                    case 'list':
+                    default:
+                        $filter = new Setting();
+                        $searchterm = $this->getParam('searchterm');
+                        $this->settings = $this->orm->searchSettings($filter, $searchterm);
+                        $this->content = $this->renderUserTemplate('content-settings-list.phtml');
+                }
+                break;
+
+            // Übersichtsseite
             case 'index.php':
             case '':
                 $filter = new Setting();

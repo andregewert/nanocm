@@ -1,6 +1,7 @@
-<?php /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
-
-use Ubergeek\NanoCm\StatusCode; ?>
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
 <div class="container">
     <form>
         <h1>Artikel verwalten</h1>
@@ -17,7 +18,7 @@ use Ubergeek\NanoCm\StatusCode; ?>
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
 
                 <label for="input_searchterm">Suche</label>
-                <input id="input_searchterm" type="text" />
+                <input id="input_searchterm" type="text" autofocus="autofocus" />
 
                 <label for="select_status" class="spaceleft">Status</label>
                 <select id="select_status">
@@ -27,7 +28,9 @@ use Ubergeek\NanoCm\StatusCode; ?>
                     <?php endforeach; ?>
                 </select>
 
-                <input type="button" class="button spaceleft" value="Aktualisieren" id="button_refresh" />
+                <a class="button spaceleft" role="button" id="button_refresh" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                </a>
             </span>
         </div>
 

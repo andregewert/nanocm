@@ -1,45 +1,68 @@
 <div class="container">
-    <form>
-        <h1>Einstellungen</h1>
+    <form onsubmit="settings.refresh(); return false;">
+        <h1>Erweiterte Einstellungen verwalten</h1>
 
         <div class="toolbar">
             <span class="left">
-                <a name="" id="" class="button" href="#" role="button" title="Einstellung hinzuf&uuml;gen">+ Neu</a>
+                <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Einstellung hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neu
+                </a>
                 <a name="" id="" class="button" href="#" role="button" title="Ausgew&auml;hlte Einstellung bearbeiten">Bearbeiten</a>
                 <a name="" id="" class="button button-secondary" href="#" role="button" title="Ausgew&auml;hlte Einstellungen l&ouml;schen">L&ouml;schen</a>
             </span>
             <span class="right" style="float: right">
-                <label>Suche</label>
-                <input type="text" />
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
 
-                <input type="button" class="button" value="Aktualisieren" />
+                <label for="input_searchterm">Suche</label>
+                <input id="input_searchterm" type="text" autofocus="autofocus" />
+
+                <a class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)" onclick="settings.refresh()">
+                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                </a>
             </span>
         </div>
 
-        <table class="list">
-            <thead>
-            <tr>
-                <th>Einstellung</th>
-                <th>Wert</th>
-                <th>Parameter</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php if (is_array($this->settings) && count($this->settings) > 0) : ?>
-                <?php foreach ($this->settings as $setting) : ?>
-                    <?php $this->log->debug($setting); ?>
-                    <tr>
-                        <td><?php echo $this->htmlEncode($setting->key); ?></td>
-                        <td><?php echo $this->htmlEncode($setting->value); ?></td>
-                        <td><?php echo $this->htmlEncode($setting->params); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else : ?>
-                <tr>
-                    <td colspan="3">Keine Einstellungen gefunden</td>
-                </tr>
-            <?php endif; ?>
-            </tbody>
-        </table>
+        <div id="placeholder_settings" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
     </form>
 </div>
+
+<script type="text/javascript">
+    var settings = new (function() {
+        var app = this;
+
+        app.showLoadingIndicator = function() {
+            $('#toolbar_spinner').addClass('loading');
+            $('.placeholder').addClass('loading');
+        };
+
+        app.hideLoadingIndicator = function() {
+            $('#toolbar_spinner').removeClass('loading');
+            $('.placeholder').removeClass('loading');
+        };
+
+        app.refresh = function() {
+            app.showLoadingIndicator();
+
+            $.ajax('/admin/settings/ajax/list', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                    searchterm: $('#input_searchterm').val()
+                }
+            }).done(function(data) {
+                $('#placeholder_settings .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                app.hideLoadingIndicator();
+            });
+        };
+
+        app.refresh();
+    })();
+</script>

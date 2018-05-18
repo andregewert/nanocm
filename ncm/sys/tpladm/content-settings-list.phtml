@@ -1,0 +1,32 @@
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminSettingsModule */
+?>
+<table class="list">
+    <thead>
+        <tr>
+            <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+            <th>Einstellung</th>
+            <th>Wert</th>
+            <th>Parameter</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (is_array($this->settings) && count($this->settings) > 0) : ?>
+            <?php foreach ($this->settings as $setting) : ?>
+                <?php $this->log->debug($setting); ?>
+                <tr>
+                    <td style="text-align: center">
+                        <input type="checkbox" value="<?php echo $setting->key; ?>" style="text-align: center">
+                    </td>
+                    <td><?php echo $this->htmlEncode($setting->key); ?></td>
+                    <td><?php echo $this->htmlEncode($setting->value); ?></td>
+                    <td><?php echo $this->htmlEncode($setting->params); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <tr>
+                <td colspan="4">Keine Einstellungen gefunden</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>

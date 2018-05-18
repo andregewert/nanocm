@@ -142,24 +142,41 @@ class Orm {
     /**
      * Durchsucht die Systemeinstellungen und gibt ein Array mit den gefundenen
      * Datensätzen zurück
-     * @param Setting|null $filter
-     * @param int $limit
+     * @param Setting|null $filter Filterkriterien
+     * @param string|null $searchterm Optionaler Suchbegriff
+     * @param int $limit Optionales Limit für das Suchergebnis
+     * @param int $offset Optionaler Startwert für das Suchergebnis
      * @return Setting[]
      */
-    public function searchSettings(Setting $filter = null, $limit = null) {
+    public function searchSettings(Setting $filter = null, $searchterm = null, $limit = null, $offset = null) {
         $settings = array();
+        $params = array();
 
+        // SQL zusammenstellen
         $sql = 'SELECT * FROM setting WHERE 1 = 1 ';
-
-        // TODO Filter auswerten
-
+        if (is_array($filter)) {
+            // ...
+        }
+        if ($searchterm !== null) {
+            $sql .= ' AND name LIKE :name ';
+            $params['name'] = "%$searchterm%";
+        }
         $sql .= ' ORDER BY name ASC ';
 
-        if ($limit !== null) {
+        // Limit berücksichtigen
+        if ($limit !== null && $offset !== null) {
+            $limit = intval($limit);
+            $offset = intval($offset);
+            $sql .= " LIMIT $offset, $limit ";
+        } elseif ($limit !== null) {
             $sql .= ' LIMIT ' . intval($limit);
         }
 
+        // Parameter setzen
         $stmt = $this->basedb->prepare($sql);
+        foreach ($params as $name => $value) {
+            $stmt->bindValue($name, $value);
+        }
         $stmt->execute();
 
         while (($setting = Setting::fetchFromPdoStatement($stmt)) !== null) {
@@ -684,29 +701,43 @@ class Orm {
      * Durchsucht die Pages nach verschiedenen Filterkriterien
      * @param array $filter
      * @param bool $releasedOnly
+     * @param string $searchterm
      * @param int|null $limit
+     * @param int|null $offset
      * @return Page[]
      */
-    public function searchPages($filter = null, bool $releasedOnly = true, $limit = null) {
+    public function searchPages($filter = null, bool $releasedOnly = true, $searchterm = null, $limit = null, $offset = null) {
         $pages = array();
+        $params = array();
 
+        // SQL zusammenstellen
         $sql = 'SELECT * FROM page WHERE 1 = 1 ' ;
-
         if ($releasedOnly) {
             $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
         }
-
-        if ($limit !== null) {
+        if ($searchterm !== null && strlen($searchterm) > 0) {
+            $sql .= ' AND headline LIKE :headline OR url LIKE :url OR content LIKE :content ';
+            $params['headline'] = "%$searchterm%";
+            $params['url'] = "%$searchterm%";
+            $params['content'] = "%$searchterm%";
+        }
+        $sql .= 'ORDER BY headline, url ASC ';
+        if ($limit !== null && $offset !== null) {
             $limit = intval($limit);
-            $sql .= " LIMIT $limit ";
+            $offset = intval($offset);
+            $sql .= " LIMIT $offset, $limit ";
+        } elseif ($limit !== null) {
+            $sql .= ' LIMIT ' . intval($limit);
         }
 
-        $sql .= 'ORDER BY url ASC ';
-
+        // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
+        foreach ($params as $name => $value) {
+            $stmt->bindValue($name, $value);
+        }
         $stmt->execute();
 
-        while (($page = Page::fetchFromPdoStatement($stmt)) !== false) {
+        while (($page = Page::fetchFromPdoStatement($stmt)) !== null) {
             $pages[] = $page;
         }
 

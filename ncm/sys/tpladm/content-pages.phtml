@@ -1,10 +1,74 @@
-<?php
-    /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */
-?>
-<div class="container">
-    <h1>Seiten</h1>
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */ ?>
 
-    <p>
-        <a name="" id="" class="btn btn-primary" href="#" role="button" title="Seite hinzuf&uuml;gen">+</a>
-    </p>
+<div class="container">
+    <form onsubmit="pages.refresh(); return false;">
+        <h1>Seiten verwalten</h1>
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_add" class="button" href="/admin/pages/edit/" role="button" title="Seite hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neu
+                </a>
+                <a class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seite bearbeiten">Bearbeiten</a>
+                <a class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seiten l&ouml;schen">L&ouml;schen</a>
+            </span>
+            <span class="right" style="float: right">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+
+                <label for="input_searchterm">Suche</label>
+                <input id="input_searchterm" type="text" autofocus="autofocus" />
+
+                <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                </a>
+            </span>
+        </div>
+
+        <div id="placeholder_pages" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
+    </form>
 </div>
+
+<script type="text/javascript">
+    var pages = new (function() {
+        var app = this;
+
+        app.showLoadingIndicator = function() {
+            $('#toolbar_spinner').addClass('loading');
+            $('.placeholder').addClass('loading');
+        };
+
+        app.hideLoadingIndicator = function() {
+            $('#toolbar_spinner').removeClass('loading');
+            $('.placeholder').removeClass('loading');
+        };
+
+        app.refresh = function() {
+            app.showLoadingIndicator();
+
+            $.ajax('/admin/pages/ajax/list', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                    searchterm: $('#input_searchterm').val()
+                }
+            }).done(function(data) {
+                $('#placeholder_pages .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                app.hideLoadingIndicator();
+            });
+        };
+
+        $('#button_refresh').click(function() {
+            app.refresh();
+        });
+
+        app.refresh();
+    })();
+</script>

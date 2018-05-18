@@ -17,6 +17,7 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\NanoCm\Page;
 
 /**
  * Verwaltung der frei definierbaren Seiten
@@ -27,11 +28,46 @@ namespace Ubergeek\NanoCm\Module;
 class AdminPagesModule extends AbstractAdminModule {
 
     /** @var string Generierter Content */
-    private $content;
+    private $content = '';
+
+    // <editor-fold desc="Properties">
+
+    /**
+     * @var Page[]
+     */
+    public $pages;
+
+    // </editor-fold>
+
 
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Seiten verwalten');
-        $this->content = $this->renderUserTemplate('content-pages.phtml');
+
+        switch ($this->getRelativeUrlPart(2)) {
+            // AJAX-Aufrufe
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/html');
+
+                switch ($this->getRelativeUrlPart(3)) {
+                    case 'list':
+                    default:
+                        $filter = new Page();
+                        $searchterm = $this->getParam('searchterm');
+                        $this->pages = $this->orm->searchPages($filter, false, $searchterm);
+                        $this->content = $this->renderUserTemplate('content-pages-list.phtml');
+                        break;
+                }
+
+                break;
+
+            // Übersichtsseite
+            case 'index.php':
+            case '':
+                $this->content = $this->renderUserTemplate('content-pages.phtml');
+                break;
+        }
+
         $this->setContent($this->content);
     }
 
