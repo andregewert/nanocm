@@ -65,6 +65,11 @@ class MarkupParser {
      */
     public $enableSmartQuotes = true;
 
+    /**
+     * @var bool Gibt an, ob externe Links in einem neuen Tab / Fenster geöffnet werden sollen (Target = _blank)
+     */
+    public $openExternalLinksInNewTab = true;
+
     // </editor-fold>
 
 
@@ -318,6 +323,23 @@ class MarkupParser {
             }
         }
 
+        // TODO Klassen und Styles definieren für Sidebars
+
+        // Sidebar right
+        elseif (preg_match("/^\-\-\-\-\&gt\;$\s*(.*?)\s*^\-\-\-\-\&gt\;$/ims", $input, $matches) === 1) {
+            $output = "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: right; width: 20rem; padding: 0.5rem\">" . $this->parseInlineElements($matches[1]) . "</div>";
+        }
+
+        // Sidebar left
+        elseif (preg_match("/^\&lt\;\-\-\-\-$\s*(.*?)\s*^\&lt\;\-\-\-\-$/ims", $input, $matches) === 1) {
+            $output = "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: left; width: 20rem; padding: 0.5rem\">" . $this->parseInlineElements($matches[1]) . "</div><br style='clear: both' />";
+        }
+
+        // Seperated / highlightes content block
+        elseif (preg_match("/^\&lt\;\-\-\-\-\&gt\;$\s*(.*?)\s*^\&lt\;\-\-\-\-\&gt\;$/ims", $input, $matches) === 1) {
+            $output = "<div class=\"sidebar\" style=\"background-color: lightgray; padding: 0.5rem\">" . $this->parseInlineElements($matches[1]) . "</div>";
+        }
+
         // Block quotes
         elseif (mb_substr($input, 0, 5) == '&gt; ') {
             $output = "<blockquote class=\"blockquote\"><p>";
@@ -422,13 +444,22 @@ class MarkupParser {
      * @see enableLinks
      */
     protected function parseInlineLinks(string $input) : string {
-        $pattern = '/\[([^\]]+)\]\(([^\s\)]+)(\s+[^\)]+)?\)/i';
+        $pattern = '/\[([^\]]+)\]\(([^\s\)]+)(\s+(\&quot\;)?([^\)]+?)(\&quot\;)?)?\)/i';
         if ($this->enableLinks) {
             $input = preg_replace_callback($pattern, function($matches) {
-                if (count($matches) > 3 && strlen($matches[3]) > 0) {
-                    $o = "<a href=\"$matches[2]\" title=\"$matches[3]\">$matches[1]</a>";
+                $external = $this->isLinkExternal($matches[2]);
+                if (count($matches) > 5 && strlen($matches[5]) > 0) {
+                    $o = "<a href=\"$matches[2]\" title=\"" . trim($matches[5]) . "\"";
+                    if ($external) {
+                        $o .= " target=\"_blank\"";
+                    }
+                    $o .= ">$matches[1]</a>";
                 } else {
-                    $o = "<a href=\"$matches[2]\">$matches[1]</a>";
+                    $o = "<a href=\"$matches[2]\"";
+                    if ($external) {
+                        $o .= " target=\"_blank\"";
+                    }
+                    $o .= ">$matches[1]</a>";
                 }
                 return $o;
             }, $input);
@@ -439,6 +470,11 @@ class MarkupParser {
             }, $input);
         }
         return $input;
+    }
+
+    protected function isLinkExternal($url) {
+        return mb_substr($url, 0, 4) == 'http';
+        // TODO Mit der aktuell konfigurierten Domain abgleichen
     }
 
     // </editor-fold>
