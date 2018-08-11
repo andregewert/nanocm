@@ -62,6 +62,12 @@ class Orm {
     private $log;
 
     /**
+     * Seitenlänge für Suchergebnisse
+     * @var int
+     */
+    public $pageLength = 5;
+
+    /**
      * Cache für den User-ID-Converter
      * @var User[]
      */
@@ -83,7 +89,6 @@ class Orm {
             $this->log = new \Ubergeek\Log\Logger();
         }
     }
-    
     
     // <editor-fold desc="Settings">
 
@@ -154,9 +159,11 @@ class Orm {
 
         // SQL zusammenstellen
         $sql = 'SELECT * FROM setting WHERE 1 = 1 ';
-        if (is_array($filter)) {
-            // ...
+        if ($filter instanceof Setting) {
+            // TODO implementieren
         }
+
+        // Feier Suchbegriff
         if ($searchterm !== null) {
             $sql .= ' AND name LIKE :name ';
             $params['name'] = "%$searchterm%";
@@ -437,6 +444,17 @@ class Orm {
     }
 
     /**
+     * Entfernt alle Tag-Zuweisungen von einem bestimmten Artikel
+     * @param int $articleId Datensatz-ID des betreffenden Artikels
+     */
+    public function unassignTagsFromArticle(int $articleId) {
+        $sql = 'DELETE FROM tag_article WHERE article_id = :article_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('article_id', $articleId);
+        $stmt->execute();
+    }
+
+    /**
      * Speichert ein Schlagwort in der Datenbank und gibt die Datensatz-ID zurück
      *
      * Wenn die Datensatz-ID nicht korrekt ermittelt werden kann
@@ -480,18 +498,33 @@ class Orm {
     
     /**
      * Durchsucht die Artikel nach bestimmten Filterkriterien
+     *
+     * Wenn der Parameter $countonly auf true gesetzt wird, werden die Parameter $page und $limit nicht mehr
+     * berücksichtigt.
+     *
      * @param \Ubergeek\NanoCm\Article $filter Optionale Suchfilter
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel
      * berücksichtig werden sollen
+     * @param string $searchterm Freier Suchbegriff
+     * @param bool $countonly Gibt an, ob das Suchergebnis oder die Antahl der Treffer zurückgegeben werden sollen
      * @param int|null $page Angeforderte Seite
      * @param int|null $limit Maximale Anzahl der zurück zu gebenden Artikel
      * @return array Ein Array mit den gefundenen Artikeln
      */
-    public function searchArticles(Article $filter = null, $releasedOnly = true, $page = null, $limit = null) {
+    public function searchArticles(Article $filter = null, $releasedOnly = true, $searchterm = null, $countonly = false, $page = null, $limit = null) {
         $articles = array();
-        
-        $sql = 'SELECT * FROM article WHERE 1 = 1 ';
-        
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        // Ergebnis oder Anzahl Ergebnisse
+        if ($countonly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= ' FROM article WHERE 1 = 1 ';
+
+        // Nur veröffentlichte Artikel berücksichtigen
         if ($releasedOnly) {
             $sql .= '
                 AND (
@@ -502,27 +535,47 @@ class Orm {
         }
         
         // Filterbedingungen einfügen
-        if (is_array($filter)) {
-            // TODO implementieren
-        }
-        
-        $sql .= 'ORDER BY start_timestamp DESC ';
-
-        // Aufteilung in Seiten
-        if ($limit !== null) {
-            $sql .= ' LIMIT ' . intval($limit);
+        if ($filter instanceof Article) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :status_code ';
+                $params['status_code'] = $filter->status_code;
+            }
         }
 
+        // Suchbegriff
+        if (!empty($searchterm)) {
+            $like = '%' . $searchterm . '%';
+            $sql .= ' AND (headline LIKE :search_headline
+                        OR content LIKE :search_content) ';
+            $params['search_headline'] = $like;
+            $params['search_content'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countonly) {
+            $sql .= 'ORDER BY start_timestamp DESC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = intval($page) * $this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        $this->log->debug($sql);
         $stmt = $this->basedb->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
         $stmt->execute();
 
+        if ($countonly) {
+            return $stmt->fetchColumn();
+        }
+
+        // Ergerbnis auslesen
         while (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
             $article->tags = $this->getTagsByArticleId($article->id);
             $articles[] = $article;
         }
-
-        $this->log->debug($sql);
-
         return $articles;
     }
 
@@ -556,7 +609,7 @@ class Orm {
      * @return Article[]
      */
     public function getLatestArticles(int $limit = 5) {
-        return $this->searchArticles(null, true, $limit);
+        return $this->searchArticles(null, true, null, false, 0, $limit);
     }
 
     /**
@@ -580,6 +633,52 @@ class Orm {
     }
 
     /**
+     * Löscht den Artikel mit der angegebenen ID
+     * @param $id Datensatz-ID des zu löschenden Artikels
+     * @return bool
+     */
+    public function deleteArticleById($id) {
+        try {
+            $this->unassignTagsFromArticle($id);
+            $sql = 'DELETE FROM article WHERE id = :article_id ';
+            $stmt = $this->basedb->prepare($sql);
+            $stmt->bindValue('article_id', $id);
+            $stmt->execute();
+        } catch (\Exception $ex) {
+            $this->log->err('Fehler beim Löschen des Artikels', $ex);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Löscht mehrere Artikel anhand ihrer Datensatz-IDs
+     * @param array $ids IDs der zu löschenden Artikel
+     * @return void
+     */
+    public function deleteArticlesById(array $ids) {
+        foreach ($ids as $id) {
+            $this->deleteArticleById($id);
+        }
+    }
+
+    /**
+     * Sperrt die Artikel mit den übergebenen IDs
+     * @param array $ids IDs der zu sperrenden Artikel
+     * @return void
+     */
+    public function lockArticlesById(array $ids) {
+        $sql = 'UPDATE article SET status_code = :status_code WHERE id = :article_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', StatusCode::LOCKED);
+
+        foreach ($ids as $article_id) {
+            $stmt->bindParam('article_id', $article_id);
+            $stmt->execute();
+        }
+    }
+
+    /**Datensatz
      * Aktualisiert einen Artikel-Datensatz.
      *
      * Wichtig: Der Freigabe-Status wird über die Update-Methode niemals

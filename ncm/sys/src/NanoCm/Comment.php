@@ -21,6 +21,8 @@
 namespace Ubergeek\NanoCm;
 
 
+use http\Exception\BadQueryStringException;
+
 /**
  * Bildet einen Artikelkommentar ab
  * @author agewert@ubergeek.de
@@ -30,6 +32,67 @@ namespace Ubergeek\NanoCm;
 class Comment {
 
     // <editor-fold desc="Properties">
+
+    /**
+     * Eindeutige Datensatz-ID
+     * @var integer
+     */
+    public $id;
+
+    /**
+     * Datensatz-ID des verknüpften Artikels
+     * @var integer
+     */
+    public $article_id;
+
+    /**
+     * Zeitpunkt der Erstellung
+     * @var \DateTime
+     */
+    public $creation_timestamp;
+
+    /**
+     * Zeitpunkt der letzten Änderung
+     * @var \DateTime
+     */
+    public $modification_timestamp;
+
+    /**
+     * Statuscode des Datensatzes
+     * @var integer
+     */
+    public $status_code;
+
+    /**
+     * Spam-Stauts
+     * @var integer
+     */
+    public $spam_status;
+
+    /**
+     * Frei eingebbarer Benutzername für den Kommentar
+     * @var string
+     */
+    public $username;
+
+    /**
+     * E-Mail-Adresse des Kommentators
+     * @var string
+     */
+    public $email;
+
+    /**
+     * Überschrift für den Kommentar
+     * @var string
+     */
+    public $headline;
+
+    /**
+     * Eigentlicher Kommentarinhalt
+     * @var string
+     */
+    public $content;
+
 
     // </editor-fold>
 

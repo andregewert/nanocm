@@ -317,3 +317,26 @@ div.virtualkeyboard {
   background-color: #f8f8f8; }
 
 /* </editor-fold> */
+/* <editor-fold desc="Paging navigation"> */
+div.paging {
+  background-color: #f8f8f8; }
+
+div.paging ul {
+  list-style: none;
+  padding: 0;
+  margin: 0; }
+
+div.paging li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  line-height: 2em; }
+
+div.paging li a {
+  padding: 0 0.5em;
+  display: block; }
+
+div.paging li.selected {
+  font-weight: bold; }
+
+/* </editor-fold> */

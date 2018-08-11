@@ -128,6 +128,7 @@ class NanoCm {
         
         // Zugriff auf die Datenbank herstellen
         $this->orm = new Orm($this->getDbHandle(), $this->log);
+        $this->orm->pageLength = intval($this->orm->getSettingValue(Constants::SETTING_SYSTEM_ADMIN_PAGELENGTH));
         
         // TODO Instanziierung nur, wenn Logging eingeschaltet
         $this->log->addWriter(
@@ -135,6 +136,11 @@ class NanoCm {
                 new Log\Filter\PriorityFilter(\Ubergeek\Log\Logger::DEBUG, Log\Filter\PriorityFilter::OPERATOR_MIN)
             )
         );
+
+        if ($this->orm->pageLength == 0) {
+            $this->orm->pageLength = 20;
+            $this->log->debug("Fehlerhafte Konfiguration Seitenlänge! Benutze Standardwert.");
+        }
         
         $this->session = new \Ubergeek\Session\SimpleSession('ncm');
         $this->session->start();

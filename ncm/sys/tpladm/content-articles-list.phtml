@@ -18,7 +18,7 @@
             <?php foreach ($this->articles as $article) : ?>
                 <tr>
                     <td style="text-align: center">
-                        <input type="checkbox" value="<?php echo $article->id; ?>" style="text-align: center">
+                        <input type="checkbox" class="selection" value="<?php echo $article->id; ?>" style="text-align: center">
                     </td>
                     <td><a href="/admin/articles/edit/<?php echo $article->id; ?>"><?php echo $this->htmlEncode($article->headline); ?></a></td>
                     <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id)); ?></td>
@@ -38,3 +38,4 @@
         <?php endif; ?>
     </tbody>
 </table>
+<?php $this->includeUserTemplate('block-paging.phtml'); ?>

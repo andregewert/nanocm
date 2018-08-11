@@ -8,11 +8,18 @@
 
         <div class="toolbar">
             <span class="left">
-                <a name="" id="" class="button" href="/admin/articles/edit/" role="button" title="Artikel hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neu
+                <a id="button_add" class="button" href="/admin/articles/edit/" role="button" title="Artikel hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16" />Neu
                 </a>
-                <a name="" id="" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlten Artikel bearbeiten">Bearbeiten</a>
-                <a name="" id="" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Artikel l&ouml;schen">L&ouml;schen</a>
+                <a id="button_edit" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlten Artikel bearbeiten">
+                    <img src="/ncm/img/fatcow/16/page_edit.png" alt="" width="16" height="16" />Bearbeiten
+                </a>
+                <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Artikel sperren">
+                    <img src="/ncm/img/fatcow/16/page_key.png" alt="" width="16" height="16" />Sperren
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Artikel l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/page_delete.png" alt="" width="16" height="16" />L&ouml;schen
+                </a>
             </span>
             <span class="right" style="float: right; vertical-align: middle">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
@@ -45,6 +52,8 @@
     function Articles() {
         var app = this;
 
+        app.page = 1;
+
         app.showLoadingIndicator = function() {
             $('#toolbar_spinner').addClass('loading');
             $('.placeholder').addClass('loading');
@@ -55,10 +64,37 @@
             $('.placeholder').removeClass('loading');
         };
 
+        /**
+         * Initialisiert EventHandler etc.
+         */
+        app.init = function() {
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+
+            $('#button_edit').click(function() {
+                app.editSelected();
+            });
+
+            $('#button_lock').click(function() {
+                app.lockSelected();
+            });
+
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
+
+            app.refresh();
+        };
+
+        /**
+         * Aktualisiert die Artikelliste
+         * @param page
+         */
         app.refresh = function(page) {
             app.showLoadingIndicator();
             if (typeof page === 'undefined') {
-                page = 1;
+                page = app.page;
             }
 
             $.ajax('/admin/articles/ajax/list', {
@@ -80,13 +116,64 @@
             });
         };
 
-        $('#button_refresh').click(function() {
-            app.refresh();
-        });
+        /**
+         * Ruft die Bearbeitungsmaske für den ersten ausgewählten Artikel auf
+         */
+        app.editSelected = function() {
+            var id = ncm.getFirstSelectedRowId();
+            if (id != null) {
+                document.location.href = '/admin/articles/edit/' + id;
+            }
+        };
+
+        /**
+         * Löscht alle ausgewählten Artikel
+         */
+        app.deleteSelected = function() {
+            var ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Artikel wirklich löschen?')) {
+                    app.showLoadingIndicator();
+                    $.ajax('/admin/articles/ajax/delete', {
+                        cache: false,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: {
+                            ids: ids
+                        }
+                    }).always(function () {
+                        app.hideLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        /**
+         * Sperrt die ausgewählten Artikel
+         */
+        app.lockSelected = function()  {
+            var ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                app.showLoadingIndicator();
+                $.ajax('/admin/articles/ajax/lock', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        ids: ids
+                    }
+                }).always(function() {
+                    app.hideLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        app.init();
     }
 
     $(document).ready(function() {
-        var articles = new Articles();
-        articles.refresh();
+        module = new Articles();
     });
 </script>

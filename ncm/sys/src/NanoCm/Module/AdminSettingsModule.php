@@ -42,6 +42,7 @@ class AdminSettingsModule extends AbstractAdminModule {
         $this->setTitle($this->getSiteTitle() . ' - Erweiterte Einstellungen verwalten');
 
         switch ($this->getRelativeUrlPart(2)) {
+
             // AJAX-Aufrufe
             case 'ajax':
                 $this->setPageTemplate(self::PAGE_NONE);

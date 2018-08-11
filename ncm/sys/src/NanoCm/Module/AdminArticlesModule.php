@@ -49,6 +49,18 @@ class AdminArticlesModule extends AbstractAdminModule {
     public $article;
 
     /**
+     * Suchbegriff
+     * @var string
+     */
+    public $searchterm;
+
+    /**
+     * Suchfilter: Statuscode
+     * @var integer
+     */
+    public $statusCode;
+
+    /**
      * Die für Artikel-Datensätze verfügbaren Statuscodes
      * @var int[]
      */
@@ -89,14 +101,36 @@ class AdminArticlesModule extends AbstractAdminModule {
     public function run() {
         $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Artikel verwalten');
-        
+
+        $this->page = $this->getParam('page');
+        $this->searchterm = $this->getParam('searchterm');
+        $this->statusCode = $this->getParam('status');
+
         switch ($this->getRelativeUrlPart(2)) {
+
             // AJAX-Aufrufe
             case 'ajax':
                 $this->setPageTemplate(self::PAGE_NONE);
                 $this->setContentType('text/html');
 
                 switch ($this->getRelativeUrlPart(3)) {
+
+                    // Artikel (endgültig) löschen
+                    case 'delete':
+                        $this->setContentType('text/javascript');
+                        $ids = $this->getParam('ids');
+                        $this->orm->deleteArticlesById($ids);
+                        $content = json_encode(true);
+                        break;
+
+                    // Artikel sperrem
+                    case 'lock':
+                        $this->setContentType('text/javascript');
+                        $ids = $this->getParam('ids');
+                        $this->orm->lockArticlesById($ids);
+                        $content = json_encode(true);
+                        break;
+
                     // Artikel speichern
                     case 'save':
                         $this->setContentType('text/javascript');
@@ -109,8 +143,10 @@ class AdminArticlesModule extends AbstractAdminModule {
                     case 'list':
                     default:
                         $filter = new Article();
-                        $filter->status_code = $this->getParam('status');
-                        $this->articles = $this->orm->searchArticles($filter, false, 20);
+                        $filter->status_code = $this->statusCode;
+
+                        $this->pageCount = ceil($this->orm->searchArticles($filter, false, $this->searchterm, true) /$this->orm->pageLength);
+                        $this->articles = $this->orm->searchArticles($filter, false, $this->searchterm, false, $this->page);
                         $content = $this->renderUserTemplate('content-articles-list.phtml');
                 }
                 break;

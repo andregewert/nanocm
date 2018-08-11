@@ -30,6 +30,18 @@ use Ubergeek\NanoCm\Exception;
 abstract class AbstractAdminModule extends AbstractModule {
 
     /**
+     * Gibt die Anzahl der anzuzeigenden Elemente an
+     * @var integer
+     */
+    public $pageCount;
+
+    /**
+     * Gibt die aktuell angezeigte Seite an
+     * @var integer
+     */
+    public $page;
+
+    /**
      * Überprüft auf grundlegende Zugriffsberechtigung auf den
      * Administrationsbereiche
      * @throws Exception\AuthorizationException

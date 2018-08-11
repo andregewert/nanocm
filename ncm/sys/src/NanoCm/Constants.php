@@ -64,6 +64,12 @@ abstract class Constants {
      */
     const SETTING_SYSTEM_ENABLETRACKBACKS = 'system.enabletrackbacks';
 
+    /**
+     * Standard-Seitenlänge für Auflistungen im Administrationsbereich
+     * @var string
+     */
+    const SETTING_SYSTEM_ADMIN_PAGELENGTH = 'system.admin.pagelength';
+
 //    /**
 //     * Anzeigename / Realname des Webmaster
 //     */

@@ -136,6 +136,9 @@ class MarkupParser {
             $output .= $this->parseBlock($block);
         }
 
+        // Fenced blocks "nachbearbeiten"
+        $output = $this->parseFencedBlocks($output);
+
         // Abkürzungen ersetzen
         $output = $this->replaceAbbreviations($output);
 
@@ -287,6 +290,40 @@ class MarkupParser {
         return $output;
     }
 
+    protected function parseFencedBlocks(string $input) : string {
+
+        // Sidebar middle
+        $input = preg_replace_callback("/^\<p\>\&lt\;\-\-\-\-\&gt\;(\<br\>)?\s*(.*?)\s*(\<br\>)?\&lt\;\-\-\-\-\&gt\;\<\/p\>$/ims", function($matches) {
+            return "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; padding: 0.5rem 0.5rem 0 0.5rem\"><p>" . $matches[2] . "</p></div>";
+        }, $input);
+
+        // Sidebar right
+        $input = preg_replace_callback("/^\<p\>\-\-\-\-\&gt\;(\<br\>)?\s*(.*?)\s*(\<br\>)?\-\-\-\-\&gt\;\<\/p\>$/ims", function ($matches) {
+            return "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: right; width: 20rem; padding: 0.5rem\"><p>" . $matches[2] . "</p></div>";
+        }, $input);
+
+        // Sidebar left
+        $input = preg_replace_callback("/^\<p\>\&lt\;\-\-\-\-(\<br\>)?\s*(.*?)\s*(\<br\>)?\&lt\;\-\-\-\-\<\/p\>$/ims", function ($matches) {
+            return "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: left; width: 20rem; padding: 0.5rem\"><p>" . $matches[2] . "</p></div>";
+        }, $input);
+
+        // Sidebar left
+
+        // Code block
+        $input = preg_replace_callback("/^\<p\>```(.*?)\<br\>(.*)```\<\/p\>$/ims", function($matches) {
+            $matches[2] = preg_replace('(\<p\>|\<br\>)', "\n", $matches[2]);
+            $matches[2] = preg_replace('(\<\/p\>)', "", $matches[2]);
+
+            if (strlen($matches[1]) > 0) {
+                return "<pre><code class=\"$matches[1]\">$matches[2]</code></pre>";
+            } else {
+                return "<pre><code>$matches[2]</code></pre>";
+            }
+        }, $input);
+
+        return $input;
+    }
+
     /**
      * Zerlegt den übergebenen Ausgangstext in einzelne zu parsende Block-Elemente
      * @param string $input Ungeparster Ausgangstext
@@ -314,31 +351,7 @@ class MarkupParser {
             $output = "<hr>\n";
         }
 
-        // Fenced Code
-        elseif (preg_match("/^```(.*?)\n(.*)```$/is", $input, $matches) === 1) {
-            if (strlen($matches[1]) > 0) {
-                $output = "<pre><code class=\"$matches[1]\">$matches[2]</code></pre>\n";
-            } else {
-                $output = "<pre><code>$matches[2]</code></pre>\n";
-            }
-        }
-
         // TODO Klassen und Styles definieren für Sidebars
-
-        // Sidebar right
-        elseif (preg_match("/^\-\-\-\-\&gt\;$\s*(.*?)\s*^\-\-\-\-\&gt\;$/ims", $input, $matches) === 1) {
-            $output = "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: right; width: 20rem; padding: 0.5rem\">" . $this->parseInlineElements($matches[1]) . "</div>";
-        }
-
-        // Sidebar left
-        elseif (preg_match("/^\&lt\;\-\-\-\-$\s*(.*?)\s*^\&lt\;\-\-\-\-$/ims", $input, $matches) === 1) {
-            $output = "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: left; width: 20rem; padding: 0.5rem\">" . $this->parseInlineElements($matches[1]) . "</div><br style='clear: both' />";
-        }
-
-        // Seperated / highlightes content block
-        elseif (preg_match("/^\&lt\;\-\-\-\-\&gt\;$\s*(.*?)\s*^\&lt\;\-\-\-\-\&gt\;$/ims", $input, $matches) === 1) {
-            $output = "<div class=\"sidebar\" style=\"background-color: lightgray; padding: 0.5rem\">" . $this->parseInlineElements($matches[1]) . "</div>";
-        }
 
         // Block quotes
         elseif (mb_substr($input, 0, 5) == '&gt; ') {
@@ -348,8 +361,6 @@ class MarkupParser {
             );
             $output .= "</p></blockquote>";
         }
-
-        // TODO Tables
 
         // Einfache Listen
         elseif (preg_match('/^\s*(\-|#)\s+/i', $input, $matches) === 1) {
@@ -392,7 +403,7 @@ class MarkupParser {
         $input = preg_replace('/\*(.+?)\*/i', "<em>$1</em>", $input);
         $input = preg_replace('/\_(.+?)\_/i', "<u>$1</u>", $input);
         $input = preg_replace('/~(.+?)~/i', "<del>$1</del>", $input);
-        $input = preg_replace('/\`(.+?)\`/i', "<code>$1</code>", $input);
+        $input = preg_replace('/(^|[^`])\`([^`]+?)\`($|[^`])/is', "$1<code>$2</code>$3", $input);
         $input = preg_replace('/\$(.+?)\$/i', "<var>$1</var>", $input);
         $input = preg_replace('/\^(.+?)\^/i', "<sup>$1</sup>", $input);
         $input = preg_replace('/\|(.+?)\|/i', "<span class=\"smallcaps\">$1</span>", $input);
@@ -412,7 +423,6 @@ class MarkupParser {
             $input = preg_replace('/  $/ims', "<br>", $input);
         } else {
             $input = preg_replace('/\n/i', "<br>", $input);
-
         }
 
         // Bestimmte typografische Zeichen ersetzen
@@ -428,8 +438,6 @@ class MarkupParser {
 
         // Links ersetzen
         $input = $this->parseInlineLinks($input);
-
-        // TODO Evtl. Fußnoten-Referenzen an dieser Stelle ersetzen?
 
         return $input;
     }

@@ -1,0 +1,12 @@
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AbstractAdminModule */
+?>
+<div class="paging">
+    <ul>
+        <?php for ($i = 1; $i <= $this->pageCount; $i++) : ?>
+            <li<?php if ($i == $this->page) echo ' class="selected"'; ?>>
+                <a href="javascript:void(0);" onclick="module.refresh(<?php echo $i; ?>)"><?php echo $i; ?></a>
+            </li>
+        <?php endfor; ?>
+    </ul>
+</div>

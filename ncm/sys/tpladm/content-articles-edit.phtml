@@ -1,11 +1,6 @@
 <?php
     /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
-
     use Ubergeek\NanoCm\StatusCode;
-
-    // TODO Anzeige von Freigabe-Status und Zeitpunkt der letzten Speicherung
-
-    // TODO Auslagern der Javascript-Quellen in separate Dateien
 ?>
 <div class="container">
     <form>
@@ -86,6 +81,11 @@
 
             <div class="row">
                 <input class="big" type="text" id="input_article_headline" placeholder="Headline" value="<?php echo $this->htmlEncode($this->article->headline); ?>" autofocus="autofocus" tabindex="0" />
+            </div>
+
+            <div class="row">
+                <label for="input_article_teaser">Optionaler Anriss-Text</label>
+                <textarea style="height: 4rem" id="input_article_teaser" tabindex="0"><?php echo $this->htmlEncode($this->article->teaser); ?></textarea>
             </div>
 
             <div class="row imgtoolbar" style="margin-bottom: -1em">
@@ -238,7 +238,7 @@
                     author_id:              $('#input_article_author_id').val(),
                     status_code:            $('#input_article_status_code').val(),
                     headline:               $('#input_article_headline').val(),
-                    teaser:                 '',
+                    teaser:                 $('#input_article_teaser').val(),
                     content:                $('#input_article_content').val(),
                     start_timestamp:        ($('#input_article_start_date').val() + ' ' + $('#input_article_start_time').val()).trim(),
                     stop_timestamp:         ($('#input_article_stop_date').val() + ' ' + $('#input_article_stop_time').val()).trim(),

@@ -35,6 +35,23 @@ function Ncm() {
         );
     };
 
+    app.getFirstSelectedRowId = function() {
+        var elem = $('table.list').find('input.selection:checked').first();
+        if (elem.length == 1) {
+            return elem.val();
+        }
+        return null;
+    };
+
+    app.getSelectedRowIds = function() {
+        var ids = [];
+        $('table.list').find('input.selection:checked').each(function() {
+            ids.push($(this).val());
+        });
+        console.log(ids);
+        return ids;
+    };
+
     // Standard-DHTML-Elemente initialisieren
     $(document).ready(function() {
 
@@ -67,3 +84,4 @@ function Ncm() {
 }
 
 var ncm = new Ncm();
+var module;
