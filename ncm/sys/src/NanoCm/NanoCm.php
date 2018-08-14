@@ -112,11 +112,11 @@ class NanoCm {
      * @param string $basepath
      */
     private function __construct($basepath) {
+
         // Pfade konfigurieren
         $this->pubdir = $basepath;
-        $this->tpldir = $this->createPath(array($this->pubdir, 'tpl'));
-        $this->ncmdir = $this->createPath(array($this->pubdir, 'ncm'));
-        $this->sysdir = $this->createPath(array($this->pubdir, 'ncm', 'sys'));
+        $this->ncmdir = Util::createPath($this->pubdir, 'ncm');
+        $this->sysdir = Util::createPath($this->pubdir, 'ncm', 'sys');
         $this->relativeBaseUrl = substr($this->pubdir, strlen($_SERVER['DOCUMENT_ROOT']));
         
         if (empty($this->relativeBaseUrl)) {
@@ -128,8 +128,14 @@ class NanoCm {
         
         // Zugriff auf die Datenbank herstellen
         $this->orm = new Orm($this->getDbHandle(), $this->log);
-        $this->orm->pageLength = intval($this->orm->getSettingValue(Constants::SETTING_SYSTEM_ADMIN_PAGELENGTH));
-        
+
+        // Template-Verzeichnis konfigurieren
+        $tpl = $this->orm->getSettingValue(Constants::SETTING_SYSTEM_TEMPLATE_PATH);
+        if (empty($tpl)) {
+            $tpl = 'default';
+        }
+        $this->tpldir = Util::createPath($this->pubdir, 'tpl', $tpl);
+
         // TODO Instanziierung nur, wenn Logging eingeschaltet
         $this->log->addWriter(
             new Log\Writer\ChromeLoggerWriter(
@@ -137,11 +143,14 @@ class NanoCm {
             )
         );
 
+        // Seitenlänge im Administrationsbereich
+        $this->orm->pageLength = intval($this->orm->getSettingValue(Constants::SETTING_SYSTEM_ADMIN_PAGELENGTH));
         if ($this->orm->pageLength == 0) {
             $this->orm->pageLength = 20;
             $this->log->debug("Fehlerhafte Konfiguration Seitenlänge! Benutze Standardwert.");
         }
-        
+
+        // Session-Initialisierung
         $this->session = new \Ubergeek\Session\SimpleSession('ncm');
         $this->session->start();
     }
@@ -151,11 +160,11 @@ class NanoCm {
      * @return string Datenbank-Dateiname
      */
     private function getSiteDbFilename() : string {
-        $fname = $this->createPath(array(
+        $fname = Util::createPath(
             $this->sysdir,
             'db',
             'site.sqlite'
-        ));
+        );
         return $fname;
     }
     
@@ -284,15 +293,7 @@ class NanoCm {
         // TODO Implementieren
     }
     
-    /**
-     * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
-     * zu einer Pfadangabe zusammen
-     * @param array $parts Pfadbestandteile
-     * @return string Der zusammengesetzte Pfad
-     */
-    public function createPath(array $parts) : string {
-        return join(DIRECTORY_SEPARATOR, $parts);
-    }
+
     
     /**
      * Konvertiert einen Eingabestring mit Formatierungs-Auszeichnungen in das

@@ -28,6 +28,16 @@ namespace Ubergeek\NanoCm;
 final class Util {
 
     /**
+     * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
+     * zu einer Pfadangabe zusammen
+     * @param string ...$parts Pfadbestandteile
+     * @return string Der zusammengesetzte Pfad
+     */
+    public static function createPath(string ...$parts) : string {
+        return join(DIRECTORY_SEPARATOR, $parts);
+    }
+
+    /**
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
      * @param string|null $string

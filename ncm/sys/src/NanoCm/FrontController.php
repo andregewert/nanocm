@@ -65,6 +65,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
 
         $moduleName = null;
         switch ($this->getRelativeUrlPart(0)) {
+            
             // Admin-Modul (Web-Interface)
             case 'admin':
                 switch ($this->getRelativeUrlPart(1)) {

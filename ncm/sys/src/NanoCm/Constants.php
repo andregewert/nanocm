@@ -38,7 +38,7 @@ abstract class Constants {
      * Relativer Pfad zum zu benutzenden HTML-Template
      * @var string
      */
-    const SETTING_SYSTEM_TPLDIR = 'system.tpldir';
+    const SETTING_SYSTEM_TEMPLATE_PATH = 'system.template.path';
     
     /**
      * Seitentitel

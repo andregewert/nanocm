@@ -1,7 +1,18 @@
 # Benutzerdefinierte Templates
 
-Dieses Verzeichnis kann verwendet werden, um benutzerdefinierte Templates zu definieren.
+In diesem Verzeichnis werden Templates für die öffentliche Ausgabeseite (also alles außer dem Administrationsbereich)
+abgelegt.
 
-Wird hier ein Template mit gleichem Namen gefunden, so hat es Vorrang vor dem entsprechenden Standard-Template.
+NanoCM unterstützt die gleichzeitige Installation mehrerer Ausgabe-Templates, zwischen denen umgeschaltet werden kann.
+Jedes zusammengehörige Template wird in einem separaten Verzeichnis abgelegt. Wird in den konfigurierten Verzeichnis
+ein bestimmte Datei nicht gefunden, so versucht das System, die entsprechende Datei aus dem Ordner "default" zu
+verwenden, weil davon ausgegangen wird, dass das Default-Template immer zusammen mit der Anwendung aktualisiert wird und
+somit vollständig ist.
 
-- Eventuell Pfad zum Template-Verzeichnis konfigurierbar machen?
+Jedes Template kann und soll für sich eigene Unterverzeichnisse für Javascript-Dateien, Images, Fonts usw. mitbringen.
+
+## Offene Punkte
+
+- Das Default-Template wird erst (vollständig) entwickelt, wenn die Vorlage für ubergeek.de fertig ist
+- Das ubergeek-Template ist und bleibt Bestandteil des Quellcode-Verwaltung
+- Das Default-Template soll schlicht und generisch bleiben und möglichst auf Bootstrap basieren

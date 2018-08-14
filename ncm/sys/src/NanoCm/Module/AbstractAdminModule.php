@@ -20,6 +20,7 @@
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\UserType;
 use Ubergeek\NanoCm\Exception;
+use Ubergeek\NanoCm\Util;
 
 /**
  * Basisklasse für Administrations-Module
@@ -48,9 +49,9 @@ abstract class AbstractAdminModule extends AbstractModule {
      */
     public function init() {
         if ($this->ncm->isUserLoggedIn() && $this->ncm->getLoggedInUser()->usertype >= UserType::EDITOR) {
-            $this->templateDir = 'tpladm';
             $this->allowUserTemplates = false;
             $this->setPageTemplate('page-admin.phtml');
+            $this->templateDir = Util::createPath($this->ncm->sysdir, 'tpladm');
         } else {
             throw new Exception\AuthorizationException("Authentifizierung notwendig!");
         }

@@ -40,7 +40,7 @@ $toolbar-bg-header: #ddd;
 $border-color:      #ddd;
 $border-color-heavy: silver;
 
-/* <editor-fold desc="Basis elements"> */
+/* <editor-fold desc="Base elements"> */
 
 html {
     font-size: 85%;
@@ -84,8 +84,7 @@ nav.main img {
 }
 
 nav.main ul {
-    list-style: none;
-    list-style-position: inside;
+    list-style: none inside none;
     display: inline-block;
     vertical-align: middle;
     margin: 0;
@@ -93,8 +92,7 @@ nav.main ul {
 }
 
 nav.main ul li {
-    list-style: none;
-    list-style-position: inside;
+    list-style: none inside none;
     display: inline-block;
     float: left;
 }

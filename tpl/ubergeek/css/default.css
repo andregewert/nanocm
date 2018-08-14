@@ -1,0 +1,193 @@
+@charset "UTF-8";
+/*!
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+/*
+    Created on : 12.08.2018, 14:06:12
+    Author     : André Gewert <agewert@ubergeek.de>
+*/
+/* Grundfarben für die Seite */
+/* Farbgebung Header / Branding */
+/* Farbgebung Navigationsbereich */
+/* Farbgebung Footer-Bereich */
+html {
+  font-size: 110%;
+  line-height: 1.4em; }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Barlow", "Fira Sans", Lato, Helvetica, Arial, sans-serif;
+  color: #333;
+  background-color: #000; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Oswald", sans-serif;
+  font-weight: normal; }
+
+a {
+  text-decoration: none;
+  color: #0a94a9; }
+
+a:hover {
+  text-decoration: underline;
+  color: #0a94a9; }
+
+a img {
+  border: none; }
+
+tt, code, pre, textarea, kbd {
+  font-family: "Anonymous Pro", DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace; }
+
+/* <editor-fold desc="Layout containers"> */
+div.frame {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 960px;
+  max-width: 100%;
+  clear: both;
+  display: flow-root;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  background-color: #fff; }
+
+div.content {
+  padding-left: 2em;
+  padding-left: 2rem;
+  padding-right: 2em;
+  padding-right: 2rem; }
+
+div.column-4 {
+  width: 320px;
+  /*    outline: solid lightgray 1px;*/
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.brand {
+  background-color: #000;
+  color: #0CADC6;
+  padding-top: 2em;
+  padding-bottom: 2em;
+  padding-left: 2em;
+  padding-right: 2em; }
+
+div.brand img {
+  max-width: 100%;
+  height: auto; }
+
+footer {
+  background-color: #000;
+  color: #fff;
+  border-top: solid #000 1px;
+  border-bottom: solid #000 1px;
+  font-size: 0.9rem;
+  padding-top: 2em;
+  padding-top: 2rem;
+  padding-bottom: 2em;
+  padding-bottom: 2rem; }
+
+/* </editor-fold> */
+/* <editor-fold desc="Main navigation"> */
+.navbar-bg {
+  background-color: #650370;
+  color: #fff; }
+
+nav ul {
+  list-style: none inside none;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0; }
+
+nav ul li {
+  list-style: none inside none;
+  display: inline-block;
+  float: left; }
+
+nav.mainnavigation {
+  background-color: #650370;
+  color: #fff; }
+
+nav.mainnavigation ul {
+  margin-left: 2em;
+  margin-left: 2rem; }
+
+nav.mainnavigation a {
+  color: #fff;
+  text-decoration: none; }
+
+nav.mainnavigation ul li a {
+  display: block;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 0.5em 0.8em;
+  color: #fff;
+  font-family: "Oswald", sans-serif; }
+
+nav.mainnavigation ul li.active a,
+nav.mainnavigation ul li a:hover {
+  text-decoration: none;
+  background-color: #0CADC6;
+  color: #000; }
+
+nav.metanavigation {
+  float: right;
+  margin-right: -1.5rem;
+  margin-top: -1.5rem;
+  font-size: 0.9rem;
+  color: #fff; }
+
+nav.metanavigation li {
+  margin-left: 0.25rem; }
+
+/* </editor-fold> */
+/* <editor-fold desc="Generic classes"> */
+div.container,
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both; }
+
+.smallcaps {
+  font-variant: small-caps; }
+
+.bg-nav-dark {
+  background-color: #38023e; }
+
+.bg-header-light {
+  background-color: #333333; }
+
+.bg-frame {
+  background-color: #666; }
+
+.bg-content {
+  background-color: #fff; }
+
+.bg-page {
+  background-color: #000; }
+
+/* </editor-fold> */

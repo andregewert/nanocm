@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<?php /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */ ?>
+<html lang="de">
+    <head>
+        <meta charset="utf-8">        
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <base href="<?php echo $this->getBaseUrl(); ?>">
+        <title><?php echo $this->htmlEncode($this->getTitle()); ?></title>
+        <link rel="stylesheet" href="/tpl/ubergeek/css/default.css" />
+        <link href="https://fonts.googleapis.com/css?family=Oswald|Fira+Sans|Anonymous+Pro|Barlow" rel="stylesheet">
+    </head>
+    <body>
+        <div class="frame bg-header-light">
+            <div class="container brand">
+                <a href="/"><img src="/tpl/ubergeek/img/ubergeek-logo.png" width="368" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
+                <nav class="metanavigation">
+                    <ul>
+                        <li><a href="/meta/kontakt.html">Kontakt</a></li>
+                        <li>&bullet;&nbsp;<a href="/meta/datenschutz.html">Datenschutz</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <?php echo $this->includeUserTemplate('navigation-main.phtml'); ?>
+
+        <div class="frame bg-frame">
+            <div class="container" style="height: 2rem"></div>
+            <?php echo $this->getContent(); ?>
+            <div class="container" style="height: 100px"></div>
+        </div>
+
+        <div class="frame bg-header-light">
+            <div class="container">
+                <footer>
+                    <div class="content">
+                        <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
+                            <?php if ($this->ncm->isUserLoggedIn()) : ?>
+                                <a href="/admin/index.php">Seite verwalten</a>&nbsp;&bullet;
+                                <a href="/logout.php">Abmelden (<?php echo $this->htmlEncode($this->ncm->getLoggedInUser()->getFullName()); ?>)</a>
+                            <?php else : ?>
+                                <a href="/login.php">Anmelden</a>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <script src="/ncm/js/jquery-3.3.1.min.js"></script>
+    </body>
+</html>

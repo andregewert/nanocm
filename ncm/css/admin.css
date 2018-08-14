@@ -22,7 +22,7 @@
     Author     : André Gewert <agewert@ubergeek.de>
 */
 /*$font-text:         Fira Sans, Roboto, DejaVu Sans Condensed, Lato, Trebuchet MS, Helvetica, Arial, sans-serif;*/
-/* <editor-fold desc="Basis elements"> */
+/* <editor-fold desc="Base elements"> */
 html {
   font-size: 85%; }
 
@@ -55,16 +55,14 @@ nav.main img {
   vertical-align: middle; }
 
 nav.main ul {
-  list-style: none;
-  list-style-position: inside;
+  list-style: none inside none;
   display: inline-block;
   vertical-align: middle;
   margin: 0;
   padding: 0; }
 
 nav.main ul li {
-  list-style: none;
-  list-style-position: inside;
+  list-style: none inside none;
   display: inline-block;
   float: left; }
 
@@ -204,7 +202,7 @@ div.toolbar .spaceleft {
 hr {
   border: 0;
   height: 1px;
-  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
   margin: 2em 0; }
 
 table.list {

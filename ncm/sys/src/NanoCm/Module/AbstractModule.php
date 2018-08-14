@@ -19,6 +19,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\Util;
+
 /**
  * Die Basisklasse für NCM-Module versteckt einige Implementierungsdetails und
  * stellt ableitenden Klassen genau die Referenzen und Methoden sowie einige
@@ -83,6 +85,7 @@ abstract class AbstractModule implements
      * 
      * Über diese Referenz sind auch alle anderen benötigten Ressourcen
      * zugänglich. Dazu gehören bspw. Datenbank-Mapping und Medien-Manager.
+     * (Außerdem Konfiguration der zu verwendenden Pfade.)
      * 
      * @var \Ubergeek\NanoCm\FrontController
      */
@@ -125,12 +128,12 @@ abstract class AbstractModule implements
      * @var array
      */
     public $templateOptions = array();
-    
+
     /**
      * Gibt den relativen Pfad zu den Templatedateien an
      * @var string
      */
-    public $templateDir = 'tpl';
+    public $templateDir = null;
 
     /**
      * Gibt an, ob die jeweiligen Templates (die im Systemverzeichnis abgelegt
@@ -160,6 +163,7 @@ abstract class AbstractModule implements
         $this->ncm = $frontController->ncm;
         $this->orm = $frontController->ncm->orm;
         $this->log = $frontController->ncm->log;
+        $this->templateDir = $frontController->ncm->tpldir;
     }
 
     
@@ -260,25 +264,13 @@ abstract class AbstractModule implements
      * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
      */
     public function renderUserTemplate(string $file) : string {
-        $fname = '';
         $c = '';
+        $fname = Util::createPath($this->templateDir, $file);
 
-        if ($this->allowUserTemplates) {
-            $fname = $this->ncm->createPath(array(
-                $this->ncm->pubdir,
-                $this->templateDir,
-                $file
-            ));
+        if ($this->allowUserTemplates && !file_exists($fname)) {
+            $fname = Util::createPath(array($this->ncm->pubdir, 'tpl', 'default'));
         }
-        
-        if (!$this->allowUserTemplates || !file_exists($fname)) {
-            $fname = $this->ncm->createPath(array(
-                $this->ncm->sysdir,
-                $this->templateDir,
-                $file
-            ));
-        }
-        
+
         if (!file_exists($fname)) {
             throw new \Exception("Template file not found: $file");
         }

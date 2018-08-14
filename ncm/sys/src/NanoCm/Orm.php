@@ -119,14 +119,24 @@ class Orm {
      * Ist die angeforderte Einstellung nicht definiert, kann über den optionalen
      * zweiten Parameter bestimmt werden, welcher Wert in diesem Fall zurück
      * gegeben werden soll.
+     *
+     * Diese Methode ist "fail safe" gestaltet; möglicherweise auftretende
+     * Fehler und Exceptions sollten abgefangen werden und gegebenenfalls der
+     * gewünschte Standardwert zurückgegeben werden.
+     *
      * @param string $name Name der gesuchten Einstellung
      * @param mixed $default Optionaler Standard-Rückgabewert
      * @return mixed Der gesuchte Wert oder der vorgegebene Standard-Wert
      */
     public function getSettingValue(string $name, $default = null) {
-        $setting = $this->getSetting($name);
-        if ($setting == null) return $default;
-        return $setting->value;
+        try {
+            $setting = $this->getSetting($name);
+            if ($setting == null) return $default;
+            return $setting->value;
+        } catch (\Exception $ex) {
+            // Fehler ignorieren
+        }
+        return $default;
     }
     
     /**

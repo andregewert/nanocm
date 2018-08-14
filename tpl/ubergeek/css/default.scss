@@ -1,0 +1,257 @@
+/*!
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+/*
+    Created on : 12.08.2018, 14:06:12
+    Author     : André Gewert <agewert@ubergeek.de>
+*/
+
+$font-headlines:    'Oswald', sans-serif;
+$font-text:         'Barlow', 'Fira Sans', Lato, Helvetica, Arial, sans-serif;
+$font-monospace:    'Anonymous Pro', DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+$font-basesize:     110%;
+$font-lineheight:   1.6em;
+
+/* Grundfarben für die Seite */
+$color-pagebg:      #000;
+$color-framebg:     #666;
+$color-contentbg:   #fff;
+$color-primary:     #333;
+$link-color:        #0a94a9;
+$link-color-alt:    #0a94a9;
+
+/* Farbgebung Header / Branding */
+$color-headerbg:    #000;
+$color-headerfg:    #0CADC6;
+
+/* Farbgebung Navigationsbereich */
+$color-navbg:       #650370;
+$color-navfg:       #fff;
+
+/* Farbgebung Footer-Bereich */
+$color-footerbg:    #000;
+$color-footerfg:    #fff;
+
+$width-content:     960px;
+$width-column:      $width-content /12;
+
+html {
+    font-size: $font-basesize;
+    line-height: 1.4em;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: $font-text;
+    color: $color-primary;
+    background-color: $color-pagebg;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-headlines;
+    font-weight: normal;
+}
+
+a {
+    text-decoration: none;
+    color: $link-color;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: $link-color-alt;
+}
+
+a img {
+    border: none;
+}
+
+tt, code, pre, textarea, kbd {
+    font-family: $font-monospace;
+}
+
+/* <editor-fold desc="Layout containers"> */
+
+div.frame {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.container {
+    margin-left: auto;
+    margin-right: auto;
+    width: $width-content;
+    max-width: 100%;
+    clear: both;
+    display: flow-root;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: $color-contentbg;
+}
+
+div.content {
+    padding-left: 2em;
+    padding-left: 2rem;
+    padding-right: 2em;
+    padding-right: 2rem;
+}
+
+div.column-4 {
+    width: $width-column *4;
+/*    outline: solid lightgray 1px;*/
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.brand {
+    background-color: $color-headerbg;
+    color: $color-headerfg;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
+div.brand img {
+    max-width: 100%;
+    height: auto;
+}
+
+footer {
+    background-color: $color-footerbg;
+    color: $color-footerfg;
+    border-top: solid $color-footerbg 1px;
+    border-bottom: solid $color-footerbg 1px;
+    font-size: 0.9rem;
+    padding-top: 2em;
+    padding-top: 2rem;
+    padding-bottom: 2em;
+    padding-bottom: 2rem;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Main navigation"> */
+
+.navbar-bg {
+    background-color: $color-navbg;
+    color: $color-navfg;
+}
+
+nav ul {
+    list-style: none inside none;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    list-style: none inside none;
+    display: inline-block;
+    float: left;
+}
+
+nav.mainnavigation {
+    background-color: $color-navbg;
+    color: $color-navfg;
+}
+
+nav.mainnavigation ul {
+    margin-left: 2em;
+    margin-left: 2rem;
+}
+
+nav.mainnavigation a {
+    color: $color-navfg;
+    text-decoration: none;
+}
+
+nav.mainnavigation ul li a {
+    display: block;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 0.5em 0.8em;
+    color: $color-navfg;
+    font-family: $font-headlines;
+}
+
+nav.mainnavigation ul li.active a,
+nav.mainnavigation ul li a:hover {
+    text-decoration: none;
+    background-color: $color-headerfg;
+    color: $color-headerbg;
+}
+
+nav.metanavigation {
+    float: right;
+    margin-right: -1.5rem;
+    margin-top: -1.5rem;
+    font-size: 0.9rem;
+    color: $color-footerfg;
+}
+
+nav.metanavigation li {
+    margin-left: 0.25rem;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Generic classes"> */
+
+div.container,
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.smallcaps {
+    font-variant: small-caps;
+}
+
+.bg-nav-dark {
+    background-color: darken($color-navbg, 10%);
+}
+
+.bg-header-light {
+    background-color: lighten($color-headerbg, 20%);
+}
+
+.bg-frame {
+    background-color: $color-framebg;
+}
+
+.bg-content {
+    background-color: $color-contentbg;
+}
+
+.bg-page {
+    background-color: $color-pagebg;
+}
+
+/* </editor-fold> */

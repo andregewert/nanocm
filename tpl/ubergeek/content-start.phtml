@@ -1,0 +1,45 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
+/** @var \Ubergeek\NanoCm\Article[] $latestArticles */
+$latestArticles = $this->orm->getLatestArticles();
+?>
+
+<?php if (count($latestArticles) >= 1) : ?>
+    <?php $article = array_shift($latestArticles); ?>
+
+    <div class="container content">
+        <?php if (!empty($article->teaser)) : ?>
+            <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
+            <div class="lead">
+                <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
+            </div>
+            <p><a class="btn btn-primary btn-lg" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>" role="button">Weiterlesen</a></p>
+        <?php else : ?>
+            <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
+            <?php echo $this->ncm->convertFormattedText($article->content); ?>
+        <?php endif; ?>
+    </div>
+
+    <?php if (count($latestArticles) > 0) : ?>
+        <div class="frame">
+            <div class="container">
+                <?php for ($i = 0; $i < 3; $i++) : ?>
+                    <?php if (($article = array_shift($latestArticles)) !== null) : ?>
+                        <div class="column-4 content">
+                            <h2><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h2>
+                            <?php if (!empty($article->teaser)) : ?>
+                                <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
+                            <?php endif; ?>
+                            <p><a class="btn btn-secondary" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>" role="button">Weiterlesen</a></p>
+                        </div>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+<?php else : ?>
+    <div class="container content">
+        <h1>Noch keine Inhalte vorhanden</h1>
+        <p>Leider gibt es hier noch nichts zu sehen!</p>
+    </div>
+<?php endif; ?>
