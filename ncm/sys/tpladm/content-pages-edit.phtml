@@ -1,0 +1,48 @@
+<?php
+/**
+ * NanoCM
+ * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+    /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
+<div class="container">
+    <form>
+        <?php if ($this->page->id > 0) : ?>
+            <h1>Seite bearbeiten</h1>
+        <?php else : ?>
+            <h1>Seite hinzuf&uuml;gen</h1>
+        <?php endif; ?>
+        <input type="hidden" id="input_page_id" value="<?php echo intval($this->page->id); ?>" />
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_save" class="button" href="javascript:void(0);" title="Seite speichern">Speichern</a>
+                <a id="button_preview" class="button" href="javascript:void(0);" title="Seitenvorschau &ouml;ffnen">Vorschau</a>
+                <a id="button_cancel" class="button button-secondary" href="javascript:void(0);" title="Bearbeitung abbrechen">Abbrechen</a>
+            </span>
+            <span class="right" style="float: right; vertical-align: middle">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+                <a id="button_toggle_settings" class="button" href="javascript:void(0)" title="Seiteneinstellungen anzeigen">
+                    <img src="/ncm/img/fatcow/16/cog.png" width="16" height="16" />Einstellungen
+                </a>
+                <a id="button_publish" class="button" href="javascript:void(0)" title="&Auml;nderungen speichern und Seite freischalten">Freischalten</a>
+            </span>
+        </div>
+    </form>
+</div>

@@ -18,6 +18,7 @@
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Page;
+use Ubergeek\NanoCm\StatusCode;
 
 /**
  * Verwaltung der frei definierbaren Seiten
@@ -33,42 +34,101 @@ class AdminPagesModule extends AbstractAdminModule {
     // <editor-fold desc="Properties">
 
     /**
+     * Die aufzulistenden Pages
      * @var Page[]
      */
     public $pages;
+
+    /**
+     * Die anzuzeigende / zu bearbeitende Seite
+     * @var Page
+     */
+    public $page;
 
     // </editor-fold>
 
 
     public function run() {
+        $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Seiten verwalten');
 
         switch ($this->getRelativeUrlPart(2)) {
+
             // AJAX-Aufrufe
             case 'ajax':
                 $this->setPageTemplate(self::PAGE_NONE);
                 $this->setContentType('text/html');
 
                 switch ($this->getRelativeUrlPart(3)) {
+
+                    // Seite(n) löschen
+
+                    // Seite(n) sperren
+
+                    // Seite speichern
+
+                    // Auflistung
                     case 'list':
                     default:
                         $filter = new Page();
                         $searchterm = $this->getParam('searchterm');
                         $this->pages = $this->orm->searchPages($filter, false, $searchterm);
-                        $this->content = $this->renderUserTemplate('content-pages-list.phtml');
+                        $content = $this->renderUserTemplate('content-pages-list.phtml');
                         break;
                 }
 
                 break;
 
+            // Seite bearbeiten
+            case 'edit':
+                $pageId = intval($this->getRelativeUrlPart(3));
+                if ($pageId > 0) {
+                    $this->page = $this->orm->getPageById($pageId, false);
+                }
+                if ($this->page == null) {
+                    $this->page = $this->createEmptyPage();
+                }
+                $content = $this->renderUserTemplate('content-pages-edit.phtml');
+                break;
+
             // Übersichtsseite
             case 'index.php':
             case '':
-                $this->content = $this->renderUserTemplate('content-pages.phtml');
+                $content = $this->renderUserTemplate('content-pages.phtml');
                 break;
         }
 
-        $this->setContent($this->content);
+        $this->setContent($content);
     }
+
+    // <editor-fold desc="Internal methods">
+
+    /**
+     * Erstellt das Datenmodell für eine neu angelegte Seite und füllt es mit
+     * sinnvollen Standardvorgaben aus.
+     * @return Page
+     */
+    private function createEmptyPage() : Page {
+        $page = new Page();
+        $page->author_id = $this->ncm->getLoggedInUser()->id;
+        $page->status_code = StatusCode::LOCKED;
+        $page->creation_timestamp = new \DateTime('now');
+        $page->modification_timestamp = new \DateTime('now');
+        return $page;
+    }
+
+    /**
+     * Erstellt ein Page-Objekt anhand der Daten aus dem aktuellen Request
+     * @return Page
+     */
+    private function createPageFromRequest() : Page {
+        $page = new Page();
+
+        // TODO implementieren
+
+        return $page;
+    }
+
+    // </editor-fold>
 
 }

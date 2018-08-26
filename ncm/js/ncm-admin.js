@@ -52,6 +52,70 @@ function Ncm() {
         return ids;
     };
 
+    app.surroundSelectionWith = function(textArea, contentBefore, contentAfter) {
+        textArea.focus();
+
+        if (textArea.setSelectionRange) {
+            var c = textArea.scrollTop;
+            var e = textArea.selectionStart;
+            var f = textArea.selectionEnd;
+
+            textArea.value = textArea.value.substring(0, textArea.selectionStart)
+                + contentBefore
+                + textArea.value.substring(textArea.selectionStart, textArea.selectionEnd)
+                + contentAfter
+                + textArea.value.substring(textArea.selectionEnd, textArea.value.length);
+            textArea.selectionStart = e;
+            textArea.selectionEnd = f + contentBefore.length + contentAfter.length;
+            textArea.scrollTop = c;
+        } else {
+            if (document.selection && document.selection.createRange) {
+                textArea.focus();
+                var b = document.selection.createRange();
+                if (b.text != "") {
+                    b.text = contentBefore + b.text + contentAfter;
+                } else {
+                    //b.text = contentBefore + "REPLACE" + contentAfter;
+                    console.log('???');
+                }
+                textArea.focus();
+            }
+        }
+    };
+
+    app.insertTextAtCaret = function(textArea, content) {
+        // IE
+        if (document.selection) {
+            textArea.focus();
+            var sel = document.selection.createRange();
+            sel.text = content;
+        }
+
+        // Others
+        else if (textArea.selectionStart || textArea.selectionStart === '0') {
+            var startPos = textArea.selectionStart;
+            var endPos = textArea.selectionEnd;
+            textArea.value = textArea.value.substring(0, startPos) + content + textArea.value.substring(endPos, textArea.value.length);
+            textArea.focus();
+            textArea.selectionStart = startPos + content.length;
+            textArea.selectionEnd = startPos + content.length;
+        }
+        else {
+            textArea.value += content;
+            textArea.focus();
+        }
+    };
+
+    /**
+     * Verbindet Toolbar und Textarea miteinander, indem auf den Toolbar-
+     * Elementen die benötigten EventHandler gesetzt werden
+     * @param textArea
+     * @param toolbarContainer
+     */
+    app.createEditorToolbar = function(textArea, toolbarContainer) {
+
+    }
+
     // Standard-DHTML-Elemente initialisieren
     $(document).ready(function() {
 
