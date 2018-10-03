@@ -172,6 +172,7 @@ input, select, option, textarea {
     box-sizing: border-box;
     border: 1px solid $border-color;
     background-color: white;
+    color: $primary-color;
 }
 
 textarea {

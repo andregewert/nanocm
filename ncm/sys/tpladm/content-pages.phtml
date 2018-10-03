@@ -1,5 +1,7 @@
-<?php /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */ ?>
-
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
 <div class="container">
     <form onsubmit="pages.refresh(); return false;">
         <h1>Seiten verwalten</h1>
@@ -18,6 +20,14 @@
                 <label for="input_searchterm">Suche</label>
                 <input id="input_searchterm" type="text" autofocus="autofocus" />
 
+                <label for="select_status" class="spaceleft">Status</label>
+                <select id="select_status">
+                    <option value="">- Alle -</option>
+                    <?php foreach ($this->availableStatusCodes as $code) : ?>
+                        <option value="<?php echo $code; ?>"><?php echo StatusCode::convertStatusId($code); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
                     <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
                 </a>
@@ -32,28 +42,33 @@
 </div>
 
 <script type="text/javascript">
-    var pages = new (function() {
-        var app = this;
+    let pages = new (function() {
+        this.page = 1;
 
-        app.showLoadingIndicator = function() {
+        function showLoadingIndicator() {
             $('#toolbar_spinner').addClass('loading');
             $('.placeholder').addClass('loading');
-        };
+        }
 
-        app.hideLoadingIndicator = function() {
+        function hideLoadingIndicator() {
             $('#toolbar_spinner').removeClass('loading');
             $('.placeholder').removeClass('loading');
-        };
+        }
 
-        app.refresh = function() {
-            app.showLoadingIndicator();
+        function refresh(page) {
+            showLoadingIndicator();
+            if (typeof page === 'undefined') {
+                page = this.page;
+            }
 
             $.ajax('/admin/pages/ajax/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
                 data: {
-                    searchterm: $('#input_searchterm').val()
+                    searchterm: $('#input_searchterm').val(),
+                    status:     $('#select_status').val(),
+                    page:       page
                 }
             }).done(function(data) {
                 $('#placeholder_pages .content').html(data);
@@ -61,14 +76,14 @@
                     ncm.toggleAllRowsSelection(this);
                 });
             }).always(function() {
-                app.hideLoadingIndicator();
+                hideLoadingIndicator();
             });
         };
 
         $('#button_refresh').click(function() {
-            app.refresh();
+            refresh();
         });
 
-        app.refresh();
+        refresh();
     })();
 </script>

@@ -29,15 +29,13 @@
             <?php echo $this->getContent(); ?>
             <div class="container" style="height: 100px"></div>
         </div>
-
         <div class="frame bg-header-light">
             <div class="container">
                 <footer>
                     <div class="content">
                         <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
                             <?php if ($this->ncm->isUserLoggedIn()) : ?>
-                                <a href="/admin/index.php">Seite verwalten</a>&nbsp;&bullet;
-                                <a href="/logout.php">Abmelden (<?php echo $this->htmlEncode($this->ncm->getLoggedInUser()->getFullName()); ?>)</a>
+                                <a href="/logout.php">Abmelden</a>
                             <?php else : ?>
                                 <a href="/login.php">Anmelden</a>
                             <?php endif; ?>

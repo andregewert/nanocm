@@ -126,7 +126,8 @@ input, select, option, textarea {
   line-height: 1.4em;
   box-sizing: border-box;
   border: 1px solid #ddd;
-  background-color: white; }
+  background-color: white;
+  color: #333; }
 
 textarea {
   font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
