@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NanoCM
  * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
@@ -19,30 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\Session;
+namespace Ubergeek\NanoCm\Exception;
 
-interface SessionInterface {
-    
-    function start();
-    
-    function stop();
-    
-    function clear();
-    
-    function getSessionName() : string;
-    
-    function getSessionId() : string;
-    
-    function getNamespace() : string;
-    
-    function getVar(string $key, $default = null);
-
-    function isVarExisting(string $key) : bool;
-    
-    function getVars();
-    
-    function setVar(string $key, $value);
-    
-    function setVars(array $values);
-    
+/**
+ * Fehlende oder ungültige Authentifizierung
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2018-10-03
+ */
+class InvalidDataException
+    extends \RuntimeException
+    implements ExceptionInterface {
 }

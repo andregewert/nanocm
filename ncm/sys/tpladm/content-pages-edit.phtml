@@ -1,23 +1,4 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
     /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
@@ -28,21 +9,215 @@
         <?php else : ?>
             <h1>Seite hinzuf&uuml;gen</h1>
         <?php endif; ?>
-        <input type="hidden" id="input_page_id" value="<?php echo intval($this->page->id); ?>" />
+        <input type="hidden" id="input_page_id" name="id" value="<?php echo intval($this->page->id); ?>" />
 
         <div class="toolbar">
             <span class="left">
-                <a id="button_save" class="button" href="javascript:void(0);" title="Seite speichern">Speichern</a>
-                <a id="button_preview" class="button" href="javascript:void(0);" title="Seitenvorschau &ouml;ffnen">Vorschau</a>
-                <a id="button_cancel" class="button button-secondary" href="javascript:void(0);" title="Bearbeitung abbrechen">Abbrechen</a>
+                <a id="button_save" class="button" role="button" href="javascript:void(0);" title="Seite speichern">
+                    <img src="/ncm/img/fatcow/16/diskette.png" alt="" width="16" height="16" />Speichern
+                </a>
+                <a id="button_preview" class="button" href="javascript:void(0);" title="Seitenvorschau &ouml;ffnen">
+                    <img src="/ncm/img/fatcow/16/eye.png" alt="" width="16" height="16" />Vorschau
+                </a>
+                <a id="button_cancel" class="button button-secondary" href="javascript:void(0);" title="Bearbeitung abbrechen">
+                    <img src="/ncm/img/fatcow/16/cancel.png" alt="" width="16" height="16" />Abbrechen
+                </a>
             </span>
             <span class="right" style="float: right; vertical-align: middle">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
                 <a id="button_toggle_settings" class="button" href="javascript:void(0)" title="Seiteneinstellungen anzeigen">
                     <img src="/ncm/img/fatcow/16/cog.png" width="16" height="16" />Einstellungen
                 </a>
-                <a id="button_publish" class="button" href="javascript:void(0)" title="&Auml;nderungen speichern und Seite freischalten">Freischalten</a>
+                <a id="button_publish" class="button" href="javascript:void(0)" title="&Auml;nderungen speichern und Seite freischalten">
+                    <img src="/ncm/img/fatcow/16/lock_open.png" width="16" height="16" />Freischalten
+                </a>
             </span>
+        </div>
+
+        <div class="editform">
+            <div class="editform_sidebar_right" id="page_settings_sidebar">
+                <p>
+                    <label>Freigabestatus</label>
+                    <select id="input_page_status_code" tabindex="0">
+                        <?php foreach ($this->availableStatusCodes as $code) : ?>
+                            <option value="<?php echo $code; ?>"<?php if ($this->page->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </p>
+                <p>
+                    <label title="Offizieller Zeitpunkt der Veröffentlichung">Ver&ouml;ffentlichungsdatum</label>
+                    <input type="date" id="input_page_publishing_date" value="<?php if ($this->page->publishing_timestamp != null) echo $this->page->publishing_timestamp->format('Y-m-d'); ?>" tabindex="0" />
+                    <input type="time" id="input_page_publishing_time" value="<?php if ($this->page->publishing_timestamp != null) echo $this->page->publishing_timestamp->format('H:i'); ?>" tabindex="0" />
+                </p>
+                <p>
+                    <label title="Autor des Artikels">Autor</label>
+                    <?php if ($this->page->author_id != null) : ?>
+                        <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->page->author_id)); ?>
+                    <?php endif; ?>
+                    <input type="hidden" id="input_page_author_id" value="<?php echo intval($this->page->author_id); ?>" />
+                </p>
+                <hr>
+                <p>
+                    <label title="Zeitpunkt der Anlage">Anlage</label>
+                    <input type="date" readonly="readonly" id="input_page_creation_date" value="<?php if ($this->page->creation_timestamp != null) echo $this->page->creation_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
+                    <input type="time" readonly="readonly" id="input_page_creation_time" value="<?php if ($this->page->creation_timestamp != null) echo $this->page->creation_timestamp->format('H:i'); ?>" tabindex="-1" />
+                </p>
+                <p>
+                    <label title="Zeitpunkt der letzten Speicherung">Zuletzt gespeichert</label>
+                    <input type="date" readonly="readonly" id="input_page_modification_date" value="<?php if ($this->page->modification_timestamp != null) echo $this->page->modification_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
+                    <input type="time" readonly="readonly" id="input_page_modification_time" value="<?php if ($this->page->modification_timestamp != null) echo $this->page->modification_timestamp->format('H:i'); ?>" tabindex="-1" />
+                </p>
+            </div>
+
+            <div class="row">
+                <input class="big" type="text" id="input_page_headline" placeholder="&Uuml;berschrift" value="<?php echo $this->htmlEncode($this->page->headline); ?>" autofocus="autofocus" tabindex="0" />
+            </div>
+
+            <div class="row">
+                <label for="input_page_url">Adresse der Seite</label>
+                <input type="text" id="input_page_url" placeholder="path/to/site" value="<?php echo $this->htmlEncode($this->page->url); ?>" tabindex="0" />
+            </div>
+
+            <div class="row imgtoolbar" style="margin-bottom: -1em">
+                <a class="button edit_bold" title="Fett" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
+                <a class="button edit_italic" title="Kursiv" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
+                <a class="button edit_underline" title="Unterstrichen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
+                <a class="button edit_strikethrough" title="Durchgestrichen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_strikethroungh.png" /></a>
+                <a class="button edit_superscript" title="Hochgestellt" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_superscript.png" /></a>
+                <a class="button edit_subscript" title="Tiefgestellt" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_subscript.png" /></a>
+                <a class="button edit_caps" title="Kapit&auml;lchen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_smallcaps.png" /></a>
+                <a class="button edit_hr" title="Horizontaler Trennstrich" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_horizontalrule.png" /></a>
+            </div>
+
+            <div class="row">
+                <textarea style="height: 36rem" id="input_page_content" tabindex="0"><?php echo $this->htmlEncode($this->page->content); ?></textarea>
+            </div>
         </div>
     </form>
 </div>
+
+<script type="text/javascript">
+    function PagesEdit() {
+        let app = this;
+
+        app.isBusy = false;
+        app.autoSaveTimer = null;
+
+        /**
+         * Initialisiert EventHandler etc.
+         */
+        app.init = function() {
+
+            // TODO Bei Eingabe / Änderung der URL muss sofort geprüft werden, ob sie nicht bereits vergeben ist!
+
+            $('#button_save').click(app.savePage);
+            $('#button_cancel').click(app.cancelEdit);
+            $('#button_toggle_settings').click(app.toggleSettings);
+
+            $('#button_publish').click(function() {
+                if (confirm('Wollen Sie die Seite wirklich freigeben?')) {
+                    $('#input_page_status_code').val(0);
+                    app.savePage();
+                }
+            });
+
+            ncm.initTextEditor($('.imgtoolbar'), $('#input_page_content'));
+        };
+
+        /**
+         * Blendet das Panel mit den Detail-Einstellungen ein oder aus
+         */
+        app.toggleSettings = function() {
+            if ($('#page_settings_sidebar').is(':visible')) {
+                $('#page_settings_sidebar').hide();
+            } else {
+                $('#page_settings_sidebar').show();
+            }
+        };
+
+        app.isUrlAlreadyExisting = function(url) {
+            // TODO implementieren
+        };
+
+        /**
+         * Speichert die aktuelle Seite
+         */
+        app.savePage = function() {
+            ncm.showDefaultLoadingIndicator();
+            $('#button_save').addClass('disabled');
+            app.isBusy = true;
+
+            $.ajax('/admin/pages/ajax/save', {
+                cache:      false,
+                type:       'POST',
+                dataType:   'JSON',
+                data:       {
+                    id:                     $('#input_page_id').val(),
+                    author_id:              $('#input_page_author_id').val(),
+                    status_code:            $('#input_page_status_code').val(),
+                    url:                    $('#input_page_url').val(),
+                    headline:               $('#input_page_headline').val(),
+                    content:                $('#input_page_content').val(),
+                    publishing_timestamp:   ($('#input_page_publishing_date').val() + ' ' + $('#input_page_publishing_time').val()).trim()
+                }
+            }).done(function(data) {
+                // Aktualisierte Werte ins Interface zurückschreiben
+                $('#input_page_id').val(data.id);
+                if (data.publishing_timestamp != null) {
+                    $('#input_page_publishing_date').val(data.publishing_timestamp.date.substr(0, 10));
+                    $('#input_page_publishing_time').val(data.publishing_timestamp.date.substr(11, 5));
+                } else {
+                    $('#input_page_publishing_date').val('');
+                    $('#input_page_publishing_time').val('');
+                }
+                if (data.creation_timestamp != null) {
+                    $('#input_page_creation_date').val(data.creation_timestamp.date.substr(0, 10));
+                    $('#input_page_creation_time').val(data.creation_timestamp.date.substr(11, 5));
+                } else {
+                    $('#input_page_creation_date').val('');
+                    $('#input_page_creation_time').val('');
+                }
+                if (data.modification_timestamp != null) {
+                    $('#input_page_modification_date').val(data.modification_timestamp.date.substr(0, 10));
+                    $('#input_page_modification_time').val(data.modification_timestamp.date.substr(11, 5));
+                } else {
+                    $('#input_page_modification_date').val('');
+                    $('#input_page_modification_time').val('');
+                }
+            }).always(function() {
+                ncm.hideDefaultLoadingIndicator();
+                app.isBusy = false;
+                $('#button_save').removeClass('disabled');
+            });
+        };
+
+        app.autoSavePage = function() {
+            if (app.isBusy) {
+                console.log("Page is busy - skip auto saving");
+            } else {
+                console.log("Autosave");
+                app.savePage();
+            }
+        };
+
+        app.openPreview = function() {
+            // TODO implementieren
+            alert('Vorschau öffnen');
+        };
+
+        /**
+         * Bricht die Bearbeitung - auf Nachfrage - ab und springt zurück zur Übersicht
+         */
+        app.cancelEdit = function() {
+            if (confirm('Wollen Sie die Bearbeitung wirklich abbrechen? Nicht gespeicherte Änderungen gehen verloren!')) {
+                window.location.href = '/admin/pages/';
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new PagesEdit();
+    });
+</script>

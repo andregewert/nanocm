@@ -1,12 +1,13 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\Controller;
@@ -41,7 +43,9 @@ interface ControllerInterface {
     public function getContent(string $area = 'default') : string;
     
     public function getParam(string $key, $default = null);
-    
+
+    public function isParamExisting(string $key) : bool;
+
     public function getParams() : array;
     
     public function setParam(string $key, $value);
@@ -49,6 +53,8 @@ interface ControllerInterface {
     public function setVar(string $key, $value);
     
     public function getVar(string $key, $default = null);
+
+    public function isVarExisting(string $key) : bool;
     
     public function getVars() : array;
     

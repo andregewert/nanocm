@@ -1,12 +1,13 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\NanoCm\Module;
@@ -242,7 +244,8 @@ abstract class AbstractModule implements
      * @return string HTML-kodierter String
      */
     public function htmlEncode($string) : string {
-        return \Ubergeek\NanoCm\Util::htmlEncode($string);
+
+        return Util::htmlEncode($string);
     }
 
     /**
@@ -315,6 +318,33 @@ abstract class AbstractModule implements
         return '';
     }
 
+    /**
+     * Ermittelt einen Wert aus den HTTP-Parametern oder aus der NanoCM-Session, falls nicht im Request gesetzt.
+     *
+     * Der Wert wird anschließend in die Session zurückgeschrieben. So können Variablen bequem aus der Session
+     * ausgelesen und gegebenenfalls mit einem HTTP-Parameter überschrieben werden. Dieser Mechanismus sollte nur bei
+     * unkritischen Dingen - etwa der Übergabe von Such-Parametern - genutzt werden.
+     *
+     * @param string $name Name des Parameters
+     * @param $default Standardwert, falls Schlüssel weder im Request noch in der Session gesetzt
+     * @return mixed
+     * @todo Besseren Namen finden
+     */
+    public function getOrOverrideSessionVarWithParam(string $name, $default = null) {
+        $value = $default;
+        if ($this->isParamExisting($name)) {
+            $value = $this->getParam($name, $default);
+        } elseif ($this->ncm->session != null && $this->ncm->session->isVarExisting($name)) {
+            $value = $this->ncm->session->getVar($name, $default);
+        }
+
+        if ($this->ncm->session != null) {
+            $this->ncm->session->setVar($name, $value);
+        }
+
+        return $value;
+    }
+
     // </editor-fold>
     
     
@@ -372,12 +402,20 @@ abstract class AbstractModule implements
         return $this->frontController->getParam($key, $default);
     }
 
+    public function isParamExisting(string $key): bool {
+        return $this->frontController->isParamExisting($key);
+    }
+
     public function getParams(): array {
         return $this->frontController->getParams();
     }
 
     public function getVar(string $key, $default = null) {
         return $this->frontController->getVar($key, $default);
+    }
+
+    public function isVarExisting(string $key): bool {
+        return $this->frontController->isVarExisting($key);
     }
 
     public function getVars(): array {

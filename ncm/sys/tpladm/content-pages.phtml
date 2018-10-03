@@ -3,28 +3,35 @@
     use Ubergeek\NanoCm\StatusCode;
 ?>
 <div class="container">
-    <form onsubmit="pages.refresh(); return false;">
+    <form onsubmit="module.refresh(); return false;">
         <h1>Seiten verwalten</h1>
 
         <div class="toolbar">
             <span class="left">
                 <a id="button_add" class="button" href="/admin/pages/edit/" role="button" title="Seite hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neu
+                    <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16" />Neue Seite
                 </a>
-                <a class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seite bearbeiten">Bearbeiten</a>
-                <a class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seiten l&ouml;schen">L&ouml;schen</a>
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seite bearbeiten">
+                    <img src="/ncm/img/fatcow/16/page_edit.png" alt="" width="16" height="16" />Bearbeiten
+                </a>
+                <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Seiten sperren">
+                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16" />Sperren
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seiten l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/page_delete.png" alt="" width="16" height="16" />L&ouml;schen
+                </a>
             </span>
             <span class="right" style="float: right">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
 
-                <label for="input_searchterm">Suche</label>
-                <input id="input_searchterm" type="text" autofocus="autofocus" />
+                <label for="input_searchTerm">Suche</label>
+                <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
 
-                <label for="select_status" class="spaceleft">Status</label>
-                <select id="select_status">
+                <label for="select_searchStatusCode" class="spaceleft">Status</label>
+                <select id="select_searchStatusCode">
                     <option value="">- Alle -</option>
                     <?php foreach ($this->availableStatusCodes as $code) : ?>
-                        <option value="<?php echo $code; ?>"><?php echo StatusCode::convertStatusId($code); ?></option>
+                        <option value="<?php echo $code; ?>" <?php if ($this->searchStatusCode != '' && $this->searchStatusCode == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
                     <?php endforeach; ?>
                 </select>
 
@@ -32,6 +39,7 @@
                     <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
                 </a>
             </span>
+            <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
         </div>
 
         <div id="placeholder_pages" class="placeholder">
@@ -42,33 +50,37 @@
 </div>
 
 <script type="text/javascript">
-    let pages = new (function() {
-        this.page = 1;
+    function Modules() {
+        let app = this;
+        app.page = $('#input_searchPage').val();
 
-        function showLoadingIndicator() {
-            $('#toolbar_spinner').addClass('loading');
-            $('.placeholder').addClass('loading');
-        }
+        /**
+         * Initialisiert Event-Handler etc.
+         */
+        app.init = function() {
+            $('#button_refresh').click(app.refresh);
+            $('#button_edit').click(app.editSelected);
+            $('#button_lock').click(app.lockSelected);
+            $('#button_delete').click(app.deleteSelected);
+            app.refresh();
+        };
 
-        function hideLoadingIndicator() {
-            $('#toolbar_spinner').removeClass('loading');
-            $('.placeholder').removeClass('loading');
-        }
-
-        function refresh(page) {
-            showLoadingIndicator();
-            if (typeof page === 'undefined') {
-                page = this.page;
-            }
+        /**
+         * Aktualisiert die Liste der Pages
+         * @param {int} page Anzuzeigende Seite
+         */
+        app.refresh = function(page) {
+            ncm.showDefaultLoadingIndicator();
+            if (typeof page === 'undefined') page = app.page;
 
             $.ajax('/admin/pages/ajax/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
                 data: {
-                    searchterm: $('#input_searchterm').val(),
-                    status:     $('#select_status').val(),
-                    page:       page
+                    searchTerm:         $('#input_searchTerm').val(),
+                    searchStatusCode:   $('#select_searchStatusCode').val(),
+                    searchPage:         page
                 }
             }).done(function(data) {
                 $('#placeholder_pages .content').html(data);
@@ -76,14 +88,67 @@
                     ncm.toggleAllRowsSelection(this);
                 });
             }).always(function() {
-                hideLoadingIndicator();
+                ncm.hideDefaultLoadingIndicator();
+                $('#input_searchTerm').focus();
             });
         };
 
-        $('#button_refresh').click(function() {
-            refresh();
-        });
+        /**
+         * Ruft die Bearbeitungsmaske für die erste ausgewählte Page auf
+         */
+        app.editSelected = function() {
+            let id = ncm.getFirstSelectedRowId();
+            if (id != null) {
+                document.location.href = '/admin/pages/edit/' + id;
+            }
+        };
 
-        refresh();
-    })();
+        /**
+         * Löscht die ausgewählten Pages
+         */
+        app.deleteSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            console.log(ids);
+            if (ids.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Seiten wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
+                    $.ajax('/admin/pages/ajax/delete', {
+                        cache:      false,
+                        type:       'GET',
+                        dataType:   'JSON',
+                        data:       {
+                            ids: ids
+                        }
+                    }).always(function() {
+                        ncm.hideDefaultLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        app.lockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/pages/ajax/lock', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        ids:    ids
+                    }
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new Modules();
+    });
 </script>

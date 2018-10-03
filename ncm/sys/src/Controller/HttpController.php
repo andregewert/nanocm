@@ -1,12 +1,13 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\Controller;
@@ -181,6 +183,15 @@ abstract class HttpController implements ControllerInterface {
     }
 
     /**
+     * Gibt true zurück, wenn der angegebene Schlüssel in den aktuellen HTTP-Parametern enthalten ist
+     * @param string $key
+     * @return bool
+     */
+    public function isParamExisting(string $key): bool {
+        return is_array($_REQUEST) && array_key_exists($key, $_REQUEST);
+    }
+
+    /**
      * Gibt den Wert einer bestimmten Variablen zurück.
      * Ist die Variable nicht gesetzt, wird der angegebene Default-Wert zurück
      * gegeben.
@@ -201,6 +212,15 @@ abstract class HttpController implements ControllerInterface {
      */
     public function getVars(): array {
         return $this->vars;
+    }
+
+    /**
+     * Gibt true zurück, wenn der angegebene Schlüssel in den Controller-Variablen definiert ist
+     * @param string $key
+     * @return bool
+     */
+    public function isVarExisting(string $key): bool {
+        return is_array($this->vars) && array_key_exists($key, $this->vars);
     }
 
     /**

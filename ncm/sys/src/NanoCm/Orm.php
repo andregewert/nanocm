@@ -21,6 +21,8 @@
 
 namespace Ubergeek\NanoCm;
 
+use Ubergeek\NanoCm\Exception\InvalidDataException;
+
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.
  * 
@@ -516,18 +518,18 @@ class Orm {
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel
      * berücksichtig werden sollen
      * @param string $searchterm Freier Suchbegriff
-     * @param bool $countonly Gibt an, ob das Suchergebnis oder die Antahl der Treffer zurückgegeben werden sollen
+     * @param bool $countOnly Gibt an, ob das Suchergebnis oder die Antahl der Treffer zurückgegeben werden sollen
      * @param int|null $page Angeforderte Seite
      * @param int|null $limit Maximale Anzahl der zurück zu gebenden Artikel
-     * @return array Ein Array mit den gefundenen Artikeln
+     * @return Article[]|int Ein Array mit den gefundenen Artikeln
      */
-    public function searchArticles(Article $filter = null, $releasedOnly = true, $searchterm = null, $countonly = false, $page = null, $limit = null) {
+    public function searchArticles(Article $filter = null, $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $articles = array();
         $params = array();
         $limit = ($limit == null)? $this->pageLength : intval($limit);
 
         // Ergebnis oder Anzahl Ergebnisse
-        if ($countonly) {
+        if ($countOnly) {
             $sql = 'SELECT COUNT(*) ';
         } else {
             $sql = 'SELECT * ';
@@ -562,22 +564,22 @@ class Orm {
         }
 
         // Begrenzung der Ergebnismenge auf Anzeigeseiten
-        if (!$countonly) {
+        if (!$countOnly) {
             $sql .= 'ORDER BY start_timestamp DESC ';
             $page = intval($page) -1;
             if ($page < 0) $page = 0;
-            $offset = intval($page) * $this->pageLength;
+            $offset = $page *$this->pageLength;
             $sql .= " LIMIT $offset, $limit ";
         }
 
-        $this->log->debug($sql);
+        // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
         $stmt->execute();
 
-        if ($countonly) {
+        if ($countOnly) {
             return $stmt->fetchColumn();
         }
 
@@ -688,14 +690,8 @@ class Orm {
         }
     }
 
-    /**Datensatz
+    /**
      * Aktualisiert einen Artikel-Datensatz.
-     *
-     * Wichtig: Der Freigabe-Status wird über die Update-Methode niemals
-     * verändert! Die Veröffentlichung und das Löschen eines Artikels muss
-     * (gegebenenfalls im Anschluss an das eigentliche Speichern) über
-     * separate Methodenaufrufe erfolgen!
-     *
      * @param Article $article
      */
     private function updateArticle(Article $article) {
@@ -706,6 +702,7 @@ class Orm {
 
         $sql = 'UPDATE article SET 
                     modification_timestamp = datetime(CURRENT_TIMESTAMP, \'localtime\'),
+                    author_id = :author_id,
                     status_code = :status_code,
                     headline = :headline,
                     teaser = :teaser,
@@ -718,6 +715,7 @@ class Orm {
                 WHERE
                     id = :id ';
         $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('author_id', $article->author_id);
         $stmt->bindValue('status_code', $article->status_code);
         $stmt->bindValue('headline', $article->headline);
         $stmt->bindValue('teaser', $article->teaser);
@@ -752,13 +750,14 @@ class Orm {
      * @return int Die generierte Artikel-ID
      */
     private function insertArticle(Article $article) {
-        $this->log->debug("Add article");
+        $this->log->debug("Insert article");
         $this->log->debug($article);
 
         // Grundlegende Validierung
         if ($article->start_timestamp == null) {
             $article->start_timestamp = new \DateTime();
         }
+        $article->creation_timestamp = new \DateTime();
         $article->modification_timestamp = new \DateTime();
 
         $sql = 'INSERT INTO article (
@@ -808,48 +807,72 @@ class Orm {
 
     /**
      * Durchsucht die Pages nach verschiedenen Filterkriterien
-     * @param array $filter
+     * @param Page $filter
      * @param bool $releasedOnly
      * @param string $searchterm
+     * @param bool $countOnly
+     * @param int|null $page
      * @param int|null $limit
-     * @param int|null $offset
-     * @return Page[]
+     * @return Page[]|int
      */
-    public function searchPages($filter = null, bool $releasedOnly = true, $searchterm = null, $limit = null, $offset = null) {
+    public function searchPages(Page $filter = null, bool $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $pages = array();
         $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
 
         // SQL zusammenstellen
-        $sql = 'SELECT * FROM page WHERE 1 = 1 ' ;
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= ' FROM page WHERE 1 = 1 ' ;
+
         if ($releasedOnly) {
             $sql .= 'AND status_code = ' . StatusCode::ACTIVE;
         }
-        if ($searchterm !== null && strlen($searchterm) > 0) {
-            $sql .= ' AND headline LIKE :headline OR url LIKE :url OR content LIKE :content ';
-            $params['headline'] = "%$searchterm%";
-            $params['url'] = "%$searchterm%";
-            $params['content'] = "%$searchterm%";
+
+        // Filterbedingungen
+        if ($filter instanceof Page) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :status_code ';
+                $params['status_code'] = $filter->status_code;
+            }
         }
-        $sql .= 'ORDER BY headline, url ASC ';
-        if ($limit !== null && $offset !== null) {
-            $limit = intval($limit);
-            $offset = intval($offset);
+
+        // Suchbegriff
+        if (!empty($searchterm)) {
+            $like = '%' . $searchterm . '%';
+            $sql .= ' AND (headline LIKE :search_headline OR url LIKE :search_url OR content LIKE :search_content) ';
+            $params['search_headline'] = $like;
+            $params['search_url'] = $like;
+            $params['search_content'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= 'ORDER BY headline, url ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
             $sql .= " LIMIT $offset, $limit ";
-        } elseif ($limit !== null) {
-            $sql .= ' LIMIT ' . intval($limit);
         }
 
         // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
-        foreach ($params as $name => $value) {
-            $stmt->bindValue($name, $value);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
         }
         $stmt->execute();
 
+        if ($countOnly) {
+            return $stmt->fetchColumn();
+        }
+
+        // Ergebnis auslesen
         while (($page = Page::fetchFromPdoStatement($stmt)) !== null) {
             $pages[] = $page;
         }
-
         return $pages;
     }
 
@@ -885,6 +908,171 @@ class Orm {
         $stmt->bindValue('url', $url);
         $stmt->execute();
         return Page::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Überprüft, ob die angegebene Page-URL bereits vergeben ist
+     * @param string $url Die zu überprüfende Seite
+     * @param null $id Optional eine nicht zu berücksichtigende Page-ID (bei Updates)
+     * @return bool true, wenn die genannte URL bereits vergeben ist
+     */
+    public function isPageUrlAlreadyExisting(string $url, $id = null) {
+        $params = array();
+
+        $sql = 'SELECT COUNT(*) FROM page WHERE url = :url ';
+        $params['url'] = $url;
+
+        if ($id != null) {
+            $sql .= ' AND id <> :id ';
+            $params['id'] = $id;
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+        return $stmt->fetchColumn() >= 1;
+    }
+
+    /**
+     * Löscht die Page mit der angegebenen ID
+     * @param int $id Datensatz-ID der zu löschenden Page
+     * @return bool true bei Erfolg, ansonsten false
+     */
+    public function deletePageById(int $id) {
+        try {
+            // TODO Evtl. verknüpfte Daten löschen
+            $sql = 'DELETE FROM page WHERE id = :page_id';
+            $stmt = $this->basedb->prepare($sql);
+            $stmt->bindValue('page_id', $id);
+            $stmt->execute();
+        } catch (\Exception $ex) {
+            $this->log->err('Fehler beim Löschen der Page', $ex);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Löscht die Pages mit den übergebenen Datensatz-IDs
+     * @param array $ids IDs der zu löschenden Pages
+     * @return void
+     */
+    public function deletePagesById(array $ids) {
+        foreach ($ids as $id) {
+            $this->deletePageById($id);
+        }
+    }
+
+    /**
+     * Setzt den Status der Seiten mit den übergebenen IDs auf "gesperrt".
+     * @param array $ids IDs der zu sperrenden Pages
+     * @return void
+     */
+    public function lockPagesById(array $ids) {
+        $sql = 'UPDATE page SET status_code = :status_code WHERE id = :page_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', StatusCode::LOCKED);
+
+        foreach ($ids as $page_id) {
+            $stmt->bindParam('page_id', $page_id);
+            $stmt->execute();
+        }
+    }
+
+    /**
+     * Speichert eine Page in der Datenbank
+     * @param Page $page Die zu speichernde Page
+     * @return int Datensatz-ID
+     * @todo Zugriffsrechte prüfen!
+     */
+    public function savePage(Page $page) {
+        if ($page->id > 0) {
+            $this->updatePage($page);
+        } else {
+            $page->id = $this->insertPage($page);
+        }
+        return $page->id;
+    }
+
+    /**
+     * Aktualisiert einen Page-Datensatz
+     * @param Page $page Die zu aktualisierende Page
+     * @return void
+     */
+    private function updatePage(Page $page) {
+        $this->log->debug("Update page");
+        $this->log->debug($page);
+
+        $page->modification_timestamp = new \DateTime();
+
+        $sql = 'UPDATE page SET
+                    modification_timestamp = DATETIME(CURRENT_TIMESTAMP, \'localtime\'),
+                    author_id = :author_id,
+                    status_code = :status_code,
+                    url = :url,
+                    headline = :headline,
+                    content = :content,
+                    publishing_timestamp = :publishing_timestamp
+                WHERE
+                    id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('author_id', $page->author_id);
+        $stmt->bindValue('status_code', $page->status_code);
+        $stmt->bindValue('url', $page->url);
+        $stmt->bindValue('headline', $page->headline);
+        $stmt->bindValue('content', $page->content);
+        if ($page->publishing_timestamp != null) {
+            $stmt->bindValue('publishing_timestamp', $page->publishing_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('publishing_timestamp', null);
+        }
+        $stmt->bindValue('id', $page->id);
+        $stmt->execute();
+    }
+
+    /**
+     * Speichert eine Page in einem neuen Datensatz
+     * @param Page $page Die zu speichernde Page
+     * @return int Die generierte Datensatz-ID
+     */
+    private function insertPage(Page $page) {
+        $this->log->debug('Insert page');
+        $this->log->debug($page);
+
+        if ($this->isPageUrlAlreadyExisting($page->url)) {
+            throw new InvalidDataException("URL bereits vergeben: $page->url");
+        }
+        if (empty($page->url)) {
+            throw new InvalidDataException("Es muss eine URL angegeben werden!");
+        }
+
+        $page->creation_timestamp = new \DateTime();
+        $page->modification_timestamp = new \DateTime();
+
+        $sql = '
+            INSERT INTO page (
+                creation_timestamp, modification_timestamp, author_id, status_code,
+                url, headline, content, publishing_timestamp
+            ) VALUES (
+                DATETIME(CURRENT_TIMESTAMP, \'localtime\'), DATETIME(CURRENT_TIMESTAMP, \'localtime\'), :author_id, :status_code,
+                :url, :headline, :content, :publishing_timestamp
+            ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('author_id', $page->author_id);
+        $stmt->bindValue('status_code', $page->status_code);
+        $stmt->bindValue('url', $page->url);
+        $stmt->bindValue('headline', $page->headline);
+        $stmt->bindValue('content', $page->content);
+
+        if ($page->publishing_timestamp != null) {
+            $stmt->bindValue('publishing_timestamp', $page->publishing_timestamp->format('Y-m-d H:i'));
+        } else {
+            $stmt->bindValue('publishing_timestamp', null);
+        }
+        $stmt->execute();
+
+        $page->id = $this->basedb->lastInsertId('id');
+        return $page->id;
     }
 
     // </editor-fold>
@@ -957,6 +1145,17 @@ class Orm {
 
         self::$userCache[$userId] = $user;
         return $user;
+    }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Internal methods">
+
+    private function bindValues(\PDOStatement $stmt, array $params) {
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
     }
 
     // </editor-fold>

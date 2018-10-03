@@ -18,14 +18,16 @@
  */
 
 function Ncm() {
-    var app = this;
+    let app = this;
 
-    app.showLoadingIndicator = function() {
-
+    app.showDefaultLoadingIndicator = function() {
+        $('#toolbar_spinner').addClass('loading');
+        $('.placeholder').addClass('loading');
     };
 
-    app.hideLoadingIndicator = function() {
-
+    app.hideDefaultLoadingIndicator = function() {
+        $('#toolbar_spinner').removeClass('loading');
+        $('.placeholder').removeClass('loading');
     };
 
     app.toggleAllRowsSelection = function(headerCheckbox) {
@@ -50,6 +52,47 @@ function Ncm() {
         });
         console.log(ids);
         return ids;
+    };
+
+    /**
+     * Initialisiert einen TextEditor, indem innerhalb der Toolbar-Elementes die passenden EventHandler
+     * gesetzt werden.
+     * @param toolbarElem Element mit den Toolbar-Buttons für den Text-Editor (als jQuery-Objekt)
+     * @param textareaElem Textarea-Element (als jQuery-Objekt)
+     */
+    app.initTextEditor = function(toolbarElem, textareaElem) {
+        // TODO Vervollständigen!
+        $(toolbarElem).find('.edit_bold').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '**', '**');
+        });
+
+        $(toolbarElem).find('.edit_italic').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '*', '*');
+        });
+
+        $(toolbarElem).find('.edit_underline').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '_', '_');
+        });
+
+        $(toolbarElem).find('.edit_strikethrough').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '~', '~');
+        });
+
+        $(toolbarElem).find('.edit_superscript').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '^', '^');
+        });
+
+        $(toolbarElem).find('.edit_subscript').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '°', '°');
+        });
+
+        $(toolbarElem).find('.edit_caps').click(function() {
+            app.surroundSelectionWith(textareaElem[0], '|', '|');
+        });
+
+        $(toolbarElem).find('.edit_hr').click(function() {
+            app.insertTextAtCaret(textareaElem[0], '\n---\n');
+        });
     };
 
     app.surroundSelectionWith = function(textArea, contentBefore, contentAfter) {

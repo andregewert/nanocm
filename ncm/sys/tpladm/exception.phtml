@@ -1,19 +1,17 @@
 <?php
     /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 ?>
-<div style="padding-top: 3.5em">
-    <div class="container">
-        <h1>Fehler</h1>
+<div class="container content">
+    <h1>Fehler</h1>
 
-        <p>Huch, es ist ein scherwiegender Fehler aufgetreten.<br>
-            Bitte laden Sie die Seite neu. Falls der Fehler bestehen sollte,
-            wenden Sie sich gerne an den Webseiten-Betreuer!</p>
+    <p>Huch, es ist ein scherwiegender Fehler aufgetreten.<br>
+        Bitte laden Sie die Seite neu. Falls der Fehler bestehen sollte,
+        wenden Sie sich gerne an den Webseiten-Betreuer!</p>
 
-        <?php if ($this->exception !== null) : ?>
-            <?php // TODO Art der Fehlerausgabe sollte konfigurierbar sein! ?>
-            <strong><?php echo $this->htmlEncode($this->exception->getMessage()); ?></strong>
-            <pre><?php echo $this->exception->getTraceAsString(); ?></pre>
-            <?php $this->debug($this->exception->getTrace()); ?>
-        <?php endif; ?>
-    </div>
+    <?php if ($this->exception !== null) : ?>
+        <?php // TODO Art der Fehlerausgabe sollte konfigurierbar sein! ?>
+        <strong><?php echo $this->htmlEncode($this->exception->getMessage()); ?></strong>
+        <pre><?php echo $this->exception->getTraceAsString(); ?></pre>
+        <?php $this->debug($this->exception->getTrace()); ?>
+    <?php endif; ?>
 </div>

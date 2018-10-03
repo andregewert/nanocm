@@ -40,7 +40,7 @@ abstract class AbstractAdminModule extends AbstractModule {
      * Gibt die aktuell angezeigte Seite an
      * @var integer
      */
-    public $page;
+    public $searchPage;
 
     /**
      * Überprüft auf grundlegende Zugriffsberechtigung auf den

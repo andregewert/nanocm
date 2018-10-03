@@ -45,6 +45,18 @@ class AdminPagesModule extends AbstractAdminModule {
     public $page;
 
     /**
+     * Suchbegriff
+     * @var string
+     */
+    public $searchTerm;
+
+    /**
+     * Suchfilter: Statuscode
+     * @var integer
+     */
+    public $searchStatusCode;
+
+    /**
      * Die für Artikel-Datensätze verfügbaren Statuscodes
      * @var int[]
      */
@@ -61,6 +73,10 @@ class AdminPagesModule extends AbstractAdminModule {
         $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Seiten verwalten');
 
+        $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
+        $this->searchStatusCode = $this->getOrOverrideSessionVarWithParam('searchStatusCode');
+        $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
+
         switch ($this->getRelativeUrlPart(2)) {
 
             // AJAX-Aufrufe
@@ -70,18 +86,50 @@ class AdminPagesModule extends AbstractAdminModule {
 
                 switch ($this->getRelativeUrlPart(3)) {
 
-                    // Seite(n) löschen
+                    // Überprüft, ob eine bestimmte URL bereits vergeben ist
+                    case 'checkurl':
+                        $this->setContentType('text/javascript');
+                        $data = $this->orm->isPageUrlAlreadyExisting(
+                            $this->getParam('url'),
+                            $this->getParam('id', null)
+                        );
+                        $content = json_encode($data);
+                        break;
+
+                    // Seite(n) endgültig löschen
+                    case 'delete':
+                        $this->setContentType('text/javascript');
+                        $ids = $this->getParam('ids');
+                        $this->orm->deletePagesById($ids);
+                        $content = json_encode(true);
+                        break;
 
                     // Seite(n) sperren
+                    case 'lock':
+                        $this->setContentType('text/javascript');
+                        $ids = $this->getParam('ids');
+                        $this->orm->lockPagesById($ids);
+                        $content = json_encode(true);
+                        break;
 
                     // Seite speichern
+                    case 'save':
+                        $this->setContentType('text/javascript');
+                        $page = $this->createPageFromRequest();
+                        $this->orm->savePage($page);
+                        $content = json_encode($page);
+                        break;
 
                     // Auflistung
                     case 'list':
                     default:
                         $filter = new Page();
-                        $searchterm = $this->getParam('searchterm');
-                        $this->pages = $this->orm->searchPages($filter, false, $searchterm);
+                        $filter->status_code = $this->searchStatusCode;
+                        $this->pageCount = ceil($this->orm->searchPages($filter, false, $this->searchTerm, true)/ $this->orm->pageLength);
+                        if ($this->searchPage > $this->pageCount) {
+                            $this->searchPage = $this->pageCount;
+                        }
+                        $this->pages = $this->orm->searchPages($filter, false, $this->searchTerm, false, $this->searchPage);
                         $content = $this->renderUserTemplate('content-pages-list.phtml');
                         break;
                 }
@@ -110,6 +158,7 @@ class AdminPagesModule extends AbstractAdminModule {
         $this->setContent($content);
     }
 
+
     // <editor-fold desc="Internal methods">
 
     /**
@@ -121,8 +170,6 @@ class AdminPagesModule extends AbstractAdminModule {
         $page = new Page();
         $page->author_id = $this->ncm->getLoggedInUser()->id;
         $page->status_code = StatusCode::LOCKED;
-        $page->creation_timestamp = new \DateTime('now');
-        $page->modification_timestamp = new \DateTime('now');
         return $page;
     }
 
@@ -132,8 +179,38 @@ class AdminPagesModule extends AbstractAdminModule {
      */
     private function createPageFromRequest() : Page {
         $page = new Page();
+        $id = intval($this->getParam('id'));
+        $oldPage = null;
 
-        // TODO implementieren
+        if ($id > 0) {
+            $oldPage = $this->orm->getPageById($id, false);
+        }
+
+        if ($oldPage !== null) {
+            $page->id = $id;
+
+            // TODO Die Übernahme dieser Werte ist eigentlich nur dann sinnvoll,
+            // wenn sie im nächsten Schritt nur bedingt überschrieben werden ...
+            // (bspw. abhängig vom Recht, den Autor nach Belieben einzustellen)
+            $page->creation_timestamp = $oldPage->creation_timestamp;
+            $page->author_id = $oldPage->author_id;
+            $page->status_code = $oldPage->status_code;
+            $page->publishing_timestamp = $oldPage->publishing_timestamp;
+        }
+
+        $page->author_id = $this->getParam('author_id', 0);
+        $page->status_code = $this->getParam('status_code', StatusCode::LOCKED);
+        $page->url = $this->getParam('url', '');
+        $page->headline = $this->getParam('headline', '');
+        $page->content = $this->getParam('content', '');
+        if (!empty($this->getParam('publishing_timestamp'))) {
+            $page->publishing_timestamp = new \DateTime($this->getParam('publishing_timestamp'));
+        }
+
+        if ($page->status_code == StatusCode::ACTIVE && $page->publishing_timestamp == null) {
+            $this->log->debug('Bei Veröffentlichung den Publishing timestamp auf NOW setzen');
+            $page->publishing_timestamp = new \DateTime();
+        }
 
         return $page;
     }

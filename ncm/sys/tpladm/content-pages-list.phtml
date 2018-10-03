@@ -4,31 +4,32 @@
 ?>
 <table class="list">
     <thead>
-    <tr>
-        <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
-        <th>Titel</th>
-        <th>Autor</th>
-        <th>URL</th>
-        <th>Status</th>
-    </tr>
+        <tr>
+            <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+            <th>Titel</th>
+            <th>Autor</th>
+            <th>URL</th>
+            <th>Status</th>
+        </tr>
     </thead>
     <tbody>
-    <?php if (is_array($this->pages) && count($this->pages) > 0) : ?>
-        <?php foreach ($this->pages as $page) : ?>
+        <?php if (is_array($this->pages) && count($this->pages) > 0) : ?>
+            <?php foreach ($this->pages as $page) : ?>
+                <tr>
+                    <td style="text-align: center">
+                        <input type="checkbox" class="selection" value="<?php echo $page->id; ?>" style="text-align: center">
+                    </td>
+                    <td><a href="/admin/pages/edit/<?php echo $page->id; ?>"><?php echo $this->htmlEncode($page->headline); ?></a></td>
+                    <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($page->author_id)); ?></td>
+                    <td><?php echo $this->htmlEncode($page->url); ?></td>
+                    <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($page->status_code)); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else : ?>
             <tr>
-                <td style="text-align: center">
-                    <input type="checkbox" value="<?php echo $page->id; ?>" style="text-align: center">
-                </td>
-                <td><a href="/admin/pages/edit/<?php echo $page->id; ?>"><?php echo $this->htmlEncode($page->headline); ?></a></td>
-                <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($page->author_id)); ?></td>
-                <td><?php echo $this->htmlEncode($page->url); ?></td>
-                <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($page->status_code)); ?></td>
+                <td colspan="5">Keine Seiten gefunden</td>
             </tr>
-        <?php endforeach; ?>
-    <?php else : ?>
-        <tr>
-            <td colspan="5">Keine Seiten gefunden</td>
-        </tr>
-    <?php endif; ?>
+        <?php endif; ?>
     </tbody>
 </table>
+<?php $this->includeUserTemplate('block-paging.phtml'); ?>

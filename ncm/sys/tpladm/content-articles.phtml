@@ -3,13 +3,13 @@
     use Ubergeek\NanoCm\StatusCode;
 ?>
 <div class="container">
-    <form>
+    <form onsubmit="module.refresh(); return false;">
         <h1>Artikel verwalten</h1>
 
         <div class="toolbar">
             <span class="left">
                 <a id="button_add" class="button" href="/admin/articles/edit/" role="button" title="Artikel hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16" />Neu
+                    <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16" />Neuer Artikel
                 </a>
                 <a id="button_edit" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlten Artikel bearbeiten">
                     <img src="/ncm/img/fatcow/16/page_edit.png" alt="" width="16" height="16" />Bearbeiten
@@ -24,14 +24,14 @@
             <span class="right" style="float: right; vertical-align: middle">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
 
-                <label for="input_searchterm">Suche</label>
-                <input id="input_searchterm" type="text" autofocus="autofocus" />
+                <label for="input_searchTerm">Suche</label>
+                <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
 
-                <label for="select_status" class="spaceleft">Status</label>
-                <select id="select_status">
+                <label for="select_searchStatusCode" class="spaceleft">Status</label>
+                <select id="select_searchStatusCode">
                     <option value="">- Alle -</option>
                     <?php foreach ($this->availableStatusCodes as $code) : ?>
-                        <option value="<?php echo $code; ?>"><?php echo StatusCode::convertStatusId($code); ?></option>
+                        <option value="<?php echo $code; ?>" <?php if ($this->searchStatusCode != '' && $this->searchStatusCode == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
                     <?php endforeach; ?>
                 </select>
 
@@ -39,6 +39,7 @@
                     <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
                 </a>
             </span>
+            <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
         </div>
 
         <div id="placeholder_articles" class="placeholder">
@@ -50,19 +51,8 @@
 </div>
 <script type="text/javascript">
     function Articles() {
-        var app = this;
-
-        app.page = 1;
-
-        app.showLoadingIndicator = function() {
-            $('#toolbar_spinner').addClass('loading');
-            $('.placeholder').addClass('loading');
-        };
-
-        app.hideLoadingIndicator = function() {
-            $('#toolbar_spinner').removeClass('loading');
-            $('.placeholder').removeClass('loading');
-        };
+        let app = this;
+        app.page = $('#input_searchPage').val();
 
         /**
          * Initialisiert EventHandler etc.
@@ -89,22 +79,20 @@
 
         /**
          * Aktualisiert die Artikelliste
-         * @param page
+         * @param {int} page
          */
         app.refresh = function(page) {
-            app.showLoadingIndicator();
-            if (typeof page === 'undefined') {
-                page = app.page;
-            }
+            ncm.showDefaultLoadingIndicator();
+            if (typeof page === 'undefined') page = app.page;
 
             $.ajax('/admin/articles/ajax/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
                 data:       {
-                    searchterm: $('#input_searchterm').val(),
-                    status:     $('#select_status').val(),
-                    page:       page
+                    searchTerm:         $('#input_searchTerm').val(),
+                    searchStatusCode:   $('#select_searchStatusCode').val(),
+                    searchPage:         page
                 }
             }).done(function(data) {
                 $('#placeholder_articles .content').html(data);
@@ -112,7 +100,8 @@
                     ncm.toggleAllRowsSelection(this);
                 });
             }).always(function() {
-                app.hideLoadingIndicator();
+                ncm.hideDefaultLoadingIndicator();
+                $('#input_searchTerm').focus();
             });
         };
 
@@ -120,7 +109,7 @@
          * Ruft die Bearbeitungsmaske für den ersten ausgewählten Artikel auf
          */
         app.editSelected = function() {
-            var id = ncm.getFirstSelectedRowId();
+            let id = ncm.getFirstSelectedRowId();
             if (id != null) {
                 document.location.href = '/admin/articles/edit/' + id;
             }
@@ -130,10 +119,10 @@
          * Löscht alle ausgewählten Artikel
          */
         app.deleteSelected = function() {
-            var ids = ncm.getSelectedRowIds();
+            let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
-                if (confirm('Wollen Sie die ausgewählten Artikel wirklich löschen?')) {
-                    app.showLoadingIndicator();
+                if (confirm('Wollen Sie die ausgewählten Artikel wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
                     $.ajax('/admin/articles/ajax/delete', {
                         cache: false,
                         type: 'GET',
@@ -142,7 +131,7 @@
                             ids: ids
                         }
                     }).always(function () {
-                        app.hideLoadingIndicator();
+                        ncm.hideDefaultLoadingIndicator();
                         app.refresh();
                     });
                 }
@@ -153,9 +142,9 @@
          * Sperrt die ausgewählten Artikel
          */
         app.lockSelected = function()  {
-            var ids = ncm.getSelectedRowIds();
+            let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
-                app.showLoadingIndicator();
+                ncm.showDefaultLoadingIndicator();
                 $.ajax('/admin/articles/ajax/lock', {
                     cache:      false,
                     type:       'GET',
@@ -164,7 +153,7 @@
                         ids: ids
                     }
                 }).always(function() {
-                    app.hideLoadingIndicator();
+                    ncm.hideDefaultLoadingIndicator();
                     app.refresh();
                 });
             }

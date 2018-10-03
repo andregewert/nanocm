@@ -51,13 +51,13 @@ class AdminArticlesModule extends AbstractAdminModule {
      * Suchbegriff
      * @var string
      */
-    public $searchterm;
+    public $searchTerm;
 
     /**
      * Suchfilter: Statuscode
      * @var integer
      */
-    public $statusCode;
+    public $searchStatusCode;
 
     /**
      * Die für Artikel-Datensätze verfügbaren Statuscodes
@@ -101,9 +101,9 @@ class AdminArticlesModule extends AbstractAdminModule {
         $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Artikel verwalten');
 
-        $this->page = $this->getParam('page');
-        $this->searchterm = $this->getParam('searchterm');
-        $this->statusCode = $this->getParam('status');
+        $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
+        $this->searchStatusCode = $this->getOrOverrideSessionVarWithParam('searchStatusCode');
+        $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -122,7 +122,7 @@ class AdminArticlesModule extends AbstractAdminModule {
                         $content = json_encode(true);
                         break;
 
-                    // Artikel sperrem
+                    // Artikel sperren
                     case 'lock':
                         $this->setContentType('text/javascript');
                         $ids = $this->getParam('ids');
@@ -142,10 +142,13 @@ class AdminArticlesModule extends AbstractAdminModule {
                     case 'list':
                     default:
                         $filter = new Article();
-                        $filter->status_code = $this->statusCode;
+                        $filter->status_code = $this->searchStatusCode;
 
-                        $this->pageCount = ceil($this->orm->searchArticles($filter, false, $this->searchterm, true) /$this->orm->pageLength);
-                        $this->articles = $this->orm->searchArticles($filter, false, $this->searchterm, false, $this->page);
+                        $this->pageCount = ceil($this->orm->searchArticles($filter, false, $this->searchTerm, true) /$this->orm->pageLength);
+                        if ($this->searchPage > $this->pageCount) {
+                            $this->searchPage = $this->pageCount;
+                        }
+                        $this->articles = $this->orm->searchArticles($filter, false, $this->searchTerm, false, $this->searchPage);
                         $content = $this->renderUserTemplate('content-articles-list.phtml');
                 }
                 break;
@@ -239,7 +242,7 @@ class AdminArticlesModule extends AbstractAdminModule {
         $article->enable_trackbacks = $this->getParam('enable_trackbacks') == 'true';
         $article->enable_comments = $this->getParam('enable_comments') == 'true';
         $article->tags = Tag::splitTagsString($this->getParam('tags'));
-        $this->log->debug($article);
+
         return $article;
     }
 
