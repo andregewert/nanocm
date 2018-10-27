@@ -69,28 +69,6 @@ class AdminArticlesModule extends AbstractAdminModule {
         StatusCode::LOCKED
     );
 
-    /**
-     * Definiert die Sonderzeichen, die über das virtuelle Keyboard eingefügt werden können
-     * @var string[]
-     */
-    public $availableSpecialChars = array(
-        160     => 'Geschütztes Leerzeichen',
-        8201    => 'Schmales Leerzeichen',
-        8239    => 'Schmales geschütztes Leerzeichen',
-        8211    => 'Halbgeviertstrich',
-        8212    => 'Geviertstrich',
-        187     => 'Guillemets',
-        171     => 'Guillemets',
-        8250    => 'Guillemets 2',
-        8249    => 'Guillemets 2',
-        8222    => 'Anführungszeichen',
-        8220    => 'Anführungszeichen',
-        8218    => 'Anführungszeichen 2',
-        8216    => 'Anführungszeichen 2',
-        8226    => 'Bullet',
-        183     => 'Mittelpunkt'
-    );
-
     // </editor-fold>
 
 

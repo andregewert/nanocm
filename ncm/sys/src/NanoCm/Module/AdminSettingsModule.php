@@ -18,6 +18,7 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Couchbase\Exception;
 use Ubergeek\NanoCm\Setting;
 
 /**
@@ -28,46 +29,83 @@ use Ubergeek\NanoCm\Setting;
  */
 class AdminSettingsModule extends AbstractAdminModule {
 
-    /** @var string Generierter Content */
-    private $content;
-
     /** @var \Ubergeek\NanoCm\Setting */
-    protected $setting;
+    public $setting;
 
     /** @var \Ubergeek\NanoCm\Setting[] */
-    protected $settings;
+    public $settings;
+
+    /**
+     * Suchbegriff
+     * @var string
+     */
+    public $searchTerm;
 
     public function run() {
-        $this->content = '';
+        $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Erweiterte Einstellungen verwalten');
 
-        switch ($this->getRelativeUrlPart(2)) {
+        $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
+        $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
 
-            // AJAX-Aufrufe
+        switch ($this->getRelativeUrlPart(2)) {
+            // AJAX-Anfragen
             case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/javascript');
+
+                switch ($this->getRelativeUrlPart(3)) {
+                    case 'delete':
+                        $keys = $this->getParam('keys');
+                        $this->orm->deleteSettingsByKey($keys);
+                        $content = json_encode(true);
+                        break;
+
+                    case 'save':
+                        $newSetting = new Setting();
+                        $newSetting->key = $this->getParam('key');
+                        $newSetting->value = $this->getParam('value');
+                        $newSetting->params = $this->getParam('params');
+                        $this->orm->saveSetting($newSetting);
+                        break;
+                }
+                break;
+
+            // Einzelne HTML-Blöcke
+            case 'html':
                 $this->setPageTemplate(self::PAGE_NONE);
                 $this->setContentType('text/html');
 
                 switch ($this->getRelativeUrlPart(3)) {
+                    case 'edit':
+                        $this->setting = $this->orm->getSetting($this->getParam('key', ''));
+                        if ($this->setting == null) {
+                            $this->setting = new Setting();
+                        }
+                        $content = $this->renderUserTemplate('content-settings-edit.phtml');
+                        break;
+
                     case 'list':
                     default:
                         $filter = new Setting();
-                        $searchterm = $this->getParam('searchterm');
-                        $this->settings = $this->orm->searchSettings($filter, $searchterm);
-                        $this->content = $this->renderUserTemplate('content-settings-list.phtml');
+
+                        $this->pageCount = ceil($this->orm->searchSettings($filter, $this->searchTerm, true) /$this->orm->pageLength);
+                        if ($this->searchPage > $this->pageCount) {
+                            $this->searchPage = $this->pageCount;
+                        }
+                        $this->settings = $this->orm->searchSettings($filter, $this->searchTerm, false, $this->searchPage);
+                        $content = $this->renderUserTemplate('content-settings-list.phtml');
                 }
                 break;
 
             // Übersichtsseite
             case 'index.php':
             case '':
-                $filter = new Setting();
-                $this->settings = $this->orm->searchSettings($filter, 20);
-                $this->content = $this->renderUserTemplate('content-settings.phtml');
+                $content = $this->renderUserTemplate('content-settings.phtml');
                 break;
         }
 
-        $this->setContent($this->content);
+        $this->setContent($content);
     }
 
 }

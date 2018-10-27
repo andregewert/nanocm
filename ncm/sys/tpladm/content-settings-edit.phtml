@@ -1,0 +1,16 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminSettingsModule */
+?>
+
+<div class="row">
+    <label>Einstellung</label>
+    <input type="text" id="edit_setting_key" value="<?php echo $this->htmlEncode($this->setting->key); ?>">
+</div>
+<div class="row">
+    <label>Wert</label>
+    <input type="text" id="edit_setting_value" value="<?php echo $this->htmlEncode($this->setting->value); ?>">
+</div>
+<div class="row">
+    <label>Parameter</label>
+    <input type="text" id="edit_setting_params" value="<?php echo $this->htmlEncode($this->setting->params); ?>">
+</div>

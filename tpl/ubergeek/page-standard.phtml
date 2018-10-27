@@ -31,8 +31,9 @@
         </div>
         <div class="frame bg-header-light">
             <div class="container">
-                <footer>
-                    <div class="content">
+                <footer class="clearfix">
+                    <!--
+                    <div class="column-3">
                         <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
                             <?php if ($this->ncm->isUserLoggedIn()) : ?>
                                 <a href="/logout.php">Abmelden</a>
@@ -40,6 +41,19 @@
                                 <a href="/login.php">Anmelden</a>
                             <?php endif; ?>
                         </p>
+                    </div>
+                    -->
+                    <div class="content column-3">
+                        <h1>Neueste Artikel</h1>
+                    </div>
+                    <div class="content column-3">
+                        <h1>Kommentare</h1>
+                    </div>
+                    <div class="content column-3">
+                        <h1>Kontakt</h1>
+                    </div>
+                    <div class="content column-3">
+                        <h1>Soziale Medien</h1>
                     </div>
                 </footer>
             </div>

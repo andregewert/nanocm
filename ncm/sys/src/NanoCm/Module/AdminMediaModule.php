@@ -28,12 +28,34 @@ namespace Ubergeek\NanoCm\Module;
  */
 class AdminMediaModule extends AbstractAdminModule {
 
-    /** @var string Generierter Content */
-    private $content;
-
     public function run() {
-        $this->content = $this->renderUserTemplate('content-media.phtml');
-        $this->setContent($this->content);
+        $content = '';
+        //$this->setTitle($this->getSiteTitle() . ' - Medien verwalten');
+        //$this->content = $this->renderUserTemplate('content-media.phtml');
+        //$this->setContent($this->content);
+
+        switch ($this->getRelativeUrlPart(2)) {
+
+            // AJAX-Aufrufe
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/javascript');
+                break;
+
+            // Einzelne HTML-Blöcke
+            case 'html':
+                $this->setPageTemplate(self::PAGE_NONE);
+                switch ($this->getRelativeUrlPart(3)) {
+
+                    // Bildauswahl
+                    case 'imageselection':
+                        $content = $this->renderUserTemplate('media-imageselection.phtml');
+                        break;
+
+                }
+                break;
+        }
+        $this->setContent($content);
     }
 
 }

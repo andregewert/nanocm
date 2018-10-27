@@ -94,6 +94,15 @@ class Orm {
     
     // <editor-fold desc="Settings">
 
+    public function saveSetting(Setting $setting) {
+        $sql = 'REPLACE INTO setting (name, setting, params) VALUES (:name, :settings, :params) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('name', $setting->key);
+        $stmt->bindValue('settings', $setting->value);
+        $stmt->bindValue('params', $setting->params);
+        $stmt->execute();
+    }
+
     /**
      * Liest einen Systemeinstellungs-Datensatz aus
      * @param string $name Name der gesuchten Einstellung
@@ -157,47 +166,87 @@ class Orm {
     }
 
     /**
+     * Löscht die Einstellung mit dem angegebenen Key
+     * @param $key Key der zu löschenden Einstellung
+     * @return bool
+     */
+    public function deleteSettingByKey($key) {
+        try {
+            $sql = 'DELETE FROM setting WHERE name = :key ';
+            $stmt = $this->basedb->prepare($sql);
+            $stmt->bindValue('key', $key);
+            $stmt->execute();
+        } catch (\Exception $ex) {
+            $this->log->err('Fehler beim Löschen der Einstellung', $ex);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Löscht mehrere Einstellungen anhand ihrer Keys
+     * @param array $keys Keys der zu löschenden Einstellungen
+     * @return void
+     */
+    public function deleteSettingsByKey(array $keys) {
+        foreach ($keys as $key) {
+            $this->deleteSettingByKey($key);
+        }
+    }
+
+    /**
      * Durchsucht die Systemeinstellungen und gibt ein Array mit den gefundenen
      * Datensätzen zurück
      * @param Setting|null $filter Filterkriterien
      * @param string|null $searchterm Optionaler Suchbegriff
-     * @param int $limit Optionales Limit für das Suchergebnis
-     * @param int $offset Optionaler Startwert für das Suchergebnis
+     * @param bool $countOnly
+     * @param int $page = null
+     * @param int $limit = null
      * @return Setting[]
      */
-    public function searchSettings(Setting $filter = null, $searchterm = null, $limit = null, $offset = null) {
+    public function searchSettings(Setting $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $settings = array();
         $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
 
         // SQL zusammenstellen
-        $sql = 'SELECT * FROM setting WHERE 1 = 1 ';
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= 'FROM setting WHERE 1 = 1 ';
+
+        // Filterbedingungen einfügen
         if ($filter instanceof Setting) {
             // TODO implementieren
         }
 
         // Feier Suchbegriff
-        if ($searchterm !== null) {
+        if (!empty($searchterm)) {
             $sql .= ' AND name LIKE :name ';
             $params['name'] = "%$searchterm%";
         }
-        $sql .= ' ORDER BY name ASC ';
 
-        // Limit berücksichtigen
-        if ($limit !== null && $offset !== null) {
-            $limit = intval($limit);
-            $offset = intval($offset);
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY name ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
             $sql .= " LIMIT $offset, $limit ";
-        } elseif ($limit !== null) {
-            $sql .= ' LIMIT ' . intval($limit);
         }
 
         // Parameter setzen
         $stmt = $this->basedb->prepare($sql);
-        foreach ($params as $name => $value) {
-            $stmt->bindValue($name, $value);
-        }
+        $this->bindValues($stmt, $params);
         $stmt->execute();
 
+        if ($countOnly) {
+            return $stmt->fetchColumn();
+        }
+
+        // Ergebnis auslesen
         while (($setting = Setting::fetchFromPdoStatement($stmt)) !== null) {
             $settings[] = $setting;
         }
@@ -574,9 +623,7 @@ class Orm {
 
         // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
+        $this->bindValues($stmt, $params);
         $stmt->execute();
 
         if ($countOnly) {

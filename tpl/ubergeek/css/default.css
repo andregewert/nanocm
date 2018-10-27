@@ -87,6 +87,15 @@ div.column-4 {
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
 
+div.column-3 {
+  width: 240px;
+  outline: solid lightgray 1px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
 div.brand {
   background-color: #000;
   color: #0CADC6;

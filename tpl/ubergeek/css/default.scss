@@ -125,6 +125,16 @@ div.column-4 {
     box-sizing: border-box;
 }
 
+div.column-3 {
+    width: $width-column *3;
+    outline: solid lightgray 1px;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 div.brand {
     background-color: $color-headerbg;
     color: $color-headerfg;

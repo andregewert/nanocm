@@ -101,50 +101,7 @@
                 <textarea style="height: 4rem" id="input_article_teaser" tabindex="0"><?php echo $this->htmlEncode($this->article->teaser); ?></textarea>
             </div>
 
-            <div class="row imgtoolbar" style="margin-bottom: -1em">
-                <a class="button" title="Fett" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('**', '**');" tabindex="10"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
-                <a class="button" title="Kursiv" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('*', '*');" tabindex="10"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
-                <a class="button" title="Unterstrichen" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('_', '_');" tabindex="10"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
-                <a class="button" title="Durchgestrichen" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('~', '~');" tabindex="10"><img src="/ncm/img/fatcow/16/text_strikethroungh.png" /></a>
-                <a class="button" title="Hochgestellt" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('^', '^');" tabindex="10"><img src="/ncm/img/fatcow/16/text_superscript.png" /></a>
-                <a class="button" title="Tiefgestellt" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('°', '°');" tabindex="10"><img src="/ncm/img/fatcow/16/text_subscript.png" /></a>
-                <a class="button" title="Kapit&auml;lchen" href="javascript:void(0)" onclick="articlesEdit.surroundSelectionWith('|', '|');" tabindex="10"><img src="/ncm/img/fatcow/16/text_smallcaps.png" /></a>
-                <a class="button" title="Horizontaler Trennstrich" href="javascript:void(0)" onclick="articlesEdit.insertTextAtCaret('\n---\n');" tabindex="10"><img src="/ncm/img/fatcow/16/text_horizontalrule.png" /></a>
-
-                <!-- Sonderzeichen einfügen -->
-                <span class="imgtoolbar_popupbutton">
-                    <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
-                        <ul class="imgtoolbar_keyboard">
-                            <?php foreach ($this->availableSpecialChars as $char => $desc) : ?>
-                                <li>
-                                    <a href="javascript:articlesEdit.insertTextAtCaret('<?php echo '&#' . $char . ';'; ?>');" title="<?php echo $this->htmlEncode($desc); ?>" tabindex="9"><?php echo '&#' . $char . ';'; ?></a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </span>
-                    <a class="button" title="Sonderzeichen einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_letter_omega.png" /></a>
-                </span>
-
-                <!-- TODO Dialogfenster für Bildauswahl öffnen -->
-                <a class="button" title="Bild einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
-
-                <!-- Emoji-Tastatur -->
-                <span class="imgtoolbar_popupbutton">
-                    <span class="imgtoolbar_popup" style="width: 500px; height: 320px; overflow: auto">
-                        <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $emojis) : ?>
-                            <label class="small"><?php echo \Ubergeek\NanoCm\Util::htmlEncode($group); ?></label>
-                            <ul class="imgtoolbar_keyboard">
-                                <?php foreach ($emojis as $emoji) : ?>
-                                    <li class="tone_<?php echo $this->htmlEncode($emoji->tone); ?>">
-                                        <a style="font-family: Roboto, 'Apple Color Emoji';" href="javascript:articlesEdit.insertTextAtCaret('<?php echo $emoji->html; ?>');" title="<?php echo $this->htmlEncode($emoji->description); ?>" tabindex="9"><?php echo $emoji->html; ?></a>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php endforeach; ?>
-                    </span>
-                    <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/emotion_amazing.png" /></a>
-                </span>
-            </div>
+            <?php $this->includeUserTemplate('blocks/editor-toolbar-standard.phtml'); ?>
 
             <div class="row">
                 <textarea style="height: 36rem" id="input_article_content" tabindex="0"><?php echo $this->htmlEncode($this->article->content); ?></textarea>
@@ -190,6 +147,8 @@
             $('#button_toggle_settings').click(function() {
                 app.toggleSettings();
             });
+
+            ncm.initTextEditor($('.imgtoolbar'), $('#input_article_content'));
 
             /*
             $(window).on('beforeunload', function() {

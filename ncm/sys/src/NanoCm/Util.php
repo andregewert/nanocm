@@ -63,6 +63,31 @@ final class Util {
     }
 
     /**
+     * Gibt ein Array mit den in der Editor-Toolbar anzuzeigenden Sonderzeichen zurück
+     * @return array
+     * @todo Beschreibung sollte lokalisierbar sein
+     */
+    public static function getSpecialCharDictionary() {
+        return array(
+            160     => 'Geschütztes Leerzeichen',
+            8201    => 'Schmales Leerzeichen',
+            8239    => 'Schmales geschütztes Leerzeichen',
+            8211    => 'Halbgeviertstrich',
+            8212    => 'Geviertstrich',
+            187     => 'Guillemets',
+            171     => 'Guillemets',
+            8250    => 'Guillemets 2',
+            8249    => 'Guillemets 2',
+            8222    => 'Anführungszeichen',
+            8220    => 'Anführungszeichen',
+            8218    => 'Anführungszeichen 2',
+            8216    => 'Anführungszeichen 2',
+            8226    => 'Bullet',
+            183     => 'Mittelpunkt'
+        );
+    }
+
+    /**
      * Gibt eine gruppierte / kategorisierte Liste von Emoji-Codes zurück.
      *
      * Die Definitionsdatei der verfügbaren Emojis wird generiert aus der vom Unicode Consortium bereitgestellten

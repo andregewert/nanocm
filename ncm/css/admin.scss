@@ -393,6 +393,90 @@ img.spinner.loading {
     opacity: 1;
 }
 
+.blanker {
+    position: fixed;
+    z-index: 19;
+    background-color: black;
+    opacity: 0.3;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.inlinepopup {
+    box-shadow: 0 0 45px #222;
+    z-index: 20;
+    position: absolute;
+    width: auto;
+    height: 250px;
+    background-color: white;
+    left: 125px;
+    right: 125px;
+    top: 50%;
+    margin-top: -125px;
+    border: solid black 1px;
+}
+
+.inlinepopup.loading {
+    background: url("/ncm/img/spin.gif") no-repeat center;
+}
+
+.inlinepopup.closed {
+    display: none;
+}
+
+.inlinepopup div.controls {
+    position: absolute;
+    width: 100%;
+    text-align: right;
+}
+
+.inlinepopup .headline {
+    margin: 0;
+    padding: 0 1em;
+}
+
+.inlinepopup .headline h2 {
+    font-size: 1.2rem;
+    line-height: 1.6em;
+    margin: 0;
+    padding: 0.5em 0 0 0;
+}
+
+.inlinepopup div.popupcontent {
+    overflow: auto;
+    padding: 0.4em 1em;
+}
+
+.inlinepopup div.buttons {
+    text-align: right;
+    border-top: solid #aaa 1px;
+    padding: 0.2em 1em;
+}
+
+.inlinepopup div.buttons input.button {
+    margin-left: 0.5em;
+}
+
+.inlinepopup div.buttons input.button.left {
+    margin-left: 0;
+    margin-right: 0.5em;
+    float: left;
+}
+
+.inlinepopup div.popupcontent label {
+    display: inline-block;
+    width: 35%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: text-bottom;
+}
+
+.inlinepopup div.popupcontent input {
+    width: 60%;
+}
+
 /* </editor-fold> */
 
 

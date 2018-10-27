@@ -78,16 +78,7 @@
                 <input type="text" id="input_page_url" placeholder="path/to/site" value="<?php echo $this->htmlEncode($this->page->url); ?>" tabindex="0" />
             </div>
 
-            <div class="row imgtoolbar" style="margin-bottom: -1em">
-                <a class="button edit_bold" title="Fett" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_bold.png" /></a>
-                <a class="button edit_italic" title="Kursiv" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_italic.png" /></a>
-                <a class="button edit_underline" title="Unterstrichen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_underline.png" /></a>
-                <a class="button edit_strikethrough" title="Durchgestrichen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_strikethroungh.png" /></a>
-                <a class="button edit_superscript" title="Hochgestellt" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_superscript.png" /></a>
-                <a class="button edit_subscript" title="Tiefgestellt" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_subscript.png" /></a>
-                <a class="button edit_caps" title="Kapit&auml;lchen" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_smallcaps.png" /></a>
-                <a class="button edit_hr" title="Horizontaler Trennstrich" href="javascript:void(0)" tabindex="10"><img src="/ncm/img/fatcow/16/text_horizontalrule.png" /></a>
-            </div>
+            <?php $this->includeUserTemplate('blocks/editor-toolbar-standard.phtml'); ?>
 
             <div class="row">
                 <textarea style="height: 36rem" id="input_page_content" tabindex="0"><?php echo $this->htmlEncode($this->page->content); ?></textarea>
