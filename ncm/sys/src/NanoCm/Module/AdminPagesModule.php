@@ -82,13 +82,12 @@ class AdminPagesModule extends AbstractAdminModule {
             // AJAX-Aufrufe
             case 'ajax':
                 $this->setPageTemplate(self::PAGE_NONE);
-                $this->setContentType('text/html');
+                $this->setContentType('text/javascript');
 
                 switch ($this->getRelativeUrlPart(3)) {
 
                     // Überprüft, ob eine bestimmte URL bereits vergeben ist
                     case 'checkurl':
-                        $this->setContentType('text/javascript');
                         $data = $this->orm->isPageUrlAlreadyExisting(
                             $this->getParam('url'),
                             $this->getParam('id', null)
@@ -98,7 +97,6 @@ class AdminPagesModule extends AbstractAdminModule {
 
                     // Seite(n) endgültig löschen
                     case 'delete':
-                        $this->setContentType('text/javascript');
                         $ids = $this->getParam('ids');
                         $this->orm->deletePagesById($ids);
                         $content = json_encode(true);
@@ -106,7 +104,6 @@ class AdminPagesModule extends AbstractAdminModule {
 
                     // Seite(n) sperren
                     case 'lock':
-                        $this->setContentType('text/javascript');
                         $ids = $this->getParam('ids');
                         $this->orm->lockPagesById($ids);
                         $content = json_encode(true);
@@ -114,7 +111,6 @@ class AdminPagesModule extends AbstractAdminModule {
 
                     // Seite speichern
                     case 'save':
-                        $this->setContentType('text/javascript');
                         $page = $this->createPageFromRequest();
                         $this->orm->savePage($page);
                         $content = json_encode($page);
@@ -129,7 +125,6 @@ class AdminPagesModule extends AbstractAdminModule {
                 switch ($this->getRelativeUrlPart(3)) {
                     // Auflistung
                     case 'list':
-                    default:
                         $filter = new Page();
                         $filter->status_code = $this->searchStatusCode;
                         $this->pageCount = ceil($this->orm->searchPages($filter, false, $this->searchTerm, true)/ $this->orm->pageLength);

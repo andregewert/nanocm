@@ -95,20 +95,34 @@ class AdminCommentsModule extends AbstractAdminModule {
 
                 switch ($this->getRelativeUrlPart(3)) {
 
-                    // Kommentar löschen
+                    // Kommentare löschen
                     case 'delete':
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) {
+                            $this->orm->deleteCommentById();
+                        }
                         break;
 
-                    // Kommentar sperren
+                    // Kommentare sperren
                     case 'lock':
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) {
+                            $this->orm->setCommentStatusCodeByIds($ids, StatusCode::LOCKED);
+                        }
                         break;
 
-                    // Kommentar als Spam markieren
-                    case 'markasspam':
+                    // Kommentare entsperren
+                    case 'unlock':
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) {
+                            $this->orm->setCommentStatusCodeByIds($ids, StatusCode::ACTIVE);
+                        }
                         break;
 
-                    // Kommentar für Review markieren
-                    case 'markforreview':
+                    // Kommentar speichern
+                    case 'save':
+                        $comment = $this->createCommentFromRequest();
+                        $content = json_encode($comment);
                         break;
                 }
                 break;
@@ -118,6 +132,15 @@ class AdminCommentsModule extends AbstractAdminModule {
                 $this->setPageTemplate(self::PAGE_NONE);
 
                 switch ($this->getRelativeUrlPart(3)) {
+                    // Bearbeitungsmaske
+                    case 'edit':
+                        $this->comment = $this->orm->getCommentById(
+                            $this->getParam('id')
+                        );
+                        $content = $this->renderUserTemplate('content-comments-edit.phtml');
+                        break;
+
+                    // Auflistung der vorhandenen Kommentare
                     case 'list':
                         $filter = new Comment();
                         $filter->status_code = $this->searchStatusCode;
@@ -144,6 +167,33 @@ class AdminCommentsModule extends AbstractAdminModule {
     }
 
     // <editor-fold desc="Internal methods">
+
+    /**
+     * Erstellt ein Comment-Objekt mit den Daten aus dem aktuellen Request
+     * @return Comment
+     */
+    private function createCommentFromRequest() : Comment {
+        $comment = new Comment();
+        $id = intval($this->getParam('id'));
+        $oldComment = null;
+        if ($id > 0) $oldComment = $this->orm->getCommentById($id);
+
+        if ($oldComment != null) {
+            $comment->id = $id;
+            $comment->article_id = $oldComment->article_id;
+            $comment->creation_timestamp = $oldComment->creation_timestamp;
+            $comment->spam_status = $oldComment->spam_status;
+        }
+
+        $comment->modification_timestamp = new \DateTime();
+        $comment->status_code = $this->getParam('status_code');
+        $comment->username = $this->getParam('username');
+        $comment->email = $this->getParam('email');
+        $comment->headline = $this->getParam('headline');
+        $comment->content = $this->getParam('content');
+
+        return $comment;
+    }
 
     // </editor-fold>
 

@@ -615,8 +615,6 @@ class Orm {
             $sql .= " LIMIT $offset, $limit ";
         }
 
-        $this->log->debug($sql);
-
         // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
         $this->bindValues($stmt, $params);
@@ -629,6 +627,95 @@ class Orm {
         }
 
         return $comments;
+    }
+
+    /**
+     * Gibt den Kommentar mit der angegebenen Datensatz-ID zurück
+     * @param integer $id Datensatz-ID des angeforderten Kommentares
+     * @return null|Comment Der gesuchte Kommentar oder null
+     */
+    public function getCommentById($id) {
+        $sql = 'SELECT * FROM comment WHERE id = :id';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        return Comment::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Löscht einen Kommentar anhand seiner Datensatz-ID
+     * @param $commentId ID des zu löschenden Kommentares
+     * @return void
+     */
+    public function deleteCommentById($commentId) {
+        $sql = 'DELETE FROM comment WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $commentId);
+        $stmt->execute();
+    }
+
+    /**
+     * Löscht mehrere Kommentare anhand ihrer IDs
+     * @param array $commentIds IDs der zu löschenden Kommentare
+     * @return void
+     */
+    public function deleteCommentsById(array $commentIds) {
+        foreach ($commentIds as $id) {
+            $this->deleteCommentById($id);
+        }
+    }
+
+    /**
+     * Setzt den Status-Code für einen bestimmten Kommentar
+     * @param $commentId ID des Kommentar-Datensatzes
+     * @param $statusCode Neuer Status-Code
+     * @return void
+     */
+    public function setCommentStatusCodeById($commentId, $statusCode) {
+        $sql = 'UPDATE comment SET status_code = :status_code WHERE id = :comment_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $statusCode);
+        $stmt->bindValue('comment_id', $commentId);
+        $stmt->execute();
+    }
+
+    /**
+     * Setzt den Status-Code für mehrere Kommentar-Datensätze anhand ihrer IDs
+     * @param array $commentIds Datensatz-IDs der zu ändernden Kommentare
+     * @param $statusCode Neuer Status-Code
+     * @return void
+     */
+    public function setCommentStatusCodeByIds(array $commentIds, $statusCode) {
+        foreach ($commentIds as $id) {
+            $this->setCommentStatusCodeById($id, $statusCode);
+        }
+    }
+
+    /**
+     * Speichert den übergebenen Kommentar in der Datenbank
+     * @param Comment $comment Der zu speichernde Datensatz
+     * @return integer Die Datensatz-ID
+     */
+    public function saveComment(Comment $comment) {
+        if ($comment->id == 0) $comment->id = null;
+        $sql = 'REPLACE INTO comment (id, article_id, creation_timestamp, status_code, spam_status, username, email, headline, content)
+                VALUES (:id, :article_id, :creation_timestamp, :status_code, :spam_status, :username, :email, :headline, :content) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $comment->id);
+        $stmt->bindValue('article_id', $comment->article_id);
+        if ($comment->creation_timestamp instanceof \DateTime) {
+            $stmt->bindValue('creation_timestamp', $comment->creation_timestamp->format('Y-m-d H:i:s'));
+        } else {
+            $stmt->bindValue('creation_timestamp', null);
+        }
+        $stmt->bindValue('status_code', $comment->status_code);
+        $stmt->bindValue('spam_status', $comment->spam_status);
+        $stmt->bindValue('username', $comment->username);
+        $stmt->bindValue('email', $comment->email);
+        $stmt->bindValue('headline', $comment->headline);
+        $stmt->bindValue('content', $comment->content);
+        $stmt->execute();
+        return $this->basedb->lastInsertId('id');
     }
 
     // </editor-fold>

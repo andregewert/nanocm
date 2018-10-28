@@ -108,7 +108,6 @@
          */
         app.deleteSelected = function() {
             let ids = ncm.getSelectedRowIds();
-            console.log(ids);
             if (ids.length > 0) {
                 if (confirm('Wollen Sie die ausgewählten Seiten wirklich endgültig löschen?')) {
                     ncm.showDefaultLoadingIndicator();

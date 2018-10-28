@@ -318,6 +318,7 @@ img.spinner.loading {
   height: 100%;
   display: none; }
 
+/* <editor-fold desc="Inline popups"> */
 .inlinepopup {
   box-shadow: 0 0 45px #222;
   z-index: 20;
@@ -375,10 +376,13 @@ img.spinner.loading {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  vertical-align: text-bottom; }
+  vertical-align: top; }
 
-.inlinepopup div.popupcontent input {
-  width: 60%; }
+.inlinepopup div.popupcontent input,
+.inlinepopup div.popupcontent textarea,
+.inlinepopup div.popupcontent select {
+  width: 60%;
+  vertical-align: text-top; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Virtual Keyboard (Emojis) "> */

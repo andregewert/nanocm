@@ -52,6 +52,8 @@
             $('#button_delete').click(function() {
                 app.deleteSelected();
             });
+
+            app.refresh();
         };
 
         /**
@@ -105,7 +107,7 @@
                         clicked: function() {
                             $.ajax('/admin/settings/ajax/save', {
                                 cache: false,
-                                type: 'GET',
+                                type: 'POST',
                                 dataType: 'JSON',
                                 data:   {
                                     key:    $('#edit_setting_key').val(),
@@ -156,7 +158,6 @@
         };
 
         app.init();
-        app.refresh();
     }
 
     $(document).ready(function() {

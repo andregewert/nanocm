@@ -42,8 +42,9 @@ use Ubergeek\NanoCm\StatusCode;
                     </td>
                     <td><?php echo $comment->creation_timestamp->format('Y-m-d H:i'); ?></td>
                     <td>
-                        <?php echo $this->htmlEncode($comment->headline); ?><br>
-                        <?php echo nl2br($this->htmlEncode($comment->content)); ?>
+                        <a href="javascript:void(0);" data-id="<?php echo $this->htmlEncode($comment->id); ?>" onclick="module.editClickedComment(this);">
+                            <?php echo $this->htmlEncode($comment->headline); ?>
+                        </a>
                     </td>
                     <td><?php echo $this->htmlEncode($comment->username); ?></td>
                     <td><?php echo $this->htmlEncode($comment->email); ?></td>
