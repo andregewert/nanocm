@@ -119,7 +119,14 @@ class AdminPagesModule extends AbstractAdminModule {
                         $this->orm->savePage($page);
                         $content = json_encode($page);
                         break;
+                }
+                break;
 
+            // Einzelne HTML-Blöcke
+            case 'html':
+                $this->setPageTemplate(self::PAGE_NONE);
+
+                switch ($this->getRelativeUrlPart(3)) {
                     // Auflistung
                     case 'list':
                     default:
@@ -133,7 +140,6 @@ class AdminPagesModule extends AbstractAdminModule {
                         $content = $this->renderUserTemplate('content-pages-list.phtml');
                         break;
                 }
-
                 break;
 
             // Seite bearbeiten

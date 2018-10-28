@@ -115,10 +115,16 @@ class AdminArticlesModule extends AbstractAdminModule {
                         $this->orm->saveArticle($article);
                         $content = json_encode($article);
                         break;
+                }
+                break;
 
+            // Einzelne HTML-Blöcke
+            case 'html':
+                $this->setPageTemplate(self::PAGE_NONE);
+
+                switch ($this->getRelativeUrlPart(3)) {
                     // Artikelliste
                     case 'list':
-                    default:
                         $filter = new Article();
                         $filter->status_code = $this->searchStatusCode;
 
@@ -128,6 +134,7 @@ class AdminArticlesModule extends AbstractAdminModule {
                         }
                         $this->articles = $this->orm->searchArticles($filter, false, $this->searchTerm, false, $this->searchPage);
                         $content = $this->renderUserTemplate('content-articles-list.phtml');
+                        break;
                 }
                 break;
 

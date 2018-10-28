@@ -554,9 +554,101 @@ class Orm {
 
     // </editor-fold>
 
+
+    // <editor-fold desc="Comments">
+
+    /**
+     * Durchsucht die Kommentare
+     *
+     * @param Comment|null $filter Optionale Filterkriterien
+     * @param bool $releasedOnly Auf true setzen, um ausschließlich freigeschaltete Kommentare zu berücksichtigen
+     * @param null $searchterm Optionaler Suchbegriff
+     * @param bool $countOnly Auf true setzen, um lediglich die Anzahl der Suchtreffer zu ermitteln
+     * @param null $page Anzuzeigende Seite (bei 1 beginnend)
+     * @param null $limit Maximale Anzahl Datensätze bzw. Seitenlänge
+     * @return int|Comment[] Anzahl Datensätze oder Array mit gefundenen Kommentaren
+     */
+    public function searchComments(Comment $filter = null, $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $comments = array();
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        // Ergebnis oder Anzahl Ergebnisse
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= ' FROM comment WHERE 1 = 1 ';
+
+        // Nur veröffentlichte Kommentare berücksichtigen
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :released_only ';
+            $params['released_only'] = StatusCode::ACTIVE;
+        }
+
+        // Filterbedingungen einfügen
+        if ($filter instanceof Comment) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :status_code ';
+                $params['status_code'] = $filter->status_code;
+            }
+        }
+
+        // Suchbegriff
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND (headline LIKE :search_headline
+                        OR content LIKE :search_content 
+                        OR username LIKE :search_username) ';
+            $params['search_headline'] = $like;
+            $params['search_content'] = $like;
+            $params['search_username'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY creation_timestamp DESC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        $this->log->debug($sql);
+
+        // Parameter füllen
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        if ($countOnly) return $stmt->fetchColumn();
+
+        while (($comment = Comment::fetchFromPdoStatement($stmt)) !== null) {
+            $comments[] = $comment;
+        }
+
+        return $comments;
+    }
+
+    // </editor-fold>
+
     
     // <editor-fold desc="Article">
-    
+
+    /**
+     * Ermittelt die Headline eines bestimmten Artikels
+     * @param int $articleId Artikel-ID
+     * @return string|null
+     */
+    public function getArticleHeadlineById($articleId) {
+        $sql = 'SELECT headline FROM article WHERE id = :article_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('article_id', $articleId);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
     /**
      * Durchsucht die Artikel nach bestimmten Filterkriterien
      *
@@ -1201,6 +1293,7 @@ class Orm {
 
     private function bindValues(\PDOStatement $stmt, array $params) {
         foreach ($params as $key => $value) {
+            $this->log->debug($key . ': ' . $value);
             $stmt->bindValue($key, $value);
         }
     }

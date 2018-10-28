@@ -99,6 +99,16 @@ class Comment {
 
     // <editor-fold desc="Public methods">
 
+    public static function fetchFromPdoStatement(\PDOStatement $stmt) {
+        /* @var $comment \Ubergeek\NanoCm\Comment */
+        if (($comment = $stmt->fetchObject(__CLASS__)) !== false) {
+            $comment->creation_timestamp = new \DateTime($comment->creation_timestamp);
+            $comment->modification_timestamp = new \DateTime($comment->modification_timestamp);
+            return $comment;
+        }
+        return null;
+    }
+
     // </editor-fold>
 
 
