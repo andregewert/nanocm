@@ -19,6 +19,9 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\NanoCm\User;
+
 /**
  * Verwaltung der Benutzerkonten
  * @author André Gewert <agewert@ubergeek.de>
@@ -27,12 +30,77 @@ namespace Ubergeek\NanoCm\Module;
  */
 class AdminUsersModule extends AbstractAdminModule {
 
-    /** @var string Generierter Content */
-    private $content;
+    // <editor-fold desc="Properties">
+
+    /**
+     * Die Liste der anzuzeigenden Benutzer-Datensätze
+     * @var User[]
+     */
+    public $users;
+
+    /**
+     * Der zu bearbeitende Benutzer-Datensatz
+     * @var User
+     */
+    public $user;
+
+    /**
+     * Suchbegriff
+     * @var string
+     */
+    public $searchTerm;
+
+    /**
+     * Suchfilter: Statuscode
+     * @var integer
+     */
+    public $searchStatusCode;
+
+    /**
+     * Die verfügbaren Status-Codes
+     * @var int[]
+     */
+    public $availableStatusCodes = array(
+        StatusCode::ACTIVE,
+        StatusCode::LOCKED
+    );
+
+    // </editor-fold>
 
     public function run() {
-        $this->content = $this->renderUserTemplate('content-users.phtml');
-        $this->setContent($this->content);
+        $content = '';
+        $this->setTitle($this->getSiteTitle() . ' - Benutzer verwalten');
+
+        $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
+        $this->searchStatusCode = $this->getOrOverrideSessionVarWithParam('searchStatusCode');
+        $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
+
+        switch ($this->getRelativeUrlPart(2)) {
+            // Einzelne HTML-Blöcke
+            case 'html':
+                $this->setPageTemplate(self::PAGE_NONE);
+                switch ($this->getRelativeUrlPart(3)) {
+                    case 'list':
+                        $filter = new User();
+                        $filter->status_code = $this->searchStatusCode;
+
+                        $this->pageCount = ceil($this->orm->searchUsers($filter, $this->searchTerm, true) / $this->orm->pageLength);
+                        if ($this->searchPage > $this->pageCount) {
+                            $this->searchPage = $this->pageCount;
+                        }
+                        $this->users = $this->orm->searchUsers($filter, $this->searchTerm, false, $this->searchPage);
+                        $content = $this->renderUserTemplate('content-users-list.phtml');
+                        break;
+                }
+                break;
+
+            case 'index.php':
+            case '':
+                $content = $this->renderUserTemplate('content-users.phtml');
+                break;
+        }
+
+        $this->setContent($content);
     }
 
 }

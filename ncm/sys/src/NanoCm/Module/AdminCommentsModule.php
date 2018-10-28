@@ -148,11 +148,11 @@ class AdminCommentsModule extends AbstractAdminModule {
                         $filter = new Comment();
                         $filter->status_code = $this->searchStatusCode;
 
-                        $this->pageCount = ceil($this->orm->searchComments($filter, false, $this->searchTerm, true) /$this->orm->pageLength);
+                        $this->pageCount = ceil($this->orm->searchComments($filter, $this->searchTerm, true) /$this->orm->pageLength);
                         if ($this->searchPage > $this->pageCount) {
                             $this->searchPage = $this->pageCount;
                         }
-                        $this->comments = $this->orm->searchComments($filter, false, $this->searchTerm, false, $this->searchPage);
+                        $this->comments = $this->orm->searchComments($filter, $this->searchTerm, false, $this->searchPage);
                         $content = $this->renderUserTemplate('content-comments-list.phtml');
                         break;
                 }

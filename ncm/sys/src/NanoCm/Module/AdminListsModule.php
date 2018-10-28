@@ -109,15 +109,15 @@ class AdminListsModule extends AbstractAdminModule {
 
                     // Liste sperren
                     case 'lock':
-                        $ids = $this->getParams('ids');
-                        if (is_array($ids)) $this->orm->setUserListStatusCodesById($ids);
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) $this->orm->setUserListStatusCodesById($ids, StatusCode::LOCKED);
                         $content = json_encode(true);
                         break;
 
                     // Liste entsperren
                     case 'unlock':
                         $ids = $this->getParam('ids');
-                        if (is_array($ids)) $this->orm->setUserListStatusCodesById($ids);
+                        if (is_array($ids)) $this->orm->setUserListStatusCodesById($ids, StatusCode::ACTIVE);
                         $content = json_encode(true);
                         break;
 
@@ -191,11 +191,11 @@ class AdminListsModule extends AbstractAdminModule {
                         $filter = new UserList();
                         $filter->status_code = $this->searchStatusCode;
 
-                        $this->pageCount = ceil($this->orm->searchUserLists($filter, false, $this->searchTerm, true) / $this->orm->pageLength);
+                        $this->pageCount = ceil($this->orm->searchUserLists($filter, $this->searchTerm, true) / $this->orm->pageLength);
                         if ($this->searchPage > $this->pageCount) {
                             $this->searchPage = $this->pageCount;
                         }
-                        $this->lists = $this->orm->searchUserLists($filter, false, $this->searchTerm, false, $this->searchPage);
+                        $this->lists = $this->orm->searchUserLists($filter, $this->searchTerm, false, $this->searchPage);
                         $content = $this->renderUserTemplate('content-lists-list.phtml');
                         break;
 

@@ -5,20 +5,21 @@
 <div class="container">
     <form onsubmit="module.refresh(); return false;">
         <h1>Seiten verwalten</h1>
+        <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
 
         <div class="toolbar">
             <span class="left">
                 <a id="button_add" class="button" href="/admin/pages/edit/" role="button" title="Seite hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16" />Neue Seite
+                    <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16">Neu
                 </a>
                 <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seite bearbeiten">
-                    <img src="/ncm/img/fatcow/16/page_edit.png" alt="" width="16" height="16" />Bearbeiten
+                    <img src="/ncm/img/fatcow/16/page_edit.png" alt="" width="16" height="16">Bearbeiten
                 </a>
                 <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Seiten sperren">
-                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16" />Sperren
+                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
                 </a>
                 <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Seiten l&ouml;schen">
-                    <img src="/ncm/img/fatcow/16/page_delete.png" alt="" width="16" height="16" />L&ouml;schen
+                    <img src="/ncm/img/fatcow/16/page_delete.png" alt="" width="16" height="16">L&ouml;schen
                 </a>
             </span>
             <span class="right" style="float: right">
@@ -39,7 +40,6 @@
                     <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
                 </a>
             </span>
-            <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
         </div>
 
         <div id="placeholder_pages" class="placeholder">

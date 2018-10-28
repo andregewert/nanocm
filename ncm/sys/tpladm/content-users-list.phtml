@@ -1,0 +1,45 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminUsersModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
+    <table class="list">
+        <thead>
+        <tr>
+            <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+            <th>Benutzername</th>
+            <th>Nachname</th>
+            <th>Vorname</th>
+            <th>E-Mail</th>
+            <th>Kontoart</th>
+            <th>Letztes Login</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php if (is_array($this->users) && count($this->users) > 0) : ?>
+            <?php foreach ($this->users as $user) : ?>
+                <tr>
+                    <td style="text-align: center">
+                        <input type="checkbox" class="selection" value="<?php echo $user->id; ?>" style="text-align: center">
+                    </td>
+                    <td><?php echo $this->htmlEncode($user->username); ?></td>
+                    <td><?php echo $this->htmlEncode($user->lastname); ?></td>
+                    <td><?php echo $this->htmlEncode($user->firstname); ?></td>
+                    <td><?php echo $this->htmlEncode($user->email); ?></td>
+                    <td><?php echo $this->htmlEncode($user->usertype); ?></td>
+                    <td>
+                        <?php if ($user->last_login_timestamp instanceof \DateTime) : ?>
+                            <?php echo $user->last_login_timestamp->format('Y-m-d H:i'); ?>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($user->status_code)); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <tr class="noresult">
+                <td colspan="8">Keine Benutzer gefunden</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+<?php $this->includeUserTemplate('blocks/list-paging.phtml'); ?>

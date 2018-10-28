@@ -1,3 +1,186 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminUsersModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
 <div class="container">
-    <h1>Benutzerkonten</h1>
+    <form onsubmit="module.refresh(); return false;">
+        <h1>Benutzerkonten verwalten</h1>
+        <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Konto hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/user_add.png" alt="" width="16" height="16">Neu
+                </a>
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Konto bearbeiten">
+                    <img src="/ncm/img/fatcow/16/user_edit.png" alt="" width="16" height="16">Bearbeiten
+                </a>
+                <a id="button_unlock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Konto freischalten">
+                    <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Freischalten
+                </a>
+                <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Konto sperren">
+                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Konto l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/user_delete.png" alt="" width="16" height="16">L&ouml;schen
+                </a>
+            </span>
+            <span class="right" style="float: right">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+
+                <label for="input_searchTerm">Suche</label>
+                <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
+
+                <label for="select_searchStatusCode" class="spaceleft">Status</label>
+                <select id="select_searchStatusCode">
+                    <option value="">- Alle -</option>
+                    <?php foreach ($this->availableStatusCodes as $code) : ?>
+                        <option value="<?php echo $code; ?>" <?php if ($this->searchStatusCode != '' && $this->searchStatusCode == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                </a>
+            </span>
+        </div>
+
+        <div id="placeholder_users" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
+    </form>
 </div>
+
+<script type="text/javascript">
+    function Users() {
+        let app = this;
+        app.page = $('#input_searchPage').val();
+
+        app.init = function() {
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+
+            $('#button_add').click(function() {
+                //app.editSetting('');
+            });
+
+            $('#button_edit').click(function() {
+                //app.editSelected();
+            });
+
+            $('#button_unlock').click(function() {
+                app.unlockSelected();
+            });
+
+            $('#button_lock').click(function() {
+                app.lockSelected();
+            });
+
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
+
+            app.refresh();
+        };
+
+        /**
+         * Aktualisiert die angezeigte Seite der Benutzerkonten
+         * @param {int} page
+         */
+        app.refresh = function(page) {
+            ncm.showDefaultLoadingIndicator();
+            if (typeof page === 'undefined') page = app.page;
+
+            $.ajax('/admin/users/html/list', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                    searchTerm:         $('#input_searchTerm').val(),
+                    searchStatusCode:   $('#select_searchStatusCode').val(),
+                    searchPage:         page
+                }
+            }).done(function(data) {
+                $('#placeholder_users .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                ncm.hideDefaultLoadingIndicator();
+            });
+        };
+
+        /**
+         * Löscht alle ausgewählten Benutzerkonten
+         */
+        app.deleteSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Benutzerkonten wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
+                    $.ajax('/admin/users/ajax/delete', {
+                        cache: false,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: {
+                            keys: ids
+                        }
+                    }).always(function () {
+                        ncm.hideDefaultLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        /**
+         * Sperrt alle ausgewählten Benutzerkonten
+         */
+        app.lockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/users/ajax/lock', {
+                    cache: false,
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: {
+                        keys: ids
+                    }
+                }).always(function () {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        /**
+         * Entsperrt alle ausgewählten Benutzerkonten
+         */
+        app.unlockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/users/ajax/lock', {
+                    cache: false,
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: {
+                        keys: ids
+                    }
+                }).always(function () {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new Users();
+    });
+</script>

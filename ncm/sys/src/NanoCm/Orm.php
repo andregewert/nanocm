@@ -297,12 +297,69 @@ class Orm {
 
     /**
      * Durchsucht die Benutzerdatenbank nach flexiblen Filterkriterien
-     * @param array $filter = null
-     * @return array Liste der gefundenen Benutzerdatensätze
+     * @param User $filter = null
+     * @param string $searchterm
+     * @param bool $countOnly
+     * @param int $page
+     * @param int $limit
+     * @return User[] Liste der gefundenen Benutzerdatensätze
      */
-    public function searchUsers(array $filter = null) {
-        // TODO Implementieren
-        return array();
+    public function searchUsers(User $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= ' FROM user WHERE 1 = 1 ';
+
+        // Filterbedingungen
+        if ($filter instanceof User) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :status_code ';
+                $params['status_code'] = $filter->status_code;
+            }
+        }
+
+        // Suchbegriff
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND (
+                        firstname LIKE :search_firstname
+                        OR lastname LIKE :search_lastname
+                        OR username LIKE :search_username
+                        OR email LIKE :search_email
+                    ) ';
+            $params['search_firstname'] = $like;
+            $params['search_lastname'] = $like;
+            $params['search_username'] = $like;
+            $params['search_email'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY username ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        // Parameter füllen
+        $stmt = $this->basedb->prepare($sql);
+        $this->log->debug($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        // Ergebnis auslesen
+        if ($countOnly) return $stmt->fetchColumn();
+        $users = array();
+        while (($user = User::fetchFromPdoStmt($stmt)) !== null) {
+            $users[] = $user;
+        }
+        return $users;
     }
 
     /**
@@ -565,14 +622,13 @@ class Orm {
      * Durchsucht die Kommentare
      *
      * @param Comment|null $filter Optionale Filterkriterien
-     * @param bool $releasedOnly Auf true setzen, um ausschließlich freigeschaltete Kommentare zu berücksichtigen
      * @param null $searchterm Optionaler Suchbegriff
      * @param bool $countOnly Auf true setzen, um lediglich die Anzahl der Suchtreffer zu ermitteln
      * @param null $page Anzuzeigende Seite (bei 1 beginnend)
      * @param null $limit Maximale Anzahl Datensätze bzw. Seitenlänge
      * @return int|Comment[] Anzahl Datensätze oder Array mit gefundenen Kommentaren
      */
-    public function searchComments(Comment $filter = null, $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+    public function searchComments(Comment $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $comments = array();
         $params = array();
         $limit = ($limit == null)? $this->pageLength : intval($limit);
@@ -584,12 +640,6 @@ class Orm {
             $sql = 'SELECT * ';
         }
         $sql .= ' FROM comment WHERE 1 = 1 ';
-
-        // Nur veröffentlichte Kommentare berücksichtigen
-        if ($releasedOnly) {
-            $sql .= ' AND status_code = :released_only ';
-            $params['released_only'] = StatusCode::ACTIVE;
-        }
 
         // Filterbedingungen einfügen
         if ($filter instanceof Comment) {
@@ -1239,14 +1289,13 @@ class Orm {
     /**
      * Durchsucht die UserListem anhand verschiedener Suchkriterien
      * @param UserList|null $filter
-     * @param bool $releasedOnly
      * @param string $searchterm
      * @param bool $countOnly
      * @param int $page
      * @param int $limit
      * @return UserList[]|int
      */
-    public function searchUserLists(UserList $filter = null, bool $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+    public function searchUserLists(UserList $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $userLists = array();
         $params = array();
         $limit = ($limit == null)? $this->pageLength : intval($limit);
@@ -1258,10 +1307,6 @@ class Orm {
             $sql = 'SELECT * ';
         }
         $sql .= ' FROM userlist WHERE 1 = 1 ';
-
-        if ($releasedOnly) {
-            $sql .= ' AND status_code = ' . StatusCode::ACTIVE;
-        }
 
         // Filterbedingungen
         if ($filter instanceof UserList) {
