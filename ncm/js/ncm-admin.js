@@ -81,6 +81,11 @@ function Ncm() {
         $('.placeholder').removeClass('loading');
     };
 
+    app.focusDefaultElement = function() {
+        $('.autofocus').first().focus();
+        $('.autofocus').first().select();
+    };
+
     app.toggleAllRowsSelection = function(headerCheckbox) {
         $(headerCheckbox).parents('table').find('input[type=checkbox]').prop(
             'checked',

@@ -220,6 +220,11 @@ table.list th {
   background-color: aliceblue;
   text-align: left; }
 
+table.list tr.noresult td {
+  padding: 1em;
+  text-align: center;
+  font-style: italic; }
+
 .imgtoolbar {
   background-color: #f8f8f8;
   padding: 0.2em 0.5em;

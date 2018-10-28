@@ -4,11 +4,11 @@ use Ubergeek\NanoCm\StatusCode;
 ?>
 <div class="row">
     <label>Datum</label>
-    <span><?php echo $this->comment->creation_timestamp->format('Y-m-d H:i'); ?></span>
+    <input type="text" readonly="readonly" value="<?php echo $this->comment->creation_timestamp->format('Y-m-d H:i'); ?>">
 </div>
 <div class="row">
     <label>Artikel</label>
-    <span><?php echo $this->htmlEncode($this->orm->getArticleHeadlineById($this->comment->article_id)); ?></span>
+    <input type="text" readonly="readonly" value="<?php echo $this->htmlEncode($this->orm->getArticleHeadlineById($this->comment->article_id)); ?>">
 </div>
 <div class="row">
     <label>Name</label>
@@ -28,7 +28,7 @@ use Ubergeek\NanoCm\StatusCode;
 </div>
 <div class="row">
     <label>Headline</label>
-    <input type="text" id="edit_comment_headline" value="<?php echo $this->htmlEncode($this->comment->headline); ?>">
+    <input type="text" id="edit_comment_headline" class="autofocus" value="<?php echo $this->htmlEncode($this->comment->headline); ?>">
 </div>
 <div class="row">
     <label>Kommentar</label>

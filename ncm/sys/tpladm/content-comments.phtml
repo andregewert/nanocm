@@ -22,11 +22,6 @@
                 <a id="button_lock" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Kommentar sperren">
                     <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
                 </a>
-                <!--
-                <a id="button_junk" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Kommentar als Junk markieren">
-                    <img src="/ncm/img/fatcow/16/bin_empty.png" alt="" width="16" height="16">Junk
-                </a>
-                -->
                 <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Kommentar l&ouml;schen">
                     <img src="/ncm/img/fatcow/16/comment_delete.png" alt="" width="16" height="16">L&ouml;schen
                 </a>
@@ -173,7 +168,10 @@
                 }, {
                     headline:   'Kommentar bearbeiten',
                     width:      500,
-                    height:     480
+                    height:     480,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
                 }, {
                     cancel: {
                         caption: 'Abbrechen',

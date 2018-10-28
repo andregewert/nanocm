@@ -286,6 +286,12 @@ table.list th {
     text-align: left;
 }
 
+table.list tr.noresult td {
+    padding: 1em;
+    text-align: center;
+    font-style: italic;
+}
+
 .imgtoolbar {
     background-color: $toolbar-bg;
     padding: 0.2em 0.5em;

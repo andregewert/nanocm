@@ -1,0 +1,251 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminListsModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
+<div class="container">
+    <form onsubmit="module.refresh(); return false;">
+        <h1>Listen verwalten</h1>
+        <input type="hidden" id="input_list_id" value="<?php echo intval($this->list->id); ?>">
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_back" class="button" href="javascript:void(0);" role="button" title="Zur&uuml;ck zur Listen-&Uuml;bersicht">
+                    <img src="/ncm/img/fatcow/16/arrow_left.png" alt="" width="16" height="16" />Zur&uuml;ck
+                </a>
+                <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Eintrag hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neu
+                </a>
+                <a id="button_unlock" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Eintrag freischalten">
+                    <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16" />Entsperren
+                </a>
+                <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlten Eintrag sperren">
+                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16" />Sperren
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Eintrag l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/delete.png" alt="" width="16" height="16" />L&ouml;schen
+                </a>
+            </span>
+            <span class="right" style="float: right">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+
+                <label for="input_searchTerm">Suche</label>
+                <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
+
+                <label for="select_searchStatusCode" class="spaceleft">Status</label>
+                <select id="select_searchStatusCode">
+                    <option value="">- Alle -</option>
+                    <?php foreach ($this->availableStatusCodes as $code) : ?>
+                        <option value="<?php echo $code; ?>" <?php if ($this->searchStatusCode != '' && $this->searchStatusCode == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                </a>
+            </span>
+        </div>
+
+        <div class="editform">
+            <div class="row">
+                <input class="big" type="text" id="input_list_title" placeholder="Listentitel" value="<?php echo $this->htmlEncode($this->list->title); ?>" autofocus="autofocus" tabindex="0" />
+            </div>
+        </div>
+
+        <div id="placeholder_listitems" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function ListItems() {
+        let app = this;
+
+        /**
+         * Initialisiert Event-Handler etc.
+         */
+        app.init = function() {
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+            $('#button_back').click(function() {
+                document.location.href = '/admin/lists/';
+            });
+            $('#button_lock').click(function() {
+                app.lockSelected();
+            });
+            $('#button_unlock').click(function() {
+                app.unlockSelected();
+            });
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
+            $('#button_add').click(function() {
+                app.editListItem(null);
+            });
+
+            app.refresh();
+        };
+
+        /**
+         * Aktualisiert die Liste der Listeneinträge
+         */
+        app.refresh = function() {
+            ncm.showDefaultLoadingIndicator();
+            $.ajax('/admin/lists/html/listitems', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                    id:                 $('#input_list_id').val(),
+                    searchTerm:         $('#input_searchTerm').val(),
+                    searchStatusCode:   $('#select_searchStatusCode').val()
+                }
+            }).done(function(data) {
+                $('#placeholder_listitems .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                ncm.hideDefaultLoadingIndicator();
+                $('#input_searchTerm').focus();
+            });
+        };
+
+        app.editListItem = function(id) {
+            let dlg = new ncm.InlinePopup(
+                '/admin/lists/html/edititem', {
+                    id:             id,
+                    userlist_id:    $('#input_list_id').val()
+                }, {
+                    headline:       (id > 0)? 'Listeneintrag bearbeiten' : 'Listeneintrag erstellen',
+                    width:          500,
+                    height:         350,
+                    loaded:         function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel:     {
+                        caption:    'Abbrechen',
+                        clicked:    function() {
+                            dlg.close();
+                        }
+                    },
+                    save:       {
+                        caption:    'Speichern',
+                        clicked:    function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/lists/ajax/saveitem', {
+                                cache:      false,
+                                type:       'POST',
+                                dataType:   'JSON',
+                                data:       {
+                                    id:             id,
+                                    userlist_id:    $('#edit_listitem_userlist_id').val(),
+                                    parent_id:      $('#edit_listitem_parent_id').val(),
+                                    status_code:    $('#edit_listitem_status_code').val(),
+                                    title:          $('#edit_listitem_title').val(),
+                                    content:        $('#edit_listitem_content').val(),
+                                    parameters:     $('#edit_listitem_parameters').val(),
+                                    sorting_code:   $('#edit_listitem_sorting_code').val()
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für den ersten ausgewählten Listeneintrag auf
+         */
+        app.editSelected = function() {
+            let id = ncm.getFirstSelectedRowId();
+            if (id != null) app.editListItem(id);
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für die angeklickte Zeile auf
+         */
+        app.editClickedListItem = function(clickedLink) {
+            let id = $(clickedLink).attr('data-id');
+            if (id != null) app.editListItem(id);
+        };
+
+        /**
+         * Löscht die ausgewählten Listeneinträge
+         */
+        app.deleteSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Listeneinträge wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
+                    $.ajax('/admin/lists/ajax/deleteitems', {
+                        cache:      false,
+                        type:       'GET',
+                        dataType:   'JSON',
+                        data:       {
+                            ids: ids
+                        }
+                    }).always(function() {
+                        ncm.hideDefaultLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        /**
+         * Entsperrt die ausgewählten Listeneinträge
+         */
+        app.unlockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/lists/ajax/unlockitems', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        ids:    ids
+                    }
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        /**
+         * Sperrt die ausgewählten Listeneinträge
+         */
+        app.lockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/lists/ajax/lockitems', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        ids:    ids
+                    }
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new ListItems();
+    });
+</script>

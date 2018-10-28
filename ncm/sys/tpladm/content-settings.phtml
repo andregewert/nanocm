@@ -6,10 +6,14 @@
         <div class="toolbar">
             <span class="left">
                 <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Einstellung hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neu
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
                 </a>
-                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Einstellung bearbeiten">Bearbeiten</a>
-                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Einstellungen l&ouml;schen">L&ouml;schen</a>
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Einstellung bearbeiten">
+                    <img src="/ncm/img/fatcow/16/toolbar_edit.png" alt="" width="16" height="16">Bearbeiten
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Einstellungen l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/toolbar_delete.png" alt="" width="16" height="16">L&ouml;schen
+                </a>
             </span>
             <span class="right" style="float: right">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
@@ -94,7 +98,10 @@
                 }, {
                     headline:   'Einstellung bearbeiten',
                     width:      500,
-                    height:     200
+                    height:     200,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
                 }, {
                     cancel: {
                         caption: 'Abbrechen',
@@ -105,6 +112,7 @@
                     save: {
                         caption: 'Speichern',
                         clicked: function() {
+                            ncm.showDefaultLoadingIndicator();
                             $.ajax('/admin/settings/ajax/save', {
                                 cache: false,
                                 type: 'POST',
@@ -115,6 +123,7 @@
                                     params: $('#edit_setting_params').val()
                                 }
                             }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
                                 dlg.close();
                                 app.refresh();
                             });

@@ -101,6 +101,7 @@ class AdminCommentsModule extends AbstractAdminModule {
                         if (is_array($ids)) {
                             $this->orm->deleteCommentById();
                         }
+                        $content = json_encode(true);
                         break;
 
                     // Kommentare sperren
@@ -109,6 +110,7 @@ class AdminCommentsModule extends AbstractAdminModule {
                         if (is_array($ids)) {
                             $this->orm->setCommentStatusCodeByIds($ids, StatusCode::LOCKED);
                         }
+                        $content = json_encode(true);
                         break;
 
                     // Kommentare entsperren
@@ -117,6 +119,7 @@ class AdminCommentsModule extends AbstractAdminModule {
                         if (is_array($ids)) {
                             $this->orm->setCommentStatusCodeByIds($ids, StatusCode::ACTIVE);
                         }
+                        $content = json_encode(true);
                         break;
 
                     // Kommentar speichern

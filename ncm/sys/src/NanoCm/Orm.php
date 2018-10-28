@@ -94,6 +94,10 @@ class Orm {
     
     // <editor-fold desc="Settings">
 
+    /**
+     * Speichert einen Setting-Datensatz in der Datenbank
+     * @param Setting $setting Der zu speichernde Setting-Datensatz
+     */
     public function saveSetting(Setting $setting) {
         $sql = 'REPLACE INTO setting (name, setting, params) VALUES (:name, :settings, :params) ';
         $stmt = $this->basedb->prepare($sql);
@@ -667,8 +671,8 @@ class Orm {
 
     /**
      * Setzt den Status-Code für einen bestimmten Kommentar
-     * @param $commentId ID des Kommentar-Datensatzes
-     * @param $statusCode Neuer Status-Code
+     * @param int $commentId ID des Kommentar-Datensatzes
+     * @param int $statusCode Neuer Status-Code
      * @return void
      */
     public function setCommentStatusCodeById($commentId, $statusCode) {
@@ -682,7 +686,7 @@ class Orm {
     /**
      * Setzt den Status-Code für mehrere Kommentar-Datensätze anhand ihrer IDs
      * @param array $commentIds Datensatz-IDs der zu ändernden Kommentare
-     * @param $statusCode Neuer Status-Code
+     * @param int $statusCode Neuer Status-Code
      * @return void
      */
     public function setCommentStatusCodeByIds(array $commentIds, $statusCode) {
@@ -694,7 +698,7 @@ class Orm {
     /**
      * Speichert den übergebenen Kommentar in der Datenbank
      * @param Comment $comment Der zu speichernde Datensatz
-     * @return integer Die Datensatz-ID
+     * @return int Die Datensatz-ID
      */
     public function saveComment(Comment $comment) {
         if ($comment->id == 0) $comment->id = null;
@@ -1029,6 +1033,279 @@ class Orm {
     // </editor-fold>
 
 
+    // <editor-fold desc="Listen">
+
+    /**
+     * Ermittelt UserList-Eintrag mit der angegebenen Datensatz-ID
+     * @param int $id Datensatz-ID
+     * @return null|UserList Die gesuchte UserList
+     */
+    public function getUserListById($id) {
+        $sql = 'SELECT * FROM userlist WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        return UserList::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Ermittelt die zu einer UserList gehörenden UserListItem-Einträge
+     * @param int $userListId Die ID der übergeordneten UserList
+     * @param boolean $statusCode
+     * @param string $searchterm
+     * @return UserListItem[] Die zugehörigen UserListItem-Einträge
+     */
+    public function getUserListItemsByUserListId($userListId, $statusCode = null, $searchterm = null) {
+        $params = array();
+        $params['userlistid'] = $userListId;
+
+        $sql = 'SELECT * FROM userlistitem WHERE userlist_id = :userlistid ';
+        if ($statusCode != null) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = $statusCode;
+        }
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND (title LIKE :search_title OR content LIKE :search_content OR parameters LIKE :search_parameters) ';
+            $params['search_title'] = $like;
+            $params['search_content'] = $like;
+            $params['search_parameters'] = $like;
+        }
+        $sql .= ' ORDER BY sorting_code ASC, title ASC ';
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        $userListItems = array();
+        while (($userListItem = UserListItem::fetchFromPdoStatement($stmt)) !== null) {
+            $userListItems[] = $userListItem;
+        }
+        return $userListItems;
+    }
+
+    public function setUserListItemStatusCodeById($id, $status_code) {
+        $sql = 'UPDATE userlistitem SET status_code = :status_code WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $status_code);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    public function setUserListItemsStatusCodeById(array $ids, $status_code) {
+        foreach ($ids as $id) {
+            $this->setUserListItemStatusCodeById($id, $status_code);
+        }
+    }
+
+    public function getUserListItemById($id) {
+        $sql = 'SELECT * FROM userlistitem WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        return UserListItem::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Speichert den übergebenen UserList-Datensatz in der Datenbank
+     * @param UserList $list Die zu speichernde UserList
+     * @return int Die Datensatz-ID
+     */
+    public function saveUserList(UserList $list) {
+        if ($list->id == 0) $list->id = null;
+
+        $sql = 'REPLACE INTO userlist (id, title, status_code, creation_timestamp)
+                VALUES (:id, :title, :status_code, :creation_timestamp)';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $list->id);
+        $stmt->bindValue('title', $list->title);
+        $stmt->bindValue('status_code', $list->status_code);
+        $stmt->bindValue('creation_timestamp', ($list->creation_timestamp == null)? null : $list->creation_timestamp->format('Y-m-d H:i:s'));
+        $stmt->execute();
+
+        return $this->basedb->lastInsertId('id');
+    }
+
+    /**
+     * Speichert den übergebenen UserListItem-Eintrag in der Datenbank
+     * @param UserListItem $item Der zu speichernde UserListItem-Eintrag
+     * @return int Die Datensatz-ID
+     */
+    public function saveUserListItem(UserListItem $item) {
+        if ($item->id == 0) $item->id = null;
+
+        $sql = 'REPLACE INTO userlistitem (id, userlist_id, parent_id, status_code, creation_timestamp, title, content, parameters, sorting_code)
+                VALUES (:id, :userlist_id, :parent_id, :status_code, :creation_timestamp, :title, :content, :parameters, :sorting_code) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $item->id);
+        $stmt->bindValue('userlist_id', $item->userlist_id);
+        $stmt->bindValue('parent_id', $item->parent_id);
+        $stmt->bindValue('status_code', $item->status_code);
+        $stmt->bindValue('creation_timestamp', ($item->creation_timestamp == null)? null : $item->creation_timestamp->format('Y-m-d H:i:s'));
+        $stmt->bindValue('title', $item->title);
+        $stmt->bindValue('content', $item->content);
+        $stmt->bindValue('parameters', $item->parameters);
+        $stmt->bindValue('sorting_code', $item->sorting_code);
+        $stmt->execute();
+
+        return $this->basedb->lastInsertId('id');
+    }
+
+    /**
+     * Setzt des Status-Code für einen UserList-Eintrag auf den angegebenen Wert
+     * @param int $id Datensatz-ID des zu ändernden UserList-Eintrags
+     * @param int $status_code Der neue Status-Code
+     * @return void
+     */
+    public function setUserListStatusCodeById($id, $status_code) {
+        $sql = 'UPDATE userlist SET status_code = :status_code WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $status_code);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
+     * Setzt den Status-Codes mehrerer UserList-Einträge auf den angegebenen Wert
+     * @param array $ids Die Datensatz-IDs der zu ändernden UserList-Einträge
+     * @param int $status_code Der neue Status-Code
+     * @return void
+     */
+    public function setUserListStatusCodesById(array $ids, $status_code) {
+        foreach ($ids as $id) {
+            $this->setUserListStatusCodeById($id, $status_code);
+        }
+    }
+
+    /**
+     * Löscht einen bestimmten UserList-Eintrag anhand seiner Datensatz-ID
+     *
+     * Hinweis: auch die zugehörigen UserListItem-Einträge werden bei diesem
+     * Vorgang gelöscht!
+     * @param int $id Datensatz-ID des zu löschenden UserList-Eintrags
+     * @return void
+     */
+    public function deleteUserListById($id) {
+        $this->deleteUserListItemsByUserListId($id);
+        $sql = 'DELETE FROM userlist WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
+     * Löscht mehrere UserList-Einträge anhand ihrer IDs
+     * @param array $ids Datensatz-IDs der zu löschenden UserList-Einträge
+     */
+    public function deleteUserListsById(array $ids) {
+        foreach ($ids as $id) {
+            $this->deleteUserListById($id);
+        }
+    }
+
+    /**
+     * Löscht einen UserListItem-Datensatz anhand seiner Datensatz-ID
+     * @param int $id Datensatz-ID des zu löschenden UserListItem-Eintrags
+     */
+    public function deleteUserListItemById($id) {
+        $sql = 'DELETE FROM userlistitem WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
+     * Löscht mehrere UserListItem-Datensätze anhand ihrer Datensatz-IDs
+     * @param array $ids Datensatz-IDs der zu löschenden UserListItems
+     * @return void
+     */
+    public function deleteUserListItemsById(array $ids) {
+        foreach ($ids as $id) {
+            $this->deleteUserListItemById($id);
+        }
+    }
+
+    /**
+     * Löscht alle UserListItem-Einträge, die zu der angegebenen UserList gehören
+     * @param int $userListId Datensatz-ID der zugehörigen UserList
+     * @return void
+     */
+    public function deleteUserListItemsByUserListId($userListId) {
+        $sql = 'DELETE FROM userlistitem WHERE userlist_id = :userlistid ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('userlistid', $userListId);
+        $stmt->execute();
+    }
+
+    /**
+     * Durchsucht die UserListem anhand verschiedener Suchkriterien
+     * @param UserList|null $filter
+     * @param bool $releasedOnly
+     * @param string $searchterm
+     * @param bool $countOnly
+     * @param int $page
+     * @param int $limit
+     * @return UserList[]|int
+     */
+    public function searchUserLists(UserList $filter = null, bool $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $userLists = array();
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        // SQL zusammenstellen
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= ' FROM userlist WHERE 1 = 1 ';
+
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = ' . StatusCode::ACTIVE;
+        }
+
+        // Filterbedingungen
+        if ($filter instanceof UserList) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :status_code ';
+                $params['status_code'] = $filter->status_code;
+            }
+        }
+
+        // Suchbegriff
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND title LIKE :search_title ';
+            $params['search_title'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= 'ORDER BY title ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        // Parameter füllen
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        if ($countOnly) {
+            return $stmt->fetchColumn();
+        }
+
+        // Ergebnis auslesen
+        while (($userList = UserList::fetchFromPdoStatement($stmt)) !== null) {
+            $userLists[] = $userList;
+        }
+        return $userLists;
+    }
+
+    // </editor-fold>
+
+
     // <editor-fold desc="Page">
 
     /**
@@ -1068,7 +1345,7 @@ class Orm {
 
         // Suchbegriff
         if (!empty($searchterm)) {
-            $like = '%' . $searchterm . '%';
+            $like = "%$searchterm%";
             $sql .= ' AND (headline LIKE :search_headline OR url LIKE :search_url OR content LIKE :search_content) ';
             $params['search_headline'] = $like;
             $params['search_url'] = $like;
@@ -1086,9 +1363,7 @@ class Orm {
 
         // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
+        $this->bindValues($stmt, $params);
         $stmt->execute();
 
         if ($countOnly) {

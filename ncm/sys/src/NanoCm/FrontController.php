@@ -72,6 +72,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                     case 'articles':
                     case 'comments':
                     case 'pages':
+                    case 'lists':
                     case 'users':
                     case 'media':
                     case 'stats':

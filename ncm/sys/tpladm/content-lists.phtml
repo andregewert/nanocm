@@ -1,0 +1,240 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminListsModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
+<div class="container">
+    <form onsubmit="module.refresh(); return false;">
+        <h1>Listen verwalten</h1>
+        <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Liste hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16" />Neue Liste
+                </a>
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Liste bearbeiten">
+                    <img src="/ncm/img/fatcow/16/edit_button.png" alt="" width="16" height="16" />Bearbeiten
+                </a>
+                <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Liste sperren">
+                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16" />Sperren
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Liste l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/delete.png" alt="" width="16" height="16" />L&ouml;schen
+                </a>
+            </span>
+            <span class="right" style="float: right">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+
+                <label for="input_searchTerm">Suche</label>
+                <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
+
+                <label for="select_searchStatusCode" class="spaceleft">Status</label>
+                <select id="select_searchStatusCode">
+                    <option value="">- Alle -</option>
+                    <?php foreach ($this->availableStatusCodes as $code) : ?>
+                        <option value="<?php echo $code; ?>" <?php if ($this->searchStatusCode != '' && $this->searchStatusCode == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+                <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                </a>
+            </span>
+        </div>
+
+        <div id="placeholder_lists" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function Lists() {
+        let app = this;
+        app.page = $('#input_searchPage').val();
+
+        /**
+         * Initialisiert Event-Handler etc.
+         */
+        app.init = function() {
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+            $('#button_edit').click(function() {
+                app.editSelected();
+            });
+            $('#button_lock').click(function() {
+                app.lockSelected();
+            });
+            $('#button_unlock').click(function() {
+                app.unlockSelected();
+            });
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
+            $('#button_add').click(function() {
+                app.editList(null);
+            });
+
+            app.refresh();
+        };
+
+        /**
+         * Aktualisiert die Liste der Pages
+         * @param {int} page Anzuzeigende Seite
+         */
+        app.refresh = function(page) {
+            ncm.showDefaultLoadingIndicator();
+            if (typeof page === 'undefined') page = app.page;
+
+            $.ajax('/admin/lists/html/list', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                    searchTerm:         $('#input_searchTerm').val(),
+                    searchStatusCode:   $('#select_searchStatusCode').val(),
+                    searchPage:         page
+                }
+            }).done(function(data) {
+                $('#placeholder_lists .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                ncm.hideDefaultLoadingIndicator();
+                $('#input_searchTerm').focus();
+            });
+        };
+
+        app.editList = function(id) {
+            let dlg = new ncm.InlinePopup(
+                '/admin/lists/html/edit', {
+                    id:             id
+                }, {
+                    headline:       (id > 0)? 'Liste bearbeiten' : 'Liste erstellen',
+                    width:          500,
+                    height:         250,
+                    loaded:         function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel:     {
+                        caption:    'Abbrechen',
+                        clicked:    function() {
+                            dlg.close();
+                        }
+                    },
+                    save:       {
+                        caption:    'Speichern',
+                        clicked:    function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/lists/ajax/save', {
+                                cache:      false,
+                                type:       'POST',
+                                dataType:   'JSON',
+                                data:       {
+                                    id:             id,
+                                    title:          $('#edit_list_title').val(),
+                                    status_code:    $('#edit_list_status_code').val()
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für die erste ausgewählte Liste auf
+         */
+        app.editSelected = function() {
+            let id = ncm.getFirstSelectedRowId();
+            if (id != null) app.editList(id);
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für die angeklickte Zeile auf
+         */
+        app.editClickedList = function(clickedLink) {
+            let id = $(clickedLink).attr('data-id');
+            if (id != null) app.editList(id);
+        };
+
+        /**
+         * Löscht die ausgewählten Listen
+         */
+        app.deleteSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Listen wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
+                    $.ajax('/admin/lists/ajax/delete', {
+                        cache:      false,
+                        type:       'GET',
+                        dataType:   'JSON',
+                        data:       {
+                            ids: ids
+                        }
+                    }).always(function() {
+                        ncm.hideDefaultLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        /**
+         * Entsperrt die ausgewählten Listen
+         */
+        app.unlockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/lists/ajax/unlock', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        ids:    ids
+                    }
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        /**
+         * Sperrt die ausgewählten Listen
+         */
+        app.lockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('/admin/lists/ajax/lock', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        ids:    ids
+                    }
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new Lists();
+    });
+</script>
