@@ -97,6 +97,7 @@ class Orm {
     /**
      * Speichert einen Setting-Datensatz in der Datenbank
      * @param Setting $setting Der zu speichernde Setting-Datensatz
+     * @return string
      */
     public function saveSetting(Setting $setting) {
         $sql = 'REPLACE INTO setting (name, setting, params) VALUES (:name, :settings, :params) ';
@@ -105,6 +106,7 @@ class Orm {
         $stmt->bindValue('settings', $setting->value);
         $stmt->bindValue('params', $setting->params);
         $stmt->execute();
+        return $this->basedb->lastInsertId('key');
     }
 
     /**
@@ -619,6 +621,31 @@ class Orm {
     // <editor-fold desc="Comments">
 
     /**
+     * Gibt die Anzahl der Kommentare zurück, die den angegebenen Status-Code besitzen
+     * @param int $statusCode Der gesuchte Status-Code
+     * @return int Die Anzahl der Kommentare mit diesem Status-Code
+     */
+    public function countCommentsByStatusCode($statusCode) {
+        $sql = 'SELECT COUNT(*) FROM comment WHERE status_code = :status_code ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $statusCode);
+        $stmt->execute();
+        return intval($stmt->fetchColumn());
+    }
+
+    /**
+     * Gibt die Anzahl aller nicht freigeschalteten Kommentare zurück
+     * @return int Anzahl der nicht freigeschalteten Kommentare
+     */
+    public function countInactiveComments() {
+        $sql = 'SELECT COUNT(*) FROM comment WHERE status_code <> :status_code ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', StatusCode::ACTIVE);
+        $stmt->execute();
+        return intval($stmt->fetchColumn());
+    }
+
+    /**
      * Durchsucht die Kommentare
      *
      * @param Comment|null $filter Optionale Filterkriterien
@@ -788,6 +815,40 @@ class Orm {
         $stmt->bindValue('article_id', $articleId);
         $stmt->execute();
         return $stmt->fetchColumn();
+    }
+
+    /**
+     * Gibt die Anzahl der aktuell freigeschalteten Artikel zurück
+     * @return int Anzahl der aktuell freigeschalteten Artikel
+     */
+    public function countReleasedArticles() {
+        $sql = 'SELECT COUNT(*) FROM article WHERE (
+                    start_timestamp <= datetime(CURRENT_TIMESTAMP, \'localtime\')
+                    AND (stop_timestamp IS NULL OR stop_timestamp >= datetime(CURRENT_TIMESTAMP, \'localtime\'))
+                )
+                AND status_code = :status_code
+        ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', StatusCode::ACTIVE);
+        $stmt->execute();
+        return intval($stmt->fetchColumn());
+    }
+
+    /**
+     * Gibt die Anzahl der gespeicherten aber nicht freigeschalteten Artikel zurück
+     * @return int Anzahl der nicht freigeschalteten Artikel
+     */
+    public function countUnreleasedArticles() {
+        $sql = 'SELECT COUNT(*) FROM article WHERE NOT (
+                    start_timestamp <= datetime(CURRENT_TIMESTAMP, \'localtime\')
+                    AND (stop_timestamp IS NULL OR stop_timestamp >= datetime(CURRENT_TIMESTAMP, \'localtime\'))
+                )
+                OR status_code <> :status_code
+        ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', StatusCode::ACTIVE);
+        $stmt->execute();
+        return intval($stmt->fetchColumn());
     }
 
     /**
@@ -1631,7 +1692,7 @@ class Orm {
      * @return string
      */
     public function getCopyrightNotice() {
-        return $this->getSettingValue(Constants::SETTING_SYSTEM_COPYRIGHTNOTICE, '');
+        return $this->getSettingValue(Setting::SETTING_SYSTEM_COPYRIGHTNOTICE, '');
     }
     
     /**
@@ -1645,7 +1706,7 @@ class Orm {
     public function getSiteTitle() : string {
         $title = 'NanoCM';
         try {
-            $title = $this->getSettingValue(Constants::SETTING_SYSTEM_SITETITLE);
+            $title = $this->getSettingValue(Setting::SETTING_SYSTEM_SITETITLE);
         } catch (\Exception $ex) {
             $this->log->warn($ex);
         }

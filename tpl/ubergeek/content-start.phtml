@@ -7,7 +7,7 @@ $latestArticles = $this->orm->getLatestArticles();
 <?php if (count($latestArticles) >= 1) : ?>
     <?php $article = array_shift($latestArticles); ?>
 
-    <div class="container content">
+    <div class="container spacing">
         <?php if (!empty($article->teaser)) : ?>
             <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
             <div class="lead">
@@ -25,7 +25,7 @@ $latestArticles = $this->orm->getLatestArticles();
             <div class="container">
                 <?php for ($i = 0; $i < 3; $i++) : ?>
                     <?php if (($article = array_shift($latestArticles)) !== null) : ?>
-                        <div class="column-4 content">
+                        <div class="column-4 spacing">
                             <h2><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h2>
                             <?php if (!empty($article->teaser)) : ?>
                                 <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
@@ -38,7 +38,7 @@ $latestArticles = $this->orm->getLatestArticles();
         </div>
     <?php endif; ?>
 <?php else : ?>
-    <div class="container content">
+    <div class="container spacing">
         <h1>Noch keine Inhalte vorhanden</h1>
         <p>Leider gibt es hier noch nichts zu sehen!</p>
     </div>

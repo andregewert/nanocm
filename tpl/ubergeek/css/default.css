@@ -72,15 +72,22 @@ div.container {
   box-sizing: border-box;
   background-color: #fff; }
 
-div.content {
+div.spacing {
   padding-left: 2em;
   padding-left: 2rem;
   padding-right: 2em;
   padding-right: 2rem; }
 
+div.column-6 {
+  width: 480px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
 div.column-4 {
   width: 320px;
-  /*    outline: solid lightgray 1px;*/
   display: inline-block;
   float: left;
   -moz-box-sizing: border-box;
@@ -89,7 +96,14 @@ div.column-4 {
 
 div.column-3 {
   width: 240px;
-  outline: solid lightgray 1px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.column-2 {
+  width: 160px;
   display: inline-block;
   float: left;
   -moz-box-sizing: border-box;
@@ -172,7 +186,7 @@ nav.metanavigation li {
 
 /* </editor-fold> */
 /* <editor-fold desc="Generic classes"> */
-div.container,
+div.container:after,
 .clearfix:after {
   content: "";
   display: table;

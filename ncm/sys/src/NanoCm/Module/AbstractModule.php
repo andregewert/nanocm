@@ -244,8 +244,28 @@ abstract class AbstractModule implements
      * @return string HTML-kodierter String
      */
     public function htmlEncode($string) : string {
-
         return Util::htmlEncode($string);
+    }
+
+    /**
+     * Formatiert eine Ganzzahl für die Ausgabe (mit Tausender-Trennzeichen)
+     * @param $int Ganzzahliger Wert
+     * @return string Für die Ausgabe formatierter Wert
+     * @todo Konvertierung muss lokalisierbar sein!
+     */
+    public function formatInt($int) : string {
+        return number_format(intval($int), 0, ',', '.');
+    }
+
+    /**
+     * Formatiert einen Dezimalbruch für die Ausgabe (mit Tausender- und Dezimaltrennzeichen)
+     * @param $float Dezimalbruch
+     * @param int $decimals Anzahl Nachkommastellen
+     * @return string Für die Ausgabe formatierter Wert
+     * @todo Konvertierung muss lokalisierbar sein!
+     */
+    public function formatFloat($float, $decimals = 2) : string {
+        return number_format(floatval($float), $decimals, ',', '.');
     }
 
     /**

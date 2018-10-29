@@ -2,7 +2,7 @@
 /* @var $this \Ubergeek\NanoCm\Module\AdminUsersModule */
 use Ubergeek\NanoCm\StatusCode;
 ?>
-<div class="container">
+<div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
         <h1>Benutzerkonten verwalten</h1>
         <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
@@ -26,7 +26,7 @@ use Ubergeek\NanoCm\StatusCode;
                 </a>
             </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif">
 
                 <label for="input_searchTerm">Suche</label>
                 <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
@@ -40,7 +40,7 @@ use Ubergeek\NanoCm\StatusCode;
                 </select>
 
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>

@@ -72,15 +72,15 @@ final class StatusCode {
      */
     public static function convertStatusId($statusId) : string {
         switch ($statusId) {
-            case StatusCode::ACTIVE:
+            case self::ACTIVE:
                 return 'Freigegeben';
-            case StatusCode::MARKED_AS_JUNK:
+            case self::MARKED_AS_JUNK:
                 return 'Spam';
-            case StatusCode::REVIEW_REQUIRED:
+            case self::REVIEW_REQUIRED:
                 return 'Review notwendig';
-            case StatusCode::MODERATION_REQUIRED:
+            case self::MODERATION_REQUIRED:
                 return 'Moderation notwendig';
-            case StatusCode::LOCKED:
+            case self::LOCKED:
                 return 'Gesperrt';
         }
         return 'Unbekannt';

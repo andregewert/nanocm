@@ -66,7 +66,7 @@ class AdminSettingsModule extends AbstractAdminModule {
                         $newSetting->key = $this->getParam('key');
                         $newSetting->value = $this->getParam('value');
                         $newSetting->params = $this->getParam('params');
-                        $this->orm->saveSetting($newSetting);
+                        $content = json_encode($this->orm->saveSetting($newSetting));
                         break;
                 }
                 break;

@@ -22,6 +22,7 @@
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Constants;
+use Ubergeek\NanoCm\Setting;
 use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
 
@@ -173,8 +174,8 @@ class AdminArticlesModule extends AbstractAdminModule {
         $article->author_id = $this->ncm->getLoggedInUser()->id;
         $article->status_code = StatusCode::LOCKED;
         $article->start_timestamp = new \DateTime('now');
-        $article->enable_comments = $this->ncm->orm->getSettingValue(Constants::SETTING_SYSTEM_ENABLECOMMENTS, true);
-        $article->enable_trackbacks = $this->ncm->orm->getSettingValue(Constants::SETTING_SYSTEM_ENABLETRACKBACKS, true);
+        $article->enable_comments = $this->ncm->orm->getSettingValue(Setting::SETTING_SYSTEM_ENABLECOMMENTS, true);
+        $article->enable_trackbacks = $this->ncm->orm->getSettingValue(Setting::SETTING_SYSTEM_ENABLETRACKBACKS, true);
 
         return $article;
     }

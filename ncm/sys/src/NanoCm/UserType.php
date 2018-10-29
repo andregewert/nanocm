@@ -43,5 +43,22 @@ final class UserType {
      * @var integer
      */
     const ADMIN = 500;
-    
+
+    /**
+     * Gibt eine Beschreibung für den übergebenen numerischen Typ-Code zurück
+     * @param $userType Benutzertyp
+     * @return string Beschreibungstext
+     * @todo Lokalisierung
+     */
+    public static function convertUserType($userType) : string {
+        switch ($userType) {
+            case self::GUEST:
+                return 'Gast';
+            case self::EDITOR:
+                return 'Redakteur';
+            case self::ADMIN:
+                return 'Administrator';
+        }
+        return 'Unbekannt';
+    }
 }

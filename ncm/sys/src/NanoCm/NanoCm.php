@@ -130,7 +130,7 @@ class NanoCm {
         $this->orm = new Orm($this->getDbHandle(), $this->log);
 
         // Template-Verzeichnis konfigurieren
-        $tpl = $this->orm->getSettingValue(Constants::SETTING_SYSTEM_TEMPLATE_PATH);
+        $tpl = $this->orm->getSettingValue(Setting::SETTING_SYSTEM_TEMPLATE_PATH);
         if (empty($tpl)) {
             $tpl = 'default';
         }
@@ -144,7 +144,7 @@ class NanoCm {
         );
 
         // Seitenlänge im Administrationsbereich
-        $this->orm->pageLength = intval($this->orm->getSettingValue(Constants::SETTING_SYSTEM_ADMIN_PAGELENGTH));
+        $this->orm->pageLength = intval($this->orm->getSettingValue(Setting::SETTING_SYSTEM_ADMIN_PAGELENGTH));
         if ($this->orm->pageLength == 0) {
             $this->orm->pageLength = 20;
             $this->log->debug("Fehlerhafte Konfiguration Seitenlänge! Benutze Standardwert.");

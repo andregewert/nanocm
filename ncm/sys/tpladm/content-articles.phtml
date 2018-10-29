@@ -2,7 +2,7 @@
     /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
-<div class="container">
+<div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
         <h1>Artikel verwalten</h1>
 
@@ -36,7 +36,7 @@
                 </select>
 
                 <a class="button spaceleft" role="button" id="button_refresh" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
             <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />

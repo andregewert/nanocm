@@ -125,7 +125,7 @@ class AdminCommentsModule extends AbstractAdminModule {
                     // Kommentar speichern
                     case 'save':
                         $comment = $this->createCommentFromRequest();
-                        $content = json_encode($comment);
+                        $content = json_encode($this->orm->saveComment($comment));
                         break;
                 }
                 break;

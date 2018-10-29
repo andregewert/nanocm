@@ -19,6 +19,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\StatusCode;
+
 /**
  * Startseite des Administrationsbereiches
  * @author André Gewert <agewert@ubergeek.de>
@@ -26,14 +28,26 @@ namespace Ubergeek\NanoCm\Module;
  * @created 2017-11-19
  */
 class AdminDashboardModule extends AbstractAdminModule {
+    public $numberOfUnmoderatedComments = 0;
 
-    /** @var string Generierter Content  */
-    private $content;
+    public $numberOfActiveComments = 0;
+
+    public $numberOfInactiveComments = 0;
+
+    public $numberOfReleasedArticles = 0;
+
+    public $numberOfUnreleasedArticles = 0;
 
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Seite verwalten');
-        $this->content = $this->renderUserTemplate('content-dashboard.phtml');
-        $this->setContent($this->content);
+
+        $this->numberOfUnmoderatedComments = $this->orm->countCommentsByStatusCode(StatusCode::MODERATION_REQUIRED);
+        $this->numberOfActiveComments = $this->orm->countCommentsByStatusCode(StatusCode::ACTIVE);
+        $this->numberOfInactiveComments = $this->orm->countInactiveComments();
+        $this->numberOfReleasedArticles = $this->orm->countReleasedArticles();
+        $this->numberOfUnreleasedArticles = $this->orm->countUnreleasedArticles();
+
+        $content = $this->renderUserTemplate('content-dashboard.phtml');
+        $this->setContent($content);
     }
-    
 }

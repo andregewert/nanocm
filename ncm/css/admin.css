@@ -45,6 +45,67 @@ a:hover {
   color: #2d5072; }
 
 /* </editor-fold> */
+/* <editor-fold desc="Container elements"> */
+div.container:after,
+div.toolbar:after,
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both; }
+
+div.toolbar {
+  clear: both; }
+
+div.container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 1180px;
+  max-width: 100%;
+  clear: both;
+  display: flow-root;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.spacing {
+  padding-left: 1em;
+  padding-left: 1rem;
+  padding-right: 1em;
+  padding-right: 1rem; }
+
+div.column-6 {
+  width: 590px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.column-4 {
+  width: 393.33333px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.column-3 {
+  width: 295px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+div.column-2 {
+  width: 196.66667px;
+  display: inline-block;
+  float: left;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+/* </editor-fold> */
 /* <editor-fold desc="Navigation elements"> */
 nav.main {
   background-color: aliceblue;
@@ -90,7 +151,8 @@ input.button {
   padding: 0.4em 1em;
   text-decoration: none !important;
   cursor: pointer;
-  line-height: 1.4em; }
+  line-height: 1.4em;
+  position: relative; }
 
 a.button:hover,
 input.button:hover {
@@ -117,6 +179,19 @@ a.button img,
 a.button-secondary img {
   vertical-align: middle;
   margin: 0 4px 0 0; }
+
+img.imageonly {
+  margin: 0 !important; }
+
+span.badge {
+  display: inline-block;
+  position: absolute;
+  border-radius: 0.6em;
+  padding: 0 0.4em;
+  top: -0.2em;
+  right: -0.1em;
+  background-color: red;
+  box-shadow: 0 0 0.2em #222; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Form elements"> */
@@ -183,12 +258,6 @@ input.big {
 
 /* </editor-fold> */
 /* <editor-fold desc="Misc elements"> */
-div.container {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 0 30px;
-  clear-after: both; }
-
 div.toolbar {
   margin: 1.5em 0 0 0;
   border-bottom: solid silver 1px;
@@ -206,6 +275,41 @@ hr {
   background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
   margin: 2em 0; }
 
+.placeholder {
+  position: relative; }
+
+.placeholder .blanker {
+  display: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  background: url("/ncm/img/spin.gif") no-repeat center; }
+
+.placeholder.loading .blanker {
+  display: block; }
+
+.placeholder.loading .content {
+  opacity: 0.2; }
+
+img.spinner {
+  vertical-align: middle;
+  margin-right: 1em;
+  opacity: 0; }
+
+img.spinner.loading {
+  opacity: 1; }
+
+.blanker {
+  position: fixed;
+  z-index: 19;
+  background-color: black;
+  opacity: 0.3;
+  width: 100%;
+  height: 100%;
+  display: none; }
+
+/* </editor-fold> */
+/* <editor-fold desc="List tables"> */
 table.list {
   width: 100%;
   border-collapse: collapse;
@@ -225,6 +329,20 @@ table.list tr.noresult td {
   text-align: center;
   font-style: italic; }
 
+td.textright {
+  text-align: right; }
+
+td.textleft {
+  text-align: left; }
+
+td.textcenter {
+  text-align: center; }
+
+td.pre {
+  font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace; }
+
+/* </editor-fold> */
+/* <editor-fold desc="Toolbars"> */
 .imgtoolbar {
   background-color: #f8f8f8;
   padding: 0.2em 0.5em;
@@ -290,39 +408,7 @@ ul.imgtoolbar_keyboard li a:hover {
   border-radius: 2px;
   border: 1px #ddd solid; }
 
-.placeholder {
-  position: relative; }
-
-.placeholder .blanker {
-  display: none;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  background: url("/ncm/img/spin.gif") no-repeat center; }
-
-.placeholder.loading .blanker {
-  display: block; }
-
-.placeholder.loading .content {
-  opacity: 0.4; }
-
-img.spinner {
-  vertical-align: middle;
-  margin-right: 1em;
-  opacity: 0; }
-
-img.spinner.loading {
-  opacity: 1; }
-
-.blanker {
-  position: fixed;
-  z-index: 19;
-  background-color: black;
-  opacity: 0.3;
-  width: 100%;
-  height: 100%;
-  display: none; }
-
+/* </editor-fold> */
 /* <editor-fold desc="Inline popups"> */
 .inlinepopup {
   box-shadow: 0 0 45px #222;

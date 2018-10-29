@@ -22,6 +22,8 @@
     Author     : André Gewert <agewert@ubergeek.de>
 */
 
+$width-content:     1180px;
+$width-column:      $width-content /12;
 $font-headlines:    Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
 $font-text:         Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
 /*$font-text:         Fira Sans, Roboto, DejaVu Sans Condensed, Lato, Trebuchet MS, Helvetica, Arial, sans-serif;*/
@@ -66,6 +68,78 @@ a {
 a:hover {
     text-decoration: underline;
     color: $link-color-alt;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Container elements"> */
+
+div.container:after,
+div.toolbar:after,
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+div.toolbar {
+    clear: both;
+}
+
+div.container {
+    margin-left: auto;
+    margin-right: auto;
+    width: $width-content;
+    max-width: 100%;
+    clear: both;
+    display: flow-root;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.spacing {
+    padding-left: 1em;
+    padding-left: 1rem;
+    padding-right: 1em;
+    padding-right: 1rem;
+}
+
+div.column-6 {
+    width: $width-column *6;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.column-4 {
+    width: $width-column *4;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.column-3 {
+    width: $width-column *3;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.column-2 {
+    width: $width-column *2;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 /* </editor-fold> */
@@ -127,6 +201,7 @@ input.button {
     text-decoration: none !important;
     cursor: pointer;
     line-height: 1.4em;
+    position: relative;
 }
 
 a.button:hover,
@@ -158,6 +233,21 @@ a.button img,
 a.button-secondary img {
     vertical-align: middle;
     margin: 0 4px 0 0;
+}
+
+img.imageonly {
+    margin: 0 !important;
+}
+
+span.badge {
+    display: inline-block;
+    position: absolute;
+    border-radius: 0.6em;
+    padding: 0 0.4em;
+    top: -0.2em;
+    right: -0.1em;
+    background-color: red;
+    box-shadow: 0 0 0.2em #222;
 }
 
 /* </editor-fold> */
@@ -241,13 +331,6 @@ input.big {
 
 /* <editor-fold desc="Misc elements"> */
 
-div.container {
-    max-width: 1140px;
-    margin: 0 auto;
-    padding: 0 30px;
-    clear-after: both;
-}
-
 div.toolbar {
     margin: 1.5em 0 0 0;
     border-bottom: solid $border-color-heavy 1px;
@@ -268,6 +351,51 @@ hr {
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
     margin: 2em 0;
 }
+
+.placeholder {
+    position: relative;
+}
+
+.placeholder .blanker {
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background: url("/ncm/img/spin.gif") no-repeat center;
+}
+
+.placeholder.loading .blanker {
+    display: block;
+}
+
+.placeholder.loading .content {
+    opacity: 0.2;
+}
+
+img.spinner {
+    vertical-align: middle;
+    margin-right: 1em;
+    opacity: 0;
+}
+
+img.spinner.loading {
+    opacity: 1;
+}
+
+.blanker {
+    position: fixed;
+    z-index: 19;
+    background-color: black;
+    opacity: 0.3;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="List tables"> */
 
 table.list {
     width: 100%;
@@ -291,6 +419,27 @@ table.list tr.noresult td {
     text-align: center;
     font-style: italic;
 }
+
+td.textright {
+    text-align: right;
+}
+
+td.textleft {
+    text-align: left;
+}
+
+td.textcenter {
+    text-align: center;
+}
+
+td.pre {
+    font-family: $font-monospace;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Toolbars"> */
 
 .imgtoolbar {
     background-color: $toolbar-bg;
@@ -369,45 +518,8 @@ ul.imgtoolbar_keyboard li a:hover {
     border: 1px $border-color solid;
 }
 
-.placeholder {
-    position: relative;
-}
+/* </editor-fold> */
 
-.placeholder .blanker {
-    display: none;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    background: url("/ncm/img/spin.gif") no-repeat center;
-}
-
-.placeholder.loading .blanker {
-    display: block;
-}
-
-.placeholder.loading .content {
-    opacity: 0.4;
-}
-
-img.spinner {
-    vertical-align: middle;
-    margin-right: 1em;
-    opacity: 0;
-}
-
-img.spinner.loading {
-    opacity: 1;
-}
-
-.blanker {
-    position: fixed;
-    z-index: 19;
-    background-color: black;
-    opacity: 0.3;
-    width: 100%;
-    height: 100%;
-    display: none;
-}
 
 /* <editor-fold desc="Inline popups"> */
 

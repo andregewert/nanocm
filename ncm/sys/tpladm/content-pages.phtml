@@ -2,7 +2,7 @@
     /* @var $this \Ubergeek\NanoCm\Module\AdminPagesModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
-<div class="container">
+<div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
         <h1>Seiten verwalten</h1>
         <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
@@ -37,7 +37,7 @@
                 </select>
 
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16" />Aktualisieren
+                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>
@@ -58,10 +58,18 @@
          * Initialisiert Event-Handler etc.
          */
         app.init = function() {
-            $('#button_refresh').click(app.refresh);
-            $('#button_edit').click(app.editSelected);
-            $('#button_lock').click(app.lockSelected);
-            $('#button_delete').click(app.deleteSelected);
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+            $('#button_edit').click(function() {
+                app.editSelected();
+            });
+            $('#button_lock').click(function() {
+                app.lockSelected();
+            });
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
             app.refresh();
         };
 
