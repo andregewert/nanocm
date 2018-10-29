@@ -63,11 +63,11 @@ use Ubergeek\NanoCm\StatusCode;
             });
 
             $('#button_add').click(function() {
-                //app.editSetting('');
+                app.editUser(null);
             });
 
             $('#button_edit').click(function() {
-                //app.editSelected();
+                app.editSelected();
             });
 
             $('#button_unlock').click(function() {
@@ -125,7 +125,7 @@ use Ubergeek\NanoCm\StatusCode;
                         type: 'GET',
                         dataType: 'JSON',
                         data: {
-                            keys: ids
+                            ids: ids
                         }
                     }).always(function () {
                         ncm.hideDefaultLoadingIndicator();
@@ -147,7 +147,7 @@ use Ubergeek\NanoCm\StatusCode;
                     type: 'GET',
                     dataType: 'JSON',
                     data: {
-                        keys: ids
+                        ids: ids
                     }
                 }).always(function () {
                     ncm.hideDefaultLoadingIndicator();
@@ -163,18 +163,84 @@ use Ubergeek\NanoCm\StatusCode;
             let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
                 ncm.showDefaultLoadingIndicator();
-                $.ajax('/admin/users/ajax/lock', {
+                $.ajax('/admin/users/ajax/unlock', {
                     cache: false,
                     type: 'GET',
                     dataType: 'JSON',
                     data: {
-                        keys: ids
+                        ids: ids
                     }
                 }).always(function () {
                     ncm.hideDefaultLoadingIndicator();
                     app.refresh();
                 });
             }
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für den ersten ausgewählten Benutzerdatensatz auf
+         */
+        app.editSelected = function() {
+            let id = ncm.getFirstSelectedRowId();
+            if (id != null) app.editUser(id);
+        }
+
+        /**
+         * Ruft die Bearbeitungsmaske für das angeklickte Benutzerkonto auf
+         */
+        app.editClickedUser = function(clickedLink) {
+            let id = $(clickedLink).attr('data-id');
+            if (id != null) app.editUser(id);
+        }
+
+        /**
+         * Ruft die Bearbeitungsmaske für Benutzerkonto mit der angegebenen ID auf
+         * @param {int} id
+         */
+        app.editUser = function(id) {
+            let dlg = new ncm.InlinePopup(
+                '/admin/users/html/edit/', {
+                    id: id
+                }, {
+                    headline:   (id > 0)? 'Benutzerkonto bearbeiten' : 'Benutzerkonto hinzufügen',
+                    width:      500,
+                    height:     480,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel: {
+                        caption: 'Abbrechen',
+                        clicked:  function() {
+                            dlg.close();
+                        }
+                    }, save: {
+                        caption: 'Speichern',
+                        clicked: function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/users/ajax/save', {
+                                cache:      false,
+                                type:       'POST',
+                                dataType:   'JSON',
+                                data:        {
+                                    id:             id,
+                                    status_code:    $('#edit_user_status_code').val(),
+                                    firstname:      $('#edit_user_firstname').val(),
+                                    lastname:       $('#edit_user_lastname').val(),
+                                    username:       $('#edit_user_username').val(),
+                                    email:          $('#edit_user_email').val(),
+                                    usertype:       $('#edit_user_usertype').val(),
+                                    password:       $('#edit_user_password').val()
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
         };
 
         app.init();

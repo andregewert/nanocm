@@ -245,6 +245,12 @@ class NanoCm {
     public function tryToLoginUser(string $username, string $passwdClear) : bool {
         $user = $this->orm->getUserByCredentials($username, $passwdClear);
         $this->session->setVar('loggedInUser', $user);
+        if ($user != null) {
+            $this->log->debug('Update login timestamp');
+            $this->orm->updateLoginTimestampByUserId($user->id);
+        } else {
+            $this->log->debug('Dont update login timestamp');
+        }
         return $user != null;
     }
     

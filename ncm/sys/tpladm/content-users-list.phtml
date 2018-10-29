@@ -24,7 +24,7 @@ use Ubergeek\NanoCm\UserType;
                     <td style="text-align: center">
                         <input type="checkbox" class="selection" value="<?php echo $user->id; ?>" style="text-align: center">
                     </td>
-                    <td><?php echo $this->htmlEncode($user->username); ?></td>
+                    <td><a href="javascript:void(0);" onclick="module.editClickedUser(this);" data-id="<?php echo intval($user->id); ?>"><?php echo $this->htmlEncode($user->username); ?></a></td>
                     <td><?php echo $this->htmlEncode($user->lastname); ?></td>
                     <td><?php echo $this->htmlEncode($user->firstname); ?></td>
                     <td><?php echo $this->htmlEncode($user->email); ?></td>

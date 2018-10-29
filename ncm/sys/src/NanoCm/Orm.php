@@ -266,6 +266,18 @@ class Orm {
     // <editor-fold desc="User">
 
     /**
+     * Aktualisiert den Zeitpunkt des letzten Logins für das angegebene Benutzerkonto auf den aktuellen Zeitpunkt
+     * @param int $id Datensatz-ID des zu ändernden Benutzerkontos
+     * @return void
+     */
+    public function updateLoginTimestampByUserId(int $id) {
+        $sql = 'UPDATE user SET last_login_timestamp = DATETIME(CURRENT_TIMESTAMP, \'localtime\') WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
      * Setzt das Passwort für einen bestimmten Benutzer
      * @param int $id Benutzer-ID
      * @param string $password Neues Passwort
@@ -351,7 +363,6 @@ class Orm {
 
         // Parameter füllen
         $stmt = $this->basedb->prepare($sql);
-        $this->log->debug($sql);
         $this->bindValues($stmt, $params);
         $stmt->execute();
 
@@ -433,11 +444,79 @@ class Orm {
     }
     
     /**
-     * Speichert den übergebenen Benutzer-Datensatz in der Datenbank
-     * @param \Ubergeek\NanoCm\User $user
+     * Speichert den übergebenen Benutzer-Datensatz in der Datenbank.
+     * ACHTUNG: Bei diesem Aufruf muss im Password-Feld bereits das gehashte Passwort stehen!
+     * @param \Ubergeek\NanoCm\User $user Der zu speichernde Benutzerkonten-Datensatz
+     * @return int Die Datensatz-ID des angelegten oder aktualisierten Benutzerkonten-Datensatzes
      */
     public function saveUser(User $user) {
-        // TODO Implementieren
+        if ($user->id < 1 && empty($user->password)) $user->password = '';
+
+        $sql = 'REPLACE INTO user (
+                    id, status_code, creation_timestamp, firstname, lastname, username, password, email, usertype
+                ) VALUES (
+                    :id, :status_code, :creation_timestamp, :firstname, :lastname, :username, :password, :email, :usertype
+                ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $user->id);
+        $stmt->bindValue('status_code', $user->status_code);
+        $stmt->bindValue('creation_timestamp', ($user->creation_timestamp == null)? null : $user->creation_timestamp->format('Y-m-d H:i:s'));
+        $stmt->bindValue('firstname', $user->firstname);
+        $stmt->bindValue('lastname', $user->lastname);
+        $stmt->bindValue('username', $user->username);
+        $stmt->bindValue('password', $user->password);
+        $stmt->bindValue('email', $user->email);
+        $stmt->bindValue('usertype', $user->usertype);
+        $stmt->execute();
+        return $this->basedb->lastInsertId('id');
+    }
+
+    /**
+     * Setzt den Status-Code für ein bestimmtes Benutzerkonto auf den angegebenen Wert
+     * @param $id Datensatz-ID des zu ändernden Benutzerkontos
+     * @param $statusCode Neuer Status-Code
+     * @return void
+     */
+    public function setUserStatusCodeById($id, $statusCode) {
+        $sql = 'UPDATE user SET status_code = :status_code WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $statusCode);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
+     * Setzt den Status-Code mehrerer Benutzerkonten auf den angegebenen Wert
+     * @param int[] $ids Datensatz-IDs der zu ändernden Benutzerkonten
+     * @param $statusCode Neuer Status-Code
+     */
+    public function setUserStatusCodeByIds(array $ids, $statusCode) {
+        foreach ($ids as $id) {
+            $this->setUserStatusCodeById($id, $statusCode);
+        }
+    }
+
+    /**
+     * Löscht das Benutzerkonto mit der angegebenen ID
+     * @param $id Datensatz-ID des zu löschenden Benutzerkontos
+     * @return void
+     */
+    public function deleteUserById($id) {
+        $sql = 'DELETE FROM user WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
+     * Löscht die Benutzerkonten mit den angegebenen IDs
+     * @param int[] $ids Datensatz-IDs der zu löschenden Benutzerkonten
+     * @return void
+     */
+    public function deleteUsersByIds(array $ids) {
+        foreach ($ids as $id) {
+            $this->deleteUserById($id);
+        }
     }
     
     // </editor-fold>
@@ -501,12 +580,10 @@ class Orm {
         $toDelete = array_diff($existingTags, $tags);
 
         foreach ($toInsert as $insert) {
-            $this->log->debug("Assigning tag $insert");
             $this->assignTagToArticle($articleId, $insert);
         }
 
         foreach ($toDelete as $delete) {
-            $this->log->debug("Unassign tag $delete");
             $this->unassignTagFromArticle($articleId, $delete);
         }
     }
@@ -1036,9 +1113,6 @@ class Orm {
      * @param Article $article
      */
     private function updateArticle(Article $article) {
-        $this->log->debug("Update article");
-        $this->log->debug($article);
-
         $article->modification_timestamp = new \DateTime();
 
         $sql = 'UPDATE article SET 
@@ -1091,9 +1165,6 @@ class Orm {
      * @return int Die generierte Artikel-ID
      */
     private function insertArticle(Article $article) {
-        $this->log->debug("Insert article");
-        $this->log->debug($article);
-
         // Grundlegende Validierung
         if ($article->start_timestamp == null) {
             $article->start_timestamp = new \DateTime();
@@ -1607,9 +1678,6 @@ class Orm {
      * @return void
      */
     private function updatePage(Page $page) {
-        $this->log->debug("Update page");
-        $this->log->debug($page);
-
         $page->modification_timestamp = new \DateTime();
 
         $sql = 'UPDATE page SET
@@ -1643,9 +1711,6 @@ class Orm {
      * @return int Die generierte Datensatz-ID
      */
     private function insertPage(Page $page) {
-        $this->log->debug('Insert page');
-        $this->log->debug($page);
-
         if ($this->isPageUrlAlreadyExisting($page->url)) {
             throw new InvalidDataException("URL bereits vergeben: $page->url");
         }

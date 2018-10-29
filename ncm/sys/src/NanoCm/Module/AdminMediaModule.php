@@ -30,9 +30,6 @@ class AdminMediaModule extends AbstractAdminModule {
 
     public function run() {
         $content = '';
-        //$this->setTitle($this->getSiteTitle() . ' - Medien verwalten');
-        //$this->content = $this->renderUserTemplate('content-media.phtml');
-        //$this->setContent($this->content);
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -54,7 +51,13 @@ class AdminMediaModule extends AbstractAdminModule {
 
                 }
                 break;
+
+            // Trägerseite
+            case 'index.php':
+            case '':
+                $content = $this->renderUserTemplate('content-media.phtml');
         }
+
         $this->setContent($content);
     }
 
