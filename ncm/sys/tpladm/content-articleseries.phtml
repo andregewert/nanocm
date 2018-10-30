@@ -1,0 +1,229 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminArticleseriesModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
+<div class="container spacing">
+    <form onsubmit="module.refresh(); return false;">
+        <h1>Artikelserien verwalten</h1>
+        <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Artikelserie hinzuf&uuml;gen">
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
+                </a>
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Artikelserie bearbeiten">
+                    <img src="/ncm/img/fatcow/16/comment_edit.png" alt="" width="16" height="16">Bearbeiten
+                </a>
+                <a id="button_unlock" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Artikelserie freigeben">
+                    <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Freigeben
+                </a>
+                <a id="button_lock" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Artikelserie sperren">
+                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Artikelserie l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/comment_delete.png" alt="" width="16" height="16">L&ouml;schen
+                </a>
+            </span>
+            <span class="right" style="float: right; vertical-align: middle">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif">
+                <label for="input_searchTerm">Suche</label>
+                <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
+                <label for="select_searchStatusCode" class="spaceleft">Status</label>
+                <select id="select_searchStatusCode">
+                    <option value="">- Alle -</option>
+                    <?php foreach ($this->availableStatusCodes as $code) : ?>
+                        <option value="<?php echo $code; ?>" <?php if ($this->searchStatusCode != '' && $this->searchStatusCode == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <a class="button spaceleft" role="button" id="button_refresh" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                </a>
+            </span>
+        </div>
+
+        <div id="placeholder_articleseries" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function Articleseries() {
+        let app = this;
+        app.page = $('#input_searchPage').val();
+
+        app.init = function() {
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+            $('#button_add').click(function() {
+                app.editSeries(null);
+            });
+            $('#button_edit').click(function() {
+                app.editSelected();
+            });
+            $('#button_lock').click(function() {
+                app.lockSelected();
+            });
+            $('#button_unlock').click(function() {
+                app.unlockSelected();
+            });
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
+
+            app.refresh();
+        };
+
+        /**
+         * Aktualisiert die angezeigte Seite der Artikelserien
+         * @param {int} page
+         */
+        app.refresh = function(page) {
+            ncm.showDefaultLoadingIndicator();
+            if (typeof page === 'undefined') page = app.page;
+
+            $.ajax('/admin/articleseries/html/list', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                    searchTerm:         $('#input_searchTerm').val(),
+                    searchStatusCode:   $('#select_searchStatusCode').val(),
+                    searchPage:         page
+                }
+            }).done(function(data) {
+                $('#placeholder_articleseries .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                ncm.hideDefaultLoadingIndicator();
+            });
+        };
+
+        app.editClickedSeries = function(clickedLink) {
+            let id = $(clickedLink).attr('data-id');
+            app.editSeries(id);
+        };
+
+        app.editSeries = function(id) {
+            let dlg = new ncm.InlinePopup(
+                '/admin/articleseries/html/edit/', {
+                    id: id
+                }, {
+                    headline:   (id == null)? 'Artikelserie anlegen' : 'Artikelserie bearbeiten',
+                    width:      500,
+                    height:     320,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel: {
+                        caption: 'Abbrechen',
+                        clicked: function() {
+                            dlg.close();
+                        }
+                    },
+                    save: {
+                        caption: 'Speichern',
+                        clicked: function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/articleseries/ajax/save', {
+                                cache: false,
+                                type: 'POST',
+                                dataType: 'JSON',
+                                data:   {
+                                    id:                 id,
+                                    status_code:        $('#edit_articleseries_status_code').val(),
+                                    title:              $('#edit_articleseries_title').val(),
+                                    description:        $('#edit_articleseries_description').val(),
+                                    sorting_key:        $('#edit_articleseries_sorting_key').val()
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für die erste ausgewählte Artikelserie auf
+         */
+        app.editSelected = function() {
+            let id = ncm.getFirstSelectedRowId();
+            if (id != null) {
+                app.editSeries(id);
+            }
+        };
+
+        app.lockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                $.ajax('/admin/articleseries/ajax/lock', {
+                    cache: false,
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: {
+                        ids: ids
+                    }
+                }).always(function () {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        app.unlockSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                $.ajax('/admin/articleseries/ajax/unlock', {
+                    cache: false,
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: {
+                        ids: ids
+                    }
+                }).always(function () {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        };
+
+        /**
+         * Löscht alle ausgewählten Artikelserien
+         */
+        app.deleteSelected = function() {
+            let ids = ncm.getSelectedRowIds();
+            if (ids.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Artikelserien wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
+                    $.ajax('/admin/articleseries/ajax/delete', {
+                        cache: false,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: {
+                            ids: ids
+                        }
+                    }).always(function () {
+                        ncm.hideDefaultLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new Articleseries();
+    });
+</script>

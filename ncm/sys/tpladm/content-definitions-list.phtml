@@ -1,0 +1,39 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminDefinitionsModule */
+?>
+<table class="list">
+    <thead>
+    <tr>
+        <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+        <th>Typ</th>
+        <th>Schl&uuml;ssel</th>
+        <th>Titel</th>
+        <th>Wert</th>
+        <th>Parameter</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php if (is_array($this->definitions) && count($this->definitions) > 0) : ?>
+        <?php foreach ($this->definitions as $definition) : ?>
+            <tr>
+                <td style="text-align: center">
+                    <input type="checkbox" class="selection" value="<?php echo $this->htmlEncode($definition->definitiontype . ' ' . $definition->key); ?>" style="text-align: center">
+                </td>
+                <td><?php echo $this->htmlEncode($definition->definitiontype); ?></td>
+                <td><a href="javascript:void(0);"
+                       data-definitiontype="<?php echo $this->htmlEncode($definition->definitiontype); ?>"
+                       data-key="<?php echo $this->htmlEncode($definition->key); ?>"
+                       onclick="module.editClickedDefinition(this);"><?php echo $this->htmlEncode($definition->key); ?></a></td>
+                <td><?php echo $this->htmlEncode($definition->title); ?></td>
+                <td><?php echo $this->htmlEncode($definition->value); ?></td>
+                <td><?php echo $this->htmlEncode($definition->parameters); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <tr class="noresult">
+            <td colspan="6">Keine Definitionen gefunden</td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+</table>
+<?php $this->includeUserTemplate('blocks/list-paging.phtml'); ?>

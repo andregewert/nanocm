@@ -77,6 +77,8 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                     case 'media':
                     case 'stats':
                     case 'settings':
+                    case 'definitions':
+                    case 'articleseries':
                         $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
                         break;
 

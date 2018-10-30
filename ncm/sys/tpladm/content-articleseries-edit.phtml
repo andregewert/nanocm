@@ -1,0 +1,30 @@
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminArticleseriesModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
+<?php if ($this->articleseries->id != null) : ?>
+    <div class="row">
+        <label>Erstellungsdatum</label>
+        <input type="text" readonly="readonly" value="<?php echo $this->articleseries->creation_timestamp->format('Y-m-d H:i'); ?>">
+    </div>
+    <div class="row">
+        <label>Letzte &Auml;nderung</label>
+        <input type="text" readonly="readonly" value="<?php echo $this->articleseries->modification_timestamp->format('Y-m-d H:i'); ?>">
+    </div>
+<?php endif; ?>
+<div class="row">
+    <label>Titel</label>
+    <input type="text" class="autofocus" id="edit_articleseries_title" value="<?php echo $this->htmlEncode($this->articleseries->title); ?>">
+</div>
+<div class="row">
+    <label>Beschreibung</label>
+    <input type="text" id="edit_articleseries_description" value="<?php echo $this->htmlEncode($this->articleseries->description); ?>">
+</div>
+<div class="row">
+    <label>Status</label>
+    <select id="edit_articleseries_status_code" size="1">
+        <?php foreach ($this->availableStatusCodes as $code) : ?>
+            <option value="<?php echo $code; ?>" <?php if ($this->articleseries->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>

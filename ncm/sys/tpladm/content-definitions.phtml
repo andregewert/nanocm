@@ -1,18 +1,21 @@
-<?php  /* @var $this \Ubergeek\NanoCm\Module\AdminSettingsModule */ ?>
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminArticleseriesModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
 <div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
-        <h1>Erweiterte Einstellungen verwalten</h1>
+        <h1>Definitionen verwalten</h1>
         <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
 
         <div class="toolbar">
             <span class="left">
-                <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Einstellung hinzuf&uuml;gen">
+                <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Definition hinzuf&uuml;gen">
                     <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
                 </a>
-                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Einstellung bearbeiten">
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Definition bearbeiten">
                     <img src="/ncm/img/fatcow/16/toolbar_edit.png" alt="" width="16" height="16">Bearbeiten
                 </a>
-                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Einstellungen l&ouml;schen">
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Definition l&ouml;schen">
                     <img src="/ncm/img/fatcow/16/toolbar_delete.png" alt="" width="16" height="16">L&ouml;schen
                 </a>
             </span>
@@ -28,7 +31,7 @@
             </span>
         </div>
 
-        <div id="placeholder_settings" class="placeholder">
+        <div id="placeholder_definitions" class="placeholder">
             <div class="blanker"></div>
             <div class="content"></div>
         </div>
@@ -36,7 +39,7 @@
 </div>
 
 <script type="text/javascript">
-    function Settings() {
+    function Definitions() {
         let app = this;
         app.page = $('#input_searchPage').val();
 
@@ -46,7 +49,7 @@
             });
 
             $('#button_add').click(function() {
-                app.editSetting('');
+                app.editDefinition('', '');
             });
 
             $('#button_edit').click(function() {
@@ -68,7 +71,7 @@
             ncm.showDefaultLoadingIndicator();
             if (typeof page === 'undefined') page = app.page;
 
-            $.ajax('/admin/settings/html/list', {
+            $.ajax('/admin/definitions/html/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
@@ -77,7 +80,7 @@
                     searchPage: page
                 }
             }).done(function(data) {
-                $('#placeholder_settings .content').html(data);
+                $('#placeholder_definitions .content').html(data);
                 $('.selectall').click(function() {
                     ncm.toggleAllRowsSelection(this);
                 });
@@ -86,19 +89,21 @@
             });
         };
 
-        app.editClickedSetting = function(clickedLink) {
+        app.editClickedDefinition = function(clickedLink) {
+            let definitiontype = $(clickedLink).attr('data-definitiontype');
             let key = $(clickedLink).attr('data-key');
-            app.editSetting(key);
+            app.editDefinition(definitiontype, key);
         };
 
-        app.editSetting = function(key) {
+        app.editDefinition = function(definitiontype, key) {
             let dlg = new ncm.InlinePopup(
-                '/admin/settings/html/edit/' + key, {
+                '/admin/definitions/html/edit/', {
+                    definitiontype: definitiontype,
                     key: key
                 }, {
-                    headline:   'Einstellung bearbeiten',
+                    headline:   (definitiontype == '' && key == '')? 'Definition anlegen' : 'Definition bearbeiten',
                     width:      500,
-                    height:     200,
+                    height:     320,
                     loaded:     function() {
                         ncm.focusDefaultElement();
                     }
@@ -113,14 +118,16 @@
                         caption: 'Speichern',
                         clicked: function() {
                             ncm.showDefaultLoadingIndicator();
-                            $.ajax('/admin/settings/ajax/save', {
+                            $.ajax('/admin/definitions/ajax/save', {
                                 cache: false,
                                 type: 'POST',
                                 dataType: 'JSON',
                                 data:   {
-                                    key:    $('#edit_setting_key').val(),
-                                    value:  $('#edit_setting_value').val(),
-                                    params: $('#edit_setting_params').val()
+                                    definitiontype:     $('#edit_definition_definitiontype').val(),
+                                    key:                $('#edit_definition_key').val(),
+                                    title:              $('#edit_definition_title').val(),
+                                    value:              $('#edit_definition_value').val(),
+                                    parameters:         $('#edit_definition_parameters').val()
                                 }
                             }).always(function() {
                                 ncm.hideDefaultLoadingIndicator();
@@ -139,7 +146,7 @@
         app.editSelected = function() {
             let id = ncm.getFirstSelectedRowId();
             if (id != null) {
-                app.editSetting(id);
+                app.editSetting(id.split(' ', 1)[0], id.split(' ', 1)[1]);
             }
         };
 
@@ -151,7 +158,7 @@
             if (ids.length > 0) {
                 if (confirm('Wollen Sie die ausgewählten Einstellungen wirklich endgültig löschen?')) {
                     ncm.showDefaultLoadingIndicator();
-                    $.ajax('/admin/settings/ajax/delete', {
+                    $.ajax('/admin/definitions/ajax/delete', {
                         cache: false,
                         type: 'GET',
                         dataType: 'JSON',
@@ -170,6 +177,6 @@
     }
 
     $(document).ready(function() {
-        module = new Settings();
+        module = new Definitions();
     });
 </script>

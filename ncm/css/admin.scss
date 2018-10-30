@@ -58,6 +58,12 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: $font-headlines;
+    margin-top: 0.4em;
+    margin-bottom: 0.2em;
+}
+
+h1 {
+    margin-top: 1em;
 }
 
 a {
@@ -253,6 +259,35 @@ span.badge {
 /* </editor-fold> */
 
 
+/* <editor-fold desc="Inline menu lists" */
+
+ul.inlinemenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.inlinemenu li {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+ul.inlinemenu li a {
+    display: block;
+    line-height: 2em;
+}
+
+ul.inlinemenu li a:hover {
+    background-color: #f5f5f5;
+    /*
+    outline: solid silver 1px;
+    outline-radius: 5px;
+    */
+}
+
+/* </editor-fold> */
+
+
 /* <editor-fold desc="Form elements"> */
 
 input, select, option, textarea {
@@ -339,6 +374,7 @@ div.toolbar {
 
 footer {
     border-top: solid $border-color-heavy 1px;
+    margin-top: 1rem;
 }
 
 div.toolbar .spaceleft {
@@ -434,6 +470,7 @@ td.textcenter {
 
 td.pre {
     font-family: $font-monospace;
+    font-size: 0.95em;
 }
 
 /* </editor-fold> */

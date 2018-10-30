@@ -4,6 +4,9 @@ use Ubergeek\NanoCm\Setting; ?>
 <div class="container spacing">
     <h1>&Uuml;bersicht</h1>
 </div>
+<div class="container spacing">
+    <h2>Kennzahlen</h2>
+</div>
 <div class="container">
     <div class="column-4 spacing">
         <table class="list" style="margin-top: 0">
@@ -72,6 +75,29 @@ use Ubergeek\NanoCm\Setting; ?>
                     <span class="badge"><?php echo $this->numberOfUnmoderatedComments; ?></span>
                 <?php endif; ?>
             </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="column-4 spacing">
+            <h2>Inhaltsverwaltung</h2>
+            <ul class="inlinemenu">
+                <li><a href="/admin/articles/">Artikel</a></li>
+                <li><a href="/admin/comments/">Kommentare</a></li>
+                <li><a href="/admin/articleseries/">Artikelserien</a></li>
+                <li><a href="/admin/pages/">Seiten</a></li>
+                <li><a href="/admin/lists/">Listen</a></li>
+                <li><a href="/admin/media/">Medien</a></li>
+            </ul>
+        </div>
+        <div class="column-4 spacing">
+            <h2>Erweiterte Verwaltung</h2>
+            <ul class="inlinemenu">
+                <li><a href="/admin/users/">Benutzerkonten</a></li>
+                <li><a href="/admin/definitions/">Definitionen</a></li>
+                <li><a href="/admin/stats/">Statistiken</a></li>
+                <li><a href="/admin/settings/">Einstellungen</a></li>
+            </ul>
         </div>
     </div>
 </div>

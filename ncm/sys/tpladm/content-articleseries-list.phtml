@@ -1,0 +1,34 @@
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminArticleseriesModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
+<table class="list">
+    <thead>
+    <tr>
+        <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+        <th>Titel</th>
+        <th>Beschreibung</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php if (is_array($this->seriesList) && count($this->seriesList) > 0) : ?>
+        <?php foreach ($this->seriesList as $series) : ?>
+            <tr>
+                <td style="text-align: center">
+                    <input type="checkbox" class="selection" value="<?php echo $series->id; ?>" style="text-align: center">
+                </td>
+                <td><a href="javascript:void(0);" data-id="<?php echo $this->htmlEncode($series->id); ?>"
+                       onclick="module.editClickedSeries(this);"><?php echo $this->htmlEncode($series->title); ?></a></td>
+                <td><?php echo $this->htmlEncode($series->description); ?></td>
+                <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($series->status_code)); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <tr class="noresult">
+            <td colspan="4">Keine Artikelserien gefunden</td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+</table>
+<?php $this->includeUserTemplate('blocks/list-paging.phtml'); ?>

@@ -91,7 +91,134 @@ class Orm {
             $this->log = new \Ubergeek\Log\Logger();
         }
     }
-    
+
+
+    // <editor-fold desc="Definitions">
+
+    /**
+     * Speichert den übergebenen Definitionsdatensatz in der Datenbank
+     * @param Definition $definition Die zu speichernde Definition
+     */
+    public function saveDefinition(Definition $definition) {
+        $sql = 'REPLACE INTO definition (
+                definitiontype, key, title, value, parameters) VALUES (
+                :type, :key, :title, :value, :parameters
+                ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('type', $definition->definitiontype);
+        $stmt->bindValue('key', $definition->key);
+        $stmt->bindValue('title', $definition->title);
+        $stmt->bindValue('value', $definition->value);
+        $stmt->bindValue('parameters', $definition->parameters);
+        $stmt->execute();
+    }
+
+    /**
+     * Ermittelt alle Definitionsdatensätze, die zu dem angegebenen Definitionstyp gehören
+     * @param string $type Definitionstyp
+     * @return Definition[] Die gefundenen Definitionsdatensätze
+     */
+    public function getDefinitionsByType(string $type) {
+        $sql = 'SELECT * FROM definition WHERE definitiontype = :type ORDER BY title ASC, value ASC, parameters ASC ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('type', $type);
+        $stmt->execute();
+
+        $definitions = array();
+        while (($definition = Definition::fetchFromPdoStatement($sql)) !== null) {
+            $definitions[] = $definition;
+        }
+        return $definitions;
+    }
+
+    /**
+     * Ermittelt einen Definitionsdatensatz anhand von Definitionstyp und Schlüssel aus
+     * @param string $type Definitionstyp
+     * @param string $key Schlüssel
+     * @return Definition Definitionsdatensatz oder null
+     */
+    public function getDefinitionByTypeAndKey(string $type, string $key) {
+        $sql = 'SELECT * FROM definition WHERE definitiontype = :type AND key = :key ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('type', $type);
+        $stmt->bindValue('key', $key);
+        $stmt->execute();
+        return Definition::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Löscht einen Definitionsdatensatz anhand von Typ und Key
+     * @param string $type Definitionstyp
+     * @param string $key Schlüssel
+     * @return void
+     */
+    public function deleteDefinitionByTypeAndKey(string $type, string $key) {
+        $sql = 'DELETE FROM definition WHERE definitiontype = :type AND key = :key ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('type', $type);
+        $stmt->bindValue('key', $key);
+        $stmt->execute();
+    }
+
+    /**
+     * Durchsucht die Definitionstabelle nach verschiedenen Kriterien
+     * @param string $type Definitionstyp
+     * @param string|null $searchterm Freier Suchbegriff
+     * @param bool $countOnly Auf true setzen, um nur die Anzahl der Suchtreffer zu ermitteln
+     * @param int|null $page Optionale Seitenangabe (bei 1 beginnend)
+     * @param int|null $limit Optionales Limit für die Ergebnismenge
+     * @return array|int Gefundene Datensätze oder Anzahl der Treffer
+     */
+    public function searchDefinitions($type = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $definitions = array();
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= 'FROM definition WHERE 1 = 1 ';
+
+        if (!empty($type)) {
+            $sql .= ' AND definitiontype = :type ';
+            $params['type'] = $type;
+        }
+
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND (title LIKE :search_title OR value LIKE :search_value OR parameters LIKE :search_parameters) ';
+            $params['search_title'] = $like;
+            $params['search_value'] = $like;
+            $params['search_parameters'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY definitiontype ASC, key ASC, title ASC, value ASC, parameters ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        // Parameter setzen und Query ausführen
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        // Ergebnis auslesen
+        if ($countOnly) return $stmt->fetchColumn();
+        while (($definition = Definition::fetchFromPdoStatement($stmt)) !== null) {
+            $definitions[] = $definition;
+        }
+        return $definitions;
+    }
+
+    // </editor-fold>
+
+
     // <editor-fold desc="Settings">
 
     /**
@@ -874,6 +1001,120 @@ class Orm {
         $stmt->bindValue('content', $comment->content);
         $stmt->execute();
         return $this->basedb->lastInsertId('id');
+    }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Articleseries">
+
+    public function searchArticleseries(Articleseries $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= 'FROM articleseries WHERE 1 = 1 ';
+
+        // Optionaler Filter
+        if ($filter instanceof Articleseries) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :status_code ';
+                $params['status_code'] = $filter->status_code;
+            }
+        }
+
+        // Freier Suchbegriff
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= 'AND (title LIKE :search_title OR description LIKE :search_description) ';
+            $params['search_title'] = $like;
+            $params['search_description'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY title ASC, description ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        // Parameter füllen und Query ausführen
+        $this->log->debug($sql);
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        // Ergebnis auslesen
+        if ($countOnly) return $stmt->fetchColumn();
+        $articleseries = array();
+        while (($series = Articleseries::fetchFromPdoStatement($stmt)) !== null) {
+            $articleseries[] = $series;
+        }
+        return $articleseries;
+    }
+
+    /**
+     * @param Articleseries $articleseries
+     * @return int Datensatz-ID
+     */
+    public function saveArticleseries($articleseries) {
+        if ($articleseries->id == 0) $articleseries->id = null;
+
+        $sql = 'REPLACE INTO articleseries (
+                id, creation_timestamp, status_code, title, description, sorting_key
+                ) VALUES (
+                :id, :creation_timestamp, :status_code, :title, :description, :sorting_key
+                ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $articleseries->id);
+        $stmt->bindValue('creation_timestamp', ($articleseries->creation_timestamp == null)? null : $articleseries->creation_timestamp->format('Y-m-d H:i:s'));
+        $stmt->bindValue('status_code', $articleseries->status_code);
+        $stmt->bindValue('title', $articleseries->title);
+        $stmt->bindValue('description', $articleseries->description);
+        $stmt->bindValue('sorting_key', $articleseries->sorting_key);
+        $stmt->execute();
+        return $this->basedb->lastInsertId('id');
+    }
+
+    public function getArticleseriesById($id) {
+        $sql = 'SELECT * FROM articleseries WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        return Articleseries::fetchFromPdoStatement($stmt);
+    }
+
+    public function deleteArticleseriesById($id) {
+        $sql = 'DELETE FROM articleseries WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    public function deleteArticleseriesByIds(array $ids) {
+        foreach ($ids as $id) {
+            $this->deleteArticleseriesById($id);
+        }
+    }
+
+    public function setArticleseriesStatusCodeById($id, $statusCode) {
+        $sql = 'UPDATE articleseries SET status_code = :status_code WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $statusCode);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    public function setArticleseriesStatusCodeByIds($ids, $statusCode) {
+        foreach ($ids as $id) {
+            $this->setArticleseriesStatusCodeById($id, $statusCode);
+        }
     }
 
     // </editor-fold>

@@ -3,14 +3,14 @@
     $current = $this->getRelativeUrlPart(1);
 ?>
 <nav class="main">
-    <a class="logo" href="/admin/index.php" tabindex="20">
-        <img src="/ncm/img/nanocm-logo.png" alt="NanoCM" title="NanoCM" width="120" />
-    </a>
+    <a class="logo" href="/admin/index.php" tabindex="20"><img src="/ncm/img/nanocm-logo.png" alt="NanoCM" title="NanoCM" width="120"></a>
 
     <ul class="navbar">
+        <!--
         <li class="nav-item<?php if ($current == '' || $current == 'index.php') echo ' active'; ?>">
             <a class="nav-link" href="/admin/index.php" tabindex="20">Dashboard</a>
         </li>
+        -->
         <li class="nav-item<?php if ($current == 'articles') echo ' active'; ?>">
             <a class="nav-link" href="/admin/articles/index.php" tabindex="20">Artikel</a>
         </li>
