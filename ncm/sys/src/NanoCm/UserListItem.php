@@ -101,7 +101,6 @@ class UserListItem {
      */
     public static function fetchFromPdoStatement(\PDOStatement $stmt) {
         /* @var $userListItem \Ubergeek\NanoCm\UserListItem */
-
         if (($userListItem = $stmt->fetchObject(__CLASS__)) !== false) {
             $userListItem->creation_timestamp = new \DateTime($userListItem->creation_timestamp);
             $userListItem->modification_timestamp = new \DateTime($userListItem->modification_timestamp);

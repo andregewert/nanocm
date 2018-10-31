@@ -1569,7 +1569,6 @@ class Orm {
         $stmt->bindValue('parameters', $item->parameters);
         $stmt->bindValue('sorting_code', $item->sorting_code);
         $stmt->execute();
-
         return $this->basedb->lastInsertId('id');
     }
 

@@ -44,9 +44,7 @@ final class Util {
      * @return string HTML-kodierter String
      */
     public static function htmlEncode($string) : string {
-        if (empty($string)) {
-            $string = '';
-        }
+        $string = (string)$string;
         return htmlentities($string, ENT_HTML5, 'utf-8');
     }
     
