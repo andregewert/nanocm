@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NanoCM
  * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
@@ -19,38 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek;
+namespace Ubergeek\Cache;
 
 /**
- * Bildet ein Schlüssel-Wert-Paar ab
+ * Markierungs-Interface für alle Custom Exceptions im Cache-Namespace
  *
- * @package Ubergeek
+ * @package Ubergeek\Cache
  * @author André Gewert <agewert@ubergeek.de>
+ * @created 2018-10-31
  */
-class KeyValuePair {
-    
-    /**
-     * Schlüssel
-     *
-     * @var string
-     */
-    public $key;
-
-    /**
-     * Wert
-     *
-     * @var mixed
-     */
-    public $value;
-    
-    /**
-     * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
-     *
-     * @param string $key Schlüssel
-     * @param object $value Wert
-     */
-    public function __construct(string $key = null, $value = null) {
-        $this->key = $key;
-        $this->value = $value;
-    }
+class ExceptionInterface  {
 }

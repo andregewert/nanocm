@@ -20,6 +20,7 @@
 namespace Ubergeek\NanoCm\Module;
 
 use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\Net\Fetch;
 
 /**
  * Startseite des Administrationsbereiches
@@ -38,6 +39,8 @@ class AdminDashboardModule extends AbstractAdminModule {
 
     public $numberOfUnreleasedArticles = 0;
 
+    public $isSiteDbAccessible = false;
+
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Seite verwalten');
 
@@ -46,6 +49,11 @@ class AdminDashboardModule extends AbstractAdminModule {
         $this->numberOfInactiveComments = $this->orm->countInactiveComments();
         $this->numberOfReleasedArticles = $this->orm->countReleasedArticles();
         $this->numberOfUnreleasedArticles = $this->orm->countUnreleasedArticles();
+
+        // Überprüfen, ob das Systemverzeichnis / die Site-Datenbank von außen erreichbar ist
+        $url = (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off')? 'http://' : 'https://';
+        $url .= $_SERVER['HTTP_HOST'] . $this->ncm->relativeBaseUrl . '/ncm/sys/db/site.sqlite';
+        $this->isSiteDbAccessible = Fetch::isUrlAccessible($url);
 
         $content = $this->renderUserTemplate('content-dashboard.phtml');
         $this->setContent($content);

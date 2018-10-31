@@ -20,6 +20,8 @@
 
 namespace Ubergeek\Net;
 
+use Ubergeek\Cache\CacheInterface;
+
 /**
  * Implementiert einen einfachen Mechanismus, um Inhalte per HTTP(S) von einer gegebenen URL auszulesen
  * Optional kann ein Cache verwendet werden, um die angeforderten Inhalte zwischenzuspeichern.
@@ -30,7 +32,14 @@ namespace Ubergeek\Net;
  */
 class Fetch {
 
-    public static function fetchFromUrl($url, $cache = null) {
+    /**
+     * Ruft den Inhalt von der angegebenen URL ab und gibt ihn als String zurück
+     *
+     * @param string $url Die abzurufende URL
+     * @param CacheInterface $cache Optional zu nutzende Cache-Instanz
+     * @return string Der abgerufene Inhalt
+     */
+    public static function fetchFromUrl(string $url, $cache = null) {
 
         // TODO Cache abfragen
 
@@ -43,6 +52,30 @@ class Fetch {
             $response = file_get_contents($url);
         }
         return $response;
+    }
+
+    /**
+     * Überprüft, ob die angegebene URL fehlerfrei abgerufen werden kann
+     *
+     * Hinweis: Für diese Funktionalität muss die PHP-Extension curl installiert sein.
+     * Andernfalls liefert die Methode immer true zurück.
+     *
+     * @param string $url Die zu prüfende URL
+     * @return bool true, wenn der Zugriff (ohne Authentifizierung) fehlerfrei möglich ist
+     */
+    public static function isUrlAccessible(string $url) : bool {
+        if (!function_exists('curl_init')) return true;
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        $result = curl_exec($ch);
+
+        if ($result !== false) {
+            $info = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+            curl_close($ch);
+            return $info == 200;
+        }
+        return false;
     }
 
 }

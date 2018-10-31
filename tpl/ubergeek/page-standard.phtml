@@ -17,6 +17,7 @@
                     <ul>
                         <li><a href="/meta/kontakt.html">Kontakt</a></li>
                         <li>&bullet;&nbsp;<a href="/meta/datenschutz.html">Datenschutz</a></li>
+
                     </ul>
                 </nav>
             </div>
@@ -32,17 +33,6 @@
         <div class="frame bg-header-light">
             <div class="container">
                 <footer class="clearfix">
-                    <!--
-                    <div class="column-3">
-                        <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
-                            <?php if ($this->ncm->isUserLoggedIn()) : ?>
-                                <a href="/logout.php">Abmelden</a>
-                            <?php else : ?>
-                                <a href="/login.php">Anmelden</a>
-                            <?php endif; ?>
-                        </p>
-                    </div>
-                    -->
                     <div class="spacing column-3">
                         <h1>Neueste Artikel</h1>
                     </div>
@@ -54,6 +44,15 @@
                     </div>
                     <div class="spacing column-3">
                         <h1>Soziale Medien</h1>
+                    </div>
+                    <div style="clear: both" class="spacing">
+                        <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
+                            <?php if ($this->ncm->isUserLoggedIn()) : ?>
+                                <a href="/logout.php">Abmelden</a>
+                            <?php else : ?>
+                                <a href="/login.php">Anmelden</a>
+                            <?php endif; ?>
+                        </p>
                     </div>
                 </footer>
             </div>

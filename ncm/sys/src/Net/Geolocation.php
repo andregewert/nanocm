@@ -29,6 +29,80 @@ namespace Ubergeek\Net;
  */
 class Geolocation {
 
-    // ...
+    // <editor-fold desc="Properties">
+
+    /**
+     * Ländername
+     * @var string
+     */
+    public $country;
+
+    /**
+     * Länderkürzel
+     * @var string
+     */
+    public $countryCode;
+
+    /**
+     * Regionalcode (bspw. HH für Hamburg)
+     * @var string
+     */
+    public $region;
+
+    /**
+     * Name der Region
+     * @var string
+     */
+    public $regionName;
+
+    /**
+     * Stadt
+     * @var string
+     */
+    public $city;
+
+    /**
+     * Postleitzahl
+     * @var string
+     */
+    public $zip;
+
+    /**
+     * Latitude
+     * @var float
+     */
+    public $latitude;
+
+    /**
+     * Longitude
+     * @var float
+     */
+    public $longitude;
+
+    /**
+     * Zeitzone
+     * @var string
+     */
+    public $timezone;
+
+    /**
+     * Name des Internet Service Providers
+     * @var string
+     */
+    public $isp;
+
+    /**
+     * Name der Organisation
+     * @var string
+     */
+    public $organisation;
+
+    /**
+     * Nummer / Name des autonomen Systems
+     * @var string
+     */
+    public $asName;
+
+    // </editor-fold>
 
 }

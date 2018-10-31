@@ -18,7 +18,11 @@
  */
 
 namespace Ubergeek\NanoCm;
+use Ubergeek\Cache\FileCache;
 use Ubergeek\Log;
+use Ubergeek\Net\Fetch;
+use Ubergeek\Net\Geolocation;
+use Ubergeek\Net\GeolocationService;
 
 /**
  * Basis-Logikklasse für das CMS
@@ -93,6 +97,12 @@ class NanoCm {
      * @var string
      */
     public $sysdir;
+
+    /**
+     * Absoluter Dateipfad für den Cache
+     * @var string
+     */
+    public $cachedir;
     
     /**
      * Relative Basis-URL zur NanoCM-Installation
@@ -117,6 +127,7 @@ class NanoCm {
         $this->pubdir = $basepath;
         $this->ncmdir = Util::createPath($this->pubdir, 'ncm');
         $this->sysdir = Util::createPath($this->pubdir, 'ncm', 'sys');
+        $this->cachedir = Util::createPath($this->pubdir, 'ncm', 'sys', 'cache');
         $this->relativeBaseUrl = substr($this->pubdir, strlen($_SERVER['DOCUMENT_ROOT']));
         
         if (empty($this->relativeBaseUrl)) {
@@ -153,6 +164,13 @@ class NanoCm {
         // Session-Initialisierung
         $this->session = new \Ubergeek\Session\SimpleSession('ncm');
         $this->session->start();
+
+
+        // Zum Testen: Cache und GeolocationService
+        //$ip = '78.50.12.56';
+        //$cache = new FileCache($this->cachedir, 60, 'ip-', $this->log);
+        //$geolocationservice = new GeolocationService($cache);
+        //var_dump($geolocationservice->getGeolocationForIpAddress($ip));
     }
     
     /**

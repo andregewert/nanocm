@@ -89,6 +89,12 @@ class Setting
     public const SETTING_SYSTEM_WEBMASTER_URL = 'system.webmaster.url';
 
     /**
+     * Diese Einstellung gibt an, ob die Statistiken Geolocation-Informationen führen sollen
+     * @var string
+     */
+    public const SETTING_SYSTEM_STATS_ENABLEGEOLOCATION = 'system.stats.enablegeolocation';
+
+    /**
      * Passwort für den Administrationszugang
      * @var string
      */
