@@ -22,6 +22,7 @@
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Page;
+use Ubergeek\NanoCm\Setting;
 
 /**
  * Kern(-Ausgabe-)modul des NanoCM.
@@ -55,6 +56,13 @@ class CoreModule extends AbstractModule {
 
     public function run() {
         $parts = $this->getRelativeUrlParts();
+
+        // Das CoreModule protokolliert Seitenzugriffe, wenn die Funktion aktiviert ist
+        if ($this->orm->getSettingValue(Setting::SETTING_SYSTEM_STATS_ENABLEACCESSLOG) == '1') {
+            $this->orm->logHttpRequest(
+                $this->ncm->createAccessLogEntry($this->frontController->getHttpRequest())
+            );
+        }
 
         switch ($parts[0]) {
             

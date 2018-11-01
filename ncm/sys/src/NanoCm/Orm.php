@@ -53,24 +53,35 @@ class Orm {
 
     /**
      * Handle für die Basis-Datenbank
+     *
      * @var \PDO
      */
     private $basedb;
+
+    /**
+     * PDO-Handle für die Statistik-Datenbank
+     *
+     * @var \PDO
+     */
+    private $statsdb;
     
     /**
      * Optionale Log-Instanz
+     *
      * @var \Ubergeek\Log\LoggerInterface
      */
     private $log;
 
     /**
      * Seitenlänge für Suchergebnisse
+     *
      * @var int
      */
     public $pageLength = 5;
 
     /**
      * Cache für den User-ID-Converter
+     *
      * @var User[]
      */
     private static $userCache;
@@ -80,17 +91,65 @@ class Orm {
     /**
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
      * übergeben werden.
+     *
      * @param \PDO $dbhandle
      * @param \Ubergeek\Log\LoggerInterface|null $log
      */
-    public function __construct(\PDO $dbhandle, \Ubergeek\Log\LoggerInterface $log = null) {
+    public function __construct(\PDO $dbhandle, \PDO $statshandle, \Ubergeek\Log\LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
+        $this->statsdb = $statshandle;
         $this->log = $log;
         
         if ($this->log == null) {
             $this->log = new \Ubergeek\Log\Logger();
         }
     }
+
+
+    // <editor-fold desc="Statistics">
+
+    /**
+     * Speichert die übergebenen Informationen als Eintrag in der Accesslog-Tabelle in der Statistik-Datenbank
+     *
+     * @param AccessLogEntry $entry Der zu speichernder Accesslog-Eintrag
+     * @return void
+     */
+    public function logHttpRequest(AccessLogEntry $entry) {
+        $sql = 'INSERT INTO accesslog (
+                    sessionid, method, url, fullurl, useragent, osname, osversion, browsername,
+                    browserversion, country, countrycode, region, regionname, city, zip, timezone,
+                    latitude, longitude
+                ) VALUES (
+                    :sessionid, :method, :url, :fullurl, :useragent, :osname, :osversion, :browsername,
+                    :browserversion, :country, :countrycode, :region, :regionname, :city, :zip, :timezone,
+                    :latitude, :longitude
+                )';
+
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('sessionid', $entry->sessionid);
+        $stmt->bindValue('method', $entry->method);
+        $stmt->bindValue('url', $entry->url);
+        $stmt->bindValue('fullurl', $entry->fullurl);
+        $stmt->bindValue('useragent', $entry->useragent);
+        $stmt->bindValue('osname', $entry->osname);
+        $stmt->bindValue('osversion', $entry->osversion);
+        $stmt->bindValue('browsername', $entry->browsername);
+        $stmt->bindValue('browserversion', $entry->browserversion);
+        $stmt->bindValue('country', $entry->country);
+        $stmt->bindValue('countrycode', $entry->countrycode);
+        $stmt->bindValue('region', $entry->region);
+        $stmt->bindValue('regionname', $entry->regionname);
+        $stmt->bindValue('city', $entry->city);
+        $stmt->bindValue('zip', $entry->zip);
+        $stmt->bindValue('timezone', $entry->timezone);
+        $stmt->bindValue('latitude', $entry->latitude);
+        $stmt->bindValue('longitude', $entry->longitude);
+        $this->log->debug($sql);
+        $stmt->execute();
+        $this->log->debug('success');
+    }
+
+    // </editor-fold>
 
 
     // <editor-fold desc="Definitions">

@@ -1,6 +1,8 @@
 /nbproject/
 /ncm/sys/cache/
 /ncm/sys/db/site.sqlite
+/ncm/sys/db/stats.sqlite
+/ncm/sys/db/*.ini
 /.idea/
 .DS_Store*
 emoji-test.txt*

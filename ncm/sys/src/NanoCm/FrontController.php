@@ -93,7 +93,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                 break;
         }
 
-        // Im Standardfall im auf das Kernmodul gehen
+        // Im Standardfall auf das Kernmodul gehen
         if ($moduleName == null) {
             $moduleName = 'CoreModule';
         }

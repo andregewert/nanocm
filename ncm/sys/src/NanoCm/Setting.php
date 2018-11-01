@@ -1,12 +1,13 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/**
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\NanoCm;
@@ -30,12 +32,14 @@ class Setting
 
     /**
      * Standard-Seitenlänge für Auflistungen im Administrationsbereich
+     *
      * @var string
      */
     public const SETTING_SYSTEM_ADMIN_PAGELENGTH = 'system.admin.pagelength';
 
     /**
      * Relativer Pfad zum zu benutzenden HTML-Template
+     *
      * @var string
      */
     public const SETTING_SYSTEM_TEMPLATE_PATH = 'system.template.path';
@@ -54,48 +58,60 @@ class Setting
 
     /**
      * Gibt an, ob die Trackback-Funktion aktiv sein soll
+     *
      * @var string
      */
     public const SETTING_SYSTEM_ENABLETRACKBACKS = 'system.enabletrackbacks';
 
     /**
      * Systemsprache
+     *
      * @var string
      */
     public const SETTING_SYSTEM_LANG = 'system.lang';
 
     /**
      * Gibt an, ob die Kommentierung von Artikel möglich sein soll
+     *
      * @var string
      */
     public const SETTING_SYSTEM_ENABLECOMMENTS = 'system.enablecomments';
 
     /**
      * Anzeigename / Realname des Webmaster
+     *
      * @var string
      */
     public const SETTING_SYSTEM_WEBMASTER_NAME = 'system.webmaster.name';
 
     /**
      * E-Mail-Adresse des Webmasters
+     *
      * @var string
      */
     public const SETTING_SYSTEM_WEBMASTER_EMAIL = 'system.webmaster.email';
 
     /**
      * Optionale weitere URL für den Webmaster, z. B. Profil bei Twitter etc.
+     *
      * @var string
      */
     public const SETTING_SYSTEM_WEBMASTER_URL = 'system.webmaster.url';
 
+    public const SETTING_SYSTEM_STATS_ENABLEACCESSLOG = 'system.stats.enableaccesslog';
+
+    public const SETTING_SYSTEM_STATS_ENABLEBROWSCAP = 'system.stats.enablebrowscap';
+
     /**
      * Diese Einstellung gibt an, ob die Statistiken Geolocation-Informationen führen sollen
+     *
      * @var string
      */
     public const SETTING_SYSTEM_STATS_ENABLEGEOLOCATION = 'system.stats.enablegeolocation';
 
     /**
      * Passwort für den Administrationszugang
+     *
      * @var string
      */
     //public const SETTING_SYSTEM_WEBMASTER_PASSWD = 'system.webmster.passwd';
@@ -105,6 +121,7 @@ class Setting
 
     /**
      * Optionale Parameter für diese Einstellung
+     *
      * @var string
      */
     public $params = null;
@@ -112,6 +129,7 @@ class Setting
     /**
      * Dem Konstruktor können optional direkt Schlüssel und Wert sowie ein
      * weiterer Parameter übergeben werden
+     *
      * @param string $key Schlüssel
      * @param object $value Wert
      * @param null $params
