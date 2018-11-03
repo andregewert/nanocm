@@ -357,16 +357,20 @@ table.list tr.noresult td {
   text-align: center;
   font-style: italic; }
 
-td.textright {
-  text-align: right; }
+td.textright,
+th.textright {
+  text-align: right !important; }
 
-td.textleft {
-  text-align: left; }
+td.textleft,
+th.textleft {
+  text-align: left !important; }
 
-td.textcenter {
-  text-align: center; }
+td.textcenter,
+th.textcenter {
+  text-align: center !important; }
 
-td.pre {
+td.pre,
+th.pre {
   font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
   font-size: 0.95em; }
 

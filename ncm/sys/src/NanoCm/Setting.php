@@ -35,79 +35,91 @@ class Setting
      *
      * @var string
      */
-    public const SETTING_SYSTEM_ADMIN_PAGELENGTH = 'system.admin.pagelength';
+    public const SYSTEM_ADMIN_PAGELENGTH = 'system.admin.pagelength';
 
     /**
      * Relativer Pfad zum zu benutzenden HTML-Template
      *
      * @var string
      */
-    public const SETTING_SYSTEM_TEMPLATE_PATH = 'system.template.path';
+    public const SYSTEM_TEMPLATE_PATH = 'system.template.path';
 
     /**
      * Seitentitel
      * @var string
      */
-    public const SETTING_SYSTEM_SITETITLE = 'system.pagetitle';
+    public const SYSTEM_SITETITLE = 'system.pagetitle';
 
     /**
      * Copyright- bzw. Footer-Hinweis
      * @var string
      */
-    public const SETTING_SYSTEM_COPYRIGHTNOTICE = 'system.copyrightnotice';
+    public const SYSTEM_COPYRIGHTNOTICE = 'system.copyrightnotice';
 
     /**
      * Gibt an, ob die Trackback-Funktion aktiv sein soll
      *
      * @var string
      */
-    public const SETTING_SYSTEM_ENABLETRACKBACKS = 'system.enabletrackbacks';
+    public const SYSTEM_ENABLETRACKBACKS = 'system.enabletrackbacks';
 
     /**
      * Systemsprache
      *
      * @var string
      */
-    public const SETTING_SYSTEM_LANG = 'system.lang';
+    public const SYSTEM_LANG = 'system.lang';
 
     /**
      * Gibt an, ob die Kommentierung von Artikel möglich sein soll
      *
      * @var string
      */
-    public const SETTING_SYSTEM_ENABLECOMMENTS = 'system.enablecomments';
+    public const SYSTEM_ENABLECOMMENTS = 'system.enablecomments';
 
     /**
      * Anzeigename / Realname des Webmaster
      *
      * @var string
      */
-    public const SETTING_SYSTEM_WEBMASTER_NAME = 'system.webmaster.name';
+    public const SYSTEM_WEBMASTER_NAME = 'system.webmaster.name';
 
     /**
      * E-Mail-Adresse des Webmasters
      *
      * @var string
      */
-    public const SETTING_SYSTEM_WEBMASTER_EMAIL = 'system.webmaster.email';
+    public const SYSTEM_WEBMASTER_EMAIL = 'system.webmaster.email';
 
     /**
      * Optionale weitere URL für den Webmaster, z. B. Profil bei Twitter etc.
      *
      * @var string
      */
-    public const SETTING_SYSTEM_WEBMASTER_URL = 'system.webmaster.url';
+    public const SYSTEM_WEBMASTER_URL = 'system.webmaster.url';
 
-    public const SETTING_SYSTEM_STATS_ENABLEACCESSLOG = 'system.stats.enableaccesslog';
+    /**
+     * Gibt an, ob das Accesslog geführt werden soll
+     *
+     * Diese Funktion kann ausgeschaltet werden, um die Geschwindigkeit zu erhöhen.
+     *
+     * @var string
+     */
+    public const SYSTEM_STATS_ENABLEACCESSLOG = 'system.stats.enableaccesslog';
 
-    public const SETTING_SYSTEM_STATS_ENABLEBROWSCAP = 'system.stats.enablebrowscap';
+    /**
+     * Gibt an, ob für das Browser-Sniffing die browscap-Funktionen genutzt werden sollen
+     *
+     * @var string
+     */
+    public const SYSTEM_STATS_ENABLEBROWSCAP = 'system.stats.enablebrowscap';
 
     /**
      * Diese Einstellung gibt an, ob die Statistiken Geolocation-Informationen führen sollen
      *
      * @var string
      */
-    public const SETTING_SYSTEM_STATS_ENABLEGEOLOCATION = 'system.stats.enablegeolocation';
+    public const SYSTEM_STATS_ENABLEGEOLOCATION = 'system.stats.enablegeolocation';
 
     /**
      * Passwort für den Administrationszugang

@@ -88,6 +88,9 @@ class Orm {
 
     // </editor-fold>
 
+
+    // <editor-fold desc="Constructor">
+
     /**
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
      * übergeben werden.
@@ -105,8 +108,276 @@ class Orm {
         }
     }
 
+    // </editor-fold>
+
 
     // <editor-fold desc="Statistics">
+
+    public function getMonthlyBrowserStats($year, $month) {
+        $sql = 'SELECT year, month, browsername, sum(count) AS sumcount
+                FROM monthlybrowser
+                WHERE year = :year AND month = :month
+                GROUP BY year, month, browsername
+                ORDER BY sumcount DESC, browsername ASC ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+
+        $stats = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $stats[] = $row;
+        }
+        return $stats;
+    }
+
+    public function getMonthlyOsStats($year, $month) {
+        $sql = 'SELECT year, month, osname, sum(count) AS sumcount
+                FROM monthlyos
+                WHERE year = :year AND month = :month
+                GROUP BY year, month, osname
+                ORDER BY sumcount DESC, osname ASC ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+
+        $stats = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $stats[] = $row;
+        }
+        return $stats;
+    }
+
+    public function getMonthlyRegionStats($year, $month) {
+        $sql = 'SELECT year, month, country, regionname, sum(count) AS sumcount
+                FROM monthlyregion
+                WHERE year = :year AND month = :month
+                GROUP BY year, month, country, regionname
+                ORDER BY sumcount DESC, country ASC, regionname ASC ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+
+        $stats = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $stats[] = $row;
+        }
+
+        $this->log->debug($stats);
+
+        return $stats;
+    }
+
+    public function getMonthlyUrlStats($year, $month) {
+        $sql = 'SELECT year, month, url, sum(count) AS sumcount
+                FROM monthlyurl
+                WHERE year = :year AND month = :month
+                GROUP BY year, month, url
+                ORDER BY sumcount DESC, url ASC ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+
+        $stats = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $stats[] = $row;
+        }
+        return $stats;
+    }
+
+    public function countUniqueSessionIds($year, $month) {
+        $sql = 'SELECT COUNT(DISTINCT sessionid) AS c
+                FROM accesslog
+                WHERE  strftime(\'%Y\', accesstime) = :year 
+                AND strftime(\'%m\', accesstime) = :month ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+
+        $stats = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $stats[] = $row;
+        }
+        return $stats;
+    }
+
+    /**
+     * Protokolliert einen Seitenzugriff in den verschiedenen Statistik-Tabellen
+     *
+     * @param AccessLogEntry $entry Der zu speichernder Accesslog-Eintrag
+     * @param bool $enableGeolocation Gibt an, ob regionale Informationen protokolliert werden sollen
+     * @return void
+     */
+    public function logHttpRequest(AccessLogEntry $entry, bool $enableGeolocation = false) {
+        if (rand(0, 99) %97 <= 3) {
+            $this->removeOldStatistics();
+        } else {
+            $this->log->debug("Skipping garbage collection");
+        }
+
+        try {
+            $this->saveAccesslog($entry);
+            $this->countMonthlyBrowserStats($entry->accesstime, $entry->browsername, $entry->browserversion);
+            $this->countMonthlyOsStats($entry->accesstime, $entry->osname, $entry->osversion);
+            $this->countMonthlyUrlStats($entry->accesstime, $entry->url);
+            if ($enableGeolocation) {
+                $this->countMonthlyRegionStats($entry->accesstime, $entry->country, $entry->countrycode, $entry->regionname);
+            }
+        } catch (\Exception $ex) {
+            $this->log->err($ex);
+        }
+    }
+
+    /**
+     * Löscht Einträge aus der Tabelle accesslog, die älter sind als 365 Tage
+     *
+     * @return void
+     */
+    protected function removeOldStatistics() {
+        $this->log->debug("Running garbage collection on accesslog");
+        $sql = 'DELETE FROM accesslog WHERE JULIANDAY(\'now\') -JULIANDAY(accesstime) > 365 ';
+        $this->statsdb->exec($sql);
+    }
+
+    /**
+     * Aktualisiert die Monatsstatistiken für die angegebene URL
+     *
+     * @param \DateTime $accessDateTime Zugriffszeitpunkt für die URL
+     * @param string $url Abgerufene URL
+     * @return void
+     */
+    protected function countMonthlyUrlStats(\DateTime $accessDateTime, $url) {
+        $sql = 'SELECT COUNT(*) FROM monthlyurl WHERE
+                year = :year AND month = :month AND url = :url ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('url', $url);
+        $stmt->execute();
+        $existing = $stmt->fetchColumn() > 0;
+
+        if ($existing) {
+            $sql = 'UPDATE monthlyurl SET count = count +1
+                    WHERE year = :year AND month = :month AND url = :url ';
+        } else {
+            $sql = 'INSERT INTO monthlyurl (year, month, url, count)
+                    VALUES (:year, :month, :url, 1)';
+        }
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('url', $url);
+        $stmt->execute();
+    }
+
+    /**
+     * Aktualisiert die Monatsstatistiken für die übergebenen Regionsinformationen
+     *
+     * @param \DateTime $accessDateTime Zeitpunkt des Zugriffs
+     * @param $country Ländername
+     * @param $countrycode Ländercode (ISO)
+     * @param $regionname Name der Region
+     * @return void
+     */
+    protected function countMonthlyRegionStats(\DateTime $accessDateTime, $country, $countrycode, $regionname) {
+        $sql = 'SELECT COUNT(*) FROM monthlyregion WHERE
+                year = :year AND month = :month AND country = :country AND countrycode = :countrycode AND regionname = :regionname ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('country', $country);
+        $stmt->bindValue('countrycode', $countrycode);
+        $stmt->bindValue('regionname', $regionname);
+        $stmt->execute();
+        $existing = $stmt->fetchColumn() > 0;
+
+        if ($existing) {
+            $sql = 'UPDATE monthlyregion SET count = count +1
+                    WHERE year = :year AND month = :month AND country = :country AND countrycode = :countrycode AND regionname = :regionname';
+        } else {
+            $sql = 'INSERT INTO monthlyregion (year, month, country, countrycode, regionname, count)
+                    VALUES (:year, :month, :country, :countrycode, :regionname, 1)';
+        }
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('country', $country);
+        $stmt->bindValue('countrycode', $countrycode);
+        $stmt->bindValue('regionname', $regionname);
+        $stmt->execute();
+    }
+
+    /**
+     * Aktualisiert die Monatsstatistiken für die übergebenen Betriebssysteminformationen
+     *
+     * @param \DateTime $accessDateTime Zeitpunkt des Zugriffs
+     * @param string $osname Name des Betriebssystems (bspw. "Windows" oder "Linux")
+     * @param string $osversion Versionsnummer des Betriebssystems
+     * @return void
+     */
+    protected function countMonthlyOsStats(\DateTime $accessDateTime, $osname, $osversion) {
+        $sql = 'SELECT COUNT(*) FROM monthlyos WHERE
+                year = :year AND month = :month AND osname = :osname AND osversion = :osversion ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('osname', $osname);
+        $stmt->bindValue('osversion', $osversion);
+        $stmt->execute();
+        $existing = $stmt->fetchColumn() > 0;
+
+        if ($existing) {
+            $sql = 'UPDATE monthlyos SET count = count +1
+                    WHERE year = :year AND month = :month AND osname = :osname AND osversion = :osversion';
+        } else {
+            $sql = 'INSERT INTO monthlyos (year, month, osname, osversion, count)
+                    VALUES (:year, :month, :osname, :osversion, 1)';
+        }
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('osname', $osname);
+        $stmt->bindValue('osversion', $osversion);
+        $stmt->execute();
+    }
+
+    /**
+     * Aktualisiert die Monatsstatistiken für die übergebenen Browser-Informationen
+     *
+     * @param \DateTime $accessDateTime Zeitpunkt des Zugriffs
+     * @param string $browser Browsername (bspw. "Firefox")
+     * @param string $version Versionsangabe zum Browser
+     * @return void
+     */
+    protected function countMonthlyBrowserStats(\DateTime $accessDateTime, $browser, $version) {
+        $sql = 'SELECT COUNT(*) FROM monthlybrowser WHERE
+                year = :year AND month = :month AND browsername = :browsername and browserversion = :browserversion ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('browsername', $browser);
+        $stmt->bindValue('browserversion', $version);
+        $stmt->execute();
+        $existing = $stmt->fetchColumn() > 0;
+
+        if ($existing) {
+            $sql = 'UPDATE monthlybrowser SET count = count +1
+                    WHERE year = :year AND month = :month AND browsername = :browsername AND browserversion = :browserversion';
+        } else {
+            $sql = 'INSERT INTO monthlybrowser (year, month, browsername, browserversion, count)
+                    VALUES (:year, :month, :browsername, :browserversion, 1)';
+        }
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $accessDateTime->format('Y'));
+        $stmt->bindValue('month', $accessDateTime->format('m'));
+        $stmt->bindValue('browsername', $browser);
+        $stmt->bindValue('browserversion', $version);
+        $stmt->execute();
+    }
 
     /**
      * Speichert die übergebenen Informationen als Eintrag in der Accesslog-Tabelle in der Statistik-Datenbank
@@ -114,7 +385,7 @@ class Orm {
      * @param AccessLogEntry $entry Der zu speichernder Accesslog-Eintrag
      * @return void
      */
-    public function logHttpRequest(AccessLogEntry $entry) {
+    protected function saveAccesslog(AccessLogEntry $entry) {
         $sql = 'INSERT INTO accesslog (
                     sessionid, method, url, fullurl, useragent, osname, osversion, browsername,
                     browserversion, country, countrycode, region, regionname, city, zip, timezone,
@@ -144,9 +415,7 @@ class Orm {
         $stmt->bindValue('timezone', $entry->timezone);
         $stmt->bindValue('latitude', $entry->latitude);
         $stmt->bindValue('longitude', $entry->longitude);
-        $this->log->debug($sql);
         $stmt->execute();
-        $this->log->debug('success');
     }
 
     // </editor-fold>
@@ -2056,7 +2325,7 @@ class Orm {
      * @return string
      */
     public function getCopyrightNotice() {
-        return $this->getSettingValue(Setting::SETTING_SYSTEM_COPYRIGHTNOTICE, '');
+        return $this->getSettingValue(Setting::SYSTEM_COPYRIGHTNOTICE, '');
     }
     
     /**
@@ -2070,7 +2339,7 @@ class Orm {
     public function getSiteTitle() : string {
         $title = 'NanoCM';
         try {
-            $title = $this->getSettingValue(Setting::SETTING_SYSTEM_SITETITLE);
+            $title = $this->getSettingValue(Setting::SYSTEM_SITETITLE);
         } catch (\Exception $ex) {
             $this->log->warn($ex);
         }

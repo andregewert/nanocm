@@ -58,9 +58,10 @@ class CoreModule extends AbstractModule {
         $parts = $this->getRelativeUrlParts();
 
         // Das CoreModule protokolliert Seitenzugriffe, wenn die Funktion aktiviert ist
-        if ($this->orm->getSettingValue(Setting::SETTING_SYSTEM_STATS_ENABLEACCESSLOG) == '1') {
+        if ($this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEACCESSLOG) == '1') {
             $this->orm->logHttpRequest(
-                $this->ncm->createAccessLogEntry($this->frontController->getHttpRequest())
+                $this->ncm->createAccessLogEntry($this->frontController->getHttpRequest()),
+                $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEGEOLOCATION) == '1'
             );
         }
 

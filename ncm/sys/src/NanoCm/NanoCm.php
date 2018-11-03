@@ -170,7 +170,7 @@ class NanoCm {
         $this->orm = new Orm($this->getDbHandle(), $this->getStatsDbHandle(), $this->log);
 
         // Template-Verzeichnis konfigurieren
-        $tpl = $this->orm->getSettingValue(Setting::SETTING_SYSTEM_TEMPLATE_PATH);
+        $tpl = $this->orm->getSettingValue(Setting::SYSTEM_TEMPLATE_PATH);
         if (empty($tpl)) {
             $tpl = 'default';
         }
@@ -184,7 +184,7 @@ class NanoCm {
         );
 
         // Seitenlänge im Administrationsbereich
-        $this->orm->pageLength = intval($this->orm->getSettingValue(Setting::SETTING_SYSTEM_ADMIN_PAGELENGTH));
+        $this->orm->pageLength = intval($this->orm->getSettingValue(Setting::SYSTEM_ADMIN_PAGELENGTH));
         if ($this->orm->pageLength == 0) {
             $this->orm->pageLength = 20;
             $this->log->debug("Fehlerhafte Konfiguration Seitenlänge! Benutze Standardwert.");
@@ -195,7 +195,7 @@ class NanoCm {
         $this->session->start();
 
         // Caches initialisieren
-        $this->ipcache = new FileCache($this->cachedir, 60 *60 *12, 'ip-', $this->log);
+        $this->ipcache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
     }
 
     /**
@@ -415,8 +415,8 @@ class NanoCm {
         $ip = '78.50.12.56';
         //$ip = $_SERVER['REMOTE_ADDR'];                // TODO Sollte aus $request ermittelt werden
         $useragent = $_SERVER['HTTP_USER_AGENT'];       // TODO Sollte aus $request ermittelt werden
-        $enableBrowscap = $this->orm->getSettingValue(Setting::SETTING_SYSTEM_STATS_ENABLEBROWSCAP) == '1';
-        $enableGeolocation = $this->orm->getSettingValue(Setting::SETTING_SYSTEM_STATS_ENABLEGEOLOCATION) == '1';
+        $enableBrowscap = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEBROWSCAP) == '1';
+        $enableGeolocation = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEGEOLOCATION) == '1';
         $geolocationservice = new GeolocationService($this->ipcache);
 
         $entry = new AccessLogEntry();

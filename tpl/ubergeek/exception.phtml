@@ -8,7 +8,8 @@
 
     <?php if ($this->exception !== null) : ?>
         <?php // TODO Art der Fehlerausgabe sollte konfigurierbar sein! ?>
-        <pre><?php echo $this->exception->getTraceAsString(); ?></pre>
+        <p><b><?php echo $this->htmlEncode($this->exception->getMessage()); ?></b></p>
+        <?php echo nl2br($this->exception->getTraceAsString()); ?>
         <?php $this->debug($this->exception->getTrace()); ?>
     <?php endif; ?>
 </div>
