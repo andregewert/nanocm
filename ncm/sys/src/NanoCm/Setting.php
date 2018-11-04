@@ -31,6 +31,22 @@ class Setting
     // <editor-fold desc="Constants">
 
     /**
+     * Gibt an, ob bei abgefangenen Fehlern die Exceptions (mit Fehlermeldung und Stacktrace) ausgegeben werden sollen.
+     * Achtung: In Produktiv-Umgebungen sollte dieses Logging unbedingt ausgeschaltet werden!
+     *
+     * @var string
+     */
+    public const SYSTEM_DEBUG_SHOWEXCEPTIONS = 'system.debug.showexceptions';
+
+    /**
+     * Gibt an, ob Debug-Output per ChromeLogger-Protokoll ausgegeben werden soll.
+     * Achtung: In Produktiv-Umgebungen sollte dieses Logging unbedingt ausgeschaltet werden!
+     *
+     * @var string
+     */
+    public const SYSTEM_DEBUG_ENABLECHROMELOGGER = 'system.debug.enablechromelogger';
+
+    /**
      * Standard-Seitenlänge für Auflistungen im Administrationsbereich
      *
      * @var string
@@ -46,12 +62,15 @@ class Setting
 
     /**
      * Seitentitel
+     * Der Seitentitel kann beispielsweise von den Templates genutzt werden.
+     *
      * @var string
      */
     public const SYSTEM_SITETITLE = 'system.pagetitle';
 
     /**
-     * Copyright- bzw. Footer-Hinweis
+     * Copyright- bzw. Footer-Hinweis.
+     * Diese Informationen können von den Seiten-Templates verwendet werden und etwa im Footer ausgegeben werden.
      * @var string
      */
     public const SYSTEM_COPYRIGHTNOTICE = 'system.copyrightnotice';
@@ -99,34 +118,39 @@ class Setting
     public const SYSTEM_WEBMASTER_URL = 'system.webmaster.url';
 
     /**
-     * Gibt an, ob das Accesslog geführt werden soll
+     * Gibt an, ob generell Statistiken protokolliert werden sollen.
+     * Wird dieser Wert auf 0 gesetzt, so werden überhaupt keine Statistiken geschrieben.
      *
-     * Diese Funktion kann ausgeschaltet werden, um die Geschwindigkeit zu erhöhen.
+     * @var string
+     */
+    public const SYSTEM_STATS_ENABLELOGGING = 'system.stats.enablelogging';
+
+    /**
+     * Gibt an, ob das ausführliche Accesslog geführt werden soll
+     * Diese Funktion kann ausgeschaltet werden, um die Geschwindigkeit zu erhöhen oder um Platz zu sparen.
      *
      * @var string
      */
     public const SYSTEM_STATS_ENABLEACCESSLOG = 'system.stats.enableaccesslog';
 
     /**
-     * Gibt an, ob für das Browser-Sniffing die browscap-Funktionen genutzt werden sollen
+     * Gibt an, ob für das Browser-Sniffing die browscap-Funktionen genutzt werden sollen.
+     * Leider ist die Konfiguration von browscap nur systemweit möglich dürfte somit auf den meisten Shared Hosts nicht
+     * zur Verfügung stehen.
      *
      * @var string
      */
     public const SYSTEM_STATS_ENABLEBROWSCAP = 'system.stats.enablebrowscap';
 
     /**
-     * Diese Einstellung gibt an, ob die Statistiken Geolocation-Informationen führen sollen
+     * Diese Einstellung gibt an, ob die Statistiken Geolocation-Informationen führen sollen.
+     * Wird dieser Wert eingeschaltet, so werden mit Hilfe des Services ip-api.com Geolocation-Informationen zu jedem
+     * Seitenaufruf ermittelt und in die Statistiken geschrieben. Ermöglicht beispielsweise zu ermitteln, aus welchen
+     * Ländern / Regionen oder gar Städten die Seitenbesucher stammen.
      *
      * @var string
      */
     public const SYSTEM_STATS_ENABLEGEOLOCATION = 'system.stats.enablegeolocation';
-
-    /**
-     * Passwort für den Administrationszugang
-     *
-     * @var string
-     */
-    //public const SETTING_SYSTEM_WEBMASTER_PASSWD = 'system.webmster.passwd';
 
     // </editor-fold>
 

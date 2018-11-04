@@ -19,6 +19,9 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\AccessLogEntry;
+use Ubergeek\NanoCm\Setting;
+
 /**
  * Einfache Statistiken für das CMS
  * @author André Gewert <agewert@ubergeek.de>
@@ -29,23 +32,82 @@ class AdminStatsModule extends AbstractAdminModule {
 
     // <editor-fold desc="Properties">
 
+    /**
+     * Eine Liste der auswählbaren Jahreszahlen
+     *
+     * @var int[]
+     */
     public $availableYears = array();
 
+    /**
+     * Eine Liste der auswählbaren Monatszahlen
+     *
+     * @var int[]
+     */
     public $availableMonths = array();
 
+    /**
+     * Anzuzeigendes Jahr
+     *
+     * @var int
+     */
     public $searchYear;
 
+    /**
+     * Anzuzeigender Monat
+     *
+     * @var int
+     */
     public $searchMonth;
 
+    /**
+     * Monatsstatistiken zu den abgerufenen URLs
+     *
+     * @var array
+     */
     public $statsUrls;
 
+    /**
+     * Monatsstatistiken zu den verwendeten Browsern
+     *
+     * @var array
+     */
     public $statsBrowsers;
 
+    /**
+     * Monatsstatistiken zu den eingesetzten Betriebssystemen
+     *
+     * @var array
+     */
     public $statsOses;
 
+    /**
+     * Monatsstatistiken zu den Herkunftsländern bzw. -Regionen
+     *
+     * @var array
+     */
     public $statsCountry;
 
+    /**
+     * Monatsstatistiken zu den Session-IDs
+     *
+     * @var array
+     */
     public $statsSessionId;
+
+    /**
+     * Gibt an, ob die Statistik-Funktionen eingeschaltet sind
+     *
+     * @var bool
+     */
+    public $statsEnabled = false;
+
+    /**
+     * Anzuzeigender Ausschnitt aus dem AccessLog
+     *
+     * @var AccessLogEntry[]
+     */
+    public $accessLog;
 
     // </editor-fold>
 
@@ -55,6 +117,8 @@ class AdminStatsModule extends AbstractAdminModule {
 
         $this->searchYear = $this->getOrOverrideSessionVarWithParam('searchYear', date('Y'));
         $this->searchMonth = $this->getOrOverrideSessionVarWithParam('searchMonth', date('m'));
+        $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
+        $this->statsEnabled = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLELOGGING) == '1';
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -62,6 +126,8 @@ class AdminStatsModule extends AbstractAdminModule {
             case 'html':
                 $this->setPageTemplate(self::PAGE_NONE);
                 switch ($this->getRelativeUrlPart(3)) {
+
+                    // Auflistung der zusammengefassten Statistiken
                     case 'list':
                         $this->statsUrls = $this->orm->getMonthlyUrlStats($this->searchYear, $this->searchMonth);
                         $this->statsBrowsers = $this->orm->getMonthlyBrowserStats($this->searchYear, $this->searchMonth);
@@ -70,7 +136,20 @@ class AdminStatsModule extends AbstractAdminModule {
                         $this->statsSessionId = $this->orm->countUniqueSessionIds($this->searchYear, $this->searchMonth);
                         $content = $this->renderUserTemplate('content-stats-list.phtml');
                         break;
+
+                    // Ausschnitt aus dem AccessLog
+                    case 'listaccesslog':
+                        $this->pageCount = ceil($this->orm->searchAccessLog($this->searchYear, $this->searchMonth, true) /$this->orm->pageLength);
+                        if ($this->searchPage > $this->pageCount) $this->searchPage = $this->pageCount;
+                        $this->accessLog = $this->orm->searchAccessLog($this->searchYear, $this->searchMonth, false, $this->searchPage);
+                        $content = $this->renderUserTemplate('content-stats-accesslog-list.phtml');
+                        break;
                 }
+                break;
+
+            // Trägerseite AccessLog
+            case 'accesslog':
+                $content = $this->renderUserTemplate('content-stats-accesslog.phtml');
                 break;
 
             // Trägerseite

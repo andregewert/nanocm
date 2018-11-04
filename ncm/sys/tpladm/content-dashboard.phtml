@@ -6,7 +6,7 @@ use Ubergeek\NanoCm\Setting; ?>
 </div>
 <?php if ($this->isSiteDbAccessible) : ?>
     <div class="container spacing">
-        <div class="error" style="border: solid red 5px; padding: 1em; font-size: 1.5rem; border-radius: 5px; margin-bottom: 1rem; margin-top: 1rem">
+        <div class="msgcritical">
             <em>ACHTUNG:</em> Die Systemdatenbank ist &uuml;ber den Webserver von au&szlig;en erreichbar!<br>
             Bitte &uuml;berpr&uuml;fen Sie unbedingt die Server-Einstellungen! Andernfalls sind s&auml;mtliche
             Daten der Website, einschlie&szlig;lich der Benutzerkonten und nicht freigeschalteter Inhalte f&uuml;r
@@ -69,6 +69,14 @@ use Ubergeek\NanoCm\Setting; ?>
             <tr>
                 <td>Anzahl Mediendateien</td>
                 <td class="textright pre">0</td>
+            </tr>
+            <tr>
+                <td>Gr&ouml;&szlig;e der Site-Datenbank</td>
+                <td class="textright pre"><?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($this->sizeOfSiteDb, 1); ?></td>
+            </tr>
+            <tr>
+                <td>Gr&ouml;&szlig;e der Statistik-Datenbank</td>
+                <td class="textright pre"><?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($this->sizeOfStatsDb, 1); ?></td>
             </tr>
         </table>
     </div>

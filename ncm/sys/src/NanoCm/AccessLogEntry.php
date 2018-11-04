@@ -74,8 +74,18 @@ class AccessLogEntry {
 
     // <editor-fold desc="Public methods">
 
-    public function __construct() {
-        $this->accesstime = new \DateTime();
+    /**
+     * Erstellt ein AccessLogEntry-Objekt aus dem übergebenen PDO-Statement
+     * @param \PDOStatement $stmt
+     * @return AccessLogEntry
+     */
+    public static function fetchFromPdoStatement(\PDOStatement $stmt) {
+        /* @var $entry AccessLogEntry */
+        if (($entry = $stmt->fetchObject(__CLASS__)) !== false) {
+            $entry->accesstime = new \DateTime($entry->accesstime);
+            return $entry;
+        }
+        return null;
     }
 
     // </editor-fold>

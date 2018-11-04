@@ -1,9 +1,29 @@
 <?php
+/**
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */
 ?>
 
 <div class="container spacing">
     <h1>Statistiken</h1>
+    <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
 </div>
 
 <?php if (!$this->statsEnabled) : ?>
@@ -19,8 +39,8 @@
     <form onsubmit="module.refresh(); return false;">
         <div class="toolbar">
             <span class="left">
-                <a id="button_add" class="button" href="/admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
-                    <img src="/ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">Seitenzugriffe
+                <a id="button_add" class="button" href="/admin/stats/" role="button" title="Zusammengefasste Statistiken anzeigen">
+                    <img src="/ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">&Uuml;bersicht
                 </a>
             </span>
             <span class="right" style="float: right">
@@ -44,7 +64,7 @@
             </span>
         </div>
 
-        <div id="placeholder_stats" class="placeholder">
+        <div id="placeholder_accesslog" class="placeholder">
             <div class="blanker"></div>
             <div class="content"></div>
         </div>
@@ -52,8 +72,9 @@
 </div>
 
 <script type="text/javascript">
-    function Stats() {
+    function AccessLog() {
         let app = this;
+        app.page = $('#input_searchPage').val();
 
         /**
          * Initialisiert Event-Handler etc.
@@ -66,21 +87,23 @@
         };
 
         /**
-         * Aktualisiert die angezeigten Statisitken
+         * Aktualisiert den angezeigten Ausschnitt aus dem AccessLog
          */
-        app.refresh = function() {
+        app.refresh = function(page) {
             ncm.showDefaultLoadingIndicator();
+            if (typeof page === 'undefined') page = app.page;
 
-            $.ajax('/admin/stats/html/list', {
+            $.ajax('/admin/stats/html/listaccesslog', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
                 data: {
                     searchYear:         $('#input_searchYear').val(),
-                    searchMonth:        $('#select_searchMonth').val()
+                    searchMonth:        $('#select_searchMonth').val(),
+                    searchPage:         page
                 }
             }).done(function(data) {
-                $('#placeholder_stats .content').html(data);
+                $('#placeholder_accesslog .content').html(data);
             }).always(function() {
                 ncm.hideDefaultLoadingIndicator();
                 $('#input_searchYear').focus();
@@ -90,6 +113,6 @@
     }
 
     $(document).ready(function() {
-        module = new Stats();
+        module = new AccessLog();
     });
 </script>

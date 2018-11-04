@@ -95,7 +95,8 @@ class Orm {
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
      * übergeben werden.
      *
-     * @param \PDO $dbhandle
+     * @param \PDO $dbhandle PDO-Handle für die Site-Datenbank
+     * @param \PDO $statshandle PDO-Handle für die Statistik-Datenbank
      * @param \Ubergeek\Log\LoggerInterface|null $log
      */
     public function __construct(\PDO $dbhandle, \PDO $statshandle, \Ubergeek\Log\LoggerInterface $log = null) {
@@ -113,6 +114,60 @@ class Orm {
 
     // <editor-fold desc="Statistics">
 
+    /**
+     * Durchsucht das AccessLog
+     *
+     * @param int $year Jahreszahl (vierstellig)
+     * @param int $month Monatszahl (1-12)
+     * @param bool $countOnly
+     * @param null|int $page
+     * @param null|int $limit
+     * @return array|mixed
+     */
+    public function searchAccessLog($year, $month, $countOnly = false, $page = null, $limit = null) {
+        $stats = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= 'FROM accesslog WHERE
+                    strftime(\'%Y\', accesstime) = :year 
+                    AND strftime(\'%m\', accesstime) = :month ';
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY accesstime DESC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        // Parameter setzen
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year, \PDO::PARAM_STR);
+        $stmt->bindValue('month', $month, \PDO::PARAM_STR);
+        $stmt->execute();
+
+        // Ergebnis auslesen
+        if ($countOnly) return $stmt->fetchColumn();
+        while (($entry = AccessLogEntry::fetchFromPdoStatement($stmt)) !== null) {
+            $stats[] = $entry;
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Ermittelt die Monatsstatistiken zu den verwendeten Browsern für den angegebenen Monat
+     *
+     * @param int $year Jahreszahl (vierstellig)
+     * @param int $month Monatszahl (1-12)
+     * @return array Zugriffszahlen für den angegebenen Monat
+     */
     public function getMonthlyBrowserStats($year, $month) {
         $sql = 'SELECT year, month, browsername, sum(count) AS sumcount
                 FROM monthlybrowser
@@ -131,6 +186,13 @@ class Orm {
         return $stats;
     }
 
+    /**
+     * Ermittelt die Monatsstatistiken zu den verwendeten Betriebssystemen für den angegebenen Monat
+     *
+     * @param int $year Jahreszahl (viertstellig)
+     * @param int $month Monatszahl (1-12)
+     * @return array Zugriffszahlen für den angegebenen Monat
+     */
     public function getMonthlyOsStats($year, $month) {
         $sql = 'SELECT year, month, osname, sum(count) AS sumcount
                 FROM monthlyos
@@ -149,6 +211,13 @@ class Orm {
         return $stats;
     }
 
+    /**
+     * Ermittelt die Monatssatistiken zu den Herkunftsregionen für den angegebenen Monat
+     *
+     * @param int $year Jahreszahl (vierstellig)
+     * @param int $month Monatszahl (1-12)
+     * @return array Zugriffszahlen für den angegebenen Monat
+     */
     public function getMonthlyRegionStats($year, $month) {
         $sql = 'SELECT year, month, country, regionname, sum(count) AS sumcount
                 FROM monthlyregion
@@ -170,6 +239,13 @@ class Orm {
         return $stats;
     }
 
+    /**
+     * Ermittelt die Monatsstatistiken zu den abgerufenen URLs für den angegebenen Monat
+     *
+     * @param int $year Jahreszahl (vierstellig)
+     * @param int $month Monatszahl (1-12)
+     * @return array Zugriffszahlen für den angegebenen Monat
+     */
     public function getMonthlyUrlStats($year, $month) {
         $sql = 'SELECT year, month, url, sum(count) AS sumcount
                 FROM monthlyurl
@@ -188,15 +264,27 @@ class Orm {
         return $stats;
     }
 
+    /**
+     * Ermittelt die Anzahl eindeutiger Session-ID für den angegebenen Monat.
+     * Die Session-IDs werden ausschließlich im Accesslog mitgeschrieben. Statistiken zu den Sessions funktionieren also
+     * nur dann, wenn das ausführliche Accesslog eingeschaltet ist!
+     *
+     * @param int $year Jahreszahl (vierstellig)
+     * @param int $month Monatszahl (1-12)
+     * @return array Zugriffszahlen für den angegebenen Monat
+     */
     public function countUniqueSessionIds($year, $month) {
         $sql = 'SELECT COUNT(DISTINCT sessionid) AS c
                 FROM accesslog
                 WHERE  strftime(\'%Y\', accesstime) = :year 
                 AND strftime(\'%m\', accesstime) = :month ';
         $stmt = $this->statsdb->prepare($sql);
-        $stmt->bindValue('year', $year);
-        $stmt->bindValue('month', $month);
+        $stmt->bindValue('year', $year, \PDO::PARAM_STR);
+        $stmt->bindValue('month', $month, \PDO::PARAM_STR);
         $stmt->execute();
+
+        $this->log->debug($year);
+        $this->log->debug($month);
 
         $stats = array();
         while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
@@ -206,13 +294,21 @@ class Orm {
     }
 
     /**
-     * Protokolliert einen Seitenzugriff in den verschiedenen Statistik-Tabellen
+     * Protokolliert einen Seitenzugriff in einem ausführlichen Format in der Accesslog-Tabelle.
+     * Hinweis: Das Führen eines ausführlichen Accesslogs kann die Geschwindigkeit der Site negativ beeinflussen und
+     * sehr viel Platz auf dem Webspace beanspruchen. Über die Einstellungen des NanoCM kann diese Funktionalität auch
+     * ausgeschaltet werden. Die etwas platzsparenderen und vereinfachten monatlichen Statistiken können unabhängig
+     * davon erfasst werden.
      *
-     * @param AccessLogEntry $entry Der zu speichernder Accesslog-Eintrag
-     * @param bool $enableGeolocation Gibt an, ob regionale Informationen protokolliert werden sollen
+     * Das Accesslog wird auf einen Zeitraum von einem Jahr begrenzt, was durch eine automatische Garbage Collection
+     * erreicht wird.
+     *
+     * @param AccessLogEntry $entry Der zu speichernde Accesslog-Eintrag
      * @return void
      */
-    public function logHttpRequest(AccessLogEntry $entry, bool $enableGeolocation = false) {
+    public function logHttpRequest(AccessLogEntry $entry) {
+        $this->log->debug('logHttpRequest');
+
         if (rand(0, 99) %97 <= 3) {
             $this->removeOldStatistics();
         } else {
@@ -221,6 +317,31 @@ class Orm {
 
         try {
             $this->saveAccesslog($entry);
+        } catch (\Exception $ex) {
+            $this->log->err($ex);
+        }
+    }
+
+    /**
+     * Speichert die vereinfachten Zugriffsstatistiken.
+     * Diese Methode schreibt keinen ausführlichen Accesslog-Eintrag, sondern führt nur die monatlichen Statistiken zu
+     * Browser, Betriebssystem, Region und aufgerufener URL.
+     *
+     * @param AccessLogEntry $entry
+     * @param bool $enableGeolocation
+     * @return void
+     */
+    public function logSimplifiedStats(AccessLogEntry $entry, bool $enableGeolocation = false) {
+        $this->log->debug('logSimplifiedStats');
+
+        if (rand(0, 99) %97 <= 3) {
+            //$this->removeOldStatistics();
+            // TODO Evtl. auch auf den vereinfachten Statistiken eine automatische Garbage Collection durchführen
+        } else {
+            //$this->log->debug("Skipping garbage collection");
+        }
+
+        try {
             $this->countMonthlyBrowserStats($entry->accesstime, $entry->browsername, $entry->browserversion);
             $this->countMonthlyOsStats($entry->accesstime, $entry->osname, $entry->osversion);
             $this->countMonthlyUrlStats($entry->accesstime, $entry->url);
@@ -278,9 +399,9 @@ class Orm {
      * Aktualisiert die Monatsstatistiken für die übergebenen Regionsinformationen
      *
      * @param \DateTime $accessDateTime Zeitpunkt des Zugriffs
-     * @param $country Ländername
-     * @param $countrycode Ländercode (ISO)
-     * @param $regionname Name der Region
+     * @param string $country Ländername
+     * @param string $countrycode Ländercode (ISO)
+     * @param string $regionname Name der Region
      * @return void
      */
     protected function countMonthlyRegionStats(\DateTime $accessDateTime, $country, $countrycode, $regionname) {
@@ -2055,6 +2176,7 @@ class Orm {
 
     /**
      * Durchsucht die Pages nach verschiedenen Filterkriterien
+     *
      * @param Page $filter
      * @param bool $releasedOnly
      * @param string $searchterm

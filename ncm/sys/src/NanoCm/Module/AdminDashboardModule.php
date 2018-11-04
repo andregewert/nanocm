@@ -41,6 +41,10 @@ class AdminDashboardModule extends AbstractAdminModule {
 
     public $isSiteDbAccessible = false;
 
+    public $sizeOfSiteDb = 0;
+
+    public $sizeOfStatsDb = 0;
+
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Seite verwalten');
 
@@ -54,6 +58,10 @@ class AdminDashboardModule extends AbstractAdminModule {
         $url = (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off')? 'http://' : 'https://';
         $url .= $_SERVER['HTTP_HOST'] . $this->ncm->relativeBaseUrl . '/ncm/sys/db/site.sqlite';
         $this->isSiteDbAccessible = Fetch::isUrlAccessible($url);
+
+        // Größe der Datenbankdateien ermitteln
+        $this->sizeOfSiteDb = filesize($this->ncm->getSiteDbFilename());
+        $this->sizeOfStatsDb = filesize($this->ncm->getStatsDbFilename());
 
         $content = $this->renderUserTemplate('content-dashboard.phtml');
         $this->setContent($content);

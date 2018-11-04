@@ -23,6 +23,7 @@ namespace Ubergeek\NanoCm;
 use Ubergeek\Cache\FileCache;
 use Ubergeek\Controller\HttpRequest;
 use Ubergeek\Log;
+use Ubergeek\Log\Logger;
 use Ubergeek\Net\GeolocationService;
 use Ubergeek\Net\UserAgentInfo;
 
@@ -41,6 +42,13 @@ class NanoCm {
      * @var \Ubergeek\NanoCm\NanoCm
      */
     private static $ncm = null;
+
+    /**
+     * FileCache für IP-Geolocation-Abfragen
+     *
+     * @var FileCache
+     */
+    private $ipcache;
     
     // </editor-fold>
     
@@ -136,13 +144,19 @@ class NanoCm {
      */
     public $relativeBaseUrl;
 
-    private $ipcache;
-    
+    /**
+     * Gibt an, ob auf Fehlerseiten Informationen zu abgefangenen Exceptions detailliert ausgegeben werden sollen.
+     * Achtung: Diese Funktion sollte in Produktivumgebungen unbedingt ausgeschaltet werden!
+     *
+     * @var bool true, wenn auf Fehlerseiten detaillierte Informatione zu abgefangenen Exceptions ausgegeben werden sollen
+     */
+    public $showExceptions = false;
+
     // </editor-fold>
-    
-    
-    // <editor-fold desc="Internal methods">
-    
+
+
+    // <editor-fold desc="Contructor">
+
     /**
      * Dem Konstruktur muss der Pfad zur Installationsbasis übergeben werden.
      * Der Konstruktor ist als private deklariert, da die Klasse als Singleton
@@ -158,14 +172,13 @@ class NanoCm {
         $this->cachedir = Util::createPath($this->pubdir, 'ncm', 'sys', 'cache');
         $this->relativeBaseUrl = substr($this->pubdir, strlen($_SERVER['DOCUMENT_ROOT']));
         $this->browscappath = Util::createPath($this->sysdir, 'db', 'lite_php_browscap.ini');
-
         if (empty($this->relativeBaseUrl)) {
             $this->relativeBaseUrl = '/';
         }
 
         // Ein (leerer) Logger wird immer instanziiert
         $this->log = new Log\Logger();
-        
+
         // Zugriff auf die Datenbank herstellen
         $this->orm = new Orm($this->getDbHandle(), $this->getStatsDbHandle(), $this->log);
 
@@ -176,12 +189,18 @@ class NanoCm {
         }
         $this->tpldir = Util::createPath($this->pubdir, 'tpl', $tpl);
 
-        // TODO Instanziierung nur, wenn Logging eingeschaltet
-        $this->log->addWriter(
-            new Log\Writer\ChromeLoggerWriter(
-                new Log\Filter\PriorityFilter(\Ubergeek\Log\Logger::DEBUG, Log\Filter\PriorityFilter::OPERATOR_MIN)
-            )
-        );
+        // ChromeLoggerWriter instanziieren, wenn eingeschaltet
+        if ($this->orm->getSettingValue(Setting::SYSTEM_DEBUG_ENABLECHROMELOGGER) == 1) {
+            $this->log->addWriter(
+                new Log\Writer\ChromeLoggerWriter(
+                    new Log\Filter\PriorityFilter(Logger::DEBUG, Log\Filter\PriorityFilter::OPERATOR_MIN)
+                )
+            );
+        }
+
+        // Ausgabe von Informationen zu abgefangenen Exceptions ist vom Seitenbetreuer konfigurierbar
+        $this->showExceptions = $this->orm->getSettingValue(Setting::SYSTEM_DEBUG_SHOWEXCEPTIONS) == '1';
+        $this->log->debug('showExceptions: ' . $this->showExceptions);
 
         // Seitenlänge im Administrationsbereich
         $this->orm->pageLength = intval($this->orm->getSettingValue(Setting::SYSTEM_ADMIN_PAGELENGTH));
@@ -198,33 +217,10 @@ class NanoCm {
         $this->ipcache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
     }
 
-    /**
-     * Gibt den absoluten Namen der Site-spezifischen Datenbank-Datei zurück
-     *
-     * @return string Datenbank-Dateiname
-     */
-    private function getSiteDbFilename() : string {
-        $fname = Util::createPath(
-            $this->sysdir,
-            'db',
-            'site.sqlite'
-        );
-        return $fname;
-    }
+    // </editor-fold>
 
-    /**
-     * Gibt den absoluten Dateipfad zur Statistik-Datenbankdatei zurück
-     *
-     * @return string
-     */
-    private function getStatsDbFilename() : string {
-        $fname = Util::createPath(
-            $this->sysdir,
-            'db',
-            'stats.sqlite'
-        );
-        return $fname;
-    }
+    
+    // <editor-fold desc="Internal methods">
     
     /**
      * Gibt das Datenbank-Handle für die Standard-System-Datenbank zurück
@@ -290,7 +286,35 @@ class NanoCm {
         self::$ncm = new NanoCm($basepath);
         return self::$ncm;
     }
-    
+
+    /**
+     * Gibt den absoluten Namen der Site-spezifischen Datenbank-Datei zurück
+     *
+     * @return string Datenbank-Dateiname
+     */
+    public function getSiteDbFilename() : string {
+        $fname = Util::createPath(
+            $this->sysdir,
+            'db',
+            'site.sqlite'
+        );
+        return $fname;
+    }
+
+    /**
+     * Gibt den absoluten Dateipfad zur Statistik-Datenbankdatei zurück
+     *
+     * @return string
+     */
+    public function getStatsDbFilename() : string {
+        $fname = Util::createPath(
+            $this->sysdir,
+            'db',
+            'stats.sqlite'
+        );
+        return $fname;
+    }
+
     /**
      * Gibt true zurück, wenn an der aktuellen NCM-Session ein Benutzer
      * angemeldet ist.
@@ -412,14 +436,14 @@ class NanoCm {
      */
     public function createAccessLogEntry(HttpRequest $request) : AccessLogEntry {
 
-        $ip = '78.50.12.56';
-        //$ip = $_SERVER['REMOTE_ADDR'];                // TODO Sollte aus $request ermittelt werden
+        $ip = $_SERVER['REMOTE_ADDR'];                  // TODO Sollte aus $request ermittelt werden
         $useragent = $_SERVER['HTTP_USER_AGENT'];       // TODO Sollte aus $request ermittelt werden
         $enableBrowscap = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEBROWSCAP) == '1';
         $enableGeolocation = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEGEOLOCATION) == '1';
         $geolocationservice = new GeolocationService($this->ipcache);
 
         $entry = new AccessLogEntry();
+        $entry->accesstime = new \DateTime();
         $entry->useragent = $useragent;
         $entry->method = $_SERVER['REQUEST_METHOD'];    // TODO Sollte aus $request ermittelt werden
         $entry->url = $request->requestUri->document;
@@ -457,6 +481,7 @@ class NanoCm {
             $geolocation = null;
             try {
                 $geolocation = $geolocationservice->getGeolocationForIpAddress($ip);
+                $this->log->debug($geolocation);
             } catch (\Exception $ex) {
                 $this->log->err("Fehler beim Aufruf von Geolocation-Informationen: " . $ex->getMessage());
                 $this->log->err($ex->getTrace());
@@ -471,6 +496,9 @@ class NanoCm {
                 $entry->timezone = $geolocation->timezone;
                 $entry->latitude = $geolocation->latitude;
                 $entry->longitude = $geolocation->longitude;
+            } else {
+                $entry->country = 'Unknown';
+                $entry->regionname = 'Unknown';
             }
         }
 

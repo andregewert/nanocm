@@ -1,0 +1,43 @@
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */ ?>
+<h2>Seitenzugriffe</h2>
+<table class="list">
+    <thead>
+        <tr>
+            <th>Zeitpunkt</th>
+            <th>Methode</th>
+            <th>URL</th>
+            <th>Session-ID</th>
+            <th>OS</th>
+            <th>Browser</th>
+            <th>Land</th>
+            <th>Region</th>
+            <th>Stadt</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (is_array($this->accessLog) && count($this->accessLog) > 0) : ?>
+            <?php foreach ($this->accessLog as $accessLogEntry) : ?>
+                <tr>
+                    <td class="pre">
+                        <?php if ($accessLogEntry->accesstime instanceof \DateTime) : ?>
+                            <?php echo $accessLogEntry->accesstime->format('y-m-d H:i:s'); ?>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo $this->htmlEncode($accessLogEntry->method); ?></td>
+                    <td title="<?php echo $this->htmlEncode($accessLogEntry->fullurl); ?>"><?php echo $this->htmlEncode($accessLogEntry->url); ?></td>
+                    <td><?php echo $this->htmlEncode($accessLogEntry->sessionid); ?></td>
+                    <td><?php echo $this->htmlEncode($accessLogEntry->osname . ' ' . $accessLogEntry->osversion); ?></td>
+                    <td title="<?php echo $this->htmlEncode($accessLogEntry->useragent); ?>"><?php echo $this->htmlEncode($accessLogEntry->browsername . ' ' . $accessLogEntry->browserversion); ?></td>
+                    <td><?php echo $this->htmlEncode($accessLogEntry->country); ?></td>
+                    <td><?php echo $this->htmlEncode($accessLogEntry->regionname); ?></td>
+                    <td><?php echo $this->htmlEncode($accessLogEntry->city); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <tr class="noresult">
+                <td colspan="9">Keine Eintr&auml;ge gefunden</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+<?php $this->includeUserTemplate('blocks/list-paging.phtml'); ?>

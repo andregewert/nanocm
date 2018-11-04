@@ -6,8 +6,7 @@
         Bitte laden Sie die Seite neu. Falls der Fehler bestehen sollte,
         wenden Sie sich gerne an den Webseiten-Betreuer!</p>
 
-    <?php if ($this->exception !== null) : ?>
-        <?php // TODO Art der Fehlerausgabe sollte konfigurierbar sein! ?>
+    <?php if ($this->exception !== null && $this->ncm->showExceptions) : ?>
         <p><b><?php echo $this->htmlEncode($this->exception->getMessage()); ?></b></p>
         <?php echo nl2br($this->exception->getTraceAsString()); ?>
         <?php $this->debug($this->exception->getTrace()); ?>

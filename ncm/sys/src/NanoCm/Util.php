@@ -27,6 +27,12 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
+    public static function sizeHumanReadable($bytes, $decimals = 2) {
+        $size = array('B','KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . @$size[$factor];
+    }
+
     /**
      * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
      * zu einer Pfadangabe zusammen

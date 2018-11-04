@@ -58,11 +58,15 @@ class CoreModule extends AbstractModule {
         $parts = $this->getRelativeUrlParts();
 
         // Das CoreModule protokolliert Seitenzugriffe, wenn die Funktion aktiviert ist
-        if ($this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEACCESSLOG) == '1') {
-            $this->orm->logHttpRequest(
-                $this->ncm->createAccessLogEntry($this->frontController->getHttpRequest()),
-                $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEGEOLOCATION) == '1'
-            );
+        if ($this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLELOGGING) == '1') {
+            $geolocation = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEGEOLOCATION) == '1';
+            $accesslog = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEACCESSLOG) == '1';
+            $entry = $this->ncm->createAccessLogEntry($this->frontController->getHttpRequest());
+
+            if ($accesslog) {
+                $this->orm->logHttpRequest($entry);
+            }
+            $this->orm->logSimplifiedStats($entry, $geolocation);
         }
 
         switch ($parts[0]) {

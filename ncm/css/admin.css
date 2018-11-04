@@ -111,6 +111,25 @@ div.column-2 {
   box-sizing: border-box; }
 
 /* </editor-fold> */
+/* <editor-fold desc="Message boxes"> */
+div.msgcritical {
+  border: solid red 5px;
+  border-radius: 5px;
+  font-size: 1.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem; }
+
+div.msgnote {
+  border: solid black 1px;
+  border-radius: 5px;
+  background-color: beige;
+  font-size: 1.1rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem; }
+
+/* </editor-fold> */
 /* <editor-fold desc="Navigation elements"> */
 nav.main {
   background-color: aliceblue;
