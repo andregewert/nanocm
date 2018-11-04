@@ -20,6 +20,10 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\Medium;
+use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\NanoCm\Util;
+
 /**
  * Verwaltung der Benutzerkonten
  * @author André Gewert <agewert@ubergeek.de>
@@ -28,8 +32,76 @@ namespace Ubergeek\NanoCm\Module;
  */
 class AdminMediaModule extends AbstractAdminModule {
 
+    // <editor-fold desc="Properties">
+
+    /**
+     * Suchbegriff
+     *
+     * @var string
+     */
+    public $searchTerm;
+
+    /**
+     * Suchfilter: Statuscode
+     *
+     * @var int
+     */
+    public $searchStatusCode;
+
+    /**
+     * Suchfilter: übergeordneter Ordner
+     *
+     * @var int
+     */
+    public $searchParentId;
+
+    /**
+     * Auflistung der übergeordneten Ordner
+     *
+     * @var Medium[]
+     */
+    public $parentFolders;
+
+    /**
+     * Der aktuell gewählte Ordner
+     *
+     * @var Medium
+     */
+    public $currentFolder;
+
+    /**
+     * Liste der anzuzeigenden Medien
+     *
+     * @var Medium[]
+     */
+    public $media;
+
+    /**
+     * Die für Listen-Datensätze verfügbaren Statuscodes
+     *
+     * @var int[]
+     */
+    public $availableStatusCodes = array(
+        StatusCode::ACTIVE,
+        StatusCode::LOCKED
+    );
+
+    // </editor-fold>
+
     public function run() {
         $content = '';
+        $this->setTitle($this->getSiteTitle() . ' - Medien verwalten');
+
+        $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
+        $this->searchStatusCode = $this->getOrOverrideSessionVarWithParam('searchStatusCode');
+        $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
+        $this->searchParentId = $this->getOrOverrideSessionVarWithParam('searchParentId', 0);
+
+        if ($this->searchParentId > 0) {
+            $this->currentFolder = $this->orm->getMediumById($this->searchParentId);
+            $this->parentFolders = $this->orm->getParentFolders($this->searchParentId);
+        }
+        $this->log->debug($this->parentFolders);
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -43,6 +115,18 @@ class AdminMediaModule extends AbstractAdminModule {
             case 'html':
                 $this->setPageTemplate(self::PAGE_NONE);
                 switch ($this->getRelativeUrlPart(3)) {
+
+                    // Auflistung von Medien
+                    case 'list':
+                        $filter = new Medium();
+                        $filter->status_code = $this->searchStatusCode;
+                        $this->pageCount = ceil($this->orm->searchMedia($filter, $this->searchParentId, $this->searchTerm, true) / $this->orm->pageLength);
+                        if ($this->searchPage > $this->pageCount) {
+                            $this->searchPage = $this->pageCount;
+                        }
+                        $this->media = $this->orm->searchMedia($filter, $this->searchParentId, $this->searchTerm, false, $this->searchPage);
+                        $content = $this->renderUserTemplate('content-media-list.phtml');
+                        break;
 
                     // Bildauswahl
                     case 'imageselection':
@@ -61,4 +145,18 @@ class AdminMediaModule extends AbstractAdminModule {
         $this->setContent($content);
     }
 
+
+    // <editor-fold desc="Methods">
+
+    public function getFileImage($extension) {
+        $extension = strtolower($extension);
+        $extension = preg_replace('/[^a-z0-9]/i', '', $extension);
+        $path = Util::createPath($this->ncm->ncmdir, 'img', 'fatcow', '16', 'file_extension_' . $extension . '.png');
+        if (file_exists($path)) {
+            return 'file_extension_' . $extension . '.png';
+        }
+        return 'file_extension_bin.png';
+    }
+
+    // </editor-fold>
 }

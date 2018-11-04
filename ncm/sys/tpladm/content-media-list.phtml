@@ -1,0 +1,70 @@
+<?php
+    /* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */
+    use Ubergeek\NanoCm\StatusCode;
+?>
+<?php if ($this->currentFolder instanceof \Ubergeek\NanoCm\Medium) : ?>
+    <h2><?php echo $this->htmlEncode($this->currentFolder->title); ?></h2>
+<?php else : ?>
+    <h2>Startseite</h2>
+<?php endif; ?>
+<table class="list">
+    <thead>
+        <tr>
+            <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+            <th style="width: 30px">Typ</th>
+            <th>Titel</th>
+            <th>Dateiname</th>
+            <th>Mime-Type</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if ($this->searchParentId != 0) : ?>
+            <tr>
+                <td style="padding: 0.5em"></td>
+                <td colspan="5" style="padding: 0.5em">
+                    <a href="/admin/media/index.php?searchParentId=0">Startseite</a>
+                    <?php foreach ($this->parentFolders as $parentFolder) : ?>
+                        /
+                        <a href="/admin/media/index.php?searchParentId=<?php echo $parentFolder->id; ?>"><?php echo $this->htmlEncode($parentFolder->title); ?></a>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+
+        <?php if (is_array($this->media) && count($this->media) > 0) : ?>
+            <?php foreach ($this->media as $medium) : ?>
+                <tr>
+                    <td style="text-align: center">
+                        <input type="checkbox" class="selection" value="<?php echo $medium->id; ?>" style="text-align: center">
+                    </td>
+                    <td style="text-align: center">
+                        <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
+                            <img src="/ncm/img/fatcow/16/folder.png" width="16" height="16" alt="Folder">
+                        <?php else : ?>
+                            <img src="/ncm/img/fatcow/16/<?php echo $this->getFileImage($medium->extension); ?>" width="16" height="16" alt="">
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
+                            <a href="/admin/media/index.php?searchParentId=<?php echo $medium->id; ?>"><?php echo $this->htmlEncode($medium->title); ?></a>
+                        <?php else : ?>
+                            <a href="javascript:void(0);" data-id="<?php echo $medium->id; ?>" onclick="module.editClickedMedium(this);"><?php echo $this->htmlEncode($medium->title); ?></a>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo $this->htmlEncode($medium->filename); ?></td>
+                    <td><?php echo $this->htmlEncode($medium->type); ?></td>
+                    <td>
+                        <?php if ($medium->entrytype != \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
+                            <?php echo $this->htmlEncode(StatusCode::convertStatusId($medium->status_code)); ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <tr class="noresult">
+                <td colspan="6">Keine Eintr&auml;ge gefunden</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>

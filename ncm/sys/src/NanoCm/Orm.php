@@ -1116,7 +1116,8 @@ class Orm {
     /**
      * Gibt ein Array mit den Tags (in Form von Strings) zurück,
      * die einem bestimmten Artikel zugeordnet sind
-     * @param $articleId Artikel-ID
+     *
+     * @param int $articleId Artikel-ID
      * @return string[] Array der zugewiesenen Tags
      */
     public function getTagsByArticleId($articleId) {
@@ -1127,6 +1128,30 @@ class Orm {
                 WHERE tag_article.article_id = :article_id';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('article_id', $articleId);
+        $stmt->execute();
+
+        while (($tag = $stmt->fetchColumn()) !== false) {
+            $tags[] = $tag;
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Gibt ein Array mit den Tags (in Form von Strings) zurück, die einem bestimmten
+     * Medium zugeordnet sind.
+     *
+     * @param int $mediumId ID des Mediendatensatzes
+     * @return string[] Array der zugewiesenen Tags
+     */
+    public function getTagsByMediumId($mediumId) {
+        $tags = array();
+
+        $sql = 'SELECT tag.title FROM tag_medium LEFT JOIN tag
+                ON tag.id = tag_medium.tag_id
+                WHERE tag_medium.medium_id = :medium_id';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('medium_id', $mediumId);
         $stmt->execute();
 
         while (($tag = $stmt->fetchColumn()) !== false) {
@@ -1588,6 +1613,101 @@ class Orm {
     }
 
     // </editor-fold>
+
+
+    // <editor-fold desc="Medium">
+
+    public function getParentFolders($entryId) {
+        $parents = array();
+        $startentry = $this->getMediumById($entryId);
+        $entry = $startentry;
+
+        do {
+            $entry = $this->getMediumById($entry->parent_id);
+            if ($entry != null) {
+                $parents[] = $entry;
+            }
+        } while ($entry != null && $entry->parent_id != 0);
+
+        if ($startentry != null) {
+            $parents[] = $startentry;
+        }
+
+        return $parents;
+    }
+
+    public function getMediumById(int $mediumId) {
+        $sql = 'SELECT * FROM medium WHERE id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $mediumId);
+        $stmt->execute();
+        return Medium::fetchFromPdoStatement($stmt);
+    }
+
+    public function searchMedia(Medium $filter = null, $parentId = 0, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $media = array();
+        $params = array();
+        $limit = ($limit == null)? $this->pageLength : intval($limit);
+
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= ' FROM medium WHERE parent_id = :parent_id ';
+        $params['parent_id'] = intval($parentId);
+
+        // Filterbedingungen einfügen
+        if ($filter instanceof Medium) {
+            if ($filter->status_code != null) {
+                $sql .= ' AND status_code = :filter_status_code ';
+                $params['filter_status_code'] = $filter->status_code;
+            }
+            if ($filter->entrytype != null) {
+                $sql .= ' AND entrytype = :filter_entrytype ';
+                $params['filter_entrytype'] = $filter->entrytype;
+            }
+        }
+
+        // Suchbegriff
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND (
+                filename LIKE :search_filename
+                OR title LIKE :search_title
+                OR description LIKE :search_description
+                OR attribution LIKE :search_attribution
+            ) ';
+            $params['search_filename'] = $like;
+            $params['search_title'] = $like;
+            $params['search_description'] = $like;
+            $params['search_attribution'] = $like;
+        }
+
+        // Begrenzung der Ergebnismenge auf Anzeigeseiten
+        if (!$countOnly) {
+            $sql .= ' ORDER BY entrytype ASC, title ASC, filename ASC ';
+            $page = intval($page) -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        // Parameter füllen und Query ausführen
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        // Ergebnis auslesen
+        if ($countOnly) return $stmt->fetchColumn();
+        while (($medium = Medium::fetchFromPdoStatement($stmt)) !== null) {
+            $medium->tags = $this->getTagsByMediumId($medium->id);
+            $media[] = $medium;
+        }
+        return $media;
+    }
+
+    // <editor-fold>
 
     
     // <editor-fold desc="Article">
