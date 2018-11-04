@@ -33,66 +33,77 @@ class Article {
     
     /**
      * Eindeutige ID des Artikels
-     * @var integer
+     *
+     * @var int
      */
     public $id;
     
     /**
      * Erstellungszeitpunkt
+     *
      * @var \DateTime
      */
     public $creation_timestamp;
     
     /**
      * Änderungs-Zeitpunkt
+     *
      * @var \DateTime|null
      */
     public $modification_timestamp = null;
 
     /**
      * Benutzer-ID des Autors
-     * @var integer
+     *
+     * @var int
      */
     public $author_id;
     
     /**
      * Statuscode
-     * @var integer
+     *
+     * @var int
      */
     public $status_code;
 
     /**
      * Artikelüberschrift
+     *
      * @var string
      */
     public $headline;
     
     /**
      * Optionaler Anrisstext
+     *
      * @var string
      */
     public $teaser;
     
     /**
      * Artikeltext
+     *
      * @var string
      */
     public $content;
 
     /**
      * Startzeitpunkt für die Freischaltung
+     *
      * @var \DateTime|null
      */
     public $start_timestamp = null;
     
     /**
      * Endzeitpunkt für die Freischaltung
+     *
      * @var \DateTime|null
      */
     public $stop_timestamp = null;
     
     /**
      * Veröffentlichungszeitpunkt
+     *
      * @var \DateTime|null
      */
     public $publishing_timestamp = null;
@@ -102,6 +113,7 @@ class Article {
      * 
      * Die globale Einstellung für die Trackback-Funktionalität hat immer
      * Vorrang vor der artikel-bezogenen Einstellung.
+     *
      * @var bool
      */
     public $enable_trackbacks;
@@ -111,12 +123,43 @@ class Article {
      * 
      * Die globale Einstellung für die Kommentar-Funktionalität hat immer
      * Vorrang vor der artikel-bezogenen Einstellung.
+     *
      * @var bool
      */
     public $enable_comments;
 
     /**
+     * Schlüssel für die Artikelart-Definition
+     * @var string
+     */
+    public $articletype_key;
+
+    /**
+     * Optionale Template-Variablen.
+     * Die Variablen werden in dieser Property als Array geführt und müssen beim Speichern / Laden entsprechend
+     * gemapt werden.
+     *
+     * @var string
+     */
+    public $templatevars;
+
+    /**
+     * Optional: Die ID einer Artikelserie, zu der dieser Artikel gehören soll
+     *
+     * @var int
+     */
+    public $series_id;
+
+    /**
+     * Optional: Verknüpfte Artikelart
+     *
+     * @var Definition
+     */
+    public $articleType;
+
+    /**
      * Ein Array mit den zugewiesenen Schlagworten
+     *
      * @var string[]
      */
     public $tags;
@@ -146,6 +189,7 @@ class Article {
             }
             $article->enable_trackbacks = $article->enable_trackbacks == 1;
             $article->enable_comments = $article->enable_comments == 1;
+            $article->templatevars = json_decode($article->templatevars, true);
             return $article;
         }
         return null;

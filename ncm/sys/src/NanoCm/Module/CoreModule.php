@@ -120,7 +120,6 @@ class CoreModule extends AbstractModule {
                 $this->page = $this->orm->getPageByUrl($this->getRelativeUrl());
                 if ($this->page !== null) {
                     $this->setTitle($this->getSiteTitle() . ' - ' . $this->page->headline);
-                    $this->log->debug($this->page);
                     $this->content = $this->renderUserTemplate('content-page.phtml');
                 }
         }

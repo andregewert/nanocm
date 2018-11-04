@@ -185,6 +185,7 @@ abstract class AbstractModule implements
 
     /**
      * Gibt den Standardtitel der Site zurück.
+     *
      * @return string Seitentitel
      */
     public function getSiteTitle() : string {
@@ -193,6 +194,7 @@ abstract class AbstractModule implements
 
     /**
      * Setzt eine Template-Option auf den angegebenen Wert
+     *
      * @param string $key Name der Option
      * @param mixed $value Neuer Wert der Option
      */

@@ -21,6 +21,7 @@
 namespace Ubergeek\NanoCm\Module;
 
 use Ubergeek\NanoCm\Articleseries;
+use Ubergeek\NanoCm\Definition;
 use Ubergeek\NanoCm\StatusCode;
 
 /**
@@ -58,6 +59,13 @@ class AdminArticleseriesModule extends AbstractAdminModule {
     public $searchTerm;
 
     /**
+     * Auswählbare Sortiermodi für Artikelserien
+     *
+     * @var Definition[]
+     */
+    public $availableSortingModes = array();
+
+    /**
      * Die für Artikelserien-Datensätze verfügbaren Statuscodes
      * @var int[]
      */
@@ -75,6 +83,7 @@ class AdminArticleseriesModule extends AbstractAdminModule {
         $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
         $this->searchStatusCode = $this->getOrOverrideSessionVarWithParam('searchStatusCode');
         $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
+        $this->availableSortingModes = $this->orm->getDefinitionsByType(Definition::TYPE_ARTICLESERIES_SORT);
 
         switch ($this->getRelativeUrlPart(2)) {
 

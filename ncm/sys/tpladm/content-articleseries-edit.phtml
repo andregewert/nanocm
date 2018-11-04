@@ -21,6 +21,15 @@
     <input type="text" id="edit_articleseries_description" value="<?php echo $this->htmlEncode($this->articleseries->description); ?>">
 </div>
 <div class="row">
+    <label>Sortierung</label>
+    <select id="edit_articleseries_sorting_key" size="1">
+        <option value="">- Keine Vorgabe -</option>
+        <?php foreach ($this->availableSortingModes as $definition) : ?>
+            <option value="<?php echo $this->htmlEncode($definition->key); ?>" <?php if ($this->articleseries->sorting_key == $definition->key) echo 'selected="selected"'; ?>><?php echo $this->htmlEncode($definition->title); ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+<div class="row">
     <label>Status</label>
     <select id="edit_articleseries_status_code" size="1">
         <?php foreach ($this->availableStatusCodes as $code) : ?>

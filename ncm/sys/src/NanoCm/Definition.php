@@ -28,6 +28,25 @@ namespace Ubergeek\NanoCm;
  */
 class Definition {
 
+    // <editor-fold desc="Constants">
+
+    /**
+     * Artikelarten
+     *
+     * @var string
+     */
+    public const TYPE_ARTICLE_TYPE = 'articletype';
+
+    /**
+     * Sortiermöglichkeiten für Artikelserien
+     *
+     * @var string
+     */
+    public const TYPE_ARTICLESERIES_SORT = 'articleseriessort';
+
+    // </editor-fold>
+
+
     // <editor-fold desc="Properties">
 
     /**

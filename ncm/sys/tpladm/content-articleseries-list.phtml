@@ -4,12 +4,13 @@
 ?>
 <table class="list">
     <thead>
-    <tr>
-        <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
-        <th>Titel</th>
-        <th>Beschreibung</th>
-        <th>Status</th>
-    </tr>
+        <tr>
+            <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+            <th>Titel</th>
+            <th>Beschreibung</th>
+            <th>Sortierung</th>
+            <th>Status</th>
+        </tr>
     </thead>
     <tbody>
     <?php if (is_array($this->seriesList) && count($this->seriesList) > 0) : ?>
@@ -21,6 +22,13 @@
                 <td><a href="javascript:void(0);" data-id="<?php echo $this->htmlEncode($series->id); ?>"
                        onclick="module.editClickedSeries(this);"><?php echo $this->htmlEncode($series->title); ?></a></td>
                 <td><?php echo $this->htmlEncode($series->description); ?></td>
+                <td>
+                    <?php if (array_key_exists($series->sorting_key, $this->availableSortingModes)) : ?>
+                        <?php echo $this->htmlEncode($this->availableSortingModes[$series->sorting_key]->title); ?>
+                    <?php else : ?>
+                        Ung&uuml;ltige Sortiervorgabe
+                    <?php endif; ?>
+                </td>
                 <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($series->status_code)); ?></td>
             </tr>
         <?php endforeach; ?>

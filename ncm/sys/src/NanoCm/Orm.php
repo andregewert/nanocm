@@ -233,9 +233,6 @@ class Orm {
         while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
-
-        $this->log->debug($stats);
-
         return $stats;
     }
 
@@ -282,9 +279,6 @@ class Orm {
         $stmt->bindValue('year', $year, \PDO::PARAM_STR);
         $stmt->bindValue('month', $month, \PDO::PARAM_STR);
         $stmt->execute();
-
-        $this->log->debug($year);
-        $this->log->debug($month);
 
         $stats = array();
         while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
@@ -564,6 +558,7 @@ class Orm {
 
     /**
      * Ermittelt alle Definitionsdatensätze, die zu dem angegebenen Definitionstyp gehören
+     *
      * @param string $type Definitionstyp
      * @return Definition[] Die gefundenen Definitionsdatensätze
      */
@@ -574,8 +569,8 @@ class Orm {
         $stmt->execute();
 
         $definitions = array();
-        while (($definition = Definition::fetchFromPdoStatement($sql)) !== null) {
-            $definitions[] = $definition;
+        while (($definition = Definition::fetchFromPdoStatement($stmt)) !== null) {
+            $definitions[$definition->key] = $definition;
         }
         return $definitions;
     }
@@ -1457,6 +1452,33 @@ class Orm {
 
     // <editor-fold desc="Articleseries">
 
+    /**
+     * Gibt alle Artikelserien zurück
+     *
+     * @param bool $releasedOnly
+     * @return Articleseries[]
+     */
+    public function getArticleseries($releasedOnly = true) {
+        $params = array();
+
+        $sql = 'SELECT * FROM articleseries WHERE 1 = 1 ';
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params[status_code] = StatusCode::ACTIVE;
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        $articleseries = array();
+        while (($row = Articleseries::fetchFromPdoStatement($stmt)) !== null) {
+            $articleseries[$row->id] = $row;
+        }
+
+        return $articleseries;
+    }
+
     public function searchArticleseries(Articleseries $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $params = array();
         $limit = ($limit == null)? $this->pageLength : intval($limit);
@@ -1494,7 +1516,6 @@ class Orm {
         }
 
         // Parameter füllen und Query ausführen
-        $this->log->debug($sql);
         $stmt = $this->basedb->prepare($sql);
         $this->bindValues($stmt, $params);
         $stmt->execute();
@@ -1694,6 +1715,7 @@ class Orm {
         // Ergerbnis auslesen
         while (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
             $article->tags = $this->getTagsByArticleId($article->id);
+            $article->articleType = $this->getDefinitionByTypeAndKey(Definition::TYPE_ARTICLE_TYPE, $article->articletype_key);
             $articles[] = $article;
         }
         return $articles;
@@ -1719,6 +1741,7 @@ class Orm {
 
         if (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
             $article->tags = $this->getTagsByArticleId($article->id);
+            $article->articleType = $this->getDefinitionByTypeAndKey(Definition::TYPE_ARTICLE_TYPE, $article->articletype_key);
         }
         return $article;
     }
@@ -1804,6 +1827,10 @@ class Orm {
      */
     private function updateArticle(Article $article) {
         $article->modification_timestamp = new \DateTime();
+        $templatevars = '';
+        if (is_array($article->templatevars) && count($article->templatevars) > 0) {
+            $templatevars = json_encode($article->templatevars);
+        }
 
         $sql = 'UPDATE article SET 
                     modification_timestamp = datetime(CURRENT_TIMESTAMP, \'localtime\'),
@@ -1816,7 +1843,10 @@ class Orm {
                     stop_timestamp = :stop_timestamp,
                     publishing_timestamp = :publishing_timestamp,
                     enable_trackbacks = :enable_trackbacks,
-                    enable_comments = :enable_comments 
+                    enable_comments = :enable_comments,
+                    articletype_key = :articletype_key,
+                    templatevars = :templatevars,
+                    series_id = :series_id
                 WHERE
                     id = :id ';
         $stmt = $this->basedb->prepare($sql);
@@ -1842,6 +1872,9 @@ class Orm {
         }
         $stmt->bindValue('enable_trackbacks', $article->enable_trackbacks);
         $stmt->bindValue('enable_comments', $article->enable_comments);
+        $stmt->bindValue('articletype_key', $article->articletype_key);
+        $stmt->bindValue('templatevars', $templatevars);
+        $stmt->bindValue('series_id', $article->series_id);
         $stmt->bindValue('id', $article->id);
         $stmt->execute();
 
@@ -1862,16 +1895,21 @@ class Orm {
         $article->creation_timestamp = new \DateTime();
         $article->modification_timestamp = new \DateTime();
 
+        $templatevars = '';
+        if (is_array($article->templatevars) && count($article->templatevars) > 0) {
+            $templatevars = json_encode($article->templatevars);
+        }
+
         $sql = 'INSERT INTO article (
                   creation_timestamp, modification_timestamp, author_id,
                   status_code, headline, teaser, content, start_timestamp,
                   stop_timestamp, publishing_timestamp, enable_trackbacks,
-                  enable_comments
+                  enable_comments, articletype_key, templatevars, series_id
               ) VALUES (
                   datetime(CURRENT_TIMESTAMP, \'localtime\'), datetime(CURRENT_TIMESTAMP, \'localtime\'), :author_id,
                   :status_code, :headline, :teaser, :content, :start_timestamp,
                   :stop_timestamp, :publishing_timestamp, :enable_trackbacks,
-                  :enable_comments
+                  :enable_comments, :articletype_key, :templatevars, :series_id
               ) ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('author_id', $article->author_id);
@@ -1892,6 +1930,9 @@ class Orm {
         }
         $stmt->bindValue('enable_trackbacks', ($article->enable_trackbacks)? 1 : 0);
         $stmt->bindValue('enable_comments', ($article->enable_comments)? 1 : 0);
+        $stmt->bindValue('articletype_key', $article->articletype_key);
+        $stmt->bindValue('templatevars', $templatevars);
+        $stmt->bindValue('series_id', $article->series_id);
         $stmt->execute();
 
         $article->id = $this->basedb->lastInsertId('id');

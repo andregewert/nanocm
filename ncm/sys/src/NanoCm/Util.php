@@ -51,7 +51,7 @@ final class Util {
      */
     public static function htmlEncode($string) : string {
         $string = (string)$string;
-        return htmlentities($string, ENT_HTML5, 'utf-8');
+        return htmlentities($string, ENT_HTML5 | ENT_COMPAT, 'utf-8');
     }
     
     /**

@@ -21,7 +21,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
-use Ubergeek\NanoCm\Constants;
+use Ubergeek\NanoCm\Articleseries;
+use Ubergeek\NanoCm\Definition;
 use Ubergeek\NanoCm\Setting;
 use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
@@ -70,6 +71,20 @@ class AdminArticlesModule extends AbstractAdminModule {
         StatusCode::LOCKED
     );
 
+    /**
+     * Die zur Verfügung stehenden Artikelarten
+     *
+     * @var Definition[]
+     */
+    public $availableArticleTypes;
+
+    /**
+     * Die verfügbaren Artikelserien
+     *
+     * @var Articleseries[]
+     */
+    public $availableArticleSeries;
+
     // </editor-fold>
 
 
@@ -83,6 +98,8 @@ class AdminArticlesModule extends AbstractAdminModule {
         $this->searchTerm = $this->getOrOverrideSessionVarWithParam('searchTerm');
         $this->searchStatusCode = $this->getOrOverrideSessionVarWithParam('searchStatusCode');
         $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
+        $this->availableArticleTypes = $this->orm->getDefinitionsByType(Definition::TYPE_ARTICLE_TYPE);
+        $this->availableArticleSeries = $this->orm->getArticleseries(false);
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -148,6 +165,7 @@ class AdminArticlesModule extends AbstractAdminModule {
                 if ($this->article == null) {
                     $this->article = $this->createEmptyArticle();
                 }
+                $this->log->debug($this->article);
                 $content = $this->renderUserTemplate('content-articles-edit.phtml');
                 break;
 
@@ -166,6 +184,7 @@ class AdminArticlesModule extends AbstractAdminModule {
 
     /**
      * Erstellt ein neues Artikelmodell und füllt die wichtigsten Daten mit sinnvollen Vorgaben
+     *
      * @return Article
      */
     private function createEmptyArticle() : Article {
@@ -176,32 +195,20 @@ class AdminArticlesModule extends AbstractAdminModule {
         $article->start_timestamp = new \DateTime('now');
         $article->enable_comments = $this->ncm->orm->getSettingValue(Setting::SYSTEM_ENABLECOMMENTS, true);
         $article->enable_trackbacks = $this->ncm->orm->getSettingValue(Setting::SYSTEM_ENABLETRACKBACKS, true);
+        $article->templatevars = array();
 
         return $article;
     }
 
     /**
      * Erstellt ein Artikelmodell und füllt es mit den Daten aus dem aktuellen Request
+     *
      * @return Article
      */
     private function createArticleFromRequest() : Article {
-        $article = new Article();
         $id = intval($this->getParam('id'));
-        $oldArticle = null;
-
-        if ($id > 0) {
-            $oldArticle = $this->orm->getArticleById($id, false);
-        }
-
-        if ($oldArticle !== null) {
-            $article->id = $id;
-            $article->creation_timestamp = $oldArticle->creation_timestamp;
-            $article->author_id = $oldArticle->author_id;
-            $article->status_code = $oldArticle->status_code;
-            $article->start_timestamp = $oldArticle->start_timestamp;
-            $article->stop_timestamp = $oldArticle->stop_timestamp;
-            $article->publishing_timestamp = $oldArticle->publishing_timestamp;
-        }
+        $oldArticle = ($id > 0)? $this->orm->getArticleById($id, false) : null;
+        $article = ($oldArticle == null)? new Article() : $oldArticle;
 
         // TODO Es muss noch entschieden werden, ob der Autor nach Belieben angegeben werden kann
         $article->author_id = $this->getParam('author_id', 0);
@@ -227,6 +234,9 @@ class AdminArticlesModule extends AbstractAdminModule {
 
         $article->enable_trackbacks = $this->getParam('enable_trackbacks') == 'true';
         $article->enable_comments = $this->getParam('enable_comments') == 'true';
+        $article->articletype_key = $this->getParam('articletype_key');
+        $article->templatevars = json_decode($this->getParam('templatevars'), true);
+        $article->series_id = $this->getParam('series_id');
         $article->tags = Tag::splitTagsString($this->getParam('tags'));
 
         return $article;

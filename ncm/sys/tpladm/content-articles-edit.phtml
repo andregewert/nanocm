@@ -46,18 +46,41 @@
                 </p>
                 <p>
                     <label title="Zeitpunkt der Freischaltung / Anzeige">Startdatum</label>
-                    <input type="date" id="input_article_start_date" value="<?php if ($this->article->start_timestamp != null) echo $this->article->start_timestamp->format('Y-m-d'); ?>" tabindex="0" />
-                    <input type="time" id="input_article_start_time" value="<?php if ($this->article->start_timestamp != null) echo $this->article->start_timestamp->format('H:i'); ?>" tabindex="0" />
+                    <input type="date" id="input_article_start_date" value="<?php if ($this->article->start_timestamp != null) echo $this->article->start_timestamp->format('Y-m-d'); ?>" tabindex="0">
+                    <input type="time" id="input_article_start_time" value="<?php if ($this->article->start_timestamp != null) echo $this->article->start_timestamp->format('H:i'); ?>" tabindex="0">
                 </p>
                 <p>
                     <label title="Zeitpunkt der Anzeige-Abschaltung / Deaktivierung">Enddatum</label>
-                    <input type="date" id="input_article_stop_date" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('Y-m-d'); ?>" tabindex="0" />
-                    <input type="time" id="input_article_stop_time" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('H:i'); ?>" tabindex="0" />
+                    <input type="date" id="input_article_stop_date" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('Y-m-d'); ?>" tabindex="0">
+                    <input type="time" id="input_article_stop_time" value="<?php if ($this->article->stop_timestamp != null) echo $this->article->stop_timestamp->format('H:i'); ?>" tabindex="0">
                 </p>
                 <p>
                     <label title="Offizieller Zeitpunkt der Veröffentlichung">Ver&ouml;ffentlichungsdatum</label>
-                    <input type="date" id="input_article_publishing_date" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('Y-m-d'); ?>" tabindex="0" />
-                    <input type="time" id="input_article_publishing_time" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('H:i'); ?>" tabindex="0" />
+                    <input type="date" id="input_article_publishing_date" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('Y-m-d'); ?>" tabindex="0">
+                    <input type="time" id="input_article_publishing_time" value="<?php if ($this->article->publishing_timestamp != null) echo $this->article->publishing_timestamp->format('H:i'); ?>" tabindex="0">
+                </p>
+                <p>
+                    <label title="Artikelart">Artikelart</label>
+                    <select id="input_article_articletype_key" size="1" tabindex="0">
+                        <option value="">- Keine Vorgabe -</option>
+                        <?php foreach ($this->availableArticleTypes as $definition) : ?>
+                            <option value="<?php echo $this->htmlEncode($definition->key); ?>" <?php if ($this->article->articletype_key == $definition->key) echo 'selected="selected"'; ?>><?php echo $this->htmlEncode($definition->title); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </p>
+                <p>
+                    <label title="Zugeh&ouml;rigkeit zu einer Artikelserie festlegen">Artikelserie</label>
+                    <select id="input_article_series_id" tabindex="0">
+                        <option value="">- Keine Artikelserie -</option>
+                        <?php foreach ($this->availableArticleSeries as $id => $articleseries) : ?>
+                            <option value="<?php echo $id; ?>" <?php if ($this->article->series_id == $id) echo 'selected="selected"'; ?>><?php echo $this->htmlEncode($articleseries->title); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </p>
+                <p>
+                    <label title="Variablen zur Steuerung des Seiten-Templates">Template-Variablen</label>
+                    <input type="text" id="input_article_templatevars" value="<?php if (is_array($this->article->templatevars)) echo $this->htmlEncode(json_encode($this->article->templatevars)); ?>">
+                    <a id="button_edit_vars" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/edit_button.png" width="16" height="16" style="vertical-align: middle"></a>
                 </p>
                 <p>
                     <label title="Kommentierung dieses Artikel zulassen" for="input_article_enable_comments">Kommentare zulasen</label>
@@ -72,7 +95,7 @@
                     <?php if ($this->article->author_id != null) : ?>
                         <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id)); ?>
                     <?php endif; ?>
-                    <input type="hidden" id="input_article_author_id" value="<?php echo intval($this->article->author_id); ?>" />
+                    <input type="hidden" id="input_article_author_id" value="<?php echo intval($this->article->author_id); ?>">
                     <?php // TODO Autor-Auswahl per Popup oder Selectbox? -> zumindest Admins sollten einen Autoren auswählen können ?>
                 </p>
                 <p>
@@ -148,6 +171,10 @@
                 app.toggleSettings();
             });
 
+            $('#button_edit_vars').click(function() {
+                app.editTemplateVars();
+            });
+
             ncm.initTextEditor($('.imgtoolbar'), $('#input_article_content'));
 
             /*
@@ -182,6 +209,36 @@
             ncm.insertTextAtCaret(textArea, content);
         };
 
+        app.editTemplateVars = function() {
+            let dlg = new ncm.InlinePopup(
+                '/admin/popup/editvars/', {
+                    vars: $('#input_article_templatevars').val()
+                }, {
+                    headline:   'Template-Variablen bearbeiten',
+                    width:      500,
+                    height:     500,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel: {
+                        caption: 'Abbrechen',
+                        clicked: function() {
+                            dlg.close();
+                        }
+                    },
+                    save: {
+                        caption: 'Übernehmen',
+                        clicked: function() {
+                            // Geänderten Wert übernehmen
+                            $('#input_article_templatevars').val(editVars.getValue());
+                            dlg.close();
+                        }
+                    }
+                }
+            );
+        };
+
         app.saveArticle = function() {
             ncm.showDefaultLoadingIndicator();
             $('#button_save').addClass('disabled');
@@ -203,6 +260,9 @@
                     publishing_timestamp:   ($('#input_article_publishing_date').val() + ' ' + $('#input_article_publishing_time').val()).trim(),
                     enable_trackbacks:      $('#input_article_enable_trackbacks').prop('checked'),
                     enable_comments:        $('#input_article_enable_comments').prop('checked'),
+                    articletype_key:        $('#input_article_articletype_key').val(),
+                    templatevars:           $('#input_article_templatevars').val(),
+                    series_id:              $('#input_article_series_id').val(),
                     tags:                   $('#input_article_tags').val()
                 }
             }).done(function(data) {

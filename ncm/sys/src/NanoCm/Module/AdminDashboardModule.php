@@ -29,41 +29,87 @@ use Ubergeek\Net\Fetch;
  * @created 2017-11-19
  */
 class AdminDashboardModule extends AbstractAdminModule {
+
+    // <editor-fold desc="Properties">
+
+    /**
+     * @var int Anzahl der zu moderierenden Kommentare
+     */
     public $numberOfUnmoderatedComments = 0;
 
+    /**
+     * @var int Anzahl der freigeschalteten Kommentare
+     */
     public $numberOfActiveComments = 0;
 
+    /**
+     * @var int Anzahl der nicht freigeschalteten Kommentare
+     */
     public $numberOfInactiveComments = 0;
 
+    /**
+     * @var int Anzahl der veröffentlichten / freigeschalteten Artikel
+     */
     public $numberOfReleasedArticles = 0;
 
+    /**
+     * @var int Anzahl der nicht veröffentlichten / freigeschalteten Artikel
+     */
     public $numberOfUnreleasedArticles = 0;
 
+    /**
+     * @var bool Gibt an, ob die Site-Datenbank über den Webserver abrufbar ist
+     */
     public $isSiteDbAccessible = false;
 
+    /**
+     * @var int Größe in Bytes der Site-Datenbankdatei
+     */
     public $sizeOfSiteDb = 0;
 
+    /**
+     * @var int Größe in Bytes der Statistik-Datenbankdatei
+     */
     public $sizeOfStatsDb = 0;
+
+    // </editor-fold>
 
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Seite verwalten');
+        $content = '';
 
-        $this->numberOfUnmoderatedComments = $this->orm->countCommentsByStatusCode(StatusCode::MODERATION_REQUIRED);
-        $this->numberOfActiveComments = $this->orm->countCommentsByStatusCode(StatusCode::ACTIVE);
-        $this->numberOfInactiveComments = $this->orm->countInactiveComments();
-        $this->numberOfReleasedArticles = $this->orm->countReleasedArticles();
-        $this->numberOfUnreleasedArticles = $this->orm->countUnreleasedArticles();
+        switch ($this->getRelativeUrlPart(1)) {
 
-        // Überprüfen, ob das Systemverzeichnis / die Site-Datenbank von außen erreichbar ist
-        $url = (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off')? 'http://' : 'https://';
-        $url .= $_SERVER['HTTP_HOST'] . $this->ncm->relativeBaseUrl . '/ncm/sys/db/site.sqlite';
-        $this->isSiteDbAccessible = Fetch::isUrlAccessible($url);
+            // Verschiedene, übergreifende Popups
+            case 'popup';
+                $this->setPageTemplate(self::PAGE_NONE);
+                switch ($this->getRelativeUrlPart(2)) {
+                    case 'editvars':
+                        $content = $this->renderUserTemplate('popup-edit-vars.phtml');
+                        break;
+                }
+                break;
 
-        // Größe der Datenbankdateien ermitteln
-        $this->sizeOfSiteDb = filesize($this->ncm->getSiteDbFilename());
-        $this->sizeOfStatsDb = filesize($this->ncm->getStatsDbFilename());
+            // Trägerseite
+            case 'index.php':
+            case '':
+                $this->numberOfUnmoderatedComments = $this->orm->countCommentsByStatusCode(StatusCode::MODERATION_REQUIRED);
+                $this->numberOfActiveComments = $this->orm->countCommentsByStatusCode(StatusCode::ACTIVE);
+                $this->numberOfInactiveComments = $this->orm->countInactiveComments();
+                $this->numberOfReleasedArticles = $this->orm->countReleasedArticles();
+                $this->numberOfUnreleasedArticles = $this->orm->countUnreleasedArticles();
 
-        $content = $this->renderUserTemplate('content-dashboard.phtml');
+                // Überprüfen, ob das Systemverzeichnis / die Site-Datenbank von außen erreichbar ist
+                $url = (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') ? 'http://' : 'https://';
+                $url .= $_SERVER['HTTP_HOST'] . $this->ncm->relativeBaseUrl . '/ncm/sys/db/site.sqlite';
+                $this->isSiteDbAccessible = Fetch::isUrlAccessible($url);
+
+                // Größe der Datenbankdateien ermitteln
+                $this->sizeOfSiteDb = filesize($this->ncm->getSiteDbFilename());
+                $this->sizeOfStatsDb = filesize($this->ncm->getStatsDbFilename());
+
+                $content = $this->renderUserTemplate('content-dashboard.phtml');
+        }
         $this->setContent($content);
     }
 }

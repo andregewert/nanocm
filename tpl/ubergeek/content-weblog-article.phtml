@@ -1,5 +1,7 @@
 <?php /* @var $this Ubergeek\NanoCm\Module\CoreModule */ ?>
-<div class="container spacing">
+<?php $class = ($this->article->articleType instanceof \Ubergeek\NanoCm\Definition)? $this->article->articleType->value : ''; ?>
+
+<div class="container spacing <?php echo $class; ?>">
     <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
     <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
 </div>
