@@ -352,10 +352,11 @@ function Ncm() {
         dlg.controls.appendChild(dlg.closeButton);
 
         dummy = document.createElement('img');
-        dummy.src = '/Atrium/icons/mini/close.png';
+        dummy.src = '/ncm/img/fatcow/16/cross.png';
         dummy.setAttribute('width', '16');
         dummy.setAttribute('height', '16');
         dummy.setAttribute('border', '0');
+        dummy.setAttribute('style', 'margin: 2px');
         dummy.setAttribute('alt', '[X]');
         dlg.closeButton.appendChild(dummy);
 
