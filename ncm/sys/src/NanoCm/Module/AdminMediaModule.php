@@ -29,6 +29,7 @@ use Ubergeek\NanoCm\Util;
  * @author André Gewert <agewert@ubergeek.de>
  * @package Ubergeek\NanoCm
  * @created 2018-01-13
+ * @todo Überprüfen, ob das Medienverzeichnis wirklich schreibbar ist
  */
 class AdminMediaModule extends AbstractAdminModule {
 
@@ -86,7 +87,15 @@ class AdminMediaModule extends AbstractAdminModule {
         StatusCode::LOCKED
     );
 
+    /**
+     * Gibt an, ob das Medienverzeichnis schreibbar ist
+     *
+     * @var bool
+     */
+    public $isMediaDirWritable = false;
+
     // </editor-fold>
+
 
     public function run() {
         $content = '';
@@ -101,14 +110,58 @@ class AdminMediaModule extends AbstractAdminModule {
             $this->currentFolder = $this->orm->getMediumById($this->searchParentId);
             $this->parentFolders = $this->orm->getParentFolders($this->searchParentId);
         }
-        $this->log->debug($this->parentFolders);
 
         switch ($this->getRelativeUrlPart(2)) {
+
+            // Datei-Upload
+            case 'upload':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/javascript');
+
+                $file = $this->getParam('file');
+                $data = $file['fileData'];
+
+                $medium = new Medium();
+                $medium->parent_id = 0;
+                $medium->title = $file['name'];
+                $medium->filename = $file['name'];
+                $medium->filesize = $file['size'];
+                $medium->type = $file['type'];
+                $medium->extension = Util::getFileExtension($file['name']);
+                $medium->id = $this->orm->insertInitialMedium($medium, $data);
+
+                $content = json_encode($medium);
+                break;
 
             // AJAX-Aufrufe
             case 'ajax':
                 $this->setPageTemplate(self::PAGE_NONE);
                 $this->setContentType('text/javascript');
+
+                switch ($this->getRelativeUrlPart(3)) {
+
+                    // Mediendateien löschen
+                    case 'delete':
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) $this->orm->deleteMediaByIds($ids);
+                        $content = json_encode(true);
+                        break;
+
+                    // Mediendateien sperren
+                    case 'lock':
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) $this->orm->setMediaStatusCodesById($ids, StatusCode::LOCKED);
+                        $content = json_encode(true);
+                        break;
+
+                    // Mediendateien entsperren
+                    case 'unlock':
+                        $ids = $this->getParam('ids');
+                        if (is_array($ids)) $this->orm->setMediaStatusCodesById($ids, StatusCode::ACTIVE);
+                        $content = json_encode(true);
+                        break;
+                }
+
                 break;
 
             // Einzelne HTML-Blöcke
@@ -126,6 +179,12 @@ class AdminMediaModule extends AbstractAdminModule {
                         }
                         $this->media = $this->orm->searchMedia($filter, $this->searchParentId, $this->searchTerm, false, $this->searchPage);
                         $content = $this->renderUserTemplate('content-media-list.phtml');
+                        break;
+
+                    // Einen Medieneintrag bearbeiten
+                    case 'edit':
+                        // TODO implementieren
+                        $content = $this->renderUserTemplate('content-media-edit.phtml');
                         break;
 
                     // Bildauswahl

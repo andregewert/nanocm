@@ -131,6 +131,13 @@ class NanoCm {
     public $cachedir;
 
     /**
+     * Absoluter Dateipfad für die Ablage von Mediendateien
+     *
+     * @var string
+     */
+    public $mediadir;
+
+    /**
      * Absoluter Dateipfad zur browscap-Datenbank
      *
      * @var string
@@ -169,6 +176,7 @@ class NanoCm {
         $this->pubdir = $basepath;
         $this->ncmdir = Util::createPath($this->pubdir, 'ncm');
         $this->sysdir = Util::createPath($this->pubdir, 'ncm', 'sys');
+        $this->mediadir = Util::createPath($this->pubdir, 'ncm', 'sys', 'media');
         $this->cachedir = Util::createPath($this->pubdir, 'ncm', 'sys', 'cache');
         $this->relativeBaseUrl = substr($this->pubdir, strlen($_SERVER['DOCUMENT_ROOT']));
         $this->browscappath = Util::createPath($this->sysdir, 'db', 'lite_php_browscap.ini');
@@ -180,7 +188,12 @@ class NanoCm {
         $this->log = new Log\Logger();
 
         // Zugriff auf die Datenbank herstellen
-        $this->orm = new Orm($this->getDbHandle(), $this->getStatsDbHandle(), $this->log);
+        $this->orm = new Orm(
+            $this->getDbHandle(),
+            $this->getStatsDbHandle(),
+            $this->mediadir,
+            $this->log
+        );
 
         // Template-Verzeichnis konfigurieren
         $tpl = $this->orm->getSettingValue(Setting::SYSTEM_TEMPLATE_PATH);

@@ -22,6 +22,7 @@
 namespace Ubergeek\NanoCm;
 
 use Ubergeek\NanoCm\Exception\InvalidDataException;
+use Ubergeek\NanoCm\Exception\MediaException;
 
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.
@@ -46,6 +47,7 @@ use Ubergeek\NanoCm\Exception\InvalidDataException;
  * @author André Gewert <agewert@ubergeek.de>
  * @package Ubergeek\NanoCm
  * @todo Caching / Converting eventuell in die Controller-Klassen verschieben
+ * @todo Caching für Mediendateien implementieren
  */
 class Orm {
 
@@ -64,6 +66,13 @@ class Orm {
      * @var \PDO
      */
     private $statsdb;
+
+    /**
+     * Verzeichnis für die Ablage von Mediendateien
+     *
+     * @var string
+     */
+    private $mediadir;
     
     /**
      * Optionale Log-Instanz
@@ -99,9 +108,10 @@ class Orm {
      * @param \PDO $statshandle PDO-Handle für die Statistik-Datenbank
      * @param \Ubergeek\Log\LoggerInterface|null $log
      */
-    public function __construct(\PDO $dbhandle, \PDO $statshandle, \Ubergeek\Log\LoggerInterface $log = null) {
+    public function __construct(\PDO $dbhandle, \PDO $statshandle, $mediadir, \Ubergeek\Log\LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
         $this->statsdb = $statshandle;
+        $this->mediadir = $mediadir;
         $this->log = $log;
         
         if ($this->log == null) {
@@ -1617,6 +1627,144 @@ class Orm {
 
     // <editor-fold desc="Medium">
 
+    /**
+     * Speichert die eigentliche Datei zum Medieneintrag mit der übergebenen ID
+     *
+     * @param $id Datensatz-ID der Mediendatei
+     * @param $data Eigentlicher Dateiinhalt
+     * @return void
+     */
+    protected function saveMediumFile($id, $data) {
+        try {
+            $filename = Util::createPath($this->mediadir, $id);
+            $this->log->debug("Saving medium file for $id");
+            file_put_contents($filename, $data);
+        } catch (\Exception $ex) {
+            throw new MediaException("Fehler beim Speichern der Mediendateien", 0, $ex);
+        }
+    }
+
+    /**
+     * Löscht die im Dateisystem gespeicherte Mediendatei mit der angegebenen ID
+     *
+     * @param $id Datensatz-ID der zu löschenden Mediendatei
+     * @return void
+     */
+    protected function deleteMediumFile($id) {
+        try {
+            $filename = Util::createPath($this->mediadir, $id);
+            $this->log->debug("Lösche Mediendatei $filename");
+            unlink($filename);
+        } catch (\Exception $ex) {
+            throw new MediaException("Fehler beim Löschen der Mediendatei", 0, $ex);
+        }
+    }
+
+    /**
+     * Fügt einen Basis-Datensatz für die angehängten Dateidaten hinzu
+     *
+     * @param Medium $medium
+     * @param string $data
+     * @return int Datensatz-ID
+     */
+    public function insertInitialMedium($medium, $data) {
+        $sql = 'INSERT INTO medium (
+                    entrytype, parent_id, status_code, filename, filesize, extension, type, title
+                ) VALUES (
+                    :entrytype, :parent_id, :status_code, :filename, :filesize, :extension, :type, :title
+                ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('entrytype', Medium::TYPE_FILE);
+        $stmt->bindValue('parent_id', $medium->parent_id);
+        $stmt->bindValue('status_code', StatusCode::LOCKED);
+        $stmt->bindValue('filename', $medium->filename);
+        $stmt->bindValue('filesize', $medium->filesize);
+        $stmt->bindValue('extension', $medium->extension);
+        $stmt->bindValue('type', $medium->type);
+        $stmt->bindValue('title', $medium->title);
+        $stmt->execute();
+        $id = $this->basedb->lastInsertId('id');
+
+        if ($id == null) {
+            throw new MediaException("Fehler beim Speichern des Medien-Datensatzes");
+        }
+
+        // Datei speichern
+        $this->saveMediumFile($id, $data);
+
+        return $id;
+    }
+
+    /**
+     * Löscht die Mediendatei mit der angegebenen Datensatz_ID
+     *
+     * @param $id Datensatz-ID der zu löschenden Mediendatei
+     * @return void
+     */
+    public function deleteMediumById($id) {
+        $medium = $this->getMediumById($id);
+        if ($medium != null) {
+            $this->log->debug("Deleting medium entry with id $id");
+            if ($medium->entrytype == Medium::TYPE_FOLDER) {
+                $this->log->debug("Entry $medium->id is folder, deleting sub entries");
+                $entries = $this->getMediaByParentId($medium->id);
+                foreach ($entries as $entry) {
+                    $this->deleteMediumById($entry->id);
+                }
+            }
+            try {
+                $this->deleteMediumFile($id);
+            } catch (\Exception $ex) {
+                $this->log->debug("Ignoring exception " . $ex->getMessage());
+            }
+            $sql = 'DELETE FROM medium WHERE id = :id ';
+            $stmt = $this->basedb->prepare($sql);
+            $stmt->bindValue('id', $id);
+            $stmt->execute();
+        }
+    }
+
+    /**
+     * Löscht die Mediendatein mit den übergebenen IDs
+     *
+     * @param array $ids Datensatz-IDs der zu löschenden Mediendateien
+     * @return void
+     */
+    public function deleteMediaByIds(array $ids) {
+        foreach ($ids as $id) {
+            $this->deleteMediumById($id);
+        }
+    }
+
+    /**
+     * Setzt den Status-Code für die Mediendatei mit der angegebenen Datensatz-ID
+     *
+     * @param $id Datensatz-ID der zu ändernden Mediendatei
+     * @param int $statusCode Neuer Status-Code
+     * @void void
+     */
+    public function setMediumStatusCodeById($id, $statusCode) {
+        $sql = 'UPDATE medium SET status_code = :status_code WHERE entrytype = :entrytype AND id = :id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('status_code', $statusCode);
+        $stmt->bindValue('entrytype', Medium::TYPE_FILE);
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    /**
+     * Setzt den Status-Code für mehrere Mediendateien auf den angegebenen Wert
+     *
+     * @param int[] $ids Liste der Datensatz-IDs der zu ändernden Mediendateien
+     * @param int $statusCode Neuer Status-Code
+     * @return void
+     */
+    public function setMediaStatusCodesById(array $ids, int $statusCode) {
+        foreach ($ids as $id) {
+            $this->setMediumStatusCodeById($id, $statusCode);
+        }
+    }
+
     public function getParentFolders($entryId) {
         $parents = array();
         $startentry = $this->getMediumById($entryId);
@@ -1642,6 +1790,25 @@ class Orm {
         $stmt->bindValue('id', $mediumId);
         $stmt->execute();
         return Medium::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Ermittelt alle Medieneinträge zu einem übergeordneten Ordner
+     *
+     * @param int $parenId Datensatz-ID des übergeordneten Ordners
+     * @return Medium[] Einträge zum angegebenen Ordner
+     */
+    public function getMediaByParentId(int $parenId) {
+        $sql = 'SELECT * FROM medium WHERE parent_id = :parent_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('parent_id', $parenId);
+        $stmt->execute();
+
+        $entries = array();
+        while (($row = Medium::fetchFromPdoStatement($stmt)) !== null) {
+            $entries[] = $row;
+        }
+        return $entries;
     }
 
     public function searchMedia(Medium $filter = null, $parentId = 0, $searchterm = null, $countOnly = false, $page = null, $limit = null) {

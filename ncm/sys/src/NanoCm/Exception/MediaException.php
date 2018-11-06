@@ -21,13 +21,13 @@
 namespace Ubergeek\NanoCm\Exception;
 
 /**
- * Fehlende oder ungültige Authentifizierung
+ * Fehler innerhalb der Medienverwaltung
  *
  * @package \Ubergeek\NanoCm\Exception
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2018-10-03
+ * @created 2018-11-05
  */
-class InvalidDataException
+class MediaException
     extends \RuntimeException
     implements ExceptionInterface {
 }

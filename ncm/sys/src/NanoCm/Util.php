@@ -27,6 +27,13 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
+    public static function getFileExtension(string $filename) {
+        if (preg_match("/\.([^\.]+?)$/i", $filename, $matches) > 0) {
+            return strtolower($matches[1]);
+        }
+        return '';
+    }
+
     public static function sizeHumanReadable($bytes, $decimals = 2) {
         $size = array('B','KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB');
         $factor = floor((strlen($bytes) - 1) / 3);

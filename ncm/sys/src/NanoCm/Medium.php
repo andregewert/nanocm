@@ -83,32 +83,37 @@ class Medium
     /**
      * @var string Dateiname
      */
-    public $filename;
+    public $filename = '';
+
+    /**
+     * @var int Dateigröße in Bytes
+     */
+    public $filesize = 0;
 
     /**
      * @var string Datei-Endung
      */
-    public $extension;
+    public $extension = '';
 
     /**
      * @var string Mime-Type (für Dateien) oder 'folder' (für Verzeichnisse)
      */
-    public $type;
+    public $type = '';
 
     /**
      * @var string Titel für die Mediendatei
      */
-    public $title;
+    public $title = '';
 
     /**
      * @var string Ausführlicher Beschreibungstext für die Mediendatei
      */
-    public $description;
+    public $description = '';
 
     /**
      * @var string Attribution / rechtlicher Hinweis für die Mediendatei
      */
-    public $attribution;
+    public $attribution = '';
 
     /**
      * @var array Verknüpfte Tags

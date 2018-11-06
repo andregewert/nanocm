@@ -26,7 +26,7 @@
                     <a href="/admin/media/index.php?searchParentId=0">Startseite</a>
                     <?php foreach ($this->parentFolders as $parentFolder) : ?>
                         /
-                        <a href="/admin/media/index.php?searchParentId=<?php echo $parentFolder->id; ?>"><?php echo $this->htmlEncode($parentFolder->title); ?></a>
+                        <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($parentFolder->id); ?>)"><?php echo $this->htmlEncode($parentFolder->title); ?></a>
                     <?php endforeach; ?>
                 </td>
             </tr>
@@ -47,7 +47,7 @@
                     </td>
                     <td>
                         <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
-                            <a href="/admin/media/index.php?searchParentId=<?php echo $medium->id; ?>"><?php echo $this->htmlEncode($medium->title); ?></a>
+                            <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($medium->id); ?>)"><?php echo $this->htmlEncode($medium->title); ?></a>
                         <?php else : ?>
                             <a href="javascript:void(0);" data-id="<?php echo $medium->id; ?>" onclick="module.editClickedMedium(this);"><?php echo $this->htmlEncode($medium->title); ?></a>
                         <?php endif; ?>
