@@ -213,7 +213,6 @@ class NanoCm {
 
         // Ausgabe von Informationen zu abgefangenen Exceptions ist vom Seitenbetreuer konfigurierbar
         $this->showExceptions = $this->orm->getSettingValue(Setting::SYSTEM_DEBUG_SHOWEXCEPTIONS) == '1';
-        $this->log->debug('showExceptions: ' . $this->showExceptions);
 
         // Seitenlänge im Administrationsbereich
         $this->orm->pageLength = intval($this->orm->getSettingValue(Setting::SYSTEM_ADMIN_PAGELENGTH));

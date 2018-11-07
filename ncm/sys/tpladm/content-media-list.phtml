@@ -3,7 +3,7 @@
     use Ubergeek\NanoCm\StatusCode;
 ?>
 <?php if ($this->currentFolder instanceof \Ubergeek\NanoCm\Medium) : ?>
-    <h2><?php echo $this->htmlEncode($this->currentFolder->title); ?></h2>
+    <h2><?php echo $this->htmlEncode($this->currentFolder->filename); ?></h2>
 <?php else : ?>
     <h2>Startseite</h2>
 <?php endif; ?>
@@ -11,13 +11,13 @@
     <thead>
         <tr>
             <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
-            <th style="width: 30px">Typ</th>
             <th class="textright" style="width: 30px">ID</th>
             <th>Dateiname</th>
             <th>Titel</th>
             <th class="textright">Gr&ouml;&szlig;e</th>
             <th>Mime-Type</th>
             <th class="textright">&Auml;nderungsdatum</th>
+            <th class="textcenter">Aktionen</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -41,13 +41,6 @@
                     <td style="text-align: center">
                         <input type="checkbox" class="selection" value="<?php echo $medium->id; ?>" style="text-align: center">
                     </td>
-                    <td style="text-align: center">
-                        <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
-                            <img src="/ncm/img/fatcow/16/folder.png" width="16" height="16" alt="Folder">
-                        <?php else : ?>
-                            <img src="/ncm/img/fatcow/16/<?php echo $this->getFileImage($medium->extension); ?>" width="16" height="16" alt="">
-                        <?php endif; ?>
-                    </td>
                     <td class="textright pre">
                         <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
                             <a href="javascript:void(0);" onclick="module.editFolder(<?php echo $medium->id; ?>);"><?php echo $medium->id; ?></a>
@@ -55,12 +48,15 @@
                             <a href="javascript:void(0);" onclick="module.editMedium(<?php echo $medium->id; ?>);"><?php echo $medium->id; ?></a>
                         <?php endif; ?>
                     </td>
-
                     <td>
                         <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
-                            <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($medium->id); ?>)"><?php echo $this->htmlEncode($medium->filename); ?></a>
+                            <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($medium->id); ?>)">
+                                <img src="/ncm/img/fatcow/16/folder.png" width="16" height="16" alt="Folder" style="vertical-align: middle; margin-right: 0.25em"><?php echo $this->htmlEncode($medium->filename); ?>
+                            </a>
                         <?php else : ?>
-                            <a href="javascript:void(0);" onclick="module.editMedium(<?php echo $medium->id; ?>);"><?php echo $this->htmlEncode($medium->filename); ?></a>
+                            <a href="javascript:void(0);" onclick="module.editMedium(<?php echo $medium->id; ?>);">
+                                <img src="/ncm/img/fatcow/16/<?php echo $this->getFileIcon($medium->extension); ?>" width="16" height="16" alt="" style="vertical-align: middle; margin-right: 0.25em"><?php echo $this->htmlEncode($medium->filename); ?>
+                            </a>
                         <?php endif; ?>
                     </td>
 
@@ -74,6 +70,13 @@
                     <td class="textright pre">
                         <?php if ($medium->modification_timestamp instanceof \DateTime) : ?>
                             <?php echo $medium->modification_timestamp->format('Y-m-d H:i'); ?>
+                        <?php endif; ?>
+                    </td>
+                    <td class="textcenter">
+                        <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
+                            <a href="javascript:void(0);" onclick="module.editFolder(<?php echo $medium->id; ?>);"><img src="/ncm/img/fatcow/16/edit_button.png" alt="Bearbeiten" title="Ordner bearbeiten" width="16" height="16"></a>
+                        <?php else : ?>
+                            <a href="/admin/media/download/<?php echo $medium->id; ?>"><img src="/ncm/img/fatcow/16/download.png" alt="Download" title="Datei herunterladen" width="16" height="16"></a>
                         <?php endif; ?>
                     </td>
                     <td>

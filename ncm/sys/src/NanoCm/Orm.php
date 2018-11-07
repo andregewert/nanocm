@@ -1141,153 +1141,10 @@ class Orm {
     // <editor-fold desc="Tag">
 
     /**
-     * Gibt eine Liste aller definierten Schlagworte zurück
-     * @return Tag[]
-     */
-    public function getTags() {
-        $tags = array();
-
-        $sql = 'SELECT * FROM tag ORDER BY title ASC';
-        $stmt = $this->basedb->prepare($sql);
-        $stmt->execute();
-
-        while (($tag = Tag::fetchFromPdoStatement($stmt)) !== null) {
-            $tags[] = $tag;
-        }
-
-        return $tags;
-    }
-
-    /**
-     * Gibt ein Array mit den Tags (in Form von Strings) zurück,
-     * die einem bestimmten Artikel zugeordnet sind
+     * Löscht alle Tag-Zuweisungen zum angegebenen Artikel
      *
-     * @param int $articleId Artikel-ID
-     * @return string[] Array der zugewiesenen Tags
-     */
-    public function getTagsByArticleId($articleId) {
-        $tags = array();
-
-        $sql = 'SELECT tag.title FROM tag_article LEFT JOIN tag
-                ON tag.id = tag_article.tag_id
-                WHERE tag_article.article_id = :article_id';
-        $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('article_id', $articleId);
-        $stmt->execute();
-
-        while (($tag = $stmt->fetchColumn()) !== false) {
-            $tags[] = $tag;
-        }
-
-        return $tags;
-    }
-
-    /**
-     * Gibt ein Array mit den Tags (in Form von Strings) zurück, die einem bestimmten
-     * Medium zugeordnet sind.
-     *
-     * @param int $mediumId ID des Mediendatensatzes
-     * @return string[] Array der zugewiesenen Tags
-     */
-    public function getTagsByMediumId($mediumId) {
-        $tags = array();
-
-        $sql = 'SELECT tag.title FROM tag_medium LEFT JOIN tag
-                ON tag.id = tag_medium.tag_id
-                WHERE tag_medium.medium_id = :medium_id';
-        $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('medium_id', $mediumId);
-        $stmt->execute();
-
-        while (($tag = $stmt->fetchColumn()) !== false) {
-            $tags[] = $tag;
-        }
-
-        return $tags;
-    }
-
-    /**
-     * Weist die übergebenen Tags einem bestimmten Artikel zu
-     *
-     * Die zuzuweisenden Tags werden lediglich als Strings übergeben,
-     * nicht etwa als Tag-Objekte.
-     * @param $articleId Artikel-ID
-     * @param string[] $tags Liste der zuzuweisenden Tags
+     * @param int $articleId ID des Artikel-Datensatzes
      * @return void
-     */
-    public function assignTagsToArticle($articleId, array $tags) {
-        $existingTags = $this->getTagsByArticleId($articleId);
-        $toInsert = array_diff($tags, $existingTags);
-        $toDelete = array_diff($existingTags, $tags);
-
-        foreach ($toInsert as $insert) {
-            $this->assignTagToArticle($articleId, $insert);
-        }
-
-        foreach ($toDelete as $delete) {
-            $this->unassignTagFromArticle($articleId, $delete);
-        }
-    }
-
-    /**
-     * Weist das übergebene Schlagwort einem bestimmten Artikel hinzu
-     * @param int $articleId Artikel-ID
-     * @param string $title Zuzuweisendes Schlagwort
-     * @return void
-     */
-    public function assignTagToArticle(int $articleId, string $title) {
-        if (!empty(trim($title))) {
-            $tagId = $this->saveTag($title);
-            if ($tagId > 0) {
-                $this->assignTagIdToArticle($articleId, $tagId);
-            }
-        }
-    }
-
-    /**
-     * Ordnet das Schlagwort mit der angegebenen ID einem Artikel hinzu
-     * @param int $articleId Artikel-ID
-     * @param int $tagId Tag-ID
-     * @return void
-     */
-    public function assignTagIdToArticle(int $articleId, int $tagId) {
-        $sql = 'REPLACE INTO tag_article (article_id, tag_id) VALUES (:article_id, :tag_id)';
-        $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('article_id', $articleId);
-        $stmt->bindValue('tag_id', $tagId);
-        $stmt->execute();
-    }
-
-    /**
-     * Entfernt (falls vorhanden) die Zuweisung eines Schlagwortes von einem
-     * bestimmten Artikel
-     * @param int $articleId Artikel-ID
-     * @param string $title Schlagwort
-     * @return void
-     */
-    public function unassignTagFromArticle(int $articleId, string $title) {
-        $tagId = $this->getTagIdByTitle($title);
-        $this->unassignTagIdFromArticle($articleId, $tagId);
-    }
-
-    /**
-     * Entfernt (falls vorhanden) die Zuweisung des Schlagwortes mit der angegebenen ID
-     * von einem bestimmten Artikel
-     * @param int $articleId Artikel-ID
-     * @param int $tagId Tag-ID
-     * @return void
-     */
-    public function unassignTagIdFromArticle(int $articleId, int $tagId) {
-        $sql = 'DELETE FROM tag_article WHERE article_id = :article_id AND tag_id = :tag_id';
-        $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('article_id', $articleId);
-        $stmt->bindValue('tag_id', $tagId);
-        $stmt->execute();
-    }
-
-    /**
-     * Entfernt alle Tag-Zuweisungen von einem bestimmten Artikel
-     * @param int $articleId Datensatz-ID des betreffenden Artikels
      */
     public function unassignTagsFromArticle(int $articleId) {
         $sql = 'DELETE FROM tag_article WHERE article_id = :article_id ';
@@ -1297,40 +1154,102 @@ class Orm {
     }
 
     /**
-     * Speichert ein Schlagwort in der Datenbank und gibt die Datensatz-ID zurück
+     * Löscht alle Tag-Zuweisungen zum angegebenen Mediendatensatz
      *
-     * Wenn die Datensatz-ID nicht korrekt ermittelt werden kann
-     * (mögliche Gründe?), so wird 0 zurück gegeben.
-     * @param string $title
-     * @return int
+     * @param int $mediumId ID des Mediendatensatzes
+     * @return void
      */
-    public function saveTag(string $title) {
-        $sql = 'REPLACE INTO tag (title) VALUES (:title) ';
+    public function unassignTagsFromMedium(int $mediumId) {
+        $sql = 'DELETE FROM tag_medium WHERE medium_id = :medium_id ';
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('title', $title);
+        $stmt->bindValue('medium_id', $mediumId);
         $stmt->execute();
-
-        return $this->getTagIdByTitle($title);
     }
 
     /**
-     * Ermittelt die Datensatz-ID für das angegebene Schlagwort.
+     * Gibt alle dem angegebenen Artikel zugewiesenen Tags in Form eines String-Arrays zurück
      *
-     * Wenn die ID nicht ermittelt werden kann (etwa weil das Schlagwort
-     * nicht in der Datenbank vorhanden ist), so wird null zurück
-     * gegeben.
-     * @param string $title Gesuchtes Schlagwort
-     * @return int|null
+     * @param int $articleId ID des Artikel-Datensatzes
+     * @return string[] Die zugewiesenen Tags
      */
-    public function getTagIdByTitle(string $title) {
-        $sql = 'SELECT id FROM tag WHERE LOWER(title) = :title ';
+    public function getTagsByArticleId(int $articleId) {
+        $sql = 'SELECT tag FROM tag_article WHERE article_id = :article_id ORDER BY tag ASC ';
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('title', mb_strtolower($title));
+        $stmt->bindValue('article_id', $articleId);
         $stmt->execute();
-        $id = $stmt->fetchColumn();
 
-        if ($id === false) return null;
-        return $id;
+        $tags = array();
+        while (($tag = $stmt->fetchColumn()) !== false) {
+            $tags[] = $tag;
+        }
+        return $tags;
+    }
+
+    /**
+     * Gibt alle einem bestimmten Mediendatensatz zugewiesenen Tags in Form eines String-Arrays zurück
+     *
+     * @param int $mediumId ID des Mediendatensatzes
+     * @return string[] Die zugewiesenen Tags
+     */
+    public function getTagsByMediumId(int $mediumId) {
+        $sql = 'SELECT tag FROM tag_medium WHERE medium_id = :medium_id ORDER BY tag ASC ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('medium_id', $mediumId);
+        $stmt->execute();
+
+        $tags = array();
+        while (($tag = $stmt->fetchColumn()) !== false) {
+            $tags[] = $tag;
+        }
+        return $tags;
+    }
+
+    /**
+     * Weist die übergebenen Tags einem bestimmten Artikel zu.
+     * Hinweis: Alle bestehenden Zuweisungen werden durch die übergebenen Zuweisungen *ersetzt*.
+     *
+     * @param $articleId Datensatz-ID des betreffenden Artikels
+     * @param string[] $tags Die zuzuweisenden Tags
+     * @return void
+     */
+    public function assignTagsToArticle($articleId, array $tags) {
+        $sql = 'DELETE FROM tag_article WHERE article_id = :article_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('article_id', $articleId);
+        $stmt->execute();
+
+        $sql = 'REPLACE INTO tag_article (tag, article_id) VALUES (:tag, :article_id) ';
+        $stmt = $this->basedb->prepare($sql);
+
+        foreach ($tags as $tag) {
+            $stmt->bindValue('tag', $tag);
+            $stmt->bindValue('article_id', $articleId);
+            $stmt->execute();
+        }
+    }
+
+    /**
+     * Weist die übergebenen Tags einem bestimmten Medien-Datensatz zu.
+     * Hinweis: Alle bestehenden Zuweisungen werden durch die übergebenen Zuweisungen *ersetzt*.
+     *
+     * @param $mediumId ID des betreffenden Medien-Datensatzes
+     * @param string[] $tags Die zuzuweisenden Tags
+     * @return void
+     */
+    public function assignTagsToMedium($mediumId, array $tags) {
+        $sql = 'DELETE FROM tag_medium WHERE medium_id = :medium_id ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('medium_id', $mediumId);
+        $stmt->execute();
+
+        $sql = 'REPLACE INTO tag_medium (tag, medium_id) VALUES (:tag, :medium_id) ';
+        $stmt = $this->basedb->prepare($sql);
+
+        foreach ($tags as $tag) {
+            $stmt->bindValue('tag', $tag);
+            $stmt->bindValue('medium_id', $mediumId);
+            $stmt->execute();
+        }
     }
 
     // </editor-fold>
@@ -1662,6 +1581,11 @@ class Orm {
 
     // <editor-fold desc="Medium">
 
+    public function getMediumFileContents($id) {
+        $filename = Util::createPath($this->mediadir, $id);
+        return file_get_contents($filename);
+    }
+
     /**
      * Speichert die eigentliche Datei zum Medieneintrag mit der übergebenen ID
      *
@@ -1703,6 +1627,24 @@ class Orm {
     }
 
     /**
+     * Liest alle in der Datenbank angelegten Medienordner aus und gibt sie alphabetisch sortiert zurück
+     *
+     * @return Medium[] Alle Medienordner
+     */
+    public function getAllFolders() {
+        $sql = 'SELECT * FROM medium WHERE entrytype = :entrytype ORDER BY filename ASC ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('entrytype', Medium::TYPE_FOLDER);
+        $stmt->execute();
+
+        $folders = array();
+        while (($row = Medium::fetchFromPdoStatement($stmt)) !== null) {
+            $folders[] = $row;
+        }
+        return $folders;
+    }
+
+    /**
      * Zählt die Anzahl der gespeicherten Mediendateien (ohne Ordner)
      *
      * @param bool $releasedOnly Auf true setzen, um ausschließlich freigeschaltete Mediendateien zu berücksichtigen
@@ -1731,6 +1673,9 @@ class Orm {
      * @return int Datensatz-ID
      */
     public function saveMedium(Medium $medium) {
+        $this->log->debug("Saving medium ...");
+        $this->log->debug($medium);
+
         if ($medium->id == 0) $medium->id = null;
 
         $sql = 'REPLACE INTO medium (
@@ -1755,7 +1700,9 @@ class Orm {
         $stmt->bindValue('attribution', $medium->attribution);
         $stmt->execute();
 
-        return $this->basedb->lastInsertId('id');
+        $id = $this->basedb->lastInsertId('id');
+        $this->assignTagsToMedium($id, $medium->tags);
+        return $id;
     }
 
     /**
@@ -1803,7 +1750,7 @@ class Orm {
      * @return void
      */
     public function deleteMediumById($id) {
-        $medium = $this->getMediumById($id);
+        $medium = $this->getMediumById($id, null, false);
         if ($medium != null) {
             $this->log->debug("Deleting medium entry with id $id");
             if ($medium->entrytype == Medium::TYPE_FOLDER) {
@@ -1874,11 +1821,11 @@ class Orm {
      */
     public function getParentFolders($entryId) {
         $parents = array();
-        $startentry = $this->getMediumById($entryId);
+        $startentry = $this->getMediumById($entryId, null, false);
         $entry = $startentry;
 
         do {
-            $entry = $this->getMediumById($entry->parent_id);
+            $entry = $this->getMediumById($entry->parent_id, Medium::TYPE_FOLDER, false);
             if ($entry != null) {
                 $parents[] = $entry;
             }
@@ -1896,9 +1843,10 @@ class Orm {
      *
      * @param int $mediumId ID des auszulesenden Eintrags
      * @param int|null $entrytype Optionale Einschränkung auf einen bestimmten Dateityp (Ordner oder Datei)
+     * @param bool $releasedOnly Gibt ab, ob ausschließlich freigeschaltete Einträge berücksichtig werden sollen
      * @return null|Medium
      */
-    public function getMediumById(int $mediumId, $entrytype = null) {
+    public function getMediumById(int $mediumId, $entrytype = null, bool $releasedOnly = true) {
         $params = array();
         $sql = 'SELECT * FROM medium WHERE id = :id ';
         $params['id'] = $mediumId;
@@ -1906,10 +1854,18 @@ class Orm {
             $sql .= ' AND entrytype = :entrytype ';
             $params['entrytype'] = $entrytype;
         }
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
         $stmt = $this->basedb->prepare($sql);
         $this->bindValues($stmt, $params);
         $stmt->execute();
-        return Medium::fetchFromPdoStatement($stmt);
+        $medium = Medium::fetchFromPdoStatement($stmt);
+        if ($medium != null) {
+            $medium->tags = $this->getTagsByMediumId($medium->id);
+        }
+        return $medium;
     }
 
     /**
@@ -1926,6 +1882,7 @@ class Orm {
 
         $entries = array();
         while (($row = Medium::fetchFromPdoStatement($stmt)) !== null) {
+            $row->tags = $this->getTagsByMediumId($row->id);
             $entries[] = $row;
         }
         return $entries;
@@ -2964,7 +2921,6 @@ class Orm {
 
     private function bindValues(\PDOStatement $stmt, array $params) {
         foreach ($params as $key => $value) {
-            $this->log->debug($key . ': ' . $value);
             $stmt->bindValue($key, $value);
         }
     }

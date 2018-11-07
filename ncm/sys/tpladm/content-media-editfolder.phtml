@@ -8,6 +8,10 @@
     <input type="text" id="edit_medium_title" value="<?php echo $this->htmlEncode($this->medium->title); ?>">
 </div>
 <div class="row">
-    <label>Beschreibung</label>
+    <label for="edit_medium_description">Beschreibung</label>
     <input type="text" id="edit_medium_description" value="<?php echo $this->htmlEncode($this->medium->description); ?>">
+</div>
+<div class="row">
+    <label for="edit_medium_tags">Schlagworte</label>
+    <input type="text" id="edit_medium_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php if (is_array($this->medium->tags)) echo $this->htmlEncode(join(', ', $this->medium->tags)); ?>">
 </div>

@@ -44,7 +44,7 @@ use Ubergeek\NanoCm\StatusCode;
         </div>
 
         <div id="media_dropzone" class="dropzone">
-            Dateien hier ablegen
+            Dateien zum Hinzuf&uuml;gen hier ablegen
         </div>
 
         <div id="placeholder_media" class="placeholder">
@@ -66,8 +66,6 @@ use Ubergeek\NanoCm\StatusCode;
         app.init = function() {
 
             // Drag and drop für File upload initialisieren
-            // TODO Evtl. Mehrfach-Upload ermöglichen
-
             $('#media_dropzone').on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -246,7 +244,7 @@ use Ubergeek\NanoCm\StatusCode;
                 }, {
                     headline:   'Datei bearbeiten',
                     width:      600,
-                    height:     450,
+                    height:     550,
                     loaded:     function () {
                         ncm.focusDefaultElement();
                     }
@@ -266,8 +264,13 @@ use Ubergeek\NanoCm\StatusCode;
                                 type:       'POST',
                                 dataType:   'JSON',
                                 data:       {
-                                    id: id
-                                    // TODO vervollständigen
+                                    id: id,
+                                    parent_id: $('#edit_medium_parent_id').val(),
+                                    title: $('#edit_medium_title').val(),
+                                    tags: $('#edit_medium_tags').val(),
+                                    status_code: $('#edit_medium_status_code').val(),
+                                    description: $('#edit_medium_description').val(),
+                                    attribution: $('#edit_medium_attribution').val()
                                 }
                             }).always(function() {
                                 ncm.hideDefaultLoadingIndicator();
@@ -318,7 +321,8 @@ use Ubergeek\NanoCm\StatusCode;
                                     parent_id:      app.parentId,
                                     filename:       $('#edit_medium_filename').val(),
                                     title:          $('#edit_medium_title').val(),
-                                    description:    $('#edit_medium_description').val()
+                                    description:    $('#edit_medium_description').val(),
+                                    tags:           $('#edit_medium_tags').val()
                                 }
                             }).always(function() {
                                 ncm.hideDefaultLoadingIndicator();

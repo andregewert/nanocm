@@ -1,1 +1,51 @@
-<?php /* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */ ?>
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
+<div class="row">
+    <label for="edit_medium_parent_id">Ordner</label>
+    <select id="edit_medium_parent_id" size="1">
+        <option value="0">- Kein Ordner -</option>
+        <?php foreach ($this->availableFolders as $folder) : ?>
+            <option value="<?php echo $folder->id; ?>"<?php if ($this->medium->parent_id == $folder->id) echo ' selected="selected"'; ?>><?php echo $this->htmlEncode($folder->filename); ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+<div class="row">
+    <label for="edit_medium_filename">Dateiname</label>
+    <input type="text" readonly="readonly" id="edit_medium_filename" value="<?php echo $this->htmlEncode($this->medium->filename); ?>">
+</div>
+<div class="row">
+    <label for="edit_medium_type">Dateityp</label>
+    <input type="text" readonly="readonly" id="edit_medium_type" value="<?php echo $this->htmlEncode($this->medium->type); ?>">
+</div>
+<div class="row">
+    <label for="edit_medium_title">Titel</label>
+    <input type="text" id="edit_medium_title" class="autofocus" value="<?php echo $this->htmlEncode($this->medium->title); ?>">
+</div>
+
+<div class="row">
+    <label for="edit_medium_tags">Schlagworte</label>
+    <input type="text" id="edit_medium_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php if (is_array($this->medium->tags)) echo $this->htmlEncode(join(', ', $this->medium->tags)); ?>">
+</div>
+<div class="row">
+    <label>Status</label>
+    <select id="edit_medium_status_code" size="1">
+        <?php foreach ($this->availableStatusCodes as $code) : ?>
+            <option value="<?php echo $code; ?>" <?php if ($this->medium->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+<div class="row">
+    <label for="edit_medium_description">Beschreibung</label>
+</div>
+<div class="row">
+    <textarea style="width: 100%; height: 5rem" id="edit_medium_description"><?php echo nl2br($this->htmlEncode($this->medium->description)); ?></textarea>
+</div>
+<div class="row">
+    <label>Rechtliche Hinweise</label>
+</div>
+<div class="row">
+    <textarea style="width: 100%; height: 5rem" id="edit_medium_attribution"><?php echo nl2br($this->htmlEncode($this->medium->attribution)); ?></textarea>
+</div>

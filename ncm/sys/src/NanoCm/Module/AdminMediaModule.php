@@ -22,6 +22,7 @@ namespace Ubergeek\NanoCm\Module;
 
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\NanoCm\Tag;
 use Ubergeek\NanoCm\Util;
 
 /**
@@ -95,6 +96,13 @@ class AdminMediaModule extends AbstractAdminModule {
     );
 
     /**
+     * Eine Liste von verfügbaren Ordnern
+     *
+     * @var Medium[]
+     */
+    public $availableFolders = array();
+
+    /**
      * Gibt an, ob das Medienverzeichnis schreibbar ist
      *
      * @var bool
@@ -114,11 +122,30 @@ class AdminMediaModule extends AbstractAdminModule {
         $this->searchParentId = $this->getOrOverrideSessionVarWithParam('searchParentId', 0);
 
         if ($this->searchParentId > 0) {
-            $this->currentFolder = $this->orm->getMediumById($this->searchParentId);
+            $this->currentFolder = $this->orm->getMediumById($this->searchParentId, Medium::TYPE_FOLDER, false);
             $this->parentFolders = $this->orm->getParentFolders($this->searchParentId);
         }
 
+        $this->availableFolders = $this->orm->getAllFolders();
+
         switch ($this->getRelativeUrlPart(2)) {
+
+            // Datei direkt herunterladen
+            case 'download':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('binary/octet-stream');
+
+                $id = intval($this->getRelativeUrlPart(3));
+                $file = $this->orm->getMediumById($id, Medium::TYPE_FILE, false);
+                if ($file != null) {
+                    if (strlen($file->type) > 0) {
+                        $this->setContentType($file->type);
+                        $this->replaceMeta('Content-Disposition', "attachment; filename=\"" . urlencode($file->filename) . "\"");
+                        $this->replaceMeta('Content-Length', $file->filesize);
+                        $content = $this->orm->getMediumFileContents($id);
+                    }
+                }
+                break;
 
             // Datei-Upload
             case 'upload':
@@ -126,7 +153,7 @@ class AdminMediaModule extends AbstractAdminModule {
                 $this->setContentType('text/javascript');
 
                 $file = $this->getParam('file');
-                $data = $file['fileData'];
+                $data = utf8_decode($file['fileData']);
 
                 $medium = new Medium();
                 $medium->entrytype = Medium::TYPE_FILE;
@@ -157,7 +184,10 @@ class AdminMediaModule extends AbstractAdminModule {
 
                     // Mediendatei speichern
                     case 'savemedium':
-                        // TODO implementieren
+                        $medium = $this->createFileFromRequest();
+                        if ($medium != null) {
+                            $this->orm->saveMedium($medium);
+                        }
                         $content = json_encode(true);
                         break;
 
@@ -204,13 +234,15 @@ class AdminMediaModule extends AbstractAdminModule {
 
                     // Einen Medieneintrag bearbeiten
                     case 'editmedium':
-                        // TODO implementieren
-                        $content = $this->renderUserTemplate('content-media-editmedium.phtml');
+                        $this->medium = $this->orm->getMediumById($this->getParam('id'), Medium::TYPE_FILE, false);
+                        if ($this->medium != null) {
+                            $content = $this->renderUserTemplate('content-media-editmedium.phtml');
+                        }
                         break;
 
                     // Einen Ordner bearbeiten
                     case 'editfolder':
-                        $this->medium = $this->orm->getMediumById($this->getParam('id'), Medium::TYPE_FOLDER);
+                        $this->medium = $this->orm->getMediumById($this->getParam('id'), Medium::TYPE_FOLDER, false);
                         if ($this->medium == null) {
                             $this->medium = new Medium();
                             $this->medium->entrytype = Medium::TYPE_FOLDER;
@@ -224,6 +256,7 @@ class AdminMediaModule extends AbstractAdminModule {
 
                     // Bildauswahl
                     case 'imageselection':
+                        // TODO implementieren
                         $content = $this->renderUserTemplate('media-imageselection.phtml');
                         break;
 
@@ -242,7 +275,7 @@ class AdminMediaModule extends AbstractAdminModule {
 
     // <editor-fold desc="Methods">
 
-    public function getFileImage($extension) {
+    public function getFileIcon($extension) {
         $extension = strtolower($extension);
         $extension = preg_replace('/[^a-z0-9]/i', '', $extension);
         $path = Util::createPath($this->ncm->ncmdir, 'img', 'fatcow', '16', 'file_extension_' . $extension . '.png');
@@ -252,9 +285,23 @@ class AdminMediaModule extends AbstractAdminModule {
         return 'file_extension_bin.png';
     }
 
+    private function createFileFromRequest() : Medium {
+        $id = intval($this->getParam('id'));
+        $medium = $this->orm->getMediumById($id, Medium::TYPE_FILE, false);
+        if ($medium == null) return null;
+
+        $medium->parent_id = intval($this->getParam('parent_id'));
+        $medium->status_code = intval($this->getParam('status_code'));
+        $medium->title = $this->getParam('title');
+        $medium->description = $this->getParam('description');
+        $medium->attribution = $this->getParam('attribution');
+        $medium->tags = Tag::splitTagsString($this->getParam('tags'));
+        return $medium;
+    }
+
     private function createFolderFromRequest() : Medium {
         $id = intval($this->getParam('id'));
-        $oldMedium = ($id == 0)? null : $this->orm->getMediumById($id, Medium::TYPE_FOLDER);
+        $oldMedium = ($id == 0)? null : $this->orm->getMediumById($id, Medium::TYPE_FOLDER, false);
         $medium = ($oldMedium == null)? new Medium() : $oldMedium;
 
         $medium->entrytype = Medium::TYPE_FOLDER;
@@ -267,7 +314,7 @@ class AdminMediaModule extends AbstractAdminModule {
         $medium->title = $this->getParam('title');
         $medium->description = $this->getParam('description');
         $medium->attribution = '';
-
+        $medium->tags = Tag::splitTagsString($this->getParam('tags'));
         return $medium;
     }
 
