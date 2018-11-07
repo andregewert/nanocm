@@ -78,6 +78,13 @@ class AdminMediaModule extends AbstractAdminModule {
     public $media;
 
     /**
+     * Zu bearbeitende Mediendatei oder zu bearbeitender Ordner
+     *
+     * @var Medium
+     */
+    public $medium;
+
+    /**
      * Die für Listen-Datensätze verfügbaren Statuscodes
      *
      * @var int[]
@@ -122,7 +129,8 @@ class AdminMediaModule extends AbstractAdminModule {
                 $data = $file['fileData'];
 
                 $medium = new Medium();
-                $medium->parent_id = 0;
+                $medium->entrytype = Medium::TYPE_FILE;
+                $medium->parent_id = intval($this->getParam('parent_id'));
                 $medium->title = $file['name'];
                 $medium->filename = $file['name'];
                 $medium->filesize = $file['size'];
@@ -139,6 +147,19 @@ class AdminMediaModule extends AbstractAdminModule {
                 $this->setContentType('text/javascript');
 
                 switch ($this->getRelativeUrlPart(3)) {
+
+                    // Ordner speichern
+                    case 'savefolder':
+                        $medium = $this->createFolderFromRequest();
+                        $this->orm->saveMedium($medium);
+                        $content = json_encode(true);
+                        break;
+
+                    // Mediendatei speichern
+                    case 'savemedium':
+                        // TODO implementieren
+                        $content = json_encode(true);
+                        break;
 
                     // Mediendateien löschen
                     case 'delete':
@@ -182,9 +203,23 @@ class AdminMediaModule extends AbstractAdminModule {
                         break;
 
                     // Einen Medieneintrag bearbeiten
-                    case 'edit':
+                    case 'editmedium':
                         // TODO implementieren
-                        $content = $this->renderUserTemplate('content-media-edit.phtml');
+                        $content = $this->renderUserTemplate('content-media-editmedium.phtml');
+                        break;
+
+                    // Einen Ordner bearbeiten
+                    case 'editfolder':
+                        $this->medium = $this->orm->getMediumById($this->getParam('id'), Medium::TYPE_FOLDER);
+                        if ($this->medium == null) {
+                            $this->medium = new Medium();
+                            $this->medium->entrytype = Medium::TYPE_FOLDER;
+                            $this->medium->filename = 'Neuer Ordner';
+                            $this->medium->parent_id = $this->searchParentId;
+                            $this->medium->status_code = StatusCode::ACTIVE;
+                            $this->medium->tags = array();
+                        }
+                        $content = $this->renderUserTemplate('content-media-editfolder.phtml');
                         break;
 
                     // Bildauswahl
@@ -215,6 +250,25 @@ class AdminMediaModule extends AbstractAdminModule {
             return 'file_extension_' . $extension . '.png';
         }
         return 'file_extension_bin.png';
+    }
+
+    private function createFolderFromRequest() : Medium {
+        $id = intval($this->getParam('id'));
+        $oldMedium = ($id == 0)? null : $this->orm->getMediumById($id, Medium::TYPE_FOLDER);
+        $medium = ($oldMedium == null)? new Medium() : $oldMedium;
+
+        $medium->entrytype = Medium::TYPE_FOLDER;
+        $medium->parent_id = intval($this->getParam('parent_id'));
+        $medium->status_code = StatusCode::ACTIVE;
+        $medium->filename = $this->getParam('filename');
+        $medium->filesize = 0;
+        $medium->extension = '';
+        $medium->type = '';
+        $medium->title = $this->getParam('title');
+        $medium->description = $this->getParam('description');
+        $medium->attribution = '';
+
+        return $medium;
     }
 
     // </editor-fold>

@@ -241,6 +241,19 @@ ul.inlinemenu li a:hover {
 
 /* </editor-fold> */
 /* <editor-fold desc="Form elements"> */
+div.dropzone {
+  width: 80%;
+  margin: 1rem auto;
+  border: dashed #ddd 4px;
+  border-radius: 0.5em;
+  padding: 2em;
+  text-align: center;
+  background-color: #f8f8f8; }
+
+div.dropzone.dragover {
+  border-color: silver;
+  /*    background-color: $nav-color-bg;*/ }
+
 input, select, option, textarea {
   font-family: Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
   font-size: 1rem;
@@ -404,7 +417,7 @@ th.pre {
 .imgtoolbar a.button {
   background-color: transparent;
   color: black;
-  vertical-align: center;
+  vertical-align: middle;
   font-size: 0.9rem;
   padding: 6px;
   line-height: 1em;
@@ -444,7 +457,7 @@ ul.imgtoolbar_keyboard {
 ul.imgtoolbar_keyboard li {
   display: inline-block;
   text-align: center;
-  vertical-align: center;
+  vertical-align: middle;
   width: 1.8em;
   float: left;
   font-size: 2rem; }

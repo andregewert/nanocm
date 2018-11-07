@@ -58,6 +58,11 @@ class AdminDashboardModule extends AbstractAdminModule {
     public $numberOfUnreleasedArticles = 0;
 
     /**
+     * @var int Anzahl der vorhandenen Mediendateien
+     */
+    public $numberOfMediaFiles = 0;
+
+    /**
      * @var bool Gibt an, ob die Site-Datenbank über den Webserver abrufbar ist
      */
     public $isSiteDbAccessible = false;
@@ -98,6 +103,7 @@ class AdminDashboardModule extends AbstractAdminModule {
                 $this->numberOfInactiveComments = $this->orm->countInactiveComments();
                 $this->numberOfReleasedArticles = $this->orm->countReleasedArticles();
                 $this->numberOfUnreleasedArticles = $this->orm->countUnreleasedArticles();
+                $this->numberOfMediaFiles = $this->orm->countMediaFiles(false);
 
                 // Überprüfen, ob das Systemverzeichnis / die Site-Datenbank von außen erreichbar ist
                 $url = (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') ? 'http://' : 'https://';

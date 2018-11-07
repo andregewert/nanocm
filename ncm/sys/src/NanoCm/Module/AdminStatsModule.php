@@ -40,13 +40,6 @@ class AdminStatsModule extends AbstractAdminModule {
     public $availableYears = array();
 
     /**
-     * Eine Liste der auswählbaren Monatszahlen
-     *
-     * @var int[]
-     */
-    public $availableMonths = array();
-
-    /**
      * Anzuzeigendes Jahr
      *
      * @var int
@@ -119,6 +112,10 @@ class AdminStatsModule extends AbstractAdminModule {
         $this->searchMonth = $this->getOrOverrideSessionVarWithParam('searchMonth', date('m'));
         $this->searchPage = $this->getOrOverrideSessionVarWithParam('searchPage', 1);
         $this->statsEnabled = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLELOGGING) == '1';
+        $this->availableYears = $this->orm->getStatisticYears();
+        if (count($this->availableYears) == 0) {
+            $this->availableYears[] = date('Y');
+        }
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -150,6 +147,11 @@ class AdminStatsModule extends AbstractAdminModule {
             // Trägerseite AccessLog
             case 'accesslog':
                 $content = $this->renderUserTemplate('content-stats-accesslog.phtml');
+                break;
+
+            // Statistik-Archiv
+            case 'archive':
+                $content = $this->renderUserTemplate('content-stats-archive.phtml');
                 break;
 
             // Trägerseite

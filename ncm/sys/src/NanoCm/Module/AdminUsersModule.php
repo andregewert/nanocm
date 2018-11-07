@@ -99,7 +99,6 @@ class AdminUsersModule extends AbstractAdminModule {
                     // Benutzerkonto speichern
                     case 'save':
                         $user = $this->createUserFromRequest();
-                        $this->log->debug($user->password);
                         $content = json_encode($this->orm->saveUser($user));
                         break;
 

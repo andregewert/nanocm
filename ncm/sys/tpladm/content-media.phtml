@@ -10,17 +10,9 @@ use Ubergeek\NanoCm\StatusCode;
 
         <div class="toolbar">
             <span class="left">
-                <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Medium hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
-                </a>
                 <a id="button_addfolder" class="button" href="javascript:void(0);" role="button" title="Neuen Ordner erstellen">
                     <img src="/ncm/img/fatcow/16/folder_add.png" alt="" width="16" height="16">Neuer Ordner
                 </a>
-                <!--
-                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Medium bearbeiten">
-                    <img src="/ncm/img/fatcow/16/edit_button.png" alt="" width="16" height="16">Bearbeiten
-                </a>
-                -->
                 <a id="button_unlock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Medium freischalten">
                     <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Freischalten
                 </a>
@@ -51,7 +43,7 @@ use Ubergeek\NanoCm\StatusCode;
             </span>
         </div>
 
-        <div id="media_dropzone" style="border: solid silver 2px; padding: 2em">
+        <div id="media_dropzone" class="dropzone">
             Dateien hier ablegen
         </div>
 
@@ -73,26 +65,22 @@ use Ubergeek\NanoCm\StatusCode;
          */
         app.init = function() {
 
-            var dropZone = document.getElementById('media_dropzone');
+            // Drag and drop für File upload initialisieren
+            // TODO Evtl. Mehrfach-Upload ermöglichen
 
-            dropZone.addEventListener('dragover', function(evt) {
-                console.log('dragover');
-                evt.stopPropagation();
-                evt.preventDefault();
-                evt.dataTransfer.dropEffect = 'copy';
-            }, false);
-
-            dropZone.addEventListener('drop', function(evt) {
-                console.log('drop');
-                evt.stopPropagation();
-                evt.preventDefault();
-
-                var files = evt.dataTransfer.files;
-                console.log(files);
-
+            $('#media_dropzone').on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }).on('dragover dragenter', function(e) {
+                $('#media_dropzone').addClass('dragover');
+                e.originalEvent.dataTransfer.dropEffect = 'copy';
+            }).on('dragleave dragend drop', function() {
+                $('#media_dropzone').removeClass('dragover');
+            }).on('drop', function(e) {
+                let files = e.originalEvent.dataTransfer.files;
                 if (files.length > 0) {
-                    var reader = new FileReader();
-                    var senddata = new Object();
+                    let reader = new FileReader();
+                    let senddata = new Object();
 
                     senddata.name = files[0].name;
                     senddata.date = files[0].lastModified;
@@ -108,27 +96,20 @@ use Ubergeek\NanoCm\StatusCode;
                             type:       'POST',
                             dataType:   'JSON',
                             data:       {
-                                file:   senddata
+                                parent_id:  app.parentId,
+                                file:       senddata
                             }
-                        }).done(function(data) {
-                            //console.log(data);
                         }).always(function() {
                             ncm.hideDefaultLoadingIndicator();
                             app.refresh();
                         });
                     };
-
-                    //reader.readAsDataURL(files[0]);
                     reader.readAsBinaryString(files[0]);
                 }
-            }, false);
-
-            $('#button_edit').click(function() {
-
             });
 
             $('#button_addfolder').click(function() {
-                app.addFolder();
+                app.editFolder(0);
             });
 
             $('#button_unlock').click(function() {
@@ -143,6 +124,10 @@ use Ubergeek\NanoCm\StatusCode;
                 app.deleteSelected();
             });
 
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+
             app.refresh();
         };
 
@@ -154,8 +139,11 @@ use Ubergeek\NanoCm\StatusCode;
          */
         app.refresh = function(page, parentId) {
             ncm.showDefaultLoadingIndicator();
+
             if (typeof page === 'undefined' || page === null) page = app.page;
             if (typeof parentId === 'undefined' || parentId === null) parentId = app.parentId;
+            app.page = page;
+            app.parentId = parentId;
 
             $.ajax('/admin/media/html/list', {
                 cache:      false,
@@ -176,12 +164,6 @@ use Ubergeek\NanoCm\StatusCode;
                 ncm.hideDefaultLoadingIndicator();
                 $('#input_searchTerm').focus();
             });
-        };
-
-        app.editClickedMedium = function(clickedElement) {
-            // TODO implementieren
-            let id = $(clickedElement).attr('data-id');
-            console.log(id);
         };
 
         /**
@@ -249,8 +231,104 @@ use Ubergeek\NanoCm\StatusCode;
             }
         };
 
-        app.addFolder = function() {
-            console.log("Add a folder");
+        /**
+         * Ruft den Bearbeitungsdialog für eine bestimmte Mediendatei auf
+         *
+         * @param {int} id
+         */
+        app.editMedium = function(id) {
+            id = parseInt(id, 10);
+            if (id == 0) return;
+
+            let dlg = new ncm.InlinePopup(
+                '/admin/media/html/editmedium', {
+                    id: id
+                }, {
+                    headline:   'Datei bearbeiten',
+                    width:      600,
+                    height:     450,
+                    loaded:     function () {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel: {
+                        caption: 'Abbrechen',
+                        clicked: function() {
+                            dlg.close();
+                        }
+                    },
+                    save: {
+                        caption: 'Speichern',
+                        clicked: function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/media/ajax/savemedium', {
+                                cache:      false,
+                                type:       'POST',
+                                dataType:   'JSON',
+                                data:       {
+                                    id: id
+                                    // TODO vervollständigen
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
+        };
+
+        /**
+         * Ruft den Bearbeitungsdialog für einen bestimmten Ordner auf
+         *
+         * @param {int} id Datensatz-ID des zu bearbeitenden Ordners
+         */
+        app.editFolder = function(id) {
+            id = parseInt(id, 10);
+
+            let dlg = new ncm.InlinePopup(
+                '/admin/media/html/editfolder', {
+                    id: id
+                }, {
+                    headline:   (id > 0)? 'Ordner bearbeiten' : 'Ordner erstellen',
+                    width:      500,
+                    height:     250,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel: {
+                        caption: 'Abbrechen',
+                        clicked: function() {
+                            dlg.close();
+                        }
+                    },
+                    save: {
+                        caption: 'Speichern',
+                        clicked: function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/media/ajax/savefolder', {
+                                cache:      false,
+                                type:       'POST',
+                                dataType:   'JSON',
+                                data:       {
+                                    id:             id,
+                                    parent_id:      app.parentId,
+                                    filename:       $('#edit_medium_filename').val(),
+                                    title:          $('#edit_medium_title').val(),
+                                    description:    $('#edit_medium_description').val()
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
         };
 
         app.init();

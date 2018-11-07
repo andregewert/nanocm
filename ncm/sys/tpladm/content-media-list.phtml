@@ -12,9 +12,12 @@
         <tr>
             <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
             <th style="width: 30px">Typ</th>
-            <th>Titel</th>
+            <th class="textright" style="width: 30px">ID</th>
             <th>Dateiname</th>
+            <th>Titel</th>
+            <th class="textright">Gr&ouml;&szlig;e</th>
             <th>Mime-Type</th>
+            <th class="textright">&Auml;nderungsdatum</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -22,11 +25,11 @@
         <?php if ($this->searchParentId != 0) : ?>
             <tr>
                 <td style="padding: 0.5em"></td>
-                <td colspan="5" style="padding: 0.5em">
-                    <a href="/admin/media/index.php?searchParentId=0">Startseite</a>
+                <td colspan="8" style="padding: 0.5em">
+                    <a href="javascript:void(0);" onclick="module.refresh(null, 0);">Startseite</a>
                     <?php foreach ($this->parentFolders as $parentFolder) : ?>
                         /
-                        <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($parentFolder->id); ?>)"><?php echo $this->htmlEncode($parentFolder->title); ?></a>
+                        <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($parentFolder->id); ?>)"><?php echo $this->htmlEncode($parentFolder->filename); ?></a>
                     <?php endforeach; ?>
                 </td>
             </tr>
@@ -45,15 +48,34 @@
                             <img src="/ncm/img/fatcow/16/<?php echo $this->getFileImage($medium->extension); ?>" width="16" height="16" alt="">
                         <?php endif; ?>
                     </td>
-                    <td>
+                    <td class="textright pre">
                         <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
-                            <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($medium->id); ?>)"><?php echo $this->htmlEncode($medium->title); ?></a>
+                            <a href="javascript:void(0);" onclick="module.editFolder(<?php echo $medium->id; ?>);"><?php echo $medium->id; ?></a>
                         <?php else : ?>
-                            <a href="javascript:void(0);" data-id="<?php echo $medium->id; ?>" onclick="module.editClickedMedium(this);"><?php echo $this->htmlEncode($medium->title); ?></a>
+                            <a href="javascript:void(0);" onclick="module.editMedium(<?php echo $medium->id; ?>);"><?php echo $medium->id; ?></a>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo $this->htmlEncode($medium->filename); ?></td>
+
+                    <td>
+                        <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
+                            <a href="javascript:void(0);" onclick="module.refresh(null, <?php echo intval($medium->id); ?>)"><?php echo $this->htmlEncode($medium->filename); ?></a>
+                        <?php else : ?>
+                            <a href="javascript:void(0);" onclick="module.editMedium(<?php echo $medium->id; ?>);"><?php echo $this->htmlEncode($medium->filename); ?></a>
+                        <?php endif; ?>
+                    </td>
+
+                    <td><?php echo $this->htmlEncode($medium->title); ?></td>
+                    <td class="textright pre">
+                        <?php if ($medium->entrytype == \Ubergeek\NanoCm\Medium::TYPE_FILE) : ?>
+                            <?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($medium->filesize); ?>
+                        <?php endif; ?>
+                    </td>
                     <td><?php echo $this->htmlEncode($medium->type); ?></td>
+                    <td class="textright pre">
+                        <?php if ($medium->modification_timestamp instanceof \DateTime) : ?>
+                            <?php echo $medium->modification_timestamp->format('Y-m-d H:i'); ?>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <?php if ($medium->entrytype != \Ubergeek\NanoCm\Medium::TYPE_FOLDER) : ?>
                             <?php echo $this->htmlEncode(StatusCode::convertStatusId($medium->status_code)); ?>
@@ -63,7 +85,7 @@
             <?php endforeach; ?>
         <?php else : ?>
             <tr class="noresult">
-                <td colspan="6">Keine Eintr&auml;ge gefunden</td>
+                <td colspan="9">Keine Eintr&auml;ge gefunden</td>
             </tr>
         <?php endif; ?>
     </tbody>

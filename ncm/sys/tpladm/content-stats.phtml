@@ -19,18 +19,30 @@
     <form onsubmit="module.refresh(); return false;">
         <div class="toolbar">
             <span class="left">
-                <a id="button_add" class="button" href="/admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
+                <a class="button" href="/admin/stats/" role="button" title="Zusammengefasste Statistiken anzeigen">
+                    <img src="/ncm/img/fatcow/16/summary_table.png" alt="" width="16" height="16">&Uuml;bersicht
+                </a>
+                <a class="button" href="/admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
                     <img src="/ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">Seitenzugriffe
+                </a>
+                <a class="button" href="/admin/stats/archive" role="button" title="Archiv">
+                    <img src="/ncm/img/fatcow/16/package.png" alt="" width="16" height="16">Archiv
                 </a>
             </span>
             <span class="right" style="float: right">
                 <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
 
                 <label for="inputsearchYear">Jahr</label>
-                <input id="input_searchYear" style="width: 80px" type="text" value="<?php echo $this->htmlEncode($this->searchYear); ?>" />
+                <select id="select_searchYear" size="1">
+                    <?php foreach ($this->availableYears as $year) : ?>
+                        <option value="<?php echo $year; ?>" <?php if ($this->searchYear == $year) echo 'selected="selected"'; ?>>
+                            <?php echo $year; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
                 <label for="select_searchMonth" class="spaceleft">Monat</label>
-                <select id="select_searchMonth">
+                <select id="select_searchMonth" size="1">
                     <?php for ($i = 1; $i <= 12; $i++) : ?>
                         <option value="<?php echo $i; ?>" <?php if ($this->searchMonth == $i) echo 'selected="selected"'; ?>>
                             <?php echo DateTime::createFromFormat('!m', $i)->format('F'); ?>
@@ -76,7 +88,7 @@
                 type:       'GET',
                 dataType:   'HTML',
                 data: {
-                    searchYear:         $('#input_searchYear').val(),
+                    searchYear:         $('#select_searchYear').val(),
                     searchMonth:        $('#select_searchMonth').val()
                 }
             }).done(function(data) {

@@ -3,14 +3,14 @@
 ?>
 
 <div class="row">
-    <label>Einstellung</label>
+    <label for="edit_setting_key">Einstellung</label>
     <input type="text" id="edit_setting_key"<?php if (empty($this->setting->key)) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->setting->key); ?>">
 </div>
 <div class="row">
-    <label>Wert</label>
+    <label for="edit_setting_value">Wert</label>
     <input type="text" id="edit_setting_value"<?php if (!empty($this->setting->key)) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->setting->value); ?>">
 </div>
 <div class="row">
-    <label>Parameter</label>
+    <label for="edit_setting_params">Parameter</label>
     <input type="text" id="edit_setting_params" value="<?php echo $this->htmlEncode($this->setting->params); ?>">
 </div>

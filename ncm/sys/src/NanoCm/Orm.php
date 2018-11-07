@@ -106,9 +106,10 @@ class Orm {
      *
      * @param \PDO $dbhandle PDO-Handle für die Site-Datenbank
      * @param \PDO $statshandle PDO-Handle für die Statistik-Datenbank
+     * @param string $mediadir Absoluter Pfad zum Ablageverzeichnis für die Medienverwaltung
      * @param \Ubergeek\Log\LoggerInterface|null $log
      */
-    public function __construct(\PDO $dbhandle, \PDO $statshandle, $mediadir, \Ubergeek\Log\LoggerInterface $log = null) {
+    public function __construct(\PDO $dbhandle, \PDO $statshandle, string $mediadir, \Ubergeek\Log\LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
         $this->statsdb = $statshandle;
         $this->mediadir = $mediadir;
@@ -123,6 +124,40 @@ class Orm {
 
 
     // <editor-fold desc="Statistics">
+
+    /**
+     * Ermittelt die in den Statistiktabellen vorhandenen Kalenderjahre
+     *
+     * @param bool $includeCurrentYear Gibt an, ob das aktuelle Kalenderjahr ausgeschlossen werden soll
+     * @return int[] Eine Liste der Jahreszahlen, die in den Statistiktabellen auftauchen
+     */
+    public function getStatisticYears(bool $includeCurrentYear = true) {
+        $sql = '
+            SELECT * FROM (
+                SELECT DISTINCT year
+                FROM monthlybrowser
+                UNION
+                SELECT DISTINCT year
+                FROM monthlyos
+                UNION
+                SELECT DISTINCT year
+                FROM monthlyregion
+                UNION
+                SELECT DISTINCT year
+                FROM monthlyurl
+                UNION
+                SELECT DISTINCT CAST(strftime(\'%Y\', accesstime) AS integer) AS year FROM accesslog
+            ) AS years
+            ORDER BY year ASC ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->execute();
+
+        $years = array();
+        while (($year = $stmt->fetchColumn()) !== false) {
+            $years[] = $year;
+        }
+        return $years;
+    }
 
     /**
      * Durchsucht das AccessLog
@@ -1633,13 +1668,19 @@ class Orm {
      * @param $id Datensatz-ID der Mediendatei
      * @param $data Eigentlicher Dateiinhalt
      * @return void
+     * @throws MediaException Wenn ein Fehler beim Speichern auftritt
      */
     protected function saveMediumFile($id, $data) {
         try {
+            // Gegebenenfalls das Medienverzeichnis anlegen
+            if (!file_exists($this->mediadir)) {
+                mkdir($this->mediadir);
+            }
+            // Datei unter der Datensatz-ID im Dateisystem ablegen
             $filename = Util::createPath($this->mediadir, $id);
             $this->log->debug("Saving medium file for $id");
             file_put_contents($filename, $data);
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             throw new MediaException("Fehler beim Speichern der Mediendateien", 0, $ex);
         }
     }
@@ -1649,15 +1690,72 @@ class Orm {
      *
      * @param $id Datensatz-ID der zu löschenden Mediendatei
      * @return void
+     * @throws MediaException Wenn beim Löschen der Datei ein Fehler auftritt
      */
     protected function deleteMediumFile($id) {
         try {
             $filename = Util::createPath($this->mediadir, $id);
             $this->log->debug("Lösche Mediendatei $filename");
             unlink($filename);
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             throw new MediaException("Fehler beim Löschen der Mediendatei", 0, $ex);
         }
+    }
+
+    /**
+     * Zählt die Anzahl der gespeicherten Mediendateien (ohne Ordner)
+     *
+     * @param bool $releasedOnly Auf true setzen, um ausschließlich freigeschaltete Mediendateien zu berücksichtigen
+     * @return int Anzahl der Mediendateien
+     */
+    public function countMediaFiles($releasedOnly = true) {
+        $params = array();
+        $sql = 'SELECT COUNT(*) FROM medium WHERE entrytype = :entrytype ';
+        $params['entrytype'] = Medium::TYPE_FILE;
+
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * Speichert einen Mediendatensatz
+     *
+     * @param Medium $medium Der zu speichernde Mediendatensatz
+     * @return int Datensatz-ID
+     */
+    public function saveMedium(Medium $medium) {
+        if ($medium->id == 0) $medium->id = null;
+
+        $sql = 'REPLACE INTO medium (
+                    id, entrytype, parent_id, creation_timestamp, status_code, filename, filesize, extension,
+                    type, title, description, attribution
+                ) VALUES (
+                    :id, :entrytype, :parent_id, :creation_timestamp, :status_code, :filename, :filesize, :extension,
+                    :type, :title, :description, :attribution
+                )';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('id', $medium->id);
+        $stmt->bindValue('entrytype', $medium->entrytype);
+        $stmt->bindValue('parent_id', $medium->parent_id);
+        $stmt->bindValue('creation_timestamp', ($medium->creation_timestamp instanceof \DateTime)? $medium->creation_timestamp->format('Y-m-d H:i:s') : null);
+        $stmt->bindValue('status_code', $medium->status_code);
+        $stmt->bindValue('filename', $medium->filename);
+        $stmt->bindValue('filesize', $medium->filesize);
+        $stmt->bindValue('extension', $medium->extension);
+        $stmt->bindValue('type', $medium->type);
+        $stmt->bindValue('title', $medium->title);
+        $stmt->bindValue('description', $medium->description);
+        $stmt->bindValue('attribution', $medium->attribution);
+        $stmt->execute();
+
+        return $this->basedb->lastInsertId('id');
     }
 
     /**
@@ -1698,6 +1796,9 @@ class Orm {
     /**
      * Löscht die Mediendatei mit der angegebenen Datensatz_ID
      *
+     * Wenn es sich bei dem betreffenden Eintrag um einen Ordner, so erfolgt eine rekursive Löschung
+     * aller enthaltenen Dateien und Ordner.
+     *
      * @param $id Datensatz-ID der zu löschenden Mediendatei
      * @return void
      */
@@ -1725,7 +1826,7 @@ class Orm {
     }
 
     /**
-     * Löscht die Mediendatein mit den übergebenen IDs
+     * Löscht die Mediendateien mit den übergebenen IDs
      *
      * @param array $ids Datensatz-IDs der zu löschenden Mediendateien
      * @return void
@@ -1765,6 +1866,12 @@ class Orm {
         }
     }
 
+    /**
+     * Ermittelt alle übergeordneten Ordner für eine bestimmte Mediendatei
+     *
+     * @param $entryId Datensatz-ID der betreffenden Mediendatei
+     * @return Medium[] Eine Liste der übergordneten Ordner
+     */
     public function getParentFolders($entryId) {
         $parents = array();
         $startentry = $this->getMediumById($entryId);
@@ -1784,10 +1891,23 @@ class Orm {
         return $parents;
     }
 
-    public function getMediumById(int $mediumId) {
+    /**
+     * Ermittelt einen Mediendateien-Datensatz anhand seiner ID
+     *
+     * @param int $mediumId ID des auszulesenden Eintrags
+     * @param int|null $entrytype Optionale Einschränkung auf einen bestimmten Dateityp (Ordner oder Datei)
+     * @return null|Medium
+     */
+    public function getMediumById(int $mediumId, $entrytype = null) {
+        $params = array();
         $sql = 'SELECT * FROM medium WHERE id = :id ';
+        $params['id'] = $mediumId;
+        if ($entrytype != null) {
+            $sql .= ' AND entrytype = :entrytype ';
+            $params['entrytype'] = $entrytype;
+        }
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('id', $mediumId);
+        $this->bindValues($stmt, $params);
         $stmt->execute();
         return Medium::fetchFromPdoStatement($stmt);
     }
@@ -1874,7 +1994,7 @@ class Orm {
         return $media;
     }
 
-    // <editor-fold>
+    // </editor-fold>
 
     
     // <editor-fold desc="Article">

@@ -314,6 +314,21 @@ ul.inlinemenu li a:hover {
 
 /* <editor-fold desc="Form elements"> */
 
+div.dropzone {
+    width: 80%;
+    margin: 1rem auto;
+    border: dashed $border-color 4px;
+    border-radius: 0.5em;
+    padding: 2em;
+    text-align: center;
+    background-color: $toolbar-bg;
+}
+
+div.dropzone.dragover {
+    border-color: $border-color-heavy;
+/*    background-color: $nav-color-bg;*/
+}
+
 input, select, option, textarea {
     font-family: $font-text;
     font-size: 1rem;
@@ -516,7 +531,7 @@ th.pre {
 .imgtoolbar a.button  {
     background-color: transparent;
     color: black;
-    vertical-align: center;
+    vertical-align: middle;
     font-size: 0.9rem;
     padding: 6px;
     line-height: 1em;
@@ -564,7 +579,7 @@ ul.imgtoolbar_keyboard {
 ul.imgtoolbar_keyboard li {
     display: inline-block;
     text-align: center;
-    vertical-align: center;
+    vertical-align: middle;
     width: 1.8em;
     float: left;
     font-size: 2rem;
