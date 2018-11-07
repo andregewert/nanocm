@@ -1579,6 +1579,41 @@ class Orm {
     // </editor-fold>
 
 
+    // <editor-fold desc="ImageFormat">
+
+    /**
+     * Gibt alle in der Datenbank definierten Bildformate zurück
+     *
+     * @return ImageFormat[] Alle definierten Bildformate
+     */
+    public function getImageFormats() {
+        $sql = 'SELECT * FROM imageformat ORDER BY title ASC ';
+        $stmt = $this->basedb->query($sql);
+
+        $formats = array();
+        while (($format = ImageFormat::fetchFromPdoStatement($stmt)) !== null) {
+            $formats[] = $format;
+        }
+        return $formats;
+    }
+
+    /**
+     * Ermittelt ein Bildformat anhand des Format-Schlüssels
+     *
+     * @param string $imageFormatKey Formatschlüssel
+     * @return null|ImageFormat Das gesuchte Bildformat oder null
+     */
+    public function getImageFormatByKey(string $imageFormatKey) {
+        $sql = 'SELECT * FROM imageformat WHERE key = :key ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('key', $imageFormatKey);
+        $stmt->execute();
+        return ImageFormat::fetchFromPdoStatement($stmt);
+    }
+
+    // </editor-fold>
+
+
     // <editor-fold desc="Medium">
 
     public function getMediumFileContents($id) {
@@ -1680,10 +1715,10 @@ class Orm {
 
         $sql = 'REPLACE INTO medium (
                     id, entrytype, parent_id, creation_timestamp, status_code, filename, filesize, extension,
-                    type, title, description, attribution
+                    type, title, description, attribution, hash
                 ) VALUES (
                     :id, :entrytype, :parent_id, :creation_timestamp, :status_code, :filename, :filesize, :extension,
-                    :type, :title, :description, :attribution
+                    :type, :title, :description, :attribution, :hash
                 )';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $medium->id);
@@ -1698,6 +1733,7 @@ class Orm {
         $stmt->bindValue('title', $medium->title);
         $stmt->bindValue('description', $medium->description);
         $stmt->bindValue('attribution', $medium->attribution);
+        $stmt->bindValue('hash', $medium->calculateHash());
         $stmt->execute();
 
         $id = $this->basedb->lastInsertId('id');
@@ -1714,9 +1750,9 @@ class Orm {
      */
     public function insertInitialMedium($medium, $data) {
         $sql = 'INSERT INTO medium (
-                    entrytype, parent_id, status_code, filename, filesize, extension, type, title
+                    entrytype, parent_id, status_code, filename, filesize, extension, type, title, hash
                 ) VALUES (
-                    :entrytype, :parent_id, :status_code, :filename, :filesize, :extension, :type, :title
+                    :entrytype, :parent_id, :status_code, :filename, :filesize, :extension, :type, :title, :hash
                 ) ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('entrytype', Medium::TYPE_FILE);
@@ -1727,6 +1763,7 @@ class Orm {
         $stmt->bindValue('extension', $medium->extension);
         $stmt->bindValue('type', $medium->type);
         $stmt->bindValue('title', $medium->title);
+        $stmt->bindValue('hash', $medium->calculateHash());
         $stmt->execute();
         $id = $this->basedb->lastInsertId('id');
 
@@ -1760,11 +1797,18 @@ class Orm {
                     $this->deleteMediumById($entry->id);
                 }
             }
+
+            // Zugehörige Datei im Dateisystem löschen
             try {
                 $this->deleteMediumFile($id);
             } catch (\Exception $ex) {
                 $this->log->debug("Ignoring exception " . $ex->getMessage());
             }
+
+            // Tag-Zuweisungen entfernen
+            $this->log->debug("Entferne Tag-Zuweisungen von Medium $id");
+            $this->unassignTagsFromMedium($id);
+
             $sql = 'DELETE FROM medium WHERE id = :id ';
             $stmt = $this->basedb->prepare($sql);
             $stmt->bindValue('id', $id);
@@ -1839,12 +1883,43 @@ class Orm {
     }
 
     /**
+     * Liest einen Mediendatensatz anhand seines Hashes aus
+     *
+     * @param string $hash Hashwert des betreffenden Medien-Datensatzes
+     * @param int|null $entrytype Eintragstyp (Ordner oder Datei)
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Inhalte berücksichtig werden sollen
+     * @return null|Medium Der gesuchte Datensatz oder null
+     */
+    public function getMediumByHash(string $hash, $entrytype = null, bool $releasedOnly = true) {
+        $params = array();
+        $sql = 'SELECT * FROM medium WHERE hash = :hash ';
+        $params['hash'] = $hash;
+        if ($entrytype != null) {
+            $sql .= ' AND entrytype = :entrytype ';
+            $params['entrytype'] = $entrytype;
+        }
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        $medium = Medium::fetchFromPdoStatement($stmt);
+        if ($medium != null) {
+            $medium->tags = $this->getTagsByMediumId($medium->id);
+        }
+        return $medium;
+    }
+
+    /**
      * Ermittelt einen Mediendateien-Datensatz anhand seiner ID
      *
      * @param int $mediumId ID des auszulesenden Eintrags
      * @param int|null $entrytype Optionale Einschränkung auf einen bestimmten Dateityp (Ordner oder Datei)
      * @param bool $releasedOnly Gibt ab, ob ausschließlich freigeschaltete Einträge berücksichtig werden sollen
-     * @return null|Medium
+     * @return null|Medium Der gesuchte Datensatz oder null
      */
     public function getMediumById(int $mediumId, $entrytype = null, bool $releasedOnly = true) {
         $params = array();
@@ -1861,6 +1936,7 @@ class Orm {
         $stmt = $this->basedb->prepare($sql);
         $this->bindValues($stmt, $params);
         $stmt->execute();
+
         $medium = Medium::fetchFromPdoStatement($stmt);
         if ($medium != null) {
             $medium->tags = $this->getTagsByMediumId($medium->id);

@@ -120,6 +120,13 @@ class Medium
      */
     public $tags;
 
+    /**
+     * Möglichst eindeutiger Hash für die Zugriff von außen
+     *
+     * @var string
+     */
+    public $hash;
+
     // </editor-fold>
 
 
@@ -133,6 +140,17 @@ class Medium
             return $medium;
         }
         return null;
+    }
+
+    /**
+     * Berechnet den Hashwert für diesen Eintrag.
+     * Der Hashwert wird berechnet anhand von Angaben, die im Normalfall nach der Anlage unveränderlich sind:
+     * dem Eintragstyp (Ordner oder Datei) und dem Dateinamen.
+     *
+     * @return string Hash für diesen Medien-Datensatz
+     */
+    public function calculateHash() {
+        return md5($this->entrytype . '-' . $this->filename);
     }
 
     // </editor-fold>

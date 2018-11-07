@@ -21,6 +21,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\ImageResizer;
+use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
 use Ubergeek\NanoCm\Setting;
 
@@ -83,6 +85,49 @@ class CoreModule extends AbstractModule {
                 } elseif ($parts[1] == 'archive') {
                     $this->setTitle($this->getSiteTitle() . ' - Archiv');
                     $this->content = $this->renderUserTemplate('content-weblog-archive.phtml');
+                }
+                break;
+
+            // Mediendateien
+            case 'media':
+                if (count($parts) >= 3) {
+                    switch ($parts[2]) {
+
+                        // Eine Datei herunterladen
+                        case 'download':
+                            $mediumHash = $parts[1];
+                            $this->setPageTemplate(self::PAGE_NONE);
+                            $this->setContentType('binary/octet-stream');
+                            $file = $this->orm->getMediumByHash($mediumHash, Medium::TYPE_FILE, true);
+                            if ($file != null) {
+                                if (strlen($file->type) > 0) {
+                                    $this->setContentType($file->type);
+                                    $this->replaceMeta('Content-Disposition', "attachment; filename=\"" . urlencode($file->filename) . "\"");
+                                    $this->replaceMeta('Content-Length', $file->filesize);
+                                    $this->content = $this->orm->getMediumFileContents($file->id);
+                                }
+                            }
+                            break;
+
+                        // Ein Bild in einem bestimmten Format ausgeben
+                        case 'image':
+                            $this->setPageTemplate(self::PAGE_NONE);
+                            $this->setContentType('image/png');
+                            $imageResizer = new ImageResizer(null);
+
+                            $mediumHash = $parts[1];
+                            $formatKey = $parts[3];
+                            $format = $this->orm->getImageFormatByKey($formatKey);
+                            $medium = $this->orm->getMediumByHash($mediumHash, Medium::TYPE_FILE, true);
+
+                            if ($medium != null) {
+                                $data = $this->orm->getMediumFileContents($medium->id);
+                                $c = $imageResizer->createImageForMediumWithImageFormat($medium, $data, $format);
+                                $this->content = $c;
+                                //$this->content = "wait!";
+                            }
+                            break;
+                    }
                 }
                 break;
             
