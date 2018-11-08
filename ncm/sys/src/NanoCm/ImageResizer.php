@@ -74,58 +74,108 @@ class ImageResizer
 
     // <editor-fold desc="Public methods">
 
-    public function createImageForMediumWithImageFormat(Medium $medium, string $data, ImageFormat $format) {
+    /**
+     * Erstellt aus der übergebenen Mediendatei ein (Vorschau-)Bild mit der übergebenen Format-Definition.
+     *
+     * Wenn das Ausgabeformat eine feste Größe definiert, so wird versucht, einen passenden mittigen Zielausschnitt im
+     * skalierten Ausgangsbild zu findet. Definiert dagegen das Format eine der Kantenlängen nicht, so wird diese anhand
+     * des Seitenverhältnisses dynamisch festgelegt. Definiert das Ausgabeformat keine der beiden Kantenlängen, so wird
+     * das Bild in der ursprünglichen Größe ausgegeben.
+     *
+     * @param Medium $medium Metadaten zur ursprünglichen Mediendatei (aus der Medienverwaltung)
+     * @param string $data Die eigentlichen Daten des Ausgangsbildes (aus dem Dateisystem)
+     * @param ImageFormat $format Die Definition für das Ausgabeformat (aus der Medienverwaltung)
+     * @param string $outputImageType Typ des Ausgabebildes
+     * @return null|string Die genrierten Bilddaten als String
+     *
+     * @todo Caching verwenden!
+     * @todo Fehler abfangen?
+     */
+    public function createImageForMediumWithImageFormat(Medium $medium, string $data, ImageFormat $format, $outputImageType = 'jpeg') {
         if (!in_array($medium->type, $this->supportedTypes)) {
             throw new MediaException("Not supported mime type: $medium->type");
         }
 
-        list($source_width, $source_height, $source_type) = getimagesizefromstring($data);
-        $ratio = $source_width /$source_height;
+        list($sourceWidth, $sourceHeight, $sourceType) = getimagesizefromstring($data);
+        $originalWidth = $sourceWidth;
+        $originalHeight = $sourceHeight;
+
+        $ratio = $sourceWidth /$sourceHeight;
         $src = imagecreatefromstring($data);
+        $offsetTop = 0;
+        $offsetLeft = 0;
 
-        $destWidth = $source_width;
-        $destHeight = $source_height;
-
-        if ($format->width > 0) {
+        // Höhe ist variabel
+        if ($format->width > 0 && $format->height == 0) {
             $destWidth = $format->width;
-            if ($format->height > 0) {
-                $destHeight = $format->height;
-            } else {
-                $destHeight = $destWidth *$ratio;
-                // TODO So einfach geht es nicht -> stattdessen einen passenden Bildausschnitt finden!
-            }
-        } elseif ($format->height > 0) {
+            $destHeight = $format->width /$ratio;
+        }
+
+        // Breite ist variabel
+        else if ($format->width == 0 && $format->height > 0) {
             $destHeight = $format->height;
-            if ($destWidth > 0) {
-                $destWidth = $destWidth;
-            } else {
-                $destWidth = $destHeight /$ratio;
-                // TODO So einfach geht es nicht -> stattdessen einen passenden Bildausschnitt finden!
+            $destWidth = $format->height *$ratio;
+        }
+
+        // Ursprungsformat verwenden
+        else if ($format->width == 0 && $format->height == 0) {
+            $destWidth = $sourceWidth;
+            $destHeight = $sourceHeight;
+        }
+
+        // Festes Format; Ausschnitt dynamisch wählen
+        else {
+            $destWidth = $format->width;
+            $destHeight = $format->height;
+
+            // Breite ist die lange Seite
+            if ($destWidth > $destHeight || ($destWidth == $destHeight && $originalWidth < $originalHeight)) {
+                if ($originalWidth != $destWidth) {
+                    $scalingFactor = $destWidth /$originalWidth;
+                    $sourceWidth = ceil($destWidth /$scalingFactor);
+                    $sourceHeight = ceil($destHeight /$scalingFactor);
+                    $offsetTop = floor($originalHeight /2) - ceil(($destHeight /$scalingFactor) /2);
+                } else {
+                    $offsetTop = floor($originalHeight /2) - ceil($destHeight /2);
+                }
+            }
+
+            // Höhe ist die lange Seite
+            else {
+                if ($originalHeight != $destHeight) {
+                    $scalingFactor = $destHeight /$originalHeight;
+                    $sourceWidth = ceil($destWidth /$scalingFactor);
+                    $sourceHeight = ceil($destHeight /$scalingFactor);
+                    $offsetLeft = floor($originalWidth /2) -ceil(($destWidth /$scalingFactor) /2);
+                } else {
+                    $offsetLeft = floor($originalWidth /2) -ceil($destWidth /2);
+                }
             }
         }
 
-        //$copy = imagecreate($destWidth, $destHeight);
         $copy = imagecreatetruecolor($destWidth, $destHeight);
         imagecopyresampled(
-            $copy,
-            $src,
-            0, 0, 0, 0,
-            $destWidth,
-            $destHeight,
-            $source_width,
-            $source_height
+            $copy,  $src,
+            0, 0,
+            $offsetLeft, $offsetTop,
+            $destWidth, $destHeight,
+            $sourceWidth, $sourceHeight
         );
 
         ob_start();
-        imagepng($copy);
+        switch ($outputImageType) {
+            case 'png':
+                imagepng($copy);
+                break;
+
+            case 'jpeg':
+            default:
+                imagejpeg($copy);
+        }
         $c = ob_get_clean();
         return $c;
     }
 
     // </editor-fold>
 
-
-    // <editor-fold desc="Internal methods">
-
-    // </editor-fold>
 }

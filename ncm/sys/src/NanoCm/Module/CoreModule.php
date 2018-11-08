@@ -111,20 +111,18 @@ class CoreModule extends AbstractModule {
 
                         // Ein Bild in einem bestimmten Format ausgeben
                         case 'image':
-                            $this->setPageTemplate(self::PAGE_NONE);
-                            $this->setContentType('image/png');
                             $imageResizer = new ImageResizer(null);
-
                             $mediumHash = $parts[1];
                             $formatKey = $parts[3];
                             $format = $this->orm->getImageFormatByKey($formatKey);
                             $medium = $this->orm->getMediumByHash($mediumHash, Medium::TYPE_FILE, true);
 
                             if ($medium != null) {
+                                $this->setPageTemplate(self::PAGE_NONE);
+                                $this->setContentType('image/jpeg');
                                 $data = $this->orm->getMediumFileContents($medium->id);
-                                $c = $imageResizer->createImageForMediumWithImageFormat($medium, $data, $format);
+                                $c = $imageResizer->createImageForMediumWithImageFormat($medium, $data, $format, 'jpeg');
                                 $this->content = $c;
-                                //$this->content = "wait!";
                             }
                             break;
                     }

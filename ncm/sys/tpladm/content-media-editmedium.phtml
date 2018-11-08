@@ -12,6 +12,10 @@ use Ubergeek\NanoCm\StatusCode;
     </select>
 </div>
 <div class="row">
+    <label for="edit_medium_hash">ID-Hash</label>
+    <input type="text" readonly="readonly" id="edit_medium_hash" value="<?php echo $this->htmlEncode($this->medium->hash); ?>">
+</div>
+<div class="row">
     <label for="edit_medium_filename">Dateiname</label>
     <input type="text" readonly="readonly" id="edit_medium_filename" value="<?php echo $this->htmlEncode($this->medium->filename); ?>">
 </div>
