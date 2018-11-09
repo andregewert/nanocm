@@ -1,0 +1,24 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */
+?>
+<div class="row">
+    <label for="edit_format_key">Schl&uuml;ssel</label>
+    <input type="text" <?php if (strlen($this->format->key) == 0) echo 'class="autofocus"'; ?>
+                        <?php if (strlen($this->format->key) != 0) echo 'readonly="readonly"'; ?> id="edit_format_key" value="<?php echo $this->htmlEncode($this->format->key); ?>">
+</div>
+<div class="row">
+    <label for="edit_format_title">Titel</label>
+    <input type="text" id="edit_format_title"<?php if (strlen($this->format->key) != 0) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->format->title); ?>">
+</div>
+<div class="row">
+    <label for="edit_format_description">Beschreibung</label>
+    <input type="text" id="edit_format_description" value="<?php echo $this->htmlEncode($this->format->description); ?>">
+</div>
+<div class="row">
+    <label for="edit_format_width">Breite (Pixel)</label>
+    <input type="text" id="edit_format_width" value="<?php echo $this->htmlEncode($this->format->width); ?>">
+</div>
+<div class="row">
+    <label for="edit_format_height">H&ouml;he (Pixel)</label>
+    <input type="text" id="edit_format_height" value="<?php echo $this->htmlEncode($this->format->height); ?>">
+</div>

@@ -5,28 +5,28 @@
 ?>
 <?php if ($this->user->id != null) : ?>
     <div class="row">
-        <label>Erstellungsdatum</label>
-        <input type="text" readonly="readonly" value="<?php echo $this->user->creation_timestamp->format('Y-m-d H:i'); ?>">
+        <label for="edit_user_creation_timestamp">Erstellungsdatum</label>
+        <input type="text" id="edit_user_creation_timestamp" readonly="readonly" value="<?php echo $this->user->creation_timestamp->format('Y-m-d H:i'); ?>">
     </div>
     <div class="row">
-        <label>Letzte &Auml;nderung</label>
-        <input type="text" readonly="readonly" value="<?php echo $this->user->modification_timestamp->format('Y-m-d H:i'); ?>">
+        <label for="edit_user_modification_timestamp">Letzte &Auml;nderung</label>
+        <input type="text" id="edit_user_modification_timestamp" readonly="readonly" value="<?php echo $this->user->modification_timestamp->format('Y-m-d H:i'); ?>">
     </div>
     <div class="row">
-        <label>Letzte Anmeldung</label>
+        <label for="edit_user_last_login_timestamp">Letzte Anmeldung</label>
         <?php if ($this->user->last_login_timestamp != null) : ?>
-            <input type="text" readonly="readonly" value="<?php echo $this->user->last_login_timestamp->format('Y-m-d H:i'); ?>">
+            <input type="text" id="edit_user_last_login_timestamp" readonly="readonly" value="<?php echo $this->user->last_login_timestamp->format('Y-m-d H:i'); ?>">
         <?php else : ?>
-            <input type="text" readonly="readonly" value="-">
+            <input type="text" id="edit_user_last_login_timestamp" readonly="readonly" value="-">
         <?php endif; ?>
     </div>
 <?php endif; ?>
 <div class="row">
-    <label>Anmeldename</label>
+    <label for="edit_user_username">Anmeldename</label>
     <input type="text" class="autofocus" id="edit_user_username" value="<?php echo $this->htmlEncode($this->user->username); ?>">
 </div>
 <div class="row">
-    <label>Kontentyp</label>
+    <label for="edit_user_usertype">Kontentyp</label>
     <select id="edit_user_usertype" size="1">
         <?php foreach ($this->availableUserTypes as $userType) : ?>
             <option value="<?php echo $userType; ?>" <?php if ($this->user->usertype == $userType) echo ' selected="selected"'; ?>><?php echo UserType::convertUserType($userType); ?></option>
@@ -34,19 +34,19 @@
     </select>
 </div>
 <div class="row">
-    <label>Vorname</label>
+    <label for="edit_user_firstname">Vorname</label>
     <input type="text" id="edit_user_firstname" value="<?php echo $this->htmlEncode($this->user->firstname); ?>">
 </div>
 <div class="row">
-    <label>Nachname</label>
+    <label for="edit_user_lastname">Nachname</label>
     <input type="text" id="edit_user_lastname" value="<?php echo $this->htmlEncode($this->user->lastname); ?>">
 </div>
 <div class="row">
-    <label>E-Mail-Adresse</label>
+    <label for="edit_user_email">E-Mail-Adresse</label>
     <input type="email" id="edit_user_email" value="<?php echo $this->htmlEncode($this->user->email); ?>">
 </div>
 <div class="row">
-    <label>Status</label>
+    <label for="edit_user_status_code">Status</label>
     <select id="edit_user_status_code" size="1">
         <?php foreach ($this->availableStatusCodes as $code) : ?>
             <option value="<?php echo $code; ?>" <?php if ($this->user->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
@@ -54,6 +54,6 @@
     </select>
 </div>
 <div class="row">
-    <label><?php echo ($this->user->id > 0)? 'Neues Passwort' : 'Passwort'; ?></label>
+    <label for="edit_user_password"><?php echo ($this->user->id > 0)? 'Neues Passwort' : 'Passwort'; ?></label>
     <input type="password" id="edit_user_password">
 </div>

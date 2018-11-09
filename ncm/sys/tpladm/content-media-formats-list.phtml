@@ -1,0 +1,48 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */
+?>
+<table class="list">
+    <thead>
+    <tr>
+        <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+        <th>Schl&uuml;ssel</th>
+        <th>Titel</th>
+        <th>Beschreibung</th>
+        <th>Breite</th>
+        <th>H&ouml;he</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php if (is_array($this->formats) && count($this->formats) > 0) : ?>
+        <?php foreach ($this->formats as $format) : ?>
+            <tr>
+                <td style="text-align: center">
+                    <input type="checkbox" class="selection" value="<?php echo $this->htmlEncode($format->key); ?>" style="text-align: center">
+                </td>
+                <td><?php echo $this->htmlEncode($format->key); ?></td>
+                <td><a href="javascript:void(0);" data-key="<?php echo $this->htmlEncode($format->key); ?>"
+                       onclick="module.editClickedFormat(this);"><?php echo $this->htmlEncode($format->title); ?></a></td>
+                <td><?php echo $this->htmlEncode($format->description); ?></td>
+                <td class="textright pre">
+                    <?php if ($format->width > 0) : ?>
+                        <?php echo $this->formatInt($format->width); ?>
+                    <?php else : ?>
+                        -
+                    <?php endif; ?>
+                </td>
+                <td class="textright pre">
+                    <?php if ($format->height > 0) : ?>
+                        <?php echo $this->formatInt($format->height); ?>
+                    <?php else : ?>
+                        -
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <tr class="noresult">
+            <td colspan="6">Keine Bildformate gefunden</td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+</table>

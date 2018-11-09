@@ -95,7 +95,6 @@ class AdminArticleseriesModule extends AbstractAdminModule {
                 switch ($this->getRelativeUrlPart(3)) {
                     case 'save':
                         $series = $this->createArticleseriesFromRequest();
-                        $this->log->debug($series);
                         $content = json_encode($this->orm->saveArticleseries($series));
                         break;
 

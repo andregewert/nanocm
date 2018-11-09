@@ -1,0 +1,170 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */
+use Ubergeek\NanoCm\StatusCode;
+?>
+<div class="container spacing">
+    <h1>Bildformate verwalten</h1>
+    <form onsubmit="module.refresh(); return false;">
+
+        <div class="toolbar">
+            <span class="left">
+                <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Neuen Bildformat anlegen">
+                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
+                </a>
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Bildformat bearbeiten">
+                    <img src="/ncm/img/fatcow/16/edit_button.png" alt="" width="16" height="16">Bearbeiten
+                </a>
+                <a id="button_formats" class="button" href="/admin/media/" role="button" title="Mediendateien verwalten">
+                    <img src="/ncm/img/fatcow/16/folder_image.png" alt="" width="16" height="16">Dateien
+                </a>
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Bildformat l&ouml;schen">
+                    <img src="/ncm/img/fatcow/16/delete.png" alt="" width="16" height="16">L&ouml;schen
+                </a>
+            </span>
+            <span class="right" style="float: right">
+                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+                <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
+                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                </a>
+            </span>
+        </div>
+
+        <div id="placeholder_formats" class="placeholder">
+            <div class="blanker"></div>
+            <div class="content"></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function Imageformats() {
+        let app = this;
+
+        app.init = function() {
+            $('#button_refresh').click(function() {
+                app.refresh();
+            });
+            $('#button_add').click(function() {
+                app.editFormat(null);
+            });
+            $('#button_edit').click(function() {
+                app.editSelected();
+            });
+            $('#button_delete').click(function() {
+                app.deleteSelected();
+            });
+
+            app.refresh();
+        };
+
+        /**
+         * Aktualisiert die angezeigte Seite der Bildformate
+         */
+        app.refresh = function() {
+            ncm.showDefaultLoadingIndicator();
+
+            $.ajax('/admin/media/formats/html/list', {
+                cache:      false,
+                type:       'GET',
+                dataType:   'HTML',
+                data: {
+                }
+            }).done(function(data) {
+                $('#placeholder_formats .content').html(data);
+                $('.selectall').click(function() {
+                    ncm.toggleAllRowsSelection(this);
+                });
+            }).always(function() {
+                ncm.hideDefaultLoadingIndicator();
+            });
+        };
+
+        app.editClickedFormat = function(clickedLink) {
+            let key = $(clickedLink).attr('data-key');
+            app.editFormat(key);
+        };
+
+        app.editFormat = function(key) {
+            let dlg = new ncm.InlinePopup(
+                '/admin/media/formats/html/edit/', {
+                    key: key
+                }, {
+                    headline:   (key == null || key == '')? 'Bildformat anlegen' : 'Bildformat bearbeiten',
+                    width:      500,
+                    height:     320,
+                    loaded:     function() {
+                        ncm.focusDefaultElement();
+                    }
+                }, {
+                    cancel: {
+                        caption: 'Abbrechen',
+                        clicked: function() {
+                            dlg.close();
+                        }
+                    },
+                    save: {
+                        caption: 'Speichern',
+                        clicked: function() {
+                            ncm.showDefaultLoadingIndicator();
+                            $.ajax('/admin/media/formats/ajax/save', {
+                                cache: false,
+                                type: 'POST',
+                                dataType: 'JSON',
+                                data:   {
+                                    key:            key,
+                                    title:          $('#edit_format_title').val(),
+                                    description:    $('#edit_format_description').val(),
+                                    width:          $('#edit_format_width').val(),
+                                    height:         $('#edit_format_height').val()
+                                }
+                            }).always(function() {
+                                ncm.hideDefaultLoadingIndicator();
+                                dlg.close();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            );
+        };
+
+        /**
+         * Ruft die Bearbeitungsmaske für das erste ausgewählte Bildformat auf
+         */
+        app.editSelected = function() {
+            let key = ncm.getFirstSelectedRowId();
+            if (key != null) {
+                app.editFormat(key);
+            }
+        };
+
+        /**
+         * Löscht alle ausgewählten Bildformate
+         */
+        app.deleteSelected = function() {
+            let keys = ncm.getSelectedRowIds();
+            if (keys.length > 0) {
+                if (confirm('Wollen Sie die ausgewählten Bildformate wirklich endgültig löschen?')) {
+                    ncm.showDefaultLoadingIndicator();
+                    $.ajax('/admin/media/formats/ajax/delete', {
+                        cache: false,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: {
+                            keys: keys
+                        }
+                    }).always(function () {
+                        ncm.hideDefaultLoadingIndicator();
+                        app.refresh();
+                    });
+                }
+            }
+        };
+
+        app.init();
+    }
+
+    $(document).ready(function() {
+        module = new Imageformats();
+    });
+</script>

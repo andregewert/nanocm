@@ -9,6 +9,8 @@
             <th>Titel</th>
             <th>Autor</th>
             <th>URL</th>
+            <th class="textright">Anlagedatum</th>
+            <th class="textright">&Auml;nderungsdatum</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -22,12 +24,18 @@
                     <td><a href="/admin/pages/edit/<?php echo $page->id; ?>"><?php echo $this->htmlEncode($page->headline); ?></a></td>
                     <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($page->author_id)); ?></td>
                     <td><?php echo $this->htmlEncode($page->url); ?></td>
+                    <td class="textright pre">
+                        <?php echo $page->creation_timestamp->format('Y-m-d H:i'); ?>
+                    </td>
+                    <td class="textright pre">
+                        <?php echo $page->modification_timestamp->format('Y-m-d H:i'); ?>
+                    </td>
                     <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($page->status_code)); ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else : ?>
             <tr class="noresult">
-                <td colspan="5">Keine Seiten gefunden</td>
+                <td colspan="7">Keine Seiten gefunden</td>
             </tr>
         <?php endif; ?>
     </tbody>

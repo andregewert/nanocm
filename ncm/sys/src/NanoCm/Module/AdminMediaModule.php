@@ -20,17 +20,18 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\Media\ImageFormat;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
 use Ubergeek\NanoCm\Util;
 
 /**
- * Verwaltung der Benutzerkonten
+ * Verwaltung der Mediendateien und Bildformate
+ *
  * @author André Gewert <agewert@ubergeek.de>
  * @package Ubergeek\NanoCm
  * @created 2018-01-13
- * @todo Überprüfen, ob das Medienverzeichnis wirklich schreibbar ist
  */
 class AdminMediaModule extends AbstractAdminModule {
 
@@ -86,6 +87,20 @@ class AdminMediaModule extends AbstractAdminModule {
     public $medium;
 
     /**
+     * Die aufzulistenden Bildformate
+     *
+     * @var ImageFormat[]
+     */
+    public $formats;
+
+    /**
+     * Das zu bearbeitende Bildformat
+     *
+     * @var ImageFormat
+     */
+    public $format;
+
+    /**
      * Die für Listen-Datensätze verfügbaren Statuscodes
      *
      * @var int[]
@@ -125,8 +140,8 @@ class AdminMediaModule extends AbstractAdminModule {
             $this->currentFolder = $this->orm->getMediumById($this->searchParentId, Medium::TYPE_FOLDER, false);
             $this->parentFolders = $this->orm->getParentFolders($this->searchParentId);
         }
-
         $this->availableFolders = $this->orm->getAllFolders();
+        $this->isMediaDirWritable = $this->orm->isMediaDirWritable();
 
         switch ($this->getRelativeUrlPart(2)) {
 
@@ -263,6 +278,62 @@ class AdminMediaModule extends AbstractAdminModule {
                 }
                 break;
 
+            // Verwaltung von Bildformaten
+            case 'formats':
+                switch ($this->getRelativeUrlPart(3)) {
+                    // AJAX-Anfragen
+                    case 'ajax':
+                        $this->setPageTemplate(self::PAGE_NONE);
+                        $this->setContentType('text/javascript');
+
+                        switch ($this->getRelativeUrlPart(4)) {
+                            // Bildformat-Definition speichern
+                            case 'save':
+                                $format = $this->createImageFormatFromRequest();
+                                $content = json_encode(
+                                    $this->orm->saveImageFormat($format)
+                                );
+
+                                // Achtung: bei *jeder* Änderung der Format-Definitionen wird der Cache
+                                // mit generierten Images vollständig geleert!
+
+                                // TODO Einschränken auf Update! Nicht bei Insert durchführen!
+
+                                $this->ncm->mediacache->clear();
+                                break;
+                        }
+                        break;
+
+                    // Einzelne HTML-Blöcke
+                    case 'html':
+                        $this->setPageTemplate(self::PAGE_NONE);
+                        $this->setContentType('text/html');
+                        switch ($this->getRelativeUrlPart(4)) {
+                            // Bildformat-Definition bearbeiten
+                            case 'edit':
+                                $this->format = $this->orm->getImageFormatByKey($this->getParam('key'));
+                                if ($this->format == null) {
+                                    $this->format = new ImageFormat();
+                                    $this->format->description = 'Neues Format';
+                                }
+                                $content = $this->renderUserTemplate('content-media-formats-edit.phtml');
+                                break;
+
+                            // Vorhandene Bildformat-Definitionen auflisten
+                            case 'list':
+                                $this->formats = $this->orm->getImageFormats();
+                                $content = $this->renderUserTemplate('content-media-formats-list.phtml');
+                                break;
+                        }
+                        break;
+
+                    // Trägerseite
+                    case 'index.php':
+                    case '':
+                        $content = $this->renderUserTemplate('content-media-formats.phtml');
+                }
+                break;
+
             // Trägerseite
             case 'index.php':
             case '':
@@ -316,6 +387,18 @@ class AdminMediaModule extends AbstractAdminModule {
         $medium->attribution = '';
         $medium->tags = Tag::splitTagsString($this->getParam('tags'));
         return $medium;
+    }
+
+    private function createImageFormatFromRequest() : ImageFormat {
+        $key = trim($this->getParam('key', ''));
+        $oldFormat = (strlen($key) == 0)? null : $this->orm->getImageFormatByKey($key);
+        $format = ($oldFormat == null)? new ImageFormat() : $oldFormat;
+
+        $format->title = $this->getParam('title');
+        $format->description = $this->getParam('description');
+        $format->width = intval($this->getParam('width'));
+        $format->height = intval($this->getParam('height'));
+        return $format;
     }
 
     // </editor-fold>

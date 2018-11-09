@@ -1583,6 +1583,27 @@ class Orm {
     // <editor-fold desc="ImageFormat">
 
     /**
+     * Speichert eine Bildformat-Definition in der Datenbank
+     *
+     * @param ImageFormat $format Die zu speichernde Bildformat-Definition
+     * @return bool true bei Erfolg
+     */
+    public function saveImageFormat(ImageFormat $format) {
+        $sql = 'REPLACE INTO imageformat (
+                    key, title, description, width, height
+                ) VALUES (
+                    :key, :title, :description, :width, :height
+                ) ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('key', $format->key);
+        $stmt->bindValue('title', $format->title);
+        $stmt->bindValue('description', $format->description);
+        $stmt->bindValue('width', $format->width);
+        $stmt->bindValue('height', $format->height);
+        return $stmt->execute();
+    }
+
+    /**
      * Gibt alle in der Datenbank definierten Bildformate zurück
      *
      * @return ImageFormat[] Alle definierten Bildformate
@@ -1617,9 +1638,33 @@ class Orm {
 
     // <editor-fold desc="Medium">
 
+    /**
+     * Liest den im Dateisystem abgelegten Inhalt einer Mediendatei aus und gibt ihn als String zurück
+     *
+     * @param $id Datensatz-ID der auszulesenden Mediendatei
+     * @return false|string Dateiinhalt bei Erfolg oder False bei Misserfolg
+     */
     public function getMediumFileContents($id) {
         $filename = Util::createPath($this->mediadir, $id);
         return file_get_contents($filename);
+    }
+
+    /**
+     * Überprüft, ob das konfigurierte Medienverzeichnis (durch den aktuellen Prozess / User) schreibbar ist
+     *
+     * @return bool true, wenn das konfigurierte Medienverzeichnis schreibbar ist
+     */
+    public function isMediaDirWritable() {
+        // Gegebenenfalls das Medienverzeichnis anlegen
+        try {
+            if (!file_exists($this->mediadir)) {
+                mkdir($this->mediadir);
+            }
+        } catch (\Throwable $ex) {
+            $this->log->debug("Fehler beim Erstellen des Medienverzeichnisses: " . $ex->getMessage());
+            $this->log->debug($ex->getTrace());
+        }
+        return is_writable($this->mediadir);
     }
 
     /**
@@ -1636,6 +1681,7 @@ class Orm {
             if (!file_exists($this->mediadir)) {
                 mkdir($this->mediadir);
             }
+
             // Datei unter der Datensatz-ID im Dateisystem ablegen
             $filename = Util::createPath($this->mediadir, $id);
             $this->log->debug("Saving medium file for $id");

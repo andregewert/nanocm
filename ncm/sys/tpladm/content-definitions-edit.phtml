@@ -1,24 +1,23 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AdminDefinitionsModule */
 ?>
-
 <div class="row">
-    <label>Definitionstyp</label>
+    <label for="edit_definition_definitiontype">Definitionstyp</label>
     <input type="text" id="edit_definition_definitiontype"<?php if (empty($this->definition->definitiontype)) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->definition->definitiontype); ?>">
 </div>
 <div class="row">
-    <label>Schl&uuml;ssel</label>
+    <label for="edit_definition_key">Schl&uuml;ssel</label>
     <input type="text" id="edit_definition_key" value="<?php echo $this->htmlEncode($this->definition->key); ?>">
 </div>
 <div class="row">
-    <label>Titel</label>
+    <label for="edit_definition_title">Titel</label>
     <input type="text" id="edit_definition_title"<?php if (!empty($this->definition->definitiontype)) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->definition->title); ?>">
 </div>
 <div class="row">
-    <label>Wert</label>
+    <label for="edit_definition_value">Wert</label>
     <input type="text" id="edit_definition_value" value="<?php echo $this->htmlEncode($this->definition->value); ?>">
 </div>
 <div class="row">
-    <label>Parameter</label>
+    <label for="edit_definition_parameters">Parameter</label>
     <input type="text" id="edit_definition_parameters" value="<?php echo $this->htmlEncode($this->definition->parameters); ?>">
 </div>

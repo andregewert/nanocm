@@ -111,7 +111,7 @@ class CoreModule extends AbstractModule {
 
                         // Ein Bild in einem bestimmten Format ausgeben
                         case 'image':
-                            $imageResizer = new ImageResizer(null);
+                            $imageResizer = new ImageResizer($this->ncm->mediacache);
                             $mediumHash = $parts[1];
                             $formatKey = $parts[3];
                             $format = $this->orm->getImageFormatByKey($formatKey);

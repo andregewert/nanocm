@@ -88,13 +88,21 @@ class ImageResizer
      * @param ImageFormat $format Die Definition für das Ausgabeformat (aus der Medienverwaltung)
      * @param string $outputImageType Typ des Ausgabebildes
      * @return null|string Die genrierten Bilddaten als String
-     *
-     * @todo Caching verwenden!
      * @todo Fehler abfangen?
      */
     public function createImageForMediumWithImageFormat(Medium $medium, string $data, ImageFormat $format, $outputImageType = 'jpeg') {
         if (!in_array($medium->type, $this->supportedTypes)) {
             throw new MediaException("Not supported mime type: $medium->type");
+        }
+
+        // Bild aus dem Cache laden, wenn möglich
+        if ($this->cache instanceof CacheInterface) {
+            $cacheKey = $medium->id . '-' . $format->key . '-' . $outputImageType;
+            $image = $this->cache->get($cacheKey);
+            if ($image != null) {
+                $this->cache->touch($cacheKey);
+                return $image;
+            }
         }
 
         list($sourceWidth, $sourceHeight, $sourceType) = getimagesizefromstring($data);
@@ -173,8 +181,11 @@ class ImageResizer
             default:
                 imagejpeg($copy);
         }
-        $c = ob_get_clean();
-        return $c;
+        $image = ob_get_clean();
+        if ($image != null && $this->cache instanceof CacheInterface) {
+            $this->cache->put($cacheKey, $image);
+        }
+        return $image;
     }
 
     // </editor-fold>

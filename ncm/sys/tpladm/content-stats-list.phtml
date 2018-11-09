@@ -13,14 +13,14 @@
             <?php foreach ($this->statsUrls as $url) : ?>
                 <tr>
                     <td><?php echo $this->htmlEncode($url['url']); ?></td>
-                    <td class="textright pre"><?php echo $url['sumcount']; ?></td>
+                    <td class="textright pre"><?php echo $this->formatInt($url['sumcount']); ?></td>
                 </tr>
                 <?php $sum += $url['sumcount']; ?>
             <?php endforeach; ?>
             <tr>
                 <th>Summe</th>
                 <th class="textright pre">
-                    <?php echo $sum; ?>
+                    <?php echo $this->formatInt($sum); ?>
                 </th>
             </tr>
         <?php else : ?>
@@ -47,14 +47,14 @@
         <?php foreach ($this->statsBrowsers as $browser) : ?>
             <tr>
                 <td><?php echo $this->htmlEncode($browser['browsername']); ?></td>
-                <td class="textright pre"><?php echo $browser['sumcount']; ?></td>
+                <td class="textright pre"><?php echo $this->formatInt($browser['sumcount']); ?></td>
             </tr>
             <?php $sum += $browser['sumcount']; ?>
         <?php endforeach; ?>
         <tr>
             <th>Summe</th>
             <th class="textright pre">
-                <?php echo $sum; ?>
+                <?php echo $this->formatInt($sum); ?>
             </th>
         </tr>
     <?php else : ?>
@@ -81,13 +81,13 @@
         <?php foreach ($this->statsOses as $os) : ?>
             <tr>
                 <td><?php echo $this->htmlEncode($os['osname']); ?></td>
-                <td class="textright pre"><?php echo $os['sumcount']; ?></td>
+                <td class="textright pre"><?php echo $this->formatInt($os['sumcount']); ?></td>
             </tr>
             <?php $sum += $os['sumcount']; ?>
         <?php endforeach; ?>
         <tr>
             <th>Summe</th>
-            <th class="textright pre"><?php echo $sum; ?></th>
+            <th class="textright pre"><?php echo $this->formatInt($sum); ?></th>
         </tr>
     <?php else : ?>
         <tr class="noresult">
@@ -115,13 +115,13 @@
             <tr>
                 <td><?php echo $this->htmlEncode($country['country']); ?></td>
                 <td><?php echo $this->htmlEncode($country['regionname']); ?></td>
-                <td class="textright pre"><?php echo $country['sumcount']; ?></td>
+                <td class="textright pre"><?php echo $this->formatInt($country['sumcount']); ?></td>
             </tr>
             <?php $sum += $country['sumcount']; ?>
         <?php endforeach; ?>
         <tr>
             <th>Summe</th>
-            <th colspan="2" class="textright pre"><?php echo $sum; ?></th>
+            <th colspan="2" class="textright pre"><?php echo $this->formatInt($sum); ?></th>
         </tr>
     <?php else : ?>
         <tr class="noresult">
@@ -146,7 +146,7 @@
         <?php foreach ($this->statsSessionId as $sessionId) : ?>
             <tr>
                 <td></td>
-                <td class="textright pre"><?php echo $sessionId['c']; ?></td>
+                <td class="textright pre"><?php echo $this->formatInt($sessionId['c']); ?></td>
             </tr>
         <?php endforeach; ?>
     <?php else : ?>

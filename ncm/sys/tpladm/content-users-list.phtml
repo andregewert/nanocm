@@ -13,7 +13,7 @@ use Ubergeek\NanoCm\UserType;
             <th>Vorname</th>
             <th>E-Mail</th>
             <th>Kontoart</th>
-            <th>Letztes Login</th>
+            <th class="textright">Letztes Login</th>
             <th>Status</th>
         </tr>
         </thead>
@@ -29,7 +29,7 @@ use Ubergeek\NanoCm\UserType;
                     <td><?php echo $this->htmlEncode($user->firstname); ?></td>
                     <td><?php echo $this->htmlEncode($user->email); ?></td>
                     <td><?php echo $this->htmlEncode(UserType::convertUserType($user->usertype)); ?></td>
-                    <td>
+                    <td class="textright pre">
                         <?php if ($user->last_login_timestamp instanceof \DateTime) : ?>
                             <?php echo $user->last_login_timestamp->format('Y-m-d H:i'); ?>
                         <?php endif; ?>

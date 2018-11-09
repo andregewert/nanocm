@@ -20,6 +20,7 @@
  */
 
 namespace Ubergeek\NanoCm;
+use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Cache\FileCache;
 use Ubergeek\Controller\HttpRequest;
 use Ubergeek\Log;
@@ -43,13 +44,6 @@ class NanoCm {
      */
     private static $ncm = null;
 
-    /**
-     * FileCache für IP-Geolocation-Abfragen
-     *
-     * @var FileCache
-     */
-    private $ipcache;
-    
     // </editor-fold>
     
     
@@ -159,6 +153,20 @@ class NanoCm {
      */
     public $showExceptions = false;
 
+    /**
+     * Cache für IP-Geolocation-Abfragen
+     *
+     * @var CacheInterface
+     */
+    public $ipcache;
+
+    /**
+     * Cache für die Medienbearbeitung
+     *
+     * @var CacheInterface
+     */
+    public $mediacache;
+
     // </editor-fold>
 
 
@@ -227,6 +235,7 @@ class NanoCm {
 
         // Caches initialisieren
         $this->ipcache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
+        $this->mediacache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
     }
 
     // </editor-fold>

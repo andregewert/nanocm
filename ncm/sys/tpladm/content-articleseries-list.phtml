@@ -9,6 +9,7 @@
             <th>Titel</th>
             <th>Beschreibung</th>
             <th>Sortierung</th>
+            <th class="textright">Anlagedatum</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -29,12 +30,15 @@
                         Ung&uuml;ltige Sortiervorgabe
                     <?php endif; ?>
                 </td>
+                <td class="textright pre">
+                    <?php echo $series->creation_timestamp->format('Y-m-d H:i'); ?>
+                </td>
                 <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($series->status_code)); ?></td>
             </tr>
         <?php endforeach; ?>
     <?php else : ?>
         <tr class="noresult">
-            <td colspan="4">Keine Artikelserien gefunden</td>
+            <td colspan="6">Keine Artikelserien gefunden</td>
         </tr>
     <?php endif; ?>
     </tbody>

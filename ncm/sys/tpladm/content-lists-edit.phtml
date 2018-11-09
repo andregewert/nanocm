@@ -13,11 +13,11 @@ use Ubergeek\NanoCm\StatusCode;
     </div>
 <?php endif; ?>
 <div class="row">
-    <label>Name der Liste</label>
+    <label for="edit_list_title">Name der Liste</label>
     <input type="text" id="edit_list_title" value="<?php echo $this->htmlEncode($this->list->title); ?>" class="autofocus">
 </div>
 <div class="row">
-    <label>Status</label>
+    <label for="edit_list_status_code">Status</label>
     <select id="edit_list_status_code" size="1">
         <?php foreach ($this->availableStatusCodes as $code) : ?>
             <option value="<?php echo $code; ?>" <?php if ($this->list->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>

@@ -1,23 +1,4 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 /* @var $this \Ubergeek\NanoCm\Module\AdminCommentsModule */
 use Ubergeek\NanoCm\StatusCode;
 ?>
@@ -25,7 +6,7 @@ use Ubergeek\NanoCm\StatusCode;
         <thead>
         <tr>
             <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
-            <th>Datum</th>
+            <th class="textright">Datum</th>
             <th>Kommentar</th>
             <th>Name</th>
             <th>E-Mail</th>
@@ -40,7 +21,7 @@ use Ubergeek\NanoCm\StatusCode;
                     <td style="text-align: center">
                         <input type="checkbox" class="selection" value="<?php echo $comment->id; ?>" style="text-align: center">
                     </td>
-                    <td><?php echo $comment->creation_timestamp->format('Y-m-d H:i'); ?></td>
+                    <td class="textright pre"><?php echo $comment->creation_timestamp->format('Y-m-d H:i'); ?></td>
                     <td>
                         <a href="javascript:void(0);" data-id="<?php echo $this->htmlEncode($comment->id); ?>" onclick="module.editClickedComment(this);">
                             <?php echo $this->htmlEncode($comment->headline); ?>

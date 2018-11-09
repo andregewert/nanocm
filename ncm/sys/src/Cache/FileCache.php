@@ -144,7 +144,7 @@ class FileCache implements CacheInterface {
         $fname = $this->createCacheFileName($key);
         if (file_exists($fname)) {
             if ($this->log != null) {
-                $this->log->debug("Touching cache entry $key / removing file $fname");
+                $this->log->debug("Touching cache entry $key for file $fname");
             }
             try {
                 touch($fname);
@@ -176,7 +176,7 @@ class FileCache implements CacheInterface {
                             $this->log->debug("Removing file $fullname");
                         }
                         try {
-                            //unlink($fullname);
+                            unlink($fullname);
                         } catch (\Exception $ex) {
                             if ($this->log instanceof Logger) {
                                 $this->log->debug("Error while deleting cache file: " . $ex->getMessage());

@@ -3,21 +3,36 @@
 use Ubergeek\NanoCm\StatusCode;
 ?>
 <div class="container spacing">
+    <h1>Medien verwalten</h1>
+</div>
+
+<?php if (!$this->isMediaDirWritable) : ?>
+    <div class="container spacing">
+        <div class="msgnote">
+            <em>Hinweis:</em> Das Verzeichnis f&uuml;r die Ablage von Mediendateien ist nicht durch den
+                Webserver schreibbar.<br>
+                Bitte &uuml;berpr&uuml;fen Sie die Server-Einstellungen bzw. Zugriffsrechte!.
+        </div>
+    </div>
+<?php endif; ?>
+
+<div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
-        <h1>Medien verwalten</h1>
         <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
         <input type="hidden" id="input_searchParentId" name="searchParentId" value="<?php echo intval($this->searchParentId); ?>" />
-
         <div class="toolbar">
             <span class="left">
                 <a id="button_addfolder" class="button" href="javascript:void(0);" role="button" title="Neuen Ordner erstellen">
-                    <img src="/ncm/img/fatcow/16/folder_add.png" alt="" width="16" height="16">Neuer Ordner
+                    <img src="/ncm/img/fatcow/16/folder_add.png" alt="" width="16" height="16">Neu
                 </a>
                 <a id="button_unlock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Medium freischalten">
                     <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Freischalten
                 </a>
                 <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Medium sperren">
                     <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
+                </a>
+                <a id="button_formats" class="button" href="/admin/media/formats/" role="button" title="Bildformate verwalten">
+                    <img src="/ncm/img/fatcow/16/images.png" alt="" width="16" height="16">Formate
                 </a>
                 <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Medium l&ouml;schen">
                     <img src="/ncm/img/fatcow/16/delete.png" alt="" width="16" height="16">L&ouml;schen

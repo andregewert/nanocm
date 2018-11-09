@@ -7,6 +7,8 @@ use Ubergeek\NanoCm\StatusCode;
         <tr>
             <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
             <th>Titel</th>
+            <th class="textright">Anlagedatum</th>
+            <th class="textright">&Auml;nderungsdatum</th>
             <th>Status</th>
         </tr>
         </thead>
@@ -18,12 +20,18 @@ use Ubergeek\NanoCm\StatusCode;
                         <input type="checkbox" class="selection" value="<?php echo $list->id; ?>" style="text-align: center">
                     </td>
                     <td><a href="/admin/lists/listitems/<?php echo intval($list->id); ?>"><?php echo $this->htmlEncode($list->title); ?></a></td>
+                    <td class="textright pre">
+                        <?php echo $list->creation_timestamp->format('Y-m-d H:i'); ?>
+                    </td>
+                    <td class="textright pre">
+                        <?php echo $list->modification_timestamp->format('Y-m-d H:i'); ?>
+                    </td>
                     <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($list->status_code)); ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else : ?>
             <tr class="noresult">
-                <td colspan="3">Keine Listen gefunden</td>
+                <td colspan="5">Keine Listen gefunden</td>
             </tr>
         <?php endif; ?>
         </tbody>
