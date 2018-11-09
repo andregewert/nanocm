@@ -27,6 +27,17 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
+    public static function getDirectorySize($path){
+        $bytestotal = 0;
+        $path = realpath($path);
+        if($path!==false && $path!='' && file_exists($path)){
+            foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)) as $object){
+                $bytestotal += $object->getSize();
+            }
+        }
+        return $bytestotal;
+    }
+
     public static function getFileExtension(string $filename) {
         if (preg_match("/\.([^\.]+?)$/i", $filename, $matches) > 0) {
             return strtolower($matches[1]);

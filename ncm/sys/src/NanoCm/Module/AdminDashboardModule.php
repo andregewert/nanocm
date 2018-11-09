@@ -20,6 +20,7 @@
 namespace Ubergeek\NanoCm\Module;
 
 use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\NanoCm\Util;
 use Ubergeek\Net\Fetch;
 
 /**
@@ -77,6 +78,10 @@ class AdminDashboardModule extends AbstractAdminModule {
      */
     public $sizeOfStatsDb = 0;
 
+    public $sizeOfCacheDir = 0;
+
+    public $sizeOfMediaDir = 0;
+
     // </editor-fold>
 
     public function run() {
@@ -104,6 +109,8 @@ class AdminDashboardModule extends AbstractAdminModule {
                 $this->numberOfReleasedArticles = $this->orm->countReleasedArticles();
                 $this->numberOfUnreleasedArticles = $this->orm->countUnreleasedArticles();
                 $this->numberOfMediaFiles = $this->orm->countMediaFiles(false);
+                $this->sizeOfMediaDir = Util::getDirectorySize($this->ncm->mediadir);
+                $this->sizeOfCacheDir = Util::getDirectorySize($this->ncm->cachedir);
 
                 // Überprüfen, ob das Systemverzeichnis / die Site-Datenbank von außen erreichbar ist
                 $url = (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') ? 'http://' : 'https://';

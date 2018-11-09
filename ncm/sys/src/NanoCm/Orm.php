@@ -23,6 +23,7 @@ namespace Ubergeek\NanoCm;
 
 use Ubergeek\NanoCm\Exception\InvalidDataException;
 use Ubergeek\NanoCm\Exception\MediaException;
+use Ubergeek\NanoCm\Media\ImageFormat;
 
 /**
  * Kapselt alle system-internen Datenbank-Funktionen in einer Klasse.

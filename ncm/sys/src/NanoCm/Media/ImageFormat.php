@@ -18,12 +18,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm;
+namespace Ubergeek\NanoCm\Media;
 
 /**
  * Bildet die Definition für ein Bildformat ab
  *
- * @package Ubergeek\NanoCm
+ * @package Ubergeek\NanoCm\Media
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-11-04
  */

@@ -21,7 +21,7 @@
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
-use Ubergeek\NanoCm\ImageResizer;
+use Ubergeek\NanoCm\Media\ImageResizer;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
 use Ubergeek\NanoCm\Setting;

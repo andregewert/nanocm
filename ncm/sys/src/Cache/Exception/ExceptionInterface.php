@@ -18,14 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\Cache;
+namespace Ubergeek\Cache\Exception;
 
 /**
  * Markierungs-Interface für alle Custom Exceptions im Cache-Namespace
  *
- * @package Ubergeek\Cache
+ * @package Ubergeek\Cache\Exception
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-10-31
  */
-class ExceptionInterface  {
+interface ExceptionInterface  {
 }

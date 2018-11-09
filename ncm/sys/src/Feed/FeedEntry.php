@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NanoCM
  * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
@@ -19,18 +18,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\Exception;
+/**
+ * Created by PhpStorm.
+ * User: agewert
+ * Date: 09.11.18
+ * Time: 19:40
+ */
+
+namespace Ubergeek\Feed;
 
 /**
- * Gemeinsames Markierungs-Interface für alle Exceptions in diesem Namespace.
- * 
- * Ableiten tun die einzelnen Exceptions dagegen von einer passenden
- * SPL-Exception-Klasse.
+ * Bildet einen Feed-Eintrag ab
  *
- * @package Ubergeek\NanoCm\Exception
+ * @package Ubergeek\Feed
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-18
+ * @created 2018-11-09
  */
-interface ExceptionInterface {
-    
+class FeedEntry {
+
 }

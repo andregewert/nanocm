@@ -71,12 +71,20 @@ use Ubergeek\NanoCm\Setting; ?>
                 <td class="textright pre"><?php echo $this->formatInt($this->numberOfMediaFiles); ?></td>
             </tr>
             <tr>
+                <td>Gr&ouml;&szlig;e der Mediendateien</td>
+                <td class="textright pre"><?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($this->sizeOfMediaDir); ?></td>
+            </tr>
+            <tr>
                 <td>Gr&ouml;&szlig;e der Site-Datenbank</td>
                 <td class="textright pre"><?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($this->sizeOfSiteDb, 1); ?></td>
             </tr>
             <tr>
                 <td>Gr&ouml;&szlig;e der Statistik-Datenbank</td>
                 <td class="textright pre"><?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($this->sizeOfStatsDb, 1); ?></td>
+            </tr>
+            <tr>
+                <td>Gr&ouml;&szlig;e des Caches</td>
+                <td class="textright pre"><?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($this->sizeOfCacheDir); ?></td>
             </tr>
         </table>
     </div>

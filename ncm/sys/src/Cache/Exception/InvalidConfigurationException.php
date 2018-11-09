@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NanoCM
  * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
@@ -19,18 +18,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\Exception;
+namespace Ubergeek\Cache\Exception;
 
 /**
- * Gemeinsames Markierungs-Interface für alle Exceptions in diesem Namespace.
- * 
- * Ableiten tun die einzelnen Exceptions dagegen von einer passenden
- * SPL-Exception-Klasse.
+ * Zeigt an, dass sich das verwendete Cache-Objekt in einem ungültigen
+ * oder unvollständigen Konfigurationszustandes befindet.
  *
- * @package Ubergeek\NanoCm\Exception
+ * @package Ubergeek\Cache\Exception
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-18
+ * @created 2018-10-31
  */
-interface ExceptionInterface {
-    
+class InvalidConfigurationException
+    extends \RuntimeException
+    implements ExceptionInterface {
+
 }

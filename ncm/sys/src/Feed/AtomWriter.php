@@ -19,18 +19,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\Exception;
+namespace Ubergeek\Feed;
 
 /**
- * Gemeinsames Markierungs-Interface für alle Exceptions in diesem Namespace.
- * 
- * Ableiten tun die einzelnen Exceptions dagegen von einer passenden
- * SPL-Exception-Klasse.
+ * Implementiert einen FeedWriter, der eine Ausgabe nach Atom-Spezifikationen erzeugt
  *
- * @package Ubergeek\NanoCm\Exception
+ * @package Ubergeek\Feed
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-18
+ * @created 2018-11-09
  */
-interface ExceptionInterface {
-    
+class AtomWriter implements FeedWriterInterface  {
+    // ...
 }

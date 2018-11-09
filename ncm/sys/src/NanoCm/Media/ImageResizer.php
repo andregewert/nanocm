@@ -18,10 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm;
+namespace Ubergeek\NanoCm\Media;
 
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\NanoCm\Exception\MediaException;
+use Ubergeek\NanoCm\Medium;
 
 /**
  * Class ImageResizer
@@ -29,7 +30,7 @@ use Ubergeek\NanoCm\Exception\MediaException;
  * Der ImageResizer ist dafür zuständig, aus Bildern in verschiedenen Ausgangsformaten Vorschaubilder in definierten
  * Formaten zu generieren. Für generierte Vorschaubilder wird ein dateibasierter Cache verwendet.
  *
- * @package Ubergeek\NanoCm
+ * @package Ubergeek\NanoCm\Media
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-11-07
  */

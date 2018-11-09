@@ -18,17 +18,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\Cache;
+namespace Ubergeek\Feed;
 
 /**
- * Zeigt an, dass sich das verwendete Cache-Objekt in einem ungültigen
- * oder unvollständigen Konfigurationszustandes befindet.
+ * Bildet die Basisdaten ("Kopfdaten") für eine Feed-Quelle ab (Titel der Website etc.)
  *
- * @package Ubergeek\Cache
+ * @package Ubergeek\Feed
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2018-10-31
+ * @created 2018-11-09
  */
-class InvalidConfigurationException
-    extends \RuntimeException
-    implements \Ubergeek\NanoCm\Exception\ExceptionInterface {
+class FeedInfo {
+
+    // TODO implementieren
+
 }

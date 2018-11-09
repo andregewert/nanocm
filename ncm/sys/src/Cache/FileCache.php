@@ -20,6 +20,7 @@
 
 namespace Ubergeek\Cache;
 
+use Ubergeek\Cache\Exception\InvalidConfigurationException;
 use Ubergeek\Log\Logger;
 
 /**
