@@ -153,5 +153,13 @@ class Medium
         return md5($this->entrytype . '-' . $this->filename);
     }
 
+    public function getImageUrl($formatKey = null) {
+        if ($formatKey != null) {
+            $url = '/media/' . $this->calculateHash() . '/image/' . urlencode($formatKey);
+            return $url;
+        }
+        return '';
+    }
+
     // </editor-fold>
 }

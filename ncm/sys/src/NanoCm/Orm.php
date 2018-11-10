@@ -2322,6 +2322,7 @@ class Orm {
         $sql = 'UPDATE article SET 
                     modification_timestamp = datetime(CURRENT_TIMESTAMP, \'localtime\'),
                     author_id = :author_id,
+                    medium_id = :medium_id,
                     status_code = :status_code,
                     headline = :headline,
                     teaser = :teaser,
@@ -2338,6 +2339,7 @@ class Orm {
                     id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('author_id', $article->author_id);
+        $stmt->bindValue('medium_id', $article->medium_id);
         $stmt->bindValue('status_code', $article->status_code);
         $stmt->bindValue('headline', $article->headline);
         $stmt->bindValue('teaser', $article->teaser);
@@ -2388,18 +2390,19 @@ class Orm {
         }
 
         $sql = 'INSERT INTO article (
-                  creation_timestamp, modification_timestamp, author_id,
+                  creation_timestamp, modification_timestamp, author_id, medium_id,
                   status_code, headline, teaser, content, start_timestamp,
                   stop_timestamp, publishing_timestamp, enable_trackbacks,
                   enable_comments, articletype_key, templatevars, series_id
               ) VALUES (
-                  datetime(CURRENT_TIMESTAMP, \'localtime\'), datetime(CURRENT_TIMESTAMP, \'localtime\'), :author_id,
+                  datetime(CURRENT_TIMESTAMP, \'localtime\'), datetime(CURRENT_TIMESTAMP, \'localtime\'), :author_id, :medium_id,
                   :status_code, :headline, :teaser, :content, :start_timestamp,
                   :stop_timestamp, :publishing_timestamp, :enable_trackbacks,
                   :enable_comments, :articletype_key, :templatevars, :series_id
               ) ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('author_id', $article->author_id);
+        $stmt->bindValue('medium_id', $article->medium_id);
         $stmt->bindValue('status_code', $article->status_code);
         $stmt->bindValue('headline', $article->headline);
         $stmt->bindValue('teaser', $article->teaser);

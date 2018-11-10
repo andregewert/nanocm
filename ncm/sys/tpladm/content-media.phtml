@@ -104,6 +104,7 @@ use Ubergeek\NanoCm\StatusCode;
                         senddata.fileData = fileData.target.result;
                         ncm.showDefaultLoadingIndicator();
 
+                        // TODO Auf Fehler bzw. negative Antworten reagieren!
                         $.ajax('/admin/media/upload', {
                             cache:      false,
                             type:       'POST',

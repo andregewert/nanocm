@@ -78,6 +78,11 @@
                     </select>
                 </p>
                 <p>
+                    <label title="Haupt-Illustration für diesen Artikel">Artikelbild</label>
+                    <!-- Hier sollte pro Artikel ein Eintrag aus der Mediendatenbank auswählbar sein; die Verwendung und der Zuschnitt erfolgen je nach Ansicht / Template automatisch -->
+                    <input type="text" id="input_article_medium_id" value="<?php echo ($this->article->medium_id == null)? '' : intval($this->article->medium_id); ?>" tabindex="0">
+                </p>
+                <p>
                     <label title="Variablen zur Steuerung des Seiten-Templates">Template-Variablen</label>
                     <input type="text" id="input_article_templatevars" value="<?php if (is_array($this->article->templatevars)) echo $this->htmlEncode(json_encode($this->article->templatevars)); ?>">
                     <a id="button_edit_vars" href="javascript:void(0)"><img src="/ncm/img/fatcow/16/edit_button.png" width="16" height="16" style="vertical-align: middle"></a>
@@ -97,10 +102,6 @@
                     <?php endif; ?>
                     <input type="hidden" id="input_article_author_id" value="<?php echo intval($this->article->author_id); ?>">
                     <?php // TODO Autor-Auswahl per Popup oder Selectbox? -> zumindest Admins sollten einen Autoren auswählen können ?>
-                </p>
-                <p>
-                    <label title="Haupt-Illustration für diesen Artikel">Artikelbild</label>
-                    <!-- Hier sollte pro Artikel ein Eintrag aus der Mediendatenbank auswählbar sein; die Verwendung und der Zuschnitt erfolgen je nach Ansicht / Template automatisch -->
                 </p>
                 <hr>
                 <p>
@@ -251,6 +252,7 @@
                 data:       {
                     id:                     $('#input_article_id').val(),
                     author_id:              $('#input_article_author_id').val(),
+                    medium_id:              $('#input_article_medium_id').val(),
                     status_code:            $('#input_article_status_code').val(),
                     headline:               $('#input_article_headline').val(),
                     teaser:                 $('#input_article_teaser').val(),

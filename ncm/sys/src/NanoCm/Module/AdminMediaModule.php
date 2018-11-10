@@ -166,21 +166,23 @@ class AdminMediaModule extends AbstractAdminModule {
             case 'upload':
                 $this->setPageTemplate(self::PAGE_NONE);
                 $this->setContentType('text/javascript');
-
                 $file = $this->getParam('file');
-                $data = utf8_decode($file['fileData']);
 
-                $medium = new Medium();
-                $medium->entrytype = Medium::TYPE_FILE;
-                $medium->parent_id = intval($this->getParam('parent_id'));
-                $medium->title = $file['name'];
-                $medium->filename = $file['name'];
-                $medium->filesize = $file['size'];
-                $medium->type = $file['type'];
-                $medium->extension = Util::getFileExtension($file['name']);
-                $medium->id = $this->orm->insertInitialMedium($medium, $data);
-
-                $content = json_encode($medium);
+                if ($file != null) {
+                    $data = utf8_decode($file['fileData']);
+                    $medium = new Medium();
+                    $medium->entrytype = Medium::TYPE_FILE;
+                    $medium->parent_id = intval($this->getParam('parent_id'));
+                    $medium->title = $file['name'];
+                    $medium->filename = $file['name'];
+                    $medium->filesize = $file['size'];
+                    $medium->type = $file['type'];
+                    $medium->extension = Util::getFileExtension((string)$file['name']);
+                    $medium->id = $this->orm->insertInitialMedium($medium, $data);
+                    $content = json_encode($medium);
+                } else {
+                    $content = json_encode(false);
+                }
                 break;
 
             // AJAX-Aufrufe

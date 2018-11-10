@@ -58,6 +58,13 @@ class Article {
      * @var int
      */
     public $author_id;
+
+    /**
+     * Optional: Medien-ID für Artikelbild
+     *
+     * @var  int|null
+     */
+    public $medium_id;
     
     /**
      * Statuscode

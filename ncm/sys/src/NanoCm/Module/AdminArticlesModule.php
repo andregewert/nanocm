@@ -165,7 +165,6 @@ class AdminArticlesModule extends AbstractAdminModule {
                 if ($this->article == null) {
                     $this->article = $this->createEmptyArticle();
                 }
-                $this->log->debug($this->article);
                 $content = $this->renderUserTemplate('content-articles-edit.phtml');
                 break;
 
@@ -212,6 +211,7 @@ class AdminArticlesModule extends AbstractAdminModule {
 
         // TODO Es muss noch entschieden werden, ob der Autor nach Belieben angegeben werden kann
         $article->author_id = $this->getParam('author_id', 0);
+        $article->medium_id = empty($this->getParam('medium_id'))? null : intval($this->getParam('medium_id'));
         $article->status_code = $this->getParam('status_code', StatusCode::LOCKED);
         $article->headline = $this->getParam('headline', '');
         $article->teaser = $this->getParam('teaser', '');
