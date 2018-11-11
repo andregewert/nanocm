@@ -17,6 +17,10 @@ use Ubergeek\NanoCm\StatusCode;
     <input type="text" id="edit_list_title" value="<?php echo $this->htmlEncode($this->list->title); ?>" class="autofocus">
 </div>
 <div class="row">
+    <label for="edit_list_key">Eindeutiger Schl&uuml;ssel</label>
+    <input type="text" id="edit_list_key" value="<?php echo $this->htmlEncode($this->list->key); ?>">
+</div>
+<div class="row">
     <label for="edit_list_status_code">Status</label>
     <select id="edit_list_status_code" size="1">
         <?php foreach ($this->availableStatusCodes as $code) : ?>

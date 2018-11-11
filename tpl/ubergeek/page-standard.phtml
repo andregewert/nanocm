@@ -15,41 +15,65 @@
         <div class="frame bg-header-light">
             <div class="container brand">
                 <a href="/"><img src="/tpl/ubergeek/img/ubergeek-logo.png" width="368" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
-                <nav class="metanavigation">
-                    <ul>
-                        <li><a href="/meta/kontakt.html">Kontakt</a></li>
-                        <li>&bullet;&nbsp;<a href="/meta/datenschutz.html">Datenschutz</a></li>
-                    </ul>
-                </nav>
+                <?php echo $this->includeUserTemplate('navigation-meta.phtml'); ?>
             </div>
         </div>
-
         <?php echo $this->includeUserTemplate('navigation-main.phtml'); ?>
-
         <div class="frame bg-frame">
-            <div class="container" style="height: 2rem"></div>
+            <div class="container" style="height: 1.2rem"></div>
             <?php echo $this->getContent(); ?>
             <div class="container" style="height: 100px"></div>
         </div>
         <div class="frame bg-header-light">
             <div class="container">
                 <footer class="clearfix">
-                    <div class="spacing column-3">
+                    <div class="spacing column-4">
                         <h1>Neueste Artikel</h1>
+                        <?php if (count(($articles = $this->orm->getLatestArticles(6))) > 0) : ?>
+                            <ul>
+                                <?php foreach ($articles as $article) : ?>
+                                    <li>
+                                        <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.')); ?>
+                                        <a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else : ?>
+                            <p>Noch keine Artikel</p>
+                        <?php endif; ?>
                     </div>
-                    <div class="spacing column-3">
+                    <div class="spacing column-4">
                         <h1>Kommentare</h1>
+                        <?php if (count(($comments = $this->orm->getLatestComments())) > 0) : ?>
+                            <ul>
+                                <?php foreach ($comments as $comment) : ?>
+                                    <li>
+                                        <?php echo $comment->creation_timestamp->format('d.m.'); ?>
+                                        <a href="javascript:void(0)">
+                                            <?php echo $this->htmlEncode($comment->username); ?>
+                                            zu
+                                            <?php echo $this->htmlEncode($this->orm->getArticleHeadlineById($comment->article_id)); ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php else : ?>
+                            <p>Noch keine Kommentare</p>
+                        <?php endif; ?>
                     </div>
-                    <div class="spacing column-3">
-                        <h1>Kontakt</h1>
-                    </div>
-                    <div class="spacing column-3">
+                    <div class="spacing column-4">
                         <h1>Soziale Medien</h1>
+                        <ul>
+                            <li><a class="extern" href="http://instagram.com/agewert">Instagram</a></li>
+                            <li><a class="extern" href="https://www.twitter.com/agewert">Twitter</a></li>
+                            <li><a class="extern" href="https://www.facebook.com/andre.gewert">Facebook</a></li>
+                        </ul>
                     </div>
-                    <div style="clear: both" class="spacing">
+                    <div style="clear: both; text-align: center; padding-top: 3rem" class="spacing">
                         <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
                             <?php if ($this->ncm->isUserLoggedIn()) : ?>
-                                <a href="/logout.php">Abmelden</a>
+                                <a href="/admin/index.php">Verwaltung</a>
+                                &bullet;&nbsp;<a href="/logout.php">Abmelden</a>
                             <?php else : ?>
                                 <a href="/login.php">Anmelden</a>
                             <?php endif; ?>
@@ -58,7 +82,6 @@
                 </footer>
             </div>
         </div>
-
         <script src="/ncm/js/jquery-3.3.1.min.js"></script>
     </body>
 </html>

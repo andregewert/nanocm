@@ -33,30 +33,42 @@ class UserList {
 
     /**
      * Eindeutige Datensatz-ID
+     *
      * @var integer
      */
     public $id;
 
     /**
+     * Eindeutiger Schlüssel zur einfachereren Identifizierung von Listen
+     *
+     * @var string
+     */
+    public $key;
+
+    /**
      * Titel bzw. Name der Liste
+     *
      * @var string
      */
     public $title;
 
     /**
      * Statuscode des Datensatzes
+     *
      * @var integer
      */
     public $status_code;
 
     /**
      * Erstellungszeitpunkt des Datensatzes
+     *
      * @var \DateTime
      */
     public $creation_timestamp;
 
     /**
      * Zeitpunkt der letzten Änderung des Datensatzes
+     *
      * @var \DateTime
      */
     public $modification_timestamp;
@@ -68,6 +80,7 @@ class UserList {
 
     /**
      * Erstellt ein UserList-Objekt aus dem übergebenen PDO-Statement
+     *
      * @param \PDOStatement $stmt
      * @return UserList|null
      */

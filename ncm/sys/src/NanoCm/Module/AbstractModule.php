@@ -356,8 +356,10 @@ abstract class AbstractModule implements
         $value = $default;
         if ($this->isParamExisting($name)) {
             $value = $this->getParam($name, $default);
+            if ($value == '') $value = null;
         } elseif ($this->ncm->session != null && $this->ncm->session->isVarExisting($name)) {
             $value = $this->ncm->session->getVar($name, $default);
+            if ($value == '') $value = null;
         }
 
         if ($this->ncm->session != null) {

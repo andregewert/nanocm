@@ -1,0 +1,32 @@
+<?php
+/* @var $this Ubergeek\NanoCm\Module\CoreModule */
+$lastYear = null;
+$lastMonth = null;
+$first = true;
+?>
+<div class="container spacing">
+    <h1>Archiv</h1>
+    <?php if (is_array($this->articles) && count($this->articles) > 0) : ?>
+        <?php foreach ($this->articles as $article) : ?>
+            <?php $pubDate = ($article->publishing_timestamp == null)? $article->start_timestamp : $article->publishing_timestamp; ?>
+            <?php if ($pubDate->format('Y') != $lastYear || $pubDate->format('m') != $lastMonth) : ?>
+                <?php if (!$first) : ?>
+                    </ul>
+                <?php endif; ?>
+                <h2><?php echo $this->htmlEncode($pubDate->format('F Y')); ?></h2>
+                <ul>
+            <?php endif; ?>
+            <li>
+                <?php echo $article->publishing_timestamp->format('d.m.Y'); ?>
+                <a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h2>
+            </li>
+            <?php
+                $lastMonth = $pubDate->format('m');
+                $lastYear = $pubDate->format('Y');
+                $first = false;
+            ?>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <p>&mdash;&nbsp;Keine Artikel gefunden&nbsp;&mdash;</p>
+    <?php endif; ?>
+</div>

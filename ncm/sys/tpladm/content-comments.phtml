@@ -219,7 +219,12 @@
                 if (confirm('Wollen Sie die ausgewählten Einstellungen wirklich endgültig löschen?')) {
                     ncm.showDefaultLoadingIndicator();
                     $.ajax('/admin/comments/ajax/delete', {
-
+                        cache:      false,
+                        type:       'POST',
+                        dataType:   'JSON',
+                        data:       {
+                            ids:    ids
+                        }
                     }).always(function() {
                         ncm.hideDefaultLoadingIndicator();
                         app.refresh();

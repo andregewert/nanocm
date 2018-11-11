@@ -99,7 +99,7 @@ class AdminCommentsModule extends AbstractAdminModule {
                     case 'delete':
                         $ids = $this->getParam('ids');
                         if (is_array($ids)) {
-                            $this->orm->deleteCommentById();
+                            $this->orm->deleteCommentsById($ids);
                         }
                         $content = json_encode(true);
                         break;

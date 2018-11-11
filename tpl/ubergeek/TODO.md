@@ -7,6 +7,8 @@ Webserver direkt abrufbar sind
 
 # Offene Punkte ubergeek.de
 
+- Vernünftige Fehlerseiten gestalten
 - Klassen und brauchbare Styles vergeben für Sidebars
 - Druck-Styles
 - Umbruchpunkte definieren für bessere responsiveness
+- Formular-Style definieren

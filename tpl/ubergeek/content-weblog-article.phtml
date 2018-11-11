@@ -1,11 +1,11 @@
 <?php
 /* @var $this Ubergeek\NanoCm\Module\CoreModule */
 $medium = null;
-$imgFormat = null;
+$format = null;
 $class = ($this->article->articleType instanceof \Ubergeek\NanoCm\Definition)? $this->article->articleType->value : '';
 
 if (!empty($this->article->medium_id)) {
-    if (($imgFormat = $this->orm->getImageFormatByKey('banner')) !== null) {
+    if (($format = $this->orm->getImageFormatByKey('banner')) !== null) {
         $medium = $this->orm->getMediumById($this->article->medium_id);
     }
 }
@@ -14,13 +14,24 @@ if (!empty($this->article->medium_id)) {
 <div class="container spacing <?php echo $class; ?>">
     <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
 
-    <?php if ($imgFormat != null && $medium != null) : ?>
-        <img src="<?php echo $this->htmlEncode($medium->getImageUrl($imgFormat->key)); ?>" alt=""
+    <?php if ($format != null && $medium != null) : ?>
+        <img src="<?php echo $this->htmlEncode($medium->getImageUrl($format->key)); ?>"
+             class="<?php echo $this->htmlEncode($format->key); ?>"
              title="<?php echo $this->htmlEncode($medium->title); ?>"
-            <?php if ($imgFormat->width > 0) echo "width=\"$imgFormat->width\""; ?>
-            <?php if ($imgFormat->height > 0) echo "height=\"$imgFormat->height\""; ?>
-        >
+            <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+            <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
     <?php endif; ?>
 
     <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
+
+    <div class="articlefooter">
+        Ver&ouml;ffentlicht von
+        <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
+        am
+        <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
+        &bullet;
+        <a href="javascript:void(0)">Kommentieren</a>
+        &bullet;
+        <a href="javascript:void(0)">Twittern</a>
+    </div>
 </div>

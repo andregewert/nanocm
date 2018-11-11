@@ -4,36 +4,40 @@ use Ubergeek\NanoCm\StatusCode;
 ?>
     <table class="list">
         <thead>
-        <tr>
-            <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
-            <th>Titel</th>
-            <th class="textright">Anlagedatum</th>
-            <th class="textright">&Auml;nderungsdatum</th>
-            <th>Status</th>
-        </tr>
+            <tr>
+                <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+                <th>ID</th>
+                <th>Schl&uuml;ssel</th>
+                <th>Titel</th>
+                <th class="textright">Anlagedatum</th>
+                <th class="textright">&Auml;nderungsdatum</th>
+                <th>Status</th>
+            </tr>
         </thead>
         <tbody>
-        <?php if (is_array($this->lists) && count($this->lists) > 0) : ?>
-            <?php foreach ($this->lists as $list) : ?>
-                <tr>
-                    <td style="text-align: center">
-                        <input type="checkbox" class="selection" value="<?php echo $list->id; ?>" style="text-align: center">
-                    </td>
-                    <td><a href="/admin/lists/listitems/<?php echo intval($list->id); ?>"><?php echo $this->htmlEncode($list->title); ?></a></td>
-                    <td class="textright pre">
-                        <?php echo $list->creation_timestamp->format('Y-m-d H:i'); ?>
-                    </td>
-                    <td class="textright pre">
-                        <?php echo $list->modification_timestamp->format('Y-m-d H:i'); ?>
-                    </td>
-                    <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($list->status_code)); ?></td>
+            <?php if (is_array($this->lists) && count($this->lists) > 0) : ?>
+                <?php foreach ($this->lists as $list) : ?>
+                    <tr>
+                        <td style="text-align: center">
+                            <input type="checkbox" class="selection" value="<?php echo $list->id; ?>" style="text-align: center">
+                        </td>
+                        <td class="textright pre"><?php echo $list->id; ?></td>
+                        <td><?php echo $this->htmlEncode($list->key); ?></td>
+                        <td><a href="/admin/lists/listitems/<?php echo intval($list->id); ?>"><?php echo $this->htmlEncode($list->title); ?></a></td>
+                        <td class="textright pre">
+                            <?php echo $list->creation_timestamp->format('Y-m-d H:i'); ?>
+                        </td>
+                        <td class="textright pre">
+                            <?php echo $list->modification_timestamp->format('Y-m-d H:i'); ?>
+                        </td>
+                        <td><?php echo $this->htmlEncode(StatusCode::convertStatusId($list->status_code)); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <tr class="noresult">
+                    <td colspan="7">Keine Listen gefunden</td>
                 </tr>
-            <?php endforeach; ?>
-        <?php else : ?>
-            <tr class="noresult">
-                <td colspan="5">Keine Listen gefunden</td>
-            </tr>
-        <?php endif; ?>
+            <?php endif; ?>
         </tbody>
     </table>
 <?php $this->includeUserTemplate('blocks/list-paging.phtml'); ?>

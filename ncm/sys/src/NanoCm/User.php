@@ -97,10 +97,15 @@ class User {
 
     /**
      * Gibt den vollständigen Namen im Format Nachname, Vorname zurück
+     *
+     * @param bool $lastNameFirst
      * @return string
      */
-    public function getFullName() : string {
-        return $this->lastname . ', ' . $this->firstname;
+    public function getFullName(bool $lastNameFirst = true) : string {
+        if ($lastNameFirst) {
+            return $this->lastname . ', ' . $this->firstname;
+        }
+        return $this->firstname . ' ' . $this->lastname;
     }
     
     /**

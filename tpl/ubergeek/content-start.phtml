@@ -1,42 +1,53 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 /* @var $latestArticles \Ubergeek\NanoCm\Article[] */
-$latestArticles = $this->orm->getLatestArticles();
+$latestArticles = $this->orm->getLatestArticles(7);
 ?>
 
 <?php if (count($latestArticles) >= 1) : ?>
-    <?php $article = array_shift($latestArticles); ?>
-
-    <div class="container spacing">
-        <?php if (!empty($article->teaser)) : ?>
-            <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
-            <div class="lead">
-                <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
-            </div>
-            <p><a class="btn btn-primary btn-lg" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>" role="button">Weiterlesen</a></p>
-        <?php else : ?>
-            <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
-            <?php echo $this->ncm->convertFormattedText($article->content); ?>
-        <?php endif; ?>
-    </div>
-
-    <?php if (count($latestArticles) > 0) : ?>
-        <div class="frame">
-            <div class="container">
-                <?php for ($i = 0; $i < 3; $i++) : ?>
-                    <?php if (($article = array_shift($latestArticles)) !== null) : ?>
-                        <div class="column-4 spacing">
-                            <h2><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h2>
-                            <?php if (!empty($article->teaser)) : ?>
-                                <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
-                            <?php endif; ?>
-                            <p><a class="btn btn-secondary" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>" role="button">Weiterlesen</a></p>
-                        </div>
+    <?php while (($article = array_shift($latestArticles)) != null) : ?>
+        <?php
+            $medium = null;
+            $format = null;
+        ?>
+        <div class="container spacing">
+            <?php if (!empty($article->teaser)) : ?>
+                <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
+                <div class="lead">
+                    <?php
+                        if (!empty($article->medium_id)) {
+                            if (($format = $this->orm->getImageFormatByKey('thumb')) !== null) {
+                                $medium = $this->orm->getMediumById($article->medium_id);
+                            }
+                        }
+                    ?>
+                    <?php if ($format != null && $medium != null) : ?>
+                        <img src="<?php echo $this->htmlEncode($medium->getImageUrl($format->key)); ?>"
+                             class="<?php echo $this->htmlEncode($format->key); ?>"
+                             title="<?php echo $this->htmlEncode($medium->title); ?>"
+                             style="float: right"
+                            <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                            <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
                     <?php endif; ?>
-                <?php endfor; ?>
+                    <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
+                </div>
+                <p><a class="readmore" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>">Weiterlesen</a></p>
+            <?php else : ?>
+                <h1><a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
+                <?php echo $this->ncm->convertFormattedText($article->content); ?>
+            <?php endif; ?>
+            <div class="articlefooter">
+                Ver&ouml;ffentlicht von
+                <?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id, false)); ?>
+                am
+                <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.Y')); ?>
+                &bullet;
+                <a href="javascript:void(0)">Kommentieren</a>
+                &bullet;
+                <a href="javascript:void(0)">Twittern</a>
             </div>
         </div>
-    <?php endif; ?>
+    <?php endwhile; ?>
 <?php else : ?>
     <div class="container spacing">
         <h1>Noch keine Inhalte vorhanden</h1>

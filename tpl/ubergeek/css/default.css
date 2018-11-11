@@ -40,6 +40,18 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "Oswald", sans-serif;
   font-weight: normal; }
 
+h1 {
+  font-size: 2.2em;
+  font-size: 2.2rem; }
+
+h2 {
+  font-size: 1.5em;
+  font-size: 1.5rem; }
+
+h3 {
+  font-size: 1.2em;
+  font-size: 1.2rem; }
+
 a {
   text-decoration: none;
   color: #0a94a9; }
@@ -130,6 +142,27 @@ footer {
   padding-bottom: 2em;
   padding-bottom: 2rem; }
 
+footer h1 {
+  font-size: 1.2em;
+  font-size: 1.2rem; }
+
+footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0; }
+
+.articlefooter {
+  /*
+  background-image: url('../img/paragraph.gif');
+  background-position: center;
+  background-repeat: no-repeat;
+  padding-bottom: 6rem;
+  */
+  border-top: solid #ddd 1px;
+  color: #888;
+  margin-bottom: 2.8em;
+  margin-bottom: 2.8rem; }
+
 /* </editor-fold> */
 /* <editor-fold desc="Main navigation"> */
 .navbar-bg {
@@ -172,7 +205,8 @@ nav.mainnavigation ul li.active a,
 nav.mainnavigation ul li a:hover {
   text-decoration: none;
   background-color: #0CADC6;
-  color: #000; }
+  color: #000;
+  /*    box-shadow: #2d5072 0 0 24px inset;*/ }
 
 nav.metanavigation {
   float: right;
@@ -209,5 +243,11 @@ div.container:after,
 
 .bg-page {
   background-color: #000; }
+
+/* </editor-fold> */
+/* <editor-fold desc="Styles for better responsiveness"> */
+img.banner {
+  max-width: 100% !important;
+  height: auto !important; }
 
 /* </editor-fold> */

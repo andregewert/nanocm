@@ -25,6 +25,7 @@ use Ubergeek\NanoCm\Media\ImageResizer;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
 use Ubergeek\NanoCm\Setting;
+use Ubergeek\NanoCm\Tag;
 
 /**
  * Kern(-Ausgabe-)modul des NanoCM.
@@ -53,6 +54,12 @@ class CoreModule extends AbstractModule {
     /** @var Article Gegebenenfalls anzuzeigender Weblog-Artikel */
     public $article = null;
 
+    /** @var Article[] Gegebenenfalls anzuzeigende Weblog-Artikel */
+    public $articles = null;
+
+    /** @var string Gesuchte Tags */
+    public $searchTags = null;
+
     // </editor-fold>
 
 
@@ -73,8 +80,9 @@ class CoreModule extends AbstractModule {
 
         switch ($parts[0]) {
             
-            // Artikelansicht oder Archiv
+            // Integrierte Weblog-Funktionen
             case 'weblog':
+                // Artikel-Ansicht
                 if ($parts[1] == 'article') {
                     $this->log->debug($parts[2]);
                     $this->article = $this->orm->getArticleById(intval($parts[2]));
@@ -82,9 +90,24 @@ class CoreModule extends AbstractModule {
                         $this->setTitle($this->getSiteTitle() . ' - ' . $this->article->headline);
                         $this->content = $this->renderUserTemplate('content-weblog-article.phtml');
                     }
-                } elseif ($parts[1] == 'archive') {
+                }
+
+                // Archiv
+                elseif ($parts[1] == 'archive') {
                     $this->setTitle($this->getSiteTitle() . ' - Archiv');
+                    $this->articles = $this->orm->getArticleArchive();
                     $this->content = $this->renderUserTemplate('content-weblog-archive.phtml');
+                }
+
+                // Suche nach Artikeln mit bestimmten Tags
+                elseif ($parts[1] == 'tags') {
+                    $this->setTitle($this->getSiteTitle() . ' - Aritkelsuche nach Stichworten');
+                    $this->searchTags = Tag::splitTagsString(urldecode($parts[2]));
+                    $filter = new Article();
+                    $filter->tags = $this->searchTags;
+                    // TODO Paginierung!
+                    $this->articles = $this->orm->searchArticles($filter);
+                    $this->content = $this->renderUserTemplate('content-weblog-tags.phtml');
                 }
                 break;
 
@@ -130,6 +153,7 @@ class CoreModule extends AbstractModule {
                 break;
             
             // Anmeldung
+            case 'login.html':
             case 'login.php':
                 $this->setTitle($this->getSiteTitle() . ' - Anmelden');
                 if ($this->getAction() == 'login') {
@@ -147,12 +171,14 @@ class CoreModule extends AbstractModule {
                 break;
             
             // Abmeldung
+            case 'logout.html':
             case 'logout.php':
                 $this->ncm->logoutUser();
                 $this->replaceMeta('location', 'index.php');
                 break;
             
             // Startseite
+            case 'index.html':
             case 'index.php';
                 $this->setTitle($this->getSiteTitle());
                 $this->content = $this->renderUserTemplate('content-start.phtml');

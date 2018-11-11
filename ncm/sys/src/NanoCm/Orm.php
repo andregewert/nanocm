@@ -948,7 +948,7 @@ class Orm {
 
         // Filterbedingungen
         if ($filter instanceof User) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :status_code ';
                 $params['status_code'] = $filter->status_code;
             }
@@ -1284,6 +1284,32 @@ class Orm {
     }
 
     /**
+     * Ermittelt die neuesten Kommentare
+     *
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Kommentare berücksichtig werden sollen
+     * @return Comment[]
+     */
+    public function getLatestComments(bool $releasedOnly = true) {
+        $comments = array();
+        $params = array();
+
+        $sql = 'SELECT * FROM comment WHERE 1 = 1 ';
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+        $sql .= ' ORDER BY creation_timestamp DESC ';
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        while (($row = Comment::fetchFromPdoStatement($stmt)) !== null) {
+            $comments[] = $row;
+        }
+        return $comments;
+    }
+
+    /**
      * Durchsucht die Kommentare
      *
      * @param Comment|null $filter Optionale Filterkriterien
@@ -1308,7 +1334,7 @@ class Orm {
 
         // Filterbedingungen einfügen
         if ($filter instanceof Comment) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :status_code ';
                 $params['status_code'] = $filter->status_code;
             }
@@ -1482,7 +1508,7 @@ class Orm {
 
         // Optionaler Filter
         if ($filter instanceof Articleseries) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :status_code ';
                 $params['status_code'] = $filter->status_code;
             }
@@ -1684,7 +1710,6 @@ class Orm {
 
             // Datei unter der Datensatz-ID im Dateisystem ablegen
             $filename = Util::createPath($this->mediadir, $id);
-            $this->log->debug("Saving medium file for $id");
             file_put_contents($filename, $data);
         } catch (\Throwable $ex) {
             throw new MediaException("Fehler beim Speichern der Mediendateien", 0, $ex);
@@ -1755,9 +1780,6 @@ class Orm {
      * @return int Datensatz-ID
      */
     public function saveMedium(Medium $medium) {
-        $this->log->debug("Saving medium ...");
-        $this->log->debug($medium);
-
         if ($medium->id == 0) $medium->id = null;
 
         $sql = 'REPLACE INTO medium (
@@ -2026,11 +2048,11 @@ class Orm {
 
         // Filterbedingungen einfügen
         if ($filter instanceof Medium) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :filter_status_code ';
                 $params['filter_status_code'] = $filter->status_code;
             }
-            if ($filter->entrytype != null) {
+            if ($filter->entrytype !== null) {
                 $sql .= ' AND entrytype = :filter_entrytype ';
                 $params['filter_entrytype'] = $filter->entrytype;
             }
@@ -2127,6 +2149,37 @@ class Orm {
     }
 
     /**
+     * Gibt eine Liste des vollständigen Artikel-Archivs zurück
+     *
+     * @return Article[]
+     */
+    public function getArticleArchive() {
+        $params = array();
+        $sql = 'SELECT * FROM article WHERE (
+                    start_timestamp <= datetime(CURRENT_TIMESTAMP, \'localtime\')
+                    AND (stop_timestamp IS NULL OR stop_timestamp >= datetime(CURRENT_TIMESTAMP, \'localtime\'))
+                ) AND status_code = :status_code
+                ORDER BY
+                    CASE WHEN
+                        publishing_timestamp IS NOT NULL THEN publishing_timestamp
+                        ELSE start_timestamp
+                    END DESC ';
+        $params['status_code'] = StatusCode::ACTIVE;
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        // Ergerbnis auslesen
+        $articles = array();
+        while (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
+            $article->tags = $this->getTagsByArticleId($article->id);
+            $article->articleType = $this->getDefinitionByTypeAndKey(Definition::TYPE_ARTICLE_TYPE, $article->articletype_key);
+            $articles[] = $article;
+        }
+        return $articles;
+    }
+
+    /**
      * Durchsucht die Artikel nach bestimmten Filterkriterien
      *
      * Wenn der Parameter $countonly auf true gesetzt wird, werden die Parameter $page und $limit nicht mehr
@@ -2152,7 +2205,27 @@ class Orm {
         } else {
             $sql = 'SELECT * ';
         }
-        $sql .= ' FROM article WHERE 1 = 1 ';
+        $sql .= ' FROM article ';
+
+        // Suche nach bestimmten Schlagworten / Tags
+        if ($filter instanceof Article && is_array($filter->tags)) {
+            $sql .= '
+                INNER JOIN (
+                SELECT article_id, count(*) AS c
+                FROM
+                tag_article
+                WHERE (1 = 0 ';
+            for ($i = 0; $i < count($filter->tags); $i++) {
+                $sql .= " OR tag = :tag_$i ";
+                $params["tag_$i"] = $filter->tags[$i];
+            }
+            $sql .= ')
+                GROUP BY article_id
+                ) AS tags ON
+                tags.article_id = article.id
+            ';
+        }
+        $sql .= ' WHERE 1 = 1 ';
 
         // Nur veröffentlichte Artikel berücksichtigen
         if ($releasedOnly) {
@@ -2166,7 +2239,7 @@ class Orm {
         
         // Filterbedingungen einfügen
         if ($filter instanceof Article) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :status_code ';
                 $params['status_code'] = $filter->status_code;
             }
@@ -2183,7 +2256,10 @@ class Orm {
 
         // Begrenzung der Ergebnismenge auf Anzeigeseiten
         if (!$countOnly) {
-            $sql .= 'ORDER BY start_timestamp DESC ';
+            $sql .= 'ORDER BY CASE WHEN
+                        publishing_timestamp IS NOT NULL THEN publishing_timestamp
+                        ELSE start_timestamp
+                    END DESC ';
             $page = intval($page) -1;
             if ($page < 0) $page = 0;
             $offset = $page *$this->pageLength;
@@ -2439,31 +2515,103 @@ class Orm {
     // <editor-fold desc="Listen">
 
     /**
-     * Ermittelt UserList-Eintrag mit der angegebenen Datensatz-ID
+     * Liest die Listendefinition mit der angegebenen Datensatz-ID aus
+     *
      * @param int $id Datensatz-ID
+     * @param boolean $releasedOnly Gibt an, ob ausschließlich freigeschaltete Datensätze berücksichtigt werden sollen
      * @return null|UserList Die gesuchte UserList
      */
-    public function getUserListById($id) {
+    public function getUserListById(int $id, bool $releasedOnly = true) {
+        $params = array();
+        $params['id'] = $id;
+
         $sql = 'SELECT * FROM userlist WHERE id = :id ';
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('id', $id);
+        $this->bindValues($stmt, $params);
         $stmt->execute();
         return UserList::fetchFromPdoStatement($stmt);
     }
 
     /**
-     * Ermittelt die zu einer UserList gehörenden UserListItem-Einträge
-     * @param int $userListId Die ID der übergeordneten UserList
-     * @param boolean $statusCode
-     * @param string $searchterm
-     * @return UserListItem[] Die zugehörigen UserListItem-Einträge
+     * Liest die Listendefinition mit dem angegebenen Key aus
+     *
+     * @param string key Datensatz-Schlüssel
+     * @param boolean $releasedOnly Gibt an, ob ausschließlich freigeschaltete Datensätze berücksichtigt werden sollen
+     * @return null|UserList Die gesuchte UserList
      */
-    public function getUserListItemsByUserListId($userListId, $statusCode = null, $searchterm = null) {
+    public function getUserListByKey(string $key, bool $releasedOnly = true) {
+        $params = array();
+        $params['key'] = $key;
+
+        $sql = 'SELECT * FROM userlist WHERE key = :key ';
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+        return UserList::fetchFromPdoStatement($stmt);
+    }
+
+    /**
+     * Ermittelt alle freigeschalteten Einträge einer benutzerdefinierten Liste (die ebenfalls freigeschaltet sein muss)
+     *
+     * Nicht freigeschaltete Listeneinträge werden ignoriert. Ist die Liste selbst nicht freigeschaltet, so werden
+     * generell keine Einträge ausgelesen. Wenn keine Ergebnisse ermittelt werden, so wird ein leeres Array zurück
+     * gegeben.
+     *
+     * @param int $userListId ID der benutzerdefinierten Liste
+     * @return UserListItem[] Ein Array mit den zugehörigen, freigeschalteten Listeneinträgen
+     */
+    public function getReleasedUserListItemsByListId($userListId) {
+        $items = array();
+        $userList = $this->getUserListById($userListId, true);
+        if ($userList != null) {
+            $items = $this->searchUserListItemsByUserListId($userListId, StatusCode::ACTIVE);
+        }
+        return $items;
+    }
+
+    /**
+     * Ermittelt alle freigeschalteten Einträge einer benutzerdefinierten Liste (die ebenfalls freigeschaltet sein muss)
+     *
+     * Nicht freigeschaltete Listeneinträge werden ignoriert. Ist die Liste selbst nicht freigeschaltet, so werden
+     * generell keine Einträge ausgelesen. Wenn keine Ergebnisse ermittelt werden, so wird ein leeres Array zurück
+     * gegeben.
+     *
+     * @param string $userListKey Key der benutzerdefinierten Liste
+     * @return UserListItem[] Ein Array mit den zugehörigen, freigeschalteten Listeneinträgen
+     */
+    public function getReleasedUserListItemsByListKey(string $userListKey) {
+        $items = array();
+        $userList = $this->getUserListByKey($userListKey, true);
+        if ($userList != null) {
+            $items = $this->searchUserListItemsByUserListId($userList->id, StatusCode::ACTIVE);
+        }
+        return $items;
+    }
+
+    /**
+     * Ermittelt die zu einer UserList gehörenden UserListItem-Einträge
+     *
+     * @param int $userListId Die ID der übergeordneten UserList
+     * @param bool|null $statusCode Optionale Einschränkung auf Datensätze mit diesem Status-Code
+     * @param string|null $searchterm Optionaler Suchbegriff
+     * @return UserListItem[] Die gefundenen UserListItem-Einträge
+     */
+    public function searchUserListItemsByUserListId($userListId, $statusCode = null, $searchterm = null) {
         $params = array();
         $params['userlistid'] = $userListId;
 
         $sql = 'SELECT * FROM userlistitem WHERE userlist_id = :userlistid ';
-        if ($statusCode != null) {
+        if ($statusCode !== null) {
             $sql .= ' AND status_code = :status_code ';
             $params['status_code'] = $statusCode;
         }
@@ -2486,40 +2634,73 @@ class Orm {
         return $userListItems;
     }
 
+    /**
+     * Setzt den Status-Code für einen bestimmten Listeneintrag auf den angegebenen Wert
+     *
+     * @param int $id Datensatz-ID des zu ändernden Listeneintrags
+     * @param int $status_code Neuer Status-Code
+     * @return bool true bei Erfolg
+     */
     public function setUserListItemStatusCodeById($id, $status_code) {
         $sql = 'UPDATE userlistitem SET status_code = :status_code WHERE id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('status_code', $status_code);
         $stmt->bindValue('id', $id);
-        $stmt->execute();
+        return $stmt->execute();
     }
 
+    /**
+     * Setzt den Status-Code für mehrere Listeneinträge auf den angegebenen Wert
+     *
+     * @param int[] $ids Datensatz-IDs der zu ändernden Listeneinträge
+     * @param int $status_code Neuer Status-Code
+     * @return void
+     */
     public function setUserListItemsStatusCodeById(array $ids, $status_code) {
         foreach ($ids as $id) {
             $this->setUserListItemStatusCodeById($id, $status_code);
         }
     }
 
-    public function getUserListItemById($id) {
+    /**
+     * Liest einen Listeneintrag anhand seiner ID aus.
+     * Standardmäßig werden ausschließlich freigeschaltete Einträge berücksichtigt.
+     * Dieses Verhalten kann mit dem Parameter $releasedOnly gesteuert werden.
+     *
+     * @param $id Datensatz-ID des gesuchten Listeneintrags
+     * @param bool $releasedOnly Gibt ab, ob ausschließlich freigeschaltete Einträge berücksichtigt werden sollen
+     * @return null|UserListItem Der gesuchte Datensatz oder null
+     */
+    public function getUserListItemById($id, $releasedOnly = true) {
+        $params = array();
+        $params['id'] = $id;
+
         $sql = 'SELECT * FROM userlistitem WHERE id = :id ';
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
         $stmt = $this->basedb->prepare($sql);
-        $stmt->bindValue('id', $id);
+        $this->bindValues($stmt, $params);
         $stmt->execute();
+
         return UserListItem::fetchFromPdoStatement($stmt);
     }
 
     /**
      * Speichert den übergebenen UserList-Datensatz in der Datenbank
+     *
      * @param UserList $list Die zu speichernde UserList
      * @return int Die Datensatz-ID
      */
     public function saveUserList(UserList $list) {
         if ($list->id == 0) $list->id = null;
 
-        $sql = 'REPLACE INTO userlist (id, title, status_code, creation_timestamp)
-                VALUES (:id, :title, :status_code, :creation_timestamp)';
+        $sql = 'REPLACE INTO userlist (id, key, title, status_code, creation_timestamp)
+                VALUES (:id, :key, :title, :status_code, :creation_timestamp)';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $list->id);
+        $stmt->bindValue('key', $list->key);
         $stmt->bindValue('title', $list->title);
         $stmt->bindValue('status_code', $list->status_code);
         $stmt->bindValue('creation_timestamp', ($list->creation_timestamp == null)? null : $list->creation_timestamp->format('Y-m-d H:i:s'));
@@ -2530,6 +2711,7 @@ class Orm {
 
     /**
      * Speichert den übergebenen UserListItem-Eintrag in der Datenbank
+     *
      * @param UserListItem $item Der zu speichernde UserListItem-Eintrag
      * @return int Die Datensatz-ID
      */
@@ -2554,6 +2736,7 @@ class Orm {
 
     /**
      * Setzt des Status-Code für einen UserList-Eintrag auf den angegebenen Wert
+     *
      * @param int $id Datensatz-ID des zu ändernden UserList-Eintrags
      * @param int $status_code Der neue Status-Code
      * @return void
@@ -2568,6 +2751,7 @@ class Orm {
 
     /**
      * Setzt den Status-Codes mehrerer UserList-Einträge auf den angegebenen Wert
+     *
      * @param array $ids Die Datensatz-IDs der zu ändernden UserList-Einträge
      * @param int $status_code Der neue Status-Code
      * @return void
@@ -2596,7 +2780,9 @@ class Orm {
 
     /**
      * Löscht mehrere UserList-Einträge anhand ihrer IDs
+     *
      * @param array $ids Datensatz-IDs der zu löschenden UserList-Einträge
+     * @return void
      */
     public function deleteUserListsById(array $ids) {
         foreach ($ids as $id) {
@@ -2606,17 +2792,20 @@ class Orm {
 
     /**
      * Löscht einen UserListItem-Datensatz anhand seiner Datensatz-ID
+     *
      * @param int $id Datensatz-ID des zu löschenden UserListItem-Eintrags
+     * @return bool true bei Erfolg
      */
     public function deleteUserListItemById($id) {
         $sql = 'DELETE FROM userlistitem WHERE id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $id);
-        $stmt->execute();
+        return $stmt->execute();
     }
 
     /**
      * Löscht mehrere UserListItem-Datensätze anhand ihrer Datensatz-IDs
+     *
      * @param array $ids Datensatz-IDs der zu löschenden UserListItems
      * @return void
      */
@@ -2628,24 +2817,26 @@ class Orm {
 
     /**
      * Löscht alle UserListItem-Einträge, die zu der angegebenen UserList gehören
+     *
      * @param int $userListId Datensatz-ID der zugehörigen UserList
-     * @return void
+     * @return bool true bei Erfolg
      */
     public function deleteUserListItemsByUserListId($userListId) {
         $sql = 'DELETE FROM userlistitem WHERE userlist_id = :userlistid ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('userlistid', $userListId);
-        $stmt->execute();
+        return $stmt->execute();
     }
 
     /**
-     * Durchsucht die UserListem anhand verschiedener Suchkriterien
-     * @param UserList|null $filter
-     * @param string $searchterm
-     * @param bool $countOnly
-     * @param int $page
-     * @param int $limit
-     * @return UserList[]|int
+     * Durchsucht die benutzerdefinierten Listen anhand verschiedener Suchkriterien
+     *
+     * @param UserList|null $filter Optionale Filterkriterien
+     * @param string|null $searchterm Suchbegriff
+     * @param bool $countOnly Gibt an, ob nur die Anzahl der Ergebnisse zurück gegeben werden soll
+     * @param int|null $page Zu ermittelnde Seitennummer
+     * @param int|null $limit Maximale Anzahl auszulesender Datensätze
+     * @return UserList[]|int Die Liste der gefundenen Listendefinitionen oder die Anzahl der Suchergebnisse
      */
     public function searchUserLists(UserList $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $userLists = array();
@@ -2662,7 +2853,7 @@ class Orm {
 
         // Filterbedingungen
         if ($filter instanceof UserList) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :status_code ';
                 $params['status_code'] = $filter->status_code;
             }
@@ -2735,7 +2926,7 @@ class Orm {
 
         // Filterbedingungen
         if ($filter instanceof Page) {
-            if ($filter->status_code != null) {
+            if ($filter->status_code !== null) {
                 $sql .= ' AND status_code = :status_code ';
                 $params['status_code'] = $filter->status_code;
             }
@@ -3006,13 +3197,15 @@ class Orm {
 
     /**
      * Konvertiert eine Benutzer-ID in den zugehörigen Anzeigenamen
+     *
      * @param int $userId
+     * @param bool $lastNameFirst
      * @return string
      */
-    public function convertUserIdToName(int $userId) : string {
+    public function convertUserIdToName(int $userId, bool $lastNameFirst = true) : string {
         $user = $this->getCachedUser($userId);
         if ($user == null) return '';
-        return $user->getFullName();
+        return $user->getFullName($lastNameFirst);
     }
 
     /**

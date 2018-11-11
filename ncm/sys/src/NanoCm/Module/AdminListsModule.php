@@ -165,7 +165,7 @@ class AdminListsModule extends AbstractAdminModule {
 
                     // Liste bearbeiten
                     case 'edit':
-                        $this->list = $this->orm->getUserListById($this->getParam('id'));
+                        $this->list = $this->orm->getUserListById($this->getParam('id'), false);
                         if ($this->list == null) {
                             $this->list = new UserList();
                             $this->list->title = 'Neue Liste';
@@ -176,7 +176,7 @@ class AdminListsModule extends AbstractAdminModule {
 
                     // Listeneintrag bearbeiten
                     case 'edititem':
-                        $this->listItem = $this->orm->getUserListItemById($this->getParam('id'));
+                        $this->listItem = $this->orm->getUserListItemById($this->getParam('id'), false);
                         if ($this->listItem == null) {
                             $this->listItem = new UserListItem();
                             $this->listItem->userlist_id = intval($this->getParam('userlist_id'));
@@ -201,9 +201,9 @@ class AdminListsModule extends AbstractAdminModule {
 
                     // Auflistung von Listeneinträgen
                     case 'listitems':
-                        $this->list = $this->orm->getUserListById($this->getParam('id'));
+                        $this->list = $this->orm->getUserListById($this->getParam('id'), false);
                         if ($this->list != null) {
-                            $this->listItems = $this->orm->getUserListItemsByUserListId(
+                            $this->listItems = $this->orm->searchUserListItemsByUserListId(
                                 $this->list->id,
                                 $this->searchStatusCode,
                                 $this->searchTerm
@@ -217,7 +217,7 @@ class AdminListsModule extends AbstractAdminModule {
 
             // Listeneinträge auflisten
             case 'listitems':
-                $this->list = $this->orm->getUserListById($this->getRelativeUrlPart(3));
+                $this->list = $this->orm->getUserListById($this->getRelativeUrlPart(3), false);
                 $content = $this->renderUserTemplate('content-lists-listitems.phtml');
                 break;
 
@@ -237,13 +237,15 @@ class AdminListsModule extends AbstractAdminModule {
     private function createUserListFromRequest() : UserList {
         $list = new UserList();
         $id = intval($this->getParam('id'));
-        $oldList = ($id == 0)? null : $this->orm->getUserListById($id);
+        $oldList = ($id == 0)? null : $this->orm->getUserListById($id, false);
 
         if ($oldList != null) {
             $list->id = $oldList->id;
+            $list->key = $oldList->key;
             $list->creation_timestamp = $oldList->creation_timestamp;
             $list->modification_timestamp = $oldList->modification_timestamp;
         }
+        $list->key = $this->getParam('key');
         $list->title = $this->getParam('title');
         $list->status_code = intval($this->getParam('status_code'));
         return $list;
@@ -251,7 +253,7 @@ class AdminListsModule extends AbstractAdminModule {
 
     private function createUserListItemFromRequest() : UserListItem {
         $id = intval($this->getParam('id'));
-        $oldItem = ($id == 0)? null : $this->orm->getUserListItemById($id);
+        $oldItem = ($id == 0)? null : $this->orm->getUserListItemById($id, false);
 
         if ($oldItem != null) {
             $listitem = $oldItem;
