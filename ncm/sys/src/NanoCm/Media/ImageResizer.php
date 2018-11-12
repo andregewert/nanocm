@@ -137,6 +137,8 @@ class ImageResizer
             $destWidth = $format->width;
             $destHeight = $format->height;
 
+            // TODO jeweils beide Seiten soweit skalieren, dass beide passen!
+
             // Breite ist die lange Seite
             if ($destWidth > $destHeight || ($destWidth == $destHeight && $originalWidth < $originalHeight)) {
                 if ($originalWidth != $destWidth) {

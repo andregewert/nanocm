@@ -30,7 +30,7 @@
                     <div class="spacing column-4">
                         <h1>Neueste Artikel</h1>
                         <?php if (count(($articles = $this->orm->getLatestArticles(6))) > 0) : ?>
-                            <ul>
+                            <ul class="nobullets">
                                 <?php foreach ($articles as $article) : ?>
                                     <li>
                                         <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.')); ?>
@@ -45,7 +45,7 @@
                     <div class="spacing column-4">
                         <h1>Kommentare</h1>
                         <?php if (count(($comments = $this->orm->getLatestComments())) > 0) : ?>
-                            <ul>
+                            <ul class="nobullets">
                                 <?php foreach ($comments as $comment) : ?>
                                     <li>
                                         <?php echo $comment->creation_timestamp->format('d.m.'); ?>
@@ -63,7 +63,7 @@
                     </div>
                     <div class="spacing column-4">
                         <h1>Soziale Medien</h1>
-                        <ul>
+                        <ul class="nobullets">
                             <li><a class="extern" href="http://instagram.com/agewert">Instagram</a></li>
                             <li><a class="extern" href="https://www.twitter.com/agewert">Twitter</a></li>
                             <li><a class="extern" href="https://www.facebook.com/andre.gewert">Facebook</a></li>

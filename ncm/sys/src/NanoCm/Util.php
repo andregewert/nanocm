@@ -27,6 +27,15 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
+    public static function getTweetThisUrl($url, $title = null) : string {
+        $tweetUrl = 'https://twitter.com/home?status=';
+        if ($title != null) {
+            $tweetUrl .= urlencode($title . "\n");
+        }
+        $tweetUrl .= urlencode($url);
+        return $tweetUrl;
+    }
+
     public static function getDirectorySize($path){
         $bytestotal = 0;
         $path = realpath($path);
@@ -54,6 +63,7 @@ final class Util {
     /**
      * Fügt die übergebenen Pfadbestandteile mit dem System-Verzeichnistrenner
      * zu einer Pfadangabe zusammen
+     *
      * @param string ...$parts Pfadbestandteile
      * @return string Der zusammengesetzte Pfad
      */
@@ -64,6 +74,7 @@ final class Util {
     /**
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
+     *
      * @param string|null $string
      * @return string HTML-kodierter String
      */

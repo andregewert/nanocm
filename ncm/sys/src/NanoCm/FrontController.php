@@ -152,4 +152,14 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         }
         return '';
     }
+
+    public function createAbsoluteSiteLink(string $relativeLink) : string {
+        $url = $this->getHttpRequest()->requestUri->protocol . '://';
+        $url .= $this->getHttpRequest()->requestUri->host;
+        if ($this->ncm->relativeBaseUrl != '/') {
+            $url .= $this->ncm->relativeBaseUrl;
+        }
+        $url .= $relativeLink;
+        return $url;
+    }
 }

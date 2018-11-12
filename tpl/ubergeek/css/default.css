@@ -66,6 +66,11 @@ a img {
 tt, code, pre, textarea, kbd {
   font-family: "Anonymous Pro", DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace; }
 
+ul.nobullets {
+  list-style: none;
+  padding: 0;
+  margin: 0; }
+
 /* <editor-fold desc="Layout containers"> */
 div.frame {
   -moz-box-sizing: border-box;
@@ -77,6 +82,9 @@ div.container {
   margin-right: auto;
   width: 960px;
   max-width: 100%;
+  overflow: auto;
+  /* Prevent collapsing margins in safari */
+  padding-top: 0;
   clear: both;
   display: flow-root;
   -moz-box-sizing: border-box;
@@ -158,6 +166,8 @@ footer ul {
   background-repeat: no-repeat;
   padding-bottom: 6rem;
   */
+  font-size: 0.8em;
+  font-size: 0.8rem;
   border-top: solid #ddd 1px;
   color: #888;
   margin-bottom: 2.8em;
@@ -236,7 +246,8 @@ div.container:after,
   background-color: #333333; }
 
 .bg-frame {
-  background-color: #666; }
+  background-color: #666;
+  background-image: url("../img/grain.png"); }
 
 .bg-content {
   background-color: #fff; }

@@ -205,6 +205,6 @@ class Article {
     public function getArticleUrl() : string {
         return '/weblog/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
     }
-    
+
     // </editor-fold>
 }

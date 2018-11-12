@@ -22,12 +22,13 @@ $latestArticles = $this->orm->getLatestArticles(7);
                         }
                     ?>
                     <?php if ($format != null && $medium != null) : ?>
+                        <a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>">
                         <img src="<?php echo $this->htmlEncode($medium->getImageUrl($format->key)); ?>"
                              class="<?php echo $this->htmlEncode($format->key); ?>"
                              title="<?php echo $this->htmlEncode($medium->title); ?>"
-                             style="float: right"
+                             style="float: left; margin-right: 1rem; margin-top: 0.2rem; margin-bottom: 0.2rem"
                             <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
-                            <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
+                            <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
                     <?php endif; ?>
                     <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
                 </div>
@@ -42,9 +43,16 @@ $latestArticles = $this->orm->getLatestArticles(7);
                 am
                 <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.Y')); ?>
                 &bullet;
-                <a href="javascript:void(0)">Kommentieren</a>
+                <a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>#comments">Kommentieren</a>
                 &bullet;
-                <a href="javascript:void(0)">Twittern</a>
+                <a href="<?php echo $this->htmlEncode(
+                        \Ubergeek\NanoCm\Util::getTweetThisUrl(
+                                $this->frontController->createAbsoluteSiteLink(
+                                        $article->getArticleUrl()
+                                ),
+                                $article->headline
+                        )
+                ); ?>" target="_blank">Twittern</a>
             </div>
         </div>
     <?php endwhile; ?>

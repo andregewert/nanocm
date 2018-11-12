@@ -46,8 +46,8 @@
                 </p>
                 <p>
                     <label title="Offizieller Zeitpunkt der Veröffentlichung">Ver&ouml;ffentlichungsdatum</label>
-                    <input type="date" id="input_page_publishing_date" value="<?php if ($this->page->publishing_timestamp != null) echo $this->page->publishing_timestamp->format('Y-m-d'); ?>" tabindex="0" />
-                    <input type="time" id="input_page_publishing_time" value="<?php if ($this->page->publishing_timestamp != null) echo $this->page->publishing_timestamp->format('H:i'); ?>" tabindex="0" />
+                    <input type="date" style="width: 8rem" id="input_page_publishing_date" value="<?php if ($this->page->publishing_timestamp != null) echo $this->page->publishing_timestamp->format('Y-m-d'); ?>" tabindex="0" />
+                    <input type="time" style="width: 8rem" id="input_page_publishing_time" value="<?php if ($this->page->publishing_timestamp != null) echo $this->page->publishing_timestamp->format('H:i'); ?>" tabindex="0" />
                 </p>
                 <p>
                     <label title="Autor des Artikels">Autor</label>
@@ -59,13 +59,13 @@
                 <hr>
                 <p>
                     <label title="Zeitpunkt der Anlage">Anlage</label>
-                    <input type="date" readonly="readonly" id="input_page_creation_date" value="<?php if ($this->page->creation_timestamp != null) echo $this->page->creation_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
-                    <input type="time" readonly="readonly" id="input_page_creation_time" value="<?php if ($this->page->creation_timestamp != null) echo $this->page->creation_timestamp->format('H:i'); ?>" tabindex="-1" />
+                    <input type="date" style="width: 8rem" readonly="readonly" id="input_page_creation_date" value="<?php if ($this->page->creation_timestamp != null) echo $this->page->creation_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
+                    <input type="time" style="width: 8rem" readonly="readonly" id="input_page_creation_time" value="<?php if ($this->page->creation_timestamp != null) echo $this->page->creation_timestamp->format('H:i'); ?>" tabindex="-1" />
                 </p>
                 <p>
                     <label title="Zeitpunkt der letzten Speicherung">Zuletzt gespeichert</label>
-                    <input type="date" readonly="readonly" id="input_page_modification_date" value="<?php if ($this->page->modification_timestamp != null) echo $this->page->modification_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
-                    <input type="time" readonly="readonly" id="input_page_modification_time" value="<?php if ($this->page->modification_timestamp != null) echo $this->page->modification_timestamp->format('H:i'); ?>" tabindex="-1" />
+                    <input type="date" style="width: 8rem" readonly="readonly" id="input_page_modification_date" value="<?php if ($this->page->modification_timestamp != null) echo $this->page->modification_timestamp->format('Y-m-d'); ?>" tabindex="-1" />
+                    <input type="time" style="width: 8rem" readonly="readonly" id="input_page_modification_time" value="<?php if ($this->page->modification_timestamp != null) echo $this->page->modification_timestamp->format('H:i'); ?>" tabindex="-1" />
                 </p>
             </div>
 
