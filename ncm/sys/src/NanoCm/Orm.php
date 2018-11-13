@@ -2102,6 +2102,52 @@ class Orm {
     // <editor-fold desc="Article">
 
     /**
+     * Durchsucht die Artikeldatenbank nach bestimmten Artikeltypen
+     *
+     * @param string $articleTypeKey Der Key des gesuchten Artikeltyps
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel berücksichtigt werden sollen
+     * @param bool $exclude Gibt an, ob der angegebene Artikeltyp ausgeschlossen werden soll oder darauf eingegrenzt werden soll
+     * @param int $limit Maximale Anzahl der Suchergebnisse
+     * @return Article[]
+     */
+    public function getLatestArticlesByArticleType(string $articleTypeKey, $releasedOnly = true, $exclude = false, $limit = 5) {
+        $params = array();
+        $limit = intval($limit);
+        if ($limit <= 0) $limit = 5;
+        $op = ($exclude)? '<>' : '=';
+
+        $sql = "SELECT * FROM article WHERE articletype_key $op :articletype_key ";
+        $params['articletype_key'] = $articleTypeKey;
+
+        if ($releasedOnly) {
+            $sql .= " AND (
+                        start_timestamp <= datetime(CURRENT_TIMESTAMP, 'localtime')
+                        AND (stop_timestamp IS NULL OR stop_timestamp >= datetime(CURRENT_TIMESTAMP, 'localtime'))
+                    ) AND status_code = :status_code ";
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+
+        $sql .= "ORDER BY
+                    CASE WHEN
+                        publishing_timestamp IS NOT NULL THEN publishing_timestamp
+                        ELSE start_timestamp
+                    END DESC
+                LIMIT $limit ";
+
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        $articles = array();
+        while (($article = Article::fetchFromPdoStatement($stmt)) !== null) {
+            $article->tags = $this->getTagsByArticleId($article->id);
+            $article->articleType = $this->getDefinitionByTypeAndKey(Definition::TYPE_ARTICLE_TYPE, $article->articletype_key);
+            $articles[] = $article;
+        }
+        return $articles;
+    }
+
+    /**
      * Ermittelt die Headline eines bestimmten Artikels
      * @param int $articleId Artikel-ID
      * @return string|null
@@ -2150,6 +2196,8 @@ class Orm {
 
     /**
      * Gibt eine Liste des vollständigen Artikel-Archivs zurück
+     *
+     * Es werden hierbei ausschließlich freigeschaltete Artikel berücksichtigt!
      *
      * @return Article[]
      */
@@ -2311,6 +2359,7 @@ class Orm {
     
     /**
      * Gibt die neuesten freigeschalteten Artikel zurück
+     *
      * @param int $limit Maximale Anzahl zurückzugebender Artikel
      * @return Article[]
      */
@@ -2320,6 +2369,7 @@ class Orm {
 
     /**
      * Speichert einen Artikel in der Datenbank
+     *
      * @param Article $article Artikeldaten
      * @return int Datensatz-ID
      * @todo Zugriffsrechte prüfen

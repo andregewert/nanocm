@@ -1,0 +1,51 @@
+<?php
+/* @var $article \Ubergeek\NanoCm\Article */
+$medium = null;
+$format = null;
+?>
+<?php if ($article instanceof \Ubergeek\NanoCm\Article) : ?>
+<div class="container spacing">
+    <?php if (!empty($article->teaser)) : ?>
+        <h1><a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
+        <div class="lead">
+            <?php
+                if (!empty($article->medium_id) && ($format = $this->orm->getImageFormatByKey('thumb')) !== null) {
+                    $medium = $this->orm->getMediumById($article->medium_id);
+                }
+            ?>
+            <?php if ($format != null && $medium != null) : ?>
+                <a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>">
+                    <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                         class="<?php echo $this->htmlEncode($format->key); ?>"
+                         title="<?php echo $this->htmlEncode($medium->title); ?>"
+                         style="float: left; margin-right: 1rem; margin-top: 0.2rem; margin-bottom: 0.2rem"
+                        <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                        <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
+            <?php endif; ?>
+            <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
+        </div>
+        <p><a class="readmore" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>">Weiterlesen</a></p>
+    <?php else : ?>
+        <h1><a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
+        <?php echo $this->ncm->convertFormattedText($article->content); ?>
+    <?php endif; ?>
+
+    <div class="articlefooter">
+        Ver&ouml;ffentlicht von
+        <?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id, false)); ?>
+        am
+        <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.Y')); ?>
+        &bullet;
+        <a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>#comments">Kommentieren</a>
+        &bullet;
+        <a href="<?php echo $this->htmlEncode(
+            \Ubergeek\NanoCm\Util::getTweetThisUrl(
+                $this->frontController->createAbsoluteSiteLink(
+                    $article->getArticleUrl()
+                ),
+                $article->headline
+            )
+        ); ?>" target="_blank">Twittern</a>
+    </div>
+</div>
+<?php endif; ?>

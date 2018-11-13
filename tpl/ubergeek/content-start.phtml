@@ -2,6 +2,18 @@
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 /* @var $latestArticles \Ubergeek\NanoCm\Article[] */
 $latestArticles = $this->orm->getLatestArticles(7);
+$fullArticles = $this->orm->getLatestArticlesByArticleType('mini', true, true, 7);
+$miniArticles = $this->orm->getLatestArticlesByArticleType('mini', true, false, 7);
+
+//$this->log->debug($fullArticles);
+//$this->log->debug($miniArticles);
+?>
+
+<?php
+    if (count($fullArticles) >= 1) {
+        $article = array_shift($fullArticles);
+        //$this->includeUserTemplate('blocks/article-teaser-big.phtml');
+    }
 ?>
 
 <?php if (count($latestArticles) >= 1) : ?>
