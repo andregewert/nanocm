@@ -7,23 +7,23 @@
         <div class="toolbar">
             <span class="left">
                 <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Einstellung hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
+                    <img src="ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
                 </a>
                 <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Einstellung bearbeiten">
-                    <img src="/ncm/img/fatcow/16/toolbar_edit.png" alt="" width="16" height="16">Bearbeiten
+                    <img src="ncm/img/fatcow/16/toolbar_edit.png" alt="" width="16" height="16">Bearbeiten
                 </a>
                 <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Einstellungen l&ouml;schen">
-                    <img src="/ncm/img/fatcow/16/toolbar_delete.png" alt="" width="16" height="16">L&ouml;schen
+                    <img src="ncm/img/fatcow/16/toolbar_delete.png" alt="" width="16" height="16">L&ouml;schen
                 </a>
             </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif">
+                <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif">
 
                 <label for="input_searchTerm">Suche</label>
                 <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>">
 
                 <a class="button spaceleft" role="button" id="button_refresh" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                    <img class="imageonly" src="ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>
@@ -68,7 +68,7 @@
             ncm.showDefaultLoadingIndicator();
             if (typeof page === 'undefined') page = app.page;
 
-            $.ajax('/admin/settings/html/list', {
+            $.ajax('admin/settings/html/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
@@ -93,7 +93,7 @@
 
         app.editSetting = function(key) {
             let dlg = new ncm.InlinePopup(
-                '/admin/settings/html/edit/' + key, {
+                'admin/settings/html/edit/' + key, {
                     key: key
                 }, {
                     headline:   'Einstellung bearbeiten',
@@ -113,7 +113,7 @@
                         caption: 'Speichern',
                         clicked: function() {
                             ncm.showDefaultLoadingIndicator();
-                            $.ajax('/admin/settings/ajax/save', {
+                            $.ajax('admin/settings/ajax/save', {
                                 cache: false,
                                 type: 'POST',
                                 dataType: 'JSON',
@@ -151,7 +151,7 @@
             if (ids.length > 0) {
                 if (confirm('Wollen Sie die ausgewählten Einstellungen wirklich endgültig löschen?')) {
                     ncm.showDefaultLoadingIndicator();
-                    $.ajax('/admin/settings/ajax/delete', {
+                    $.ajax('admin/settings/ajax/delete', {
                         cache: false,
                         type: 'GET',
                         dataType: 'JSON',

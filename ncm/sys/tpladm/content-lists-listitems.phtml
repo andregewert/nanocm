@@ -10,23 +10,23 @@ use Ubergeek\NanoCm\StatusCode;
         <div class="toolbar">
             <span class="left">
                 <a id="button_back" class="button" href="javascript:void(0);" role="button" title="Zur&uuml;ck zur Listen-&Uuml;bersicht">
-                    <img src="/ncm/img/fatcow/16/arrow_left.png" alt="" width="16" height="16">Zur&uuml;ck
+                    <img src="ncm/img/fatcow/16/arrow_left.png" alt="" width="16" height="16">Zur&uuml;ck
                 </a>
                 <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Eintrag hinzuf&uuml;gen">
-                    <img src="/ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
+                    <img src="ncm/img/fatcow/16/add.png" alt="" width="16" height="16">Neu
                 </a>
                 <a id="button_unlock" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Eintrag freischalten">
-                    <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Entsperren
+                    <img src="ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Entsperren
                 </a>
                 <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hlten Eintrag sperren">
-                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
+                    <img src="ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
                 </a>
                 <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Eintrag l&ouml;schen">
-                    <img src="/ncm/img/fatcow/16/delete.png" alt="" width="16" height="16">L&ouml;schen
+                    <img src="ncm/img/fatcow/16/delete.png" alt="" width="16" height="16">L&ouml;schen
                 </a>
             </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif">
+                <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif">
 
                 <label for="input_searchTerm">Suche</label>
                 <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
@@ -40,7 +40,7 @@ use Ubergeek\NanoCm\StatusCode;
                 </select>
 
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                    <img class="imageonly" src="ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>
@@ -70,7 +70,7 @@ use Ubergeek\NanoCm\StatusCode;
                 app.refresh();
             });
             $('#button_back').click(function() {
-                document.location.href = '/admin/lists/';
+                document.location.href = 'admin/lists/';
             });
             $('#button_lock').click(function() {
                 app.lockSelected();
@@ -93,7 +93,7 @@ use Ubergeek\NanoCm\StatusCode;
          */
         app.refresh = function() {
             ncm.showDefaultLoadingIndicator();
-            $.ajax('/admin/lists/html/listitems', {
+            $.ajax('admin/lists/html/listitems', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
@@ -115,7 +115,7 @@ use Ubergeek\NanoCm\StatusCode;
 
         app.editListItem = function(id) {
             let dlg = new ncm.InlinePopup(
-                '/admin/lists/html/edititem', {
+                'admin/lists/html/edititem', {
                     id:             id,
                     userlist_id:    $('#input_list_id').val()
                 }, {
@@ -136,7 +136,7 @@ use Ubergeek\NanoCm\StatusCode;
                         caption:    'Speichern',
                         clicked:    function() {
                             ncm.showDefaultLoadingIndicator();
-                            $.ajax('/admin/lists/ajax/saveitem', {
+                            $.ajax('admin/lists/ajax/saveitem', {
                                 cache:      false,
                                 type:       'POST',
                                 dataType:   'JSON',
@@ -185,7 +185,7 @@ use Ubergeek\NanoCm\StatusCode;
             if (ids.length > 0) {
                 if (confirm('Wollen Sie die ausgewählten Listeneinträge wirklich endgültig löschen?')) {
                     ncm.showDefaultLoadingIndicator();
-                    $.ajax('/admin/lists/ajax/deleteitems', {
+                    $.ajax('admin/lists/ajax/deleteitems', {
                         cache:      false,
                         type:       'GET',
                         dataType:   'JSON',
@@ -207,7 +207,7 @@ use Ubergeek\NanoCm\StatusCode;
             let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
                 ncm.showDefaultLoadingIndicator();
-                $.ajax('/admin/lists/ajax/unlockitems', {
+                $.ajax('admin/lists/ajax/unlockitems', {
                     cache:      false,
                     type:       'GET',
                     dataType:   'JSON',
@@ -228,7 +228,7 @@ use Ubergeek\NanoCm\StatusCode;
             let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
                 ncm.showDefaultLoadingIndicator();
-                $.ajax('/admin/lists/ajax/lockitems', {
+                $.ajax('admin/lists/ajax/lockitems', {
                     cache:      false,
                     type:       'GET',
                     dataType:   'JSON',

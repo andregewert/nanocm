@@ -10,7 +10,7 @@
     <div class="container spacing">
         <div class="msgnote">
             <em>Hinweis:</em> Das F&uuml;hren von Zugriffsstatistiken ist aktuell ausgeschaltet.<br>
-            Aktivieren Sie diese Funktion in den <a href="/admin/settings/?searchTerm=system.stats">Einstellungen</a>.
+            Aktivieren Sie diese Funktion in den <a href="admin/settings/?searchTerm=system.stats">Einstellungen</a>.
         </div>
     </div>
 <?php endif; ?>
@@ -19,18 +19,18 @@
     <form onsubmit="module.refresh(); return false;">
         <div class="toolbar">
             <span class="left">
-                <a class="button" href="/admin/stats/" role="button" title="Zusammengefasste Statistiken anzeigen">
-                    <img src="/ncm/img/fatcow/16/summary_table.png" alt="" width="16" height="16">&Uuml;bersicht
+                <a class="button" href="admin/stats/" role="button" title="Zusammengefasste Statistiken anzeigen">
+                    <img src="ncm/img/fatcow/16/summary_table.png" alt="" width="16" height="16">&Uuml;bersicht
                 </a>
-                <a class="button" href="/admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
-                    <img src="/ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">Seitenzugriffe
+                <a class="button" href="admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
+                    <img src="ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">Seitenzugriffe
                 </a>
-                <a class="button" href="/admin/stats/archive" role="button" title="Archiv">
-                    <img src="/ncm/img/fatcow/16/package.png" alt="" width="16" height="16">Archiv
+                <a class="button" href="admin/stats/archive" role="button" title="Archiv">
+                    <img src="ncm/img/fatcow/16/package.png" alt="" width="16" height="16">Archiv
                 </a>
             </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+                <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif" />
 
                 <label for="inputsearchYear">Jahr</label>
                 <select id="select_searchYear" size="1">
@@ -51,7 +51,7 @@
                 </select>
 
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                    <img class="imageonly" src="ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>
@@ -83,7 +83,7 @@
         app.refresh = function() {
             ncm.showDefaultLoadingIndicator();
 
-            $.ajax('/admin/stats/html/list', {
+            $.ajax('admin/stats/html/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',

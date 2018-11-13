@@ -155,7 +155,7 @@ function Ncm() {
         });
 
         $(toolbarElem).find('.edit_insert_image').click(function() {
-            let dlg = new app.InlinePopup('/admin/media/html/imageselection', {
+            let dlg = new app.InlinePopup('admin/media/html/imageselection', {
                 param: 'param'
             }, {
                 options: 'options',
@@ -352,7 +352,7 @@ function Ncm() {
         dlg.controls.appendChild(dlg.closeButton);
 
         dummy = document.createElement('img');
-        dummy.src = '/ncm/img/fatcow/16/cross.png';
+        dummy.src = 'ncm/img/fatcow/16/cross.png';
         dummy.setAttribute('width', '16');
         dummy.setAttribute('height', '16');
         dummy.setAttribute('border', '0');

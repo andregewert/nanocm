@@ -23,23 +23,23 @@ use Ubergeek\NanoCm\StatusCode;
         <div class="toolbar">
             <span class="left">
                 <a id="button_addfolder" class="button" href="javascript:void(0);" role="button" title="Neuen Ordner erstellen">
-                    <img src="/ncm/img/fatcow/16/folder_add.png" alt="" width="16" height="16">Neu
+                    <img src="ncm/img/fatcow/16/folder_add.png" alt="" width="16" height="16">Neu
                 </a>
                 <a id="button_unlock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Medium freischalten">
-                    <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Freischalten
+                    <img src="ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Freischalten
                 </a>
                 <a id="button_lock" class="button" href="javascript:void(0)" role="button" title="Ausgew&auml;hltes Medium sperren">
-                    <img src="/ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
+                    <img src="ncm/img/fatcow/16/lock.png" alt="" width="16" height="16">Sperren
                 </a>
-                <a id="button_formats" class="button" href="/admin/media/formats/" role="button" title="Bildformate verwalten">
-                    <img src="/ncm/img/fatcow/16/images.png" alt="" width="16" height="16">Formate
+                <a id="button_formats" class="button" href="admin/media/formats/" role="button" title="Bildformate verwalten">
+                    <img src="ncm/img/fatcow/16/images.png" alt="" width="16" height="16">Formate
                 </a>
                 <a id="button_delete" class="button button-secondary" href="javascript:void(0);" role="button" title="Ausgew&auml;hltes Medium l&ouml;schen">
-                    <img src="/ncm/img/fatcow/16/delete.png" alt="" width="16" height="16">L&ouml;schen
+                    <img src="ncm/img/fatcow/16/delete.png" alt="" width="16" height="16">L&ouml;schen
                 </a>
             </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+                <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif" />
 
                 <label for="input_searchTerm">Suche</label>
                 <input id="input_searchTerm" type="text" autofocus="autofocus" value="<?php echo $this->htmlEncode($this->searchTerm); ?>" />
@@ -53,7 +53,7 @@ use Ubergeek\NanoCm\StatusCode;
                 </select>
 
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                    <img class="imageonly" src="ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>
@@ -105,7 +105,7 @@ use Ubergeek\NanoCm\StatusCode;
                         ncm.showDefaultLoadingIndicator();
 
                         // TODO Auf Fehler bzw. negative Antworten reagieren!
-                        $.ajax('/admin/media/upload', {
+                        $.ajax('admin/media/upload', {
                             cache:      false,
                             type:       'POST',
                             dataType:   'JSON',
@@ -159,7 +159,7 @@ use Ubergeek\NanoCm\StatusCode;
             app.page = page;
             app.parentId = parentId;
 
-            $.ajax('/admin/media/html/list', {
+            $.ajax('admin/media/html/list', {
                 cache:      false,
                 type:       'GET',
                 dataType:   'HTML',
@@ -188,7 +188,7 @@ use Ubergeek\NanoCm\StatusCode;
             if (ids.length > 0) {
                 if (confirm('Wollen Sie die ausgewählten Mediendateien wirklich löschen?')) {
                     ncm.showDefaultLoadingIndicator();
-                    $.ajax('/admin/media/ajax/delete', {
+                    $.ajax('admin/media/ajax/delete', {
                         cache:      false,
                         type:       'GET',
                         dataType:   'JSON',
@@ -210,7 +210,7 @@ use Ubergeek\NanoCm\StatusCode;
             let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
                 ncm.showDefaultLoadingIndicator();
-                $.ajax('/admin/media/ajax/lock', {
+                $.ajax('admin/media/ajax/lock', {
                     cache:      false,
                     type:       'GET',
                     dataType:   'JSON',
@@ -231,7 +231,7 @@ use Ubergeek\NanoCm\StatusCode;
             let ids = ncm.getSelectedRowIds();
             if (ids.length > 0) {
                 ncm.showDefaultLoadingIndicator();
-                $.ajax('/admin/media/ajax/unlock', {
+                $.ajax('admin/media/ajax/unlock', {
                     cache:      false,
                     type:       'GET',
                     dataType:   'JSON',
@@ -255,7 +255,7 @@ use Ubergeek\NanoCm\StatusCode;
             if (id == 0) return;
 
             let dlg = new ncm.InlinePopup(
-                '/admin/media/html/editmedium', {
+                'admin/media/html/editmedium', {
                     id: id
                 }, {
                     headline:   'Datei bearbeiten',
@@ -275,7 +275,7 @@ use Ubergeek\NanoCm\StatusCode;
                         caption: 'Speichern',
                         clicked: function() {
                             ncm.showDefaultLoadingIndicator();
-                            $.ajax('/admin/media/ajax/savemedium', {
+                            $.ajax('admin/media/ajax/savemedium', {
                                 cache:      false,
                                 type:       'POST',
                                 dataType:   'JSON',
@@ -308,7 +308,7 @@ use Ubergeek\NanoCm\StatusCode;
             id = parseInt(id, 10);
 
             let dlg = new ncm.InlinePopup(
-                '/admin/media/html/editfolder', {
+                'admin/media/html/editfolder', {
                     id: id
                 }, {
                     headline:   (id > 0)? 'Ordner bearbeiten' : 'Ordner erstellen',
@@ -328,7 +328,7 @@ use Ubergeek\NanoCm\StatusCode;
                         caption: 'Speichern',
                         clicked: function() {
                             ncm.showDefaultLoadingIndicator();
-                            $.ajax('/admin/media/ajax/savefolder', {
+                            $.ajax('admin/media/ajax/savefolder', {
                                 cache:      false,
                                 type:       'POST',
                                 dataType:   'JSON',

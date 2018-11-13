@@ -1,23 +1,4 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */
 ?>
 
@@ -29,7 +10,7 @@
     <div class="container spacing">
         <div class="msgnote">
             <em>Hinweis:</em> Das F&uuml;hren von Zugriffsstatistiken ist aktuell ausgeschaltet.<br>
-            Aktivieren Sie diese Funktion in den <a href="/admin/settings/?searchTerm=system.stats">Einstellungen</a>.
+            Aktivieren Sie diese Funktion in den <a href="admin/settings/?searchTerm=system.stats">Einstellungen</a>.
         </div>
     </div>
 <?php endif; ?>
@@ -38,24 +19,24 @@
     <form onsubmit="module.refresh(); return false;">
         <div class="toolbar">
             <span class="left">
-                <a class="button" href="/admin/stats/" role="button" title="Zusammengefasste Statistiken anzeigen">
-                    <img src="/ncm/img/fatcow/16/summary_table.png" alt="" width="16" height="16">&Uuml;bersicht
+                <a class="button" href="admin/stats/" role="button" title="Zusammengefasste Statistiken anzeigen">
+                    <img src="ncm/img/fatcow/16/summary_table.png" alt="" width="16" height="16">&Uuml;bersicht
                 </a>
-                <a class="button" href="/admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
-                    <img src="/ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">Seitenzugriffe
+                <a class="button" href="admin/stats/accesslog" role="button" title="Ausf&uuml;hrliches Protokoll der Seitenzugriffe abrufen">
+                    <img src="ncm/img/fatcow/16/directory_listing.png" alt="" width="16" height="16">Seitenzugriffe
                 </a>
-                <a class="button" href="/admin/stats/archive" role="button" title="Archiv">
-                    <img src="/ncm/img/fatcow/16/package.png" alt="" width="16" height="16">Archiv
+                <a class="button" href="admin/stats/archive" role="button" title="Archiv">
+                    <img src="ncm/img/fatcow/16/package.png" alt="" width="16" height="16">Archiv
                 </a>
 
                 <a id="button_add" class="button" href="javascript:void(0);" role="button" title="Statistik-Archiv erstellen">
-                    <img src="/ncm/img/fatcow/16/add_package.png" alt="" width="16" height="16">Archiv erstellen
+                    <img src="ncm/img/fatcow/16/add_package.png" alt="" width="16" height="16">Archiv erstellen
                 </a>
             </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="/ncm/img/spin.gif" />
+                <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif" />
                 <a id="button_refresh" class="button spaceleft" role="button" title="Ansicht aktualisieren" href="javascript:void(0)">
-                    <img class="imageonly" src="/ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
+                    <img class="imageonly" src="ncm/img/fatcow/16/arrow_refresh.png" alt="" width="16" height="16">
                 </a>
             </span>
         </div>

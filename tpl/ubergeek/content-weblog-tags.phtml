@@ -19,7 +19,7 @@ $first = true;
             <?php endif; ?>
             <li>
                 <?php echo $article->publishing_timestamp->format('d.m.Y'); ?>
-                <a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h2>
+                <a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h2>
             </li>
             <?php
                 $lastMonth = $pubDate->format('m');

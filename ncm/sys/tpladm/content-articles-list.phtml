@@ -20,7 +20,7 @@
                     <td style="text-align: center">
                         <input type="checkbox" class="selection" value="<?php echo $article->id; ?>" style="text-align: center">
                     </td>
-                    <td><a href="/admin/articles/edit/<?php echo $article->id; ?>"><?php echo $this->htmlEncode($article->headline); ?></a></td>
+                    <td><a href="admin/articles/edit/<?php echo $article->id; ?>"><?php echo $this->htmlEncode($article->headline); ?></a></td>
                     <td><?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id)); ?></td>
                     <td class="textright pre"><?php echo $article->start_timestamp->format('Y-m-d H:i'); ?></td>
                     <td class="textright pre">

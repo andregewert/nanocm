@@ -23,7 +23,7 @@ use Ubergeek\NanoCm\StatusCode;
                         </td>
                         <td class="textright pre"><?php echo $list->id; ?></td>
                         <td><?php echo $this->htmlEncode($list->key); ?></td>
-                        <td><a href="/admin/lists/listitems/<?php echo intval($list->id); ?>"><?php echo $this->htmlEncode($list->title); ?></a></td>
+                        <td><a href="admin/lists/listitems/<?php echo intval($list->id); ?>"><?php echo $this->htmlEncode($list->title); ?></a></td>
                         <td class="textright pre">
                             <?php echo $list->creation_timestamp->format('Y-m-d H:i'); ?>
                         </td>

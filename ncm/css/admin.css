@@ -343,7 +343,7 @@ hr {
   height: 100%;
   width: 100%;
   position: absolute;
-  background: url("/ncm/img/spin.gif") no-repeat center; }
+  background: url("../img/spin.gif") no-repeat center; }
 
 .placeholder.loading .blanker {
   display: block; }
@@ -489,7 +489,7 @@ ul.imgtoolbar_keyboard li a:hover {
   border: solid black 1px; }
 
 .inlinepopup.loading {
-  background: url("/ncm/img/spin.gif") no-repeat center; }
+  background: url("../img/spin.gif") no-repeat center; }
 
 .inlinepopup.closed {
   display: none; }

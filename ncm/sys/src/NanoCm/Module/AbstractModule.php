@@ -177,10 +177,48 @@ abstract class AbstractModule implements
     
     /**
      * Gibt die BaseURL für die NCM-Installation zurück
+     *
+     * Hierbei handelt sich "lediglich" um denjenigen Teil-Pfad, der zwischen DOCUMENT_ROOT und NanoCM-Installation liegt.
+     * Ist das NanoCM direkt im Document Root installiert, so beinhaltet die BaseUrl den String "/"; ist NanoCM bspw. im
+     * Unterverzeichnis "nanocm" installiert, so enthält die BaseUrl den Wert "nanocm/". Wichtig für den gesamten
+     * Mechanismus ist, dass das Document Root in der Webserver-Konfiguration korrekt hinterlegt ist. Bei manchen
+     * virtualisierten bzw. chroot-Umgebungen ist dies nicht immer der Fall.
+     *
      * @return string
      */
     public function getBaseUrl() {
         return $this->ncm->relativeBaseUrl;
+    }
+
+    /**
+     * Erstellt aus einer relativen URL, die sich auf das Installationsverzeichnis von NanoCM bezieht, eine
+     * server-absolute URL
+     *
+     * Beispiel: Soll auf die Startseite der NanoCM-Installation verwiesen werden ($relativeURL ist "/index.html"), und ist NanoCM
+     * im Verzeichnis "user1/nanocm" unterhalb des Document Root installiert, so liefert diese Methode die URL
+     * "user1/nanocm/index.html" zurück.
+     *
+     * @param $relativeUrl Auf das Installationsverzeichnis von NanoCM bezogene relative URL
+     * @return string Server-absolute URL
+     */
+    public function convUrl($relativeUrl) {
+        if (preg_match('/^[a-z]+\:/i', $relativeUrl)) return $relativeUrl;
+        $url = $this->ncm->relativeBaseUrl;
+        if (substr($relativeUrl, 0, 1) == '/') {
+            $relativeUrl = substr($relativeUrl, 1);
+        }
+        return $url . $relativeUrl;
+    }
+
+    /**
+     * Wandelt eine URL genau so um wie convUrl, kodiert jedoch zusätzlich HTML-Sonderzeichen, so dass der Rückggabewert
+     * direkt bzw. ohne weiteren Funktionsaufruf in HTML-Templates ausgegeben werden kann
+     *
+     * @param $relativeUrl Auf das Installationsverzeichnis von NanoCM bezogene relative URL
+     * @return string Server-absolute und HTML-kodierte URL
+     */
+    public function htmlConvUrl($relativeUrl) {
+        return $this->htmlEncode($this->convUrl($relativeUrl));
     }
 
     /**

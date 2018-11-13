@@ -162,7 +162,7 @@ class CoreModule extends AbstractModule {
                         $this->getParam('password', '')
                     );
                     if ($success) {
-                        $this->replaceMeta('location', 'index.php');
+                        $this->replaceMeta('location', $this->convUrl('index.php'));
                     } else {
                         $this->loginError = true;
                     }
@@ -174,7 +174,8 @@ class CoreModule extends AbstractModule {
             case 'logout.html':
             case 'logout.php':
                 $this->ncm->logoutUser();
-                $this->replaceMeta('location', 'index.php');
+                $this->content = 'success';
+                $this->replaceMeta('location', $this->convUrl('index.php'));
                 break;
             
             // Startseite

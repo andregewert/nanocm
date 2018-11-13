@@ -165,7 +165,7 @@ class AdminListsModule extends AbstractAdminModule {
 
                     // Liste bearbeiten
                     case 'edit':
-                        $this->list = $this->orm->getUserListById($this->getParam('id'), false);
+                        $this->list = $this->orm->getUserListById(intval($this->getParam('id')), false);
                         if ($this->list == null) {
                             $this->list = new UserList();
                             $this->list->title = 'Neue Liste';
@@ -176,7 +176,7 @@ class AdminListsModule extends AbstractAdminModule {
 
                     // Listeneintrag bearbeiten
                     case 'edititem':
-                        $this->listItem = $this->orm->getUserListItemById($this->getParam('id'), false);
+                        $this->listItem = $this->orm->getUserListItemById(intval($this->getParam('id')), false);
                         if ($this->listItem == null) {
                             $this->listItem = new UserListItem();
                             $this->listItem->userlist_id = intval($this->getParam('userlist_id'));

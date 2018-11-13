@@ -14,7 +14,7 @@ if (count($items) == 0) {
             <ul>
                 <?php foreach ($items as $listItem) : ?>
                     <li>
-                        <a href="<?php echo $this->htmlEncode($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a>
+                        <a href="<?php echo $this->htmlConvUrl($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>

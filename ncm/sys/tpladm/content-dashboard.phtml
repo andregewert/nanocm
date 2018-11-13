@@ -90,13 +90,13 @@ use Ubergeek\NanoCm\Setting; ?>
     </div>
     <div class="column-4 spacing">
         <div>
-            <a class="button" href="/admin/articles/edit/" role="button" title="Neuen Artikel schreiben" style="width: 50%">
-                <img src="/ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16">Neuen Artikel schreiben
+            <a class="button" href="admin/articles/edit/" role="button" title="Neuen Artikel schreiben" style="width: 50%">
+                <img src="ncm/img/fatcow/16/page_add.png" alt="" width="16" height="16">Neuen Artikel schreiben
             </a>
         </div>
         <div style="margin-top: 0.5em"></div>
-            <a class="button" href="/admin/comments/?searchStatusCode=<?php echo \Ubergeek\NanoCm\StatusCode::MODERATION_REQUIRED; ?>" role="button" title="Kommentare moderieren" style="width: 50%">
-                <img src="/ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Kommentare moderieren
+            <a class="button" href="admin/comments/?searchStatusCode=<?php echo \Ubergeek\NanoCm\StatusCode::MODERATION_REQUIRED; ?>" role="button" title="Kommentare moderieren" style="width: 50%">
+                <img src="ncm/img/fatcow/16/accept_button.png" alt="" width="16" height="16">Kommentare moderieren
                 <?php if ($this->numberOfUnmoderatedComments > 0) : ?>
                     <span class="badge"><?php echo $this->numberOfUnmoderatedComments; ?></span>
                 <?php endif; ?>
@@ -108,22 +108,22 @@ use Ubergeek\NanoCm\Setting; ?>
         <div class="column-4 spacing">
             <h2>Inhaltsverwaltung</h2>
             <ul class="inlinemenu">
-                <li><a href="/admin/articles/">Artikel</a></li>
-                <li><a href="/admin/comments/">Kommentare</a></li>
-                <li><a href="/admin/pages/">Seiten</a></li>
-                <li><a href="/admin/lists/">Listen</a></li>
-                <li><a href="/admin/media/">Medien</a></li>
+                <li><a href="admin/articles/">Artikel</a></li>
+                <li><a href="admin/comments/">Kommentare</a></li>
+                <li><a href="admin/pages/">Seiten</a></li>
+                <li><a href="admin/lists/">Listen</a></li>
+                <li><a href="admin/media/">Medien</a></li>
             </ul>
         </div>
         <div class="column-4 spacing">
             <h2>Erweiterte Verwaltung</h2>
             <ul class="inlinemenu">
-                <li><a href="/admin/articleseries/">Artikelserien</a></li>
-                <li><a href="/admin/users/">Benutzerkonten</a></li>
-                <li><a href="/admin/definitions/">Definitionen</a></li>
-                <li><a href="/admin/media/formats/">Bildformate</a></li>
-                <li><a href="/admin/stats/">Statistiken</a></li>
-                <li><a href="/admin/settings/">Einstellungen</a></li>
+                <li><a href="admin/articleseries/">Artikelserien</a></li>
+                <li><a href="admin/users/">Benutzerkonten</a></li>
+                <li><a href="admin/definitions/">Definitionen</a></li>
+                <li><a href="admin/media/formats/">Bildformate</a></li>
+                <li><a href="admin/stats/">Statistiken</a></li>
+                <li><a href="admin/settings/">Einstellungen</a></li>
             </ul>
         </div>
     </div>

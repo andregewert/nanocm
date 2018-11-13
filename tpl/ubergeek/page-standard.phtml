@@ -4,17 +4,16 @@
     <head>
         <meta charset="utf-8">        
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <base href="<?php echo $this->getBaseUrl(); ?>">
         <title><?php echo $this->htmlEncode($this->getTitle()); ?></title>
-        <link rel="stylesheet" href="/tpl/ubergeek/css/default.css" />
+        <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/default.css'); ?>" />
         <link href="https://fonts.googleapis.com/css?family=Oswald|Fira+Sans|Anonymous+Pro|Barlow" rel="stylesheet">
-        <link rel="icon" type="image/png" sizes="32x32" href="/tpl/ubergeek/img/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/favicon-32x32.png'); ?>">
         <meta name="theme-color" content="#000000">
     </head>
     <body>
         <div class="frame bg-header-light">
             <div class="container brand">
-                <a href="/"><img src="/tpl/ubergeek/img/ubergeek-logo.png" width="368" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
+                <a href="<?php echo $this->htmlConvUrl('/'); ?>"><img src="<?php echo $this->htmlConvUrl('tpl/ubergeek/img/ubergeek-logo.png'); ?>" width="368" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
                 <?php echo $this->includeUserTemplate('navigation-meta.phtml'); ?>
             </div>
         </div>
@@ -34,7 +33,7 @@
                                 <?php foreach ($articles as $article) : ?>
                                     <li>
                                         <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.')); ?>
-                                        <a href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a>
+                                        <a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
@@ -72,16 +71,16 @@
                     <div style="clear: both; text-align: center; padding-top: 3rem" class="spacing">
                         <p><?php echo $this->htmlEncode($this->ncm->orm->getCopyrightNotice()); ?>&nbsp;&bullet;
                             <?php if ($this->ncm->isUserLoggedIn()) : ?>
-                                <a href="/admin/index.php">Verwaltung</a>
-                                &bullet;&nbsp;<a href="/logout.php">Abmelden</a>
+                                <a href="<?php echo $this->htmlConvUrl('/admin/index.php'); ?>">Verwaltung</a>
+                                &bullet;&nbsp;<a href="<?php echo $this->htmlConvUrl('/logout.php'); ?>">Abmelden</a>
                             <?php else : ?>
-                                <a href="/login.php">Anmelden</a>
+                                <a href="<?php echo $this->htmlConvUrl('/login.php'); ?>">Anmelden</a>
                             <?php endif; ?>
                         </p>
                     </div>
                 </footer>
             </div>
         </div>
-        <script src="/ncm/js/jquery-3.3.1.min.js"></script>
+        <script src="<?php echo $this->htmlConvUrl('/ncm/js/jquery-3.3.1.min.js'); ?>"></script>
     </body>
 </html>

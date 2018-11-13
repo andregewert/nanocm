@@ -167,6 +167,13 @@ class NanoCm {
      */
     public $mediacache;
 
+    /**
+     * Einfaches PDO mit Basisinformationen zur nanocm-Installation
+     *
+     * @var object
+     */
+    public $versionInfo;
+
     // </editor-fold>
 
 
@@ -190,6 +197,16 @@ class NanoCm {
         $this->browscappath = Util::createPath($this->sysdir, 'db', 'lite_php_browscap.ini');
         if (empty($this->relativeBaseUrl)) {
             $this->relativeBaseUrl = '/';
+        } else if (substr($this->relativeBaseUrl, -1) != '/') {
+            $this->relativeBaseUrl .= '/';
+        }
+
+        // Basisinformationen zur aktuellen Installation auslesen
+        try {
+            $this->versionInfo = json_decode(file_get_contents(Util::createPath($this->sysdir, 'version.json')));
+        } catch (\Throwable $th) {
+            // TODO Fehler erst einmal ignorieren?
+            // TODO version.json erst bei Ersteinrichtung erzeugen???
         }
 
         // Ein (leerer) Logger wird immer instanziiert
@@ -236,6 +253,8 @@ class NanoCm {
         // Caches initialisieren
         $this->ipcache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
         $this->mediacache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
+
+        $this->log->debug($this->versionInfo);
     }
 
     // </editor-fold>

@@ -22,5 +22,6 @@
 // Standard-Controller ausführen
 
 require 'ncm/sys/src/autoload.php';
+//$var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
 $var = new Ubergeek\NanoCm\FrontController(__DIR__);
 $var->execute();
