@@ -69,6 +69,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: $font-headlines;
     font-weight: normal;
+    line-height: 0.9em;
 }
 
 h1 {
@@ -140,8 +141,35 @@ div.spacing {
     padding-right: 2rem;
 }
 
+div.column-8 {
+    width: $width-column *8;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.column-7 {
+    width: $width-column *7;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 div.column-6 {
     width: $width-column *6;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div.column-5 {
+    width: $width-column *5;
     display: inline-block;
     float: left;
     -moz-box-sizing: border-box;
@@ -211,19 +239,23 @@ footer ul {
 }
 
 .articlefooter {
-    /*
-    background-image: url('../img/paragraph.gif');
-    background-position: center;
-    background-repeat: no-repeat;
-    padding-bottom: 6rem;
-    */
-
     font-size: 0.8em;
     font-size: 0.8rem;
     border-top: solid $color-lightborder 1px;
     color: $color-darkborder;
     margin-bottom: 2.8em;
     margin-bottom: 2.8rem;
+    line-height: 1.2em;
+    clear: both;
+}
+
+p.readmore {
+    font-weight: bold;
+    margin-top: -0.8rem;
+    text-align: left;
+}
+
+p.readmore a {
 }
 
 /* </editor-fold> */

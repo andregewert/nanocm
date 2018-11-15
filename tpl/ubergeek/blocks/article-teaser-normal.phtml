@@ -5,13 +5,14 @@
 
 $medium = null;
 $format = null;
-if (!empty($this->article->medium_id) && ($format = $this->orm->getImageFormatByKey('banner')) !== null) {
+if (!empty($this->article->medium_id) && ($format = $this->orm->getImageFormatByKey('thumb')) !== null) {
     $medium = $this->orm->getMediumById($this->article->medium_id);
 }
 
 $articleText = (strlen($this->article->teaser) > 0)? $this->article->teaser : $this->article->content;
 $articleText = $this->ncm->convertFormattedText($articleText);
 ?>
+
 <?php if ($this->article instanceof \Ubergeek\NanoCm\Article) : ?>
     <div class="spacing">
         <h1><a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($this->article->headline); ?></a></h1>
@@ -21,6 +22,7 @@ $articleText = $this->ncm->convertFormattedText($articleText);
                 <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
                      class="<?php echo $this->htmlEncode($format->key); ?>"
                      title="<?php echo $this->htmlEncode($medium->title); ?>"
+                     style="float: left; margin-right: 1rem; margin-top: 0.2rem; margin-bottom: 0.2rem"
                     <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
                     <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
         <?php endif; ?>
@@ -46,3 +48,4 @@ $articleText = $this->ncm->convertFormattedText($articleText);
         </div>
     </div>
 <?php endif; ?>
+

@@ -1,76 +1,26 @@
 <?php
-/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
+/* @var $this \Ubergeek\NanoCm\Module\CoreModule */
 /* @var $latestArticles \Ubergeek\NanoCm\Article[] */
-$latestArticles = $this->orm->getLatestArticles(7);
-$fullArticles = $this->orm->getLatestArticlesByArticleType('mini', true, true, 7);
-$miniArticles = $this->orm->getLatestArticlesByArticleType('mini', true, false, 7);
-
+$latestArticles = $this->orm->getLatestArticles(8);
+//$fullArticles = $this->orm->getLatestArticlesByArticleType('mini', true, true, 8);
+//$miniArticles = $this->orm->getLatestArticlesByArticleType('mini', true, false, 7);
 //$this->log->debug($fullArticles);
 //$this->log->debug($miniArticles);
 ?>
 
-<?php
-    if (count($fullArticles) >= 1) {
-        $article = array_shift($fullArticles);
-        //$this->includeUserTemplate('blocks/article-teaser-big.phtml');
-    }
-?>
-
-<?php if (count($latestArticles) >= 1) : ?>
-    <?php while (($article = array_shift($latestArticles)) != null) : ?>
+<div class="container">
+    <?php if (count($latestArticles) > 0) : ?>
         <?php
-            $medium = null;
-            $format = null;
+            $this->article = array_shift($latestArticles);
+            $this->includeUserTemplate('blocks/article-teaser-big.phtml');
         ?>
-        <div class="container spacing">
-            <?php if (!empty($article->teaser)) : ?>
-                <h1><a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
-                <div class="lead">
-                    <?php
-                        if (!empty($article->medium_id)) {
-                            if (($format = $this->orm->getImageFormatByKey('thumb')) !== null) {
-                                $medium = $this->orm->getMediumById($article->medium_id);
-                            }
-                        }
-                    ?>
-                    <?php if ($format != null && $medium != null) : ?>
-                        <a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>">
-                        <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
-                             class="<?php echo $this->htmlEncode($format->key); ?>"
-                             title="<?php echo $this->htmlEncode($medium->title); ?>"
-                             style="float: left; margin-right: 1rem; margin-top: 0.2rem; margin-bottom: 0.2rem"
-                            <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
-                            <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
-                    <?php endif; ?>
-                    <?php echo $this->ncm->convertFormattedText($article->teaser); ?>
-                </div>
-                <p><a class="readmore" href="<?php echo $this->htmlEncode($article->getArticleUrl()); ?>">Weiterlesen</a></p>
-            <?php else : ?>
-                <h1><a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($article->headline); ?></a></h1>
-                <?php echo $this->ncm->convertFormattedText($article->content); ?>
-            <?php endif; ?>
-            <div class="articlefooter">
-                Ver&ouml;ffentlicht von
-                <?php echo $this->htmlEncode($this->orm->convertUserIdToName($article->author_id, false)); ?>
-                am
-                <?php echo $this->htmlEncode($article->publishing_timestamp->format('d.m.Y')); ?>
-                &bullet;
-                <a href="<?php echo $this->htmlConvUrl($article->getArticleUrl()); ?>#comments">Kommentieren</a>
-                &bullet;
-                <a href="<?php echo $this->htmlEncode(
-                        \Ubergeek\NanoCm\Util::getTweetThisUrl(
-                                $this->frontController->createAbsoluteSiteLink(
-                                        $article->getArticleUrl()
-                                ),
-                                $article->headline
-                        )
-                ); ?>" target="_blank">Twittern</a>
-            </div>
+        <?php while (($this->article = array_shift($latestArticles)) !== null) : ?>
+            <?php $this->includeUserTemplate('blocks/article-teaser-normal.phtml'); ?>
+        <?php endwhile; ?>
+    <?php else : ?>
+        <div class="spacing">
+            <h1>Noch keine Inhalte vorhanden</h1>
+            <p>Leider gibt es hier noch nichts zu sehen!</p>
         </div>
-    <?php endwhile; ?>
-<?php else : ?>
-    <div class="container spacing">
-        <h1>Noch keine Inhalte vorhanden</h1>
-        <p>Leider gibt es hier noch nichts zu sehen!</p>
-    </div>
-<?php endif; ?>
+    <?php endif; ?>
+</div>
