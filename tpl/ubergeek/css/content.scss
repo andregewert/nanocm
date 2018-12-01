@@ -1,0 +1,129 @@
+/*!
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+@import 'vars';
+
+html {
+    font-size: $font-basesize;
+    line-height: $font-lineheight;
+}
+
+body {
+    font-family: $font-text;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-headlines;
+    font-weight: normal;
+    line-height: 0.9em;
+}
+
+h1 {
+    font-size: 2.2em;
+    font-size: 2.2rem;
+}
+
+h2 {
+    font-size: 1.5em;
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.2em;
+    font-size: 1.2rem;
+}
+
+a {
+    text-decoration: none;
+    color: $color-link;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: $color-link-alt;
+}
+
+a img {
+    border: none;
+}
+
+tt, code, pre, textarea, kbd {
+    font-family: $font-monospace;
+}
+
+ul.nobullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.smallcaps {
+    font-variant: small-caps;
+}
+
+.articlefooter {
+    font-size: 0.8em;
+    font-size: 0.8rem;
+    border-top: solid $color-lightborder 1px;
+    color: $color-darkborder;
+    margin-bottom: 2.8em;
+    margin-bottom: 2.8rem;
+    line-height: 1.2em;
+    clear: both;
+}
+
+p.readmore {
+    font-weight: bold;
+    margin-top: -0.8rem;
+    text-align: left;
+}
+
+p.readmore a {
+}
+
+/* <editor-fold desc="Forms"> */
+
+input {
+    font-size: 1rem;
+    line-height: 1.4em;
+}
+
+input {
+    width: 100%;
+    padding: 0.2em 0;
+    border: solid $color-lightborder 1px;
+    border-radius: 0.1em;
+}
+
+input:focus {
+    -moz-outline-radius: 4px;
+    box-shadow: 0 0 4px $color-headerfg;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Styles for better responsiveness"> */
+
+img.banner {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* </editor-fold> */

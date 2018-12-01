@@ -1,0 +1,59 @@
+/*!
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+$font-headlines:    'Oswald', sans-serif;
+$font-text:         'Barlow', 'Fira Sans', Lato, Helvetica, Arial, sans-serif;
+$font-monospace:    'Anonymous Pro', DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+$font-basesize:     110%;
+$font-lineheight:   1.4em;
+
+/* Grundfarben für die Seite */
+$color-pagebg:      #000;
+$color-framebg:     #666;
+
+$color-contentbg:   #fff;
+$color-contentfg:   #333;
+
+$color-lightborder: #ddd;
+$color-darkborder:  #888;
+
+$color-link:        #0a94a9;
+$color-link-alt:    #0a94a9;
+
+/* Farbgebung Header / Branding */
+$color-headerbg:    #000;
+$color-headerfg:    #0CADC6;
+
+/* Farbgebung Navigationsbereich */
+$color-navbg:       #650370;
+/*$color-navbg:       #333;*/
+$color-navfg:       #fff;
+
+/* Farbgebung Metanavigation */
+$color-metanavbg: #000;
+$color-metanavfg: #aaa;
+$color-metanavfg-active: #fff;
+
+/* Farbgebung Footer-Bereich */
+$color-footerbg:    #000;
+$color-footerfg:    #fff;
+
+/* Größenangaben */
+$width-site:        920px;
+$width-column:      $width-site /12;

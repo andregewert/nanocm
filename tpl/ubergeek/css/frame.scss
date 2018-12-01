@@ -1,0 +1,161 @@
+/*!
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+@import 'vars';
+
+body {
+    background-color: $color-contentbg;
+    color: $color-contentfg;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: $color-headerbg;
+    color: $color-headerfg;
+    padding-top: 2em !important;
+    padding-bottom: 2em !important;
+}
+
+header .brand img {
+    max-width: 100%;
+    min-width: 200px;
+    height: auto;
+}
+
+footer {
+    background-color: $color-footerbg;
+    color: $color-footerfg;
+    overflow: auto;
+    padding-bottom: 2em !important;
+    padding-top: 2em !important;
+}
+
+main {
+    background-color: $color-contentbg;
+    color: $color-contentfg;
+    overflow: auto;
+    min-height: 500px;
+    padding-bottom: 4em !important;
+}
+
+header,
+main,
+footer,
+nav.mainnavigation {
+    padding: 0 2em;
+}
+
+.container {
+    max-width: $width-site;
+    margin: 0 auto;
+    position: relative;
+}
+
+.spacing {
+/*    padding: 0.5em 1em;*/
+}
+
+/* <editor-fold desc="Navigation"> */
+
+nav ul {
+    list-style: none inside none;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    list-style: none inside none;
+    display: inline-block;
+    float: left;
+}
+
+nav.mainnavigation {
+    background-color: $color-navbg;
+    color: $color-navfg;
+    margin-left: -0.8em;
+}
+
+nav.mainnavigation a {
+    text-decoration: none;
+}
+
+nav.mainnavigation ul li a {
+    display: block;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 0.5em 0.8em;
+    color: $color-navfg;
+    font-family: $font-headlines;
+}
+
+nav.mainnavigation ul li.active a,
+nav.mainnavigation ul li a:hover {
+    text-decoration: none;
+    background-color: $color-headerfg;
+    color: $color-headerbg;
+    /*
+    border-top: solid red 2px;
+    margin-top: -2px;
+    */
+}
+
+nav.metanavigation {
+    float: right;
+    font-size: 0.9rem;
+    background-color: $color-metanavbg;
+    color: $color-metanavfg;
+    margin-top: -1em;
+}
+
+nav.metanavigation a {
+    color: $color-metanavfg;
+}
+
+nav.metanavigation a:hover {
+    color: $color-metanavfg-active;
+    text-decoration: none;
+}
+
+nav.metanavigation li {
+    margin-left: 0.25rem;
+}
+
+/* </editor-fold> */
+
+div.column-4 {
+    width: $width-column *4;
+    display: inline-block;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+@media screen and (max-width: 640px) {
+    nav.metanavigation {
+        display: none;
+    }
+
+    html {
+        background-color: red;
+    }
+}

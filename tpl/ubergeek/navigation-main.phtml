@@ -8,16 +8,14 @@ if (count($items) == 0) {
     array_push($items, $item);
 }
 ?>
-<div class="frame bg-nav-dark">
+<nav class="mainnavigation">
     <div class="container">
-        <nav class="mainnavigation">
-            <ul>
-                <?php foreach ($items as $listItem) : ?>
-                    <li>
-                        <a href="<?php echo $this->htmlConvUrl($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </nav>
+        <ul>
+            <?php foreach ($items as $listItem) : ?>
+                <li>
+                    <a href="<?php echo $this->htmlConvUrl($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
     </div>
-</div>
+</nav>
