@@ -22,8 +22,8 @@ use Ubergeek\MarkupParser\MarkupParser;
 use Ubergeek\NanoCm\Util;
 
 /**
- * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach
- * HTML
+ * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach HTML
+ *
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2017-11-04
  */

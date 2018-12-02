@@ -31,6 +31,8 @@ use Ubergeek\Log\Logger;
  * @package Ubergeek\Cache
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-10-31
+ *
+ * @todo Garbage collection implementieren!
  */
 class FileCache implements CacheInterface {
 
@@ -85,6 +87,7 @@ class FileCache implements CacheInterface {
         $this->lifetime = $lifetime;
         $this->filePrefix = $prefix;
         $this->log = $log;
+        $this->removeExpiredEntries();
     }
 
     // </editor-fold>
@@ -218,6 +221,10 @@ class FileCache implements CacheInterface {
 
 
     // <editor-fold desc="Internal Methods">
+
+    private function removeExpiredEntries() {
+        // TODO implementieren!
+    }
 
     /**
      * Überprüft, ob die angegebene Cache-Datei abgelaufen ist

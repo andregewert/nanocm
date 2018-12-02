@@ -175,11 +175,12 @@ class Article {
     
     
     // <editor-fold desc="Methods">
-    
+
     /**
      * Erstellt ein Article-Objekt anhand des übergebenen PDO-Statements
      * @param \PDOStatement $stmt
      * @return Article
+     * @throws \Exception
      */
     public static function fetchFromPdoStatement(\PDOStatement $stmt) {
         /* @var $article \Ubergeek\NanoCm\Article */
@@ -204,6 +205,10 @@ class Article {
     
     public function getArticleUrl() : string {
         return '/weblog/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
+    }
+
+    public function getTagSearchUrl(string $tag) : string {
+        return '/weblog/tags/' . $tag;
     }
 
     // </editor-fold>

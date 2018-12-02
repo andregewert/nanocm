@@ -21,8 +21,6 @@
 namespace Ubergeek\NanoCm;
 
 
-use http\Exception\BadQueryStringException;
-
 /**
  * Bildet einen Artikelkommentar ab
  * @author agewert@ubergeek.de

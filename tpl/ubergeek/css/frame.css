@@ -38,7 +38,7 @@
 /* Grundfarben für die Seite */
 /* Farbgebung Header / Branding */
 /* Farbgebung Navigationsbereich */
-/*$color-navbg:       #333;*/
+/*$color-navbg:             #333;*/
 /* Farbgebung Metanavigation */
 /* Farbgebung Footer-Bereich */
 /* Größenangaben */
@@ -66,11 +66,19 @@ footer {
   padding-bottom: 2em !important;
   padding-top: 2em !important; }
 
+footer a {
+  color: #aaa; }
+
+footer a:hover {
+  color: #fff;
+  text-decoration: none; }
+
 main {
   background-color: #fff;
   color: #333;
   overflow: auto;
   min-height: 500px;
+  padding-top: 2em !important;
   padding-bottom: 4em !important; }
 
 header,
@@ -120,11 +128,7 @@ nav.mainnavigation ul li.active a,
 nav.mainnavigation ul li a:hover {
   text-decoration: none;
   background-color: #0CADC6;
-  color: #000;
-  /*
-  border-top: solid red 2px;
-  margin-top: -2px;
-  */ }
+  color: #000; }
 
 nav.metanavigation {
   float: right;

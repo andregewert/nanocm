@@ -301,7 +301,7 @@ class AdminMediaModule extends AbstractAdminModule {
 
                                 // TODO Einschränken auf Update! Nicht bei Insert durchführen!
 
-                                $this->ncm->mediacache->clear();
+                                $this->ncm->mediaCache->clear();
                                 break;
                         }
                         break;

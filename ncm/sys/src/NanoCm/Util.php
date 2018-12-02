@@ -27,6 +27,69 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
+    public static function getGravatarUserImageUrl($mail, $default = '/images/defuser.gif') {
+        $url  = 'http://www.gravatar.com/avatar.php';
+        $url .= '?gravatar_id=' . md5(trim($mail));
+        $url .= '&default=' . urlencode('http://' . $_SERVER['HTTP_HOST'] . $default);
+        $url .= '&size=50';
+        $url .= '&rating=X';
+        return $url;
+    }
+
+    /**
+     * Überprüft, ob der übergebene Text Begriffe aus der übergebenen Liste enthält
+     *
+     * @param string $text Zu prüfender Text
+     * @param string[] $words Zu prüfende Begriffsliste
+     * @return bool true, wenn der zu prüfende Text mindestens einen der genannten Begriffe enthält
+     */
+    public static function checkTextAgainstWordsList($text, $words) : bool {
+        $tokens = preg_split('/([\W]+)/i', strtolower($text));
+        foreach ($words as $test) {
+            if (in_array($test, $tokens)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Gibt eine Wörter-Blacklist zurück, mit der Kommentare auf Junk hin
+     * überprüft werden können
+     *
+     * @return array
+     * @todo Die Begriffsliste könnte auch in der Datenbank gepflegt werden?
+     */
+    public static function getJunkWords() {
+        return array(
+            'viagra',
+            'cialis',
+            'casino',
+            'penis',
+            'rolex',
+            'visit'
+        );
+    }
+
+    /**
+     * Überprüft die übergebene E-Mail-Adresse auf Gültigkeit
+     * Es wird eine formale Überprüfung vorgenommen; außerdem
+     * wird die Domain auf einen MX-DNS-Eintrag überprüft.
+     *
+     * @param String $email
+     * @return Boolean
+     */
+    public static function isValidEmail($email) {
+        // formale Überprüfung
+        if (preg_match('/^[a-z0-9]+[a-z0-9\+\-\._]*@([a-z0-9\-]+[\.])+[a-z]{2,8}$/i', $email) !== 1)
+            return(false);
+
+        // DNS-MX-Überprüfung
+        $arr = explode('@', $email, 2);
+        if (!checkdnsrr(array_pop($arr), 'MX'))
+            return(false);
+
+        return(true);
+    }
+
     public static function getTweetThisUrl($url, $title = null) : string {
         $tweetUrl = 'https://twitter.com/home?status=';
         if ($title != null) {

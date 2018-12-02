@@ -11,34 +11,113 @@ if (!empty($this->article->medium_id)) {
 }
 ?>
 
-<div class="container spacing <?php echo $class; ?>">
-    <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
+<div class="container">
+    <article class="<?php echo $class; ?>">
+        <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
 
-    <?php if ($format != null && $medium != null) : ?>
-        <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
-             class="<?php echo $this->htmlEncode($format->key); ?>"
-             title="<?php echo $this->htmlEncode($medium->title); ?>"
-            <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
-            <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
+        <?php if ($format != null && $medium != null) : ?>
+            <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                 class="<?php echo $this->htmlEncode($format->key); ?>"
+                 title="<?php echo $this->htmlEncode($medium->title); ?>"
+                <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
+        <?php endif; ?>
+
+        <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
+
+        <div class="articlefooter">
+            <p>Ver&ouml;ffentlicht von
+                <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
+                am
+                <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
+                &bullet;
+                <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comments">Kommentieren</a>
+                &bullet;
+                <a href="<?php echo $this->htmlEncode(
+                    \Ubergeek\NanoCm\Util::getTweetThisUrl(
+                        $this->frontController->createAbsoluteSiteLink(
+                            $this->article->getArticleUrl()
+                        ),
+                        $this->article->headline
+                    )
+                ); ?>" target="_blank">Twittern</a>
+            </p>
+            <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
+                Schlagworte:
+                <ul class="taglist">
+                    <?php foreach ($this->article->tags as $tag) : ?>
+                        <li><a href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </article>
+
+    <?php if ($this->commentsEnabled) : ?>
+        <?php if (is_array($this->comments) && count($this->comments) > 0) : ?>
+            <h2>Kommentare</h2>
+
+            <ol class="comments">
+                <?php $i = 0; ?>
+                <?php foreach ($this->comments as $comment) : ?>
+                    <?php $i++; ?>
+                    <li class="<?php echo ($i %2 == 0)? 'even' : 'odd'; ?>">
+                        <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
+                        <div class="entry">
+                            <div class="userimg"><img src="<?php echo $this->htmlEncode(\Ubergeek\NanoCm\Util::getGravatarUserImageUrl($comment->email)); ?>" alt=""></div>
+                            <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
+
+                            <!-- TODO Einfache Content-Konvertierung implementieren! -->
+                            <p><?php echo nl2br($this->htmlEncode($comment->content)); ?></p>
+
+                            <div class="details">
+                                <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        <?php endif; ?>
+
+        <?php if ($this->article->enable_comments) : ?>
+            <h2><a name="comment"></a>Kommentar hinterlassen</h2>
+
+            <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
+
+            <form action="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comment" method="post" class="stdform">
+                <input type="hidden" name="cpsid" value="<?php echo $this->htmlEncode($this->captcha->captchaId); ?>">
+
+                <p>
+                    <label for="input_n">Dein Name</label>
+                    <input type="text" class="text form-control" id="input_n" name="_n" value="<?php echo $this->htmlEncode($this->commentName); ?>" maxlength="45">
+
+                    <label for="input_e">E-Mail (wird nicht angezeigt)</label>
+                    <input type="text" class="text form-control" id="input_e" name="_e" value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
+
+                    <label for="input_sc">Sicherheitsfrage:
+                        <?php echo intval($this->captcha->valueA); ?>&nbsp;<?php echo $this->captcha->operator; ?>&nbsp;<?php echo intval($this->captcha->valueB); ?>
+                        ergibt
+                    </label>
+                    <input type="text" class="text form-control" id="input_sc" name="sc" value="" size="2" autocomplete="off">
+<!--
+                    <label for="input_u">Website (optional)</label>
+                    <input type="text" class="text form-control" id="input_u" name="_u" value="<?php echo $this->htmlEncode($this->commentSite); ?>" placeholder="http://" maxlength="128">
+
+                    <label for="input_c">Ort (optional)</label>
+                    <input type="text" class="text form-control" id="input_c" name="_c" value="<?php echo $this->htmlEncode($this->commentLocation); ?>" maxlength="45">
+-->
+                    <label for="input_h">&Uuml;berschrift (optional)</label>
+                    <input type="text" class="text form-control" id="input_h" name="_h" value="<?php echo $this->htmlEncode($this->commentHeadline); ?>" maxlength="100">
+                </p>
+                <p style="margin-bottom: 0">
+                    <textarea wrap="soft" id="inpu_t" name="_t" style="height: 10em" class="form-control"><?php echo $this->htmlEncode($this->commentText); ?></textarea>
+                </p>
+
+                <p style="text-align: right">
+                    <input type="hidden" name="ac" value="s" />
+                    <input type="submit" class="button" value="Kommentieren">
+                </p>
+            </form>
+        <?php endif; ?>
     <?php endif; ?>
-
-    <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
-
-    <div class="articlefooter">
-        Ver&ouml;ffentlicht von
-        <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
-        am
-        <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
-        &bullet;
-        <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comments">Kommentieren</a>
-        &bullet;
-        <a href="<?php echo $this->htmlEncode(
-            \Ubergeek\NanoCm\Util::getTweetThisUrl(
-                $this->frontController->createAbsoluteSiteLink(
-                    $this->article->getArticleUrl()
-                ),
-                $this->article->headline
-            )
-        ); ?>" target="_blank">Twittern</a>
-    </div>
 </div>

@@ -20,12 +20,17 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use const Grpc\STATUS_UNAUTHENTICATED;
 use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\Captcha;
+use Ubergeek\NanoCm\Comment;
 use Ubergeek\NanoCm\Media\ImageResizer;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
 use Ubergeek\NanoCm\Setting;
+use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
+use Ubergeek\NanoCm\Util;
 
 /**
  * Kern(-Ausgabe-)modul des NanoCM.
@@ -54,11 +59,41 @@ class CoreModule extends AbstractModule {
     /** @var Article Gegebenenfalls anzuzeigender Weblog-Artikel */
     public $article = null;
 
+    /** @var Comment[] Gegebenfalls anzuzeigende Kommentare zu einem Artikel */
+    public $comments = null;
+
+    /** @var Captcha Gegenenfalls zu lösendes Captcha */
+    public $captcha = null;
+
     /** @var Article[] Gegebenenfalls anzuzeigende Weblog-Artikel */
     public $articles = null;
 
     /** @var string Gesuchte Tags */
     public $searchTags = null;
+
+    /** @var bool Gibt an, ob die Kommentarfunktion grundsätzlich eingeschaltet ist */
+    public $commentsEnabled = false;
+
+    /** @var bool Gibt an, ob die Trackback-Funktion grundsätzlich eingeschaltet ist */
+    public $trackbacksEnabled = false;
+
+    /** @var string Benutzereingabe "Name" für Kommentar */
+    public $commentName;
+
+    /** @var string Benutzereingabe "E-Mail" für Kommentar */
+    public $commentMail;
+
+    /** @var string Benutzereingabe "Website" für Kommentar */
+    public $commentSite;
+
+    /** @var string Benutzereingabe "Ort" für Kommentar */
+    public $commentLocation;
+
+    /** @var string Benutzereingabe "Überschrift" für Kommentar */
+    public $commentHeadline;
+
+    /** @var string Benutzereingabe "Text" für Kommentar */
+    public $commentText;
 
     // </editor-fold>
 
@@ -78,15 +113,35 @@ class CoreModule extends AbstractModule {
             $this->orm->logSimplifiedStats($entry, $geolocation);
         }
 
+        // Kommentare und Trackback
+        $this->commentsEnabled = $this->orm->getSettingValue(Setting::SYSTEM_ENABLECOMMENTS) == '1';
+        $this->trackbacksEnabled = $this->orm->getSettingValue(Setting::SYSTEM_ENABLETRACKBACKS) == '1';
+        if ($this->commentsEnabled) {
+            $this->commentName = $this->getOrOverrideSessionVarWithParam('_n');
+            $this->commentMail = $this->getOrOverrideSessionVarWithParam('_e');
+            $this->commentSite = $this->getOrOverrideSessionVarWithParam('_u');
+            $this->commentLocation = $this->getOrOverrideSessionVarWithParam('_c');
+            $this->commentHeadline = $this->getOrOverrideSessionVarWithParam('_h');
+            $this->commentText = $this->getOrOverrideSessionVarWithParam('_t');
+        }
+
         switch ($parts[0]) {
             
             // Integrierte Weblog-Funktionen
             case 'weblog':
+
                 // Artikel-Ansicht
                 if ($parts[1] == 'article') {
-                    $this->log->debug($parts[2]);
                     $this->article = $this->orm->getArticleById(intval($parts[2]));
                     if ($this->article !== null) {
+                        if ($this->commentsEnabled) {
+                            if ($this->getParam('ac') == 's' && $this->article->enable_comments) {
+                                $this->tryToSaveComment($this->article->id);
+                                // TODO Evtl. Redirect auf die Trägerseite durchführen, um Reload-Probleme zu umgehen
+                            }
+                            $this->captcha = $this->ncm->createCaptcha();
+                        }
+                        $this->comments = $this->orm->getCommentsByArticleId($this->article->id);
                         $this->setTitle($this->getSiteTitle() . ' - ' . $this->article->headline);
                         $this->content = $this->renderUserTemplate('content-weblog-article.phtml');
                     }
@@ -134,7 +189,7 @@ class CoreModule extends AbstractModule {
 
                         // Ein Bild in einem bestimmten Format ausgeben
                         case 'image':
-                            $imageResizer = new ImageResizer($this->ncm->mediacache);
+                            $imageResizer = new ImageResizer($this->ncm->mediaCache);
                             $mediumHash = $parts[1];
                             $formatKey = $parts[3];
                             $format = $this->orm->getImageFormatByKey($formatKey);
@@ -196,4 +251,69 @@ class CoreModule extends AbstractModule {
 
         $this->setContent($this->content);
     }
+
+
+    // <editor-fold desc="Internal methods">
+
+    private function tryToSaveComment($articleId) : bool {
+        $captchaId = $this->getParam('cpsid', '');
+        $captchaInput = $this->getParam('sc', '');
+
+        $comment = new Comment();
+        $comment->article_id = $articleId;
+        $comment->status_code = StatusCode::ACTIVE;
+        $comment->spam_status = 0;
+        $comment->username = $this->commentName;
+        $comment->email = $this->commentMail;
+        $comment->headline = $this->commentHeadline;
+        $comment->content = $this->commentText;
+
+        $this->log->debug($comment);
+
+        // Eingabe auf Vollständigkeit überprüfen
+        if (strlen($comment->username) < 1
+            || strlen($comment->content) < 1
+            || strlen($comment->email) < 1) {
+            $this->addUserMessage("Bitte gib mindestens einen Namen, eine E-Mail-Adresse und einen Text ein, um zu kommentieren", "Unvollständige Eingaben");
+            return false;
+        }
+
+        // Captcha überprüfen
+        if (!$this->ncm->isCaptchaSolved($captchaId, $captchaInput)) {
+            $this->addUserMessage('Du hast die Sicherheitsfrage nicht korrekt beantwortet', 'Fehler');
+            return false;
+        }
+
+        // E-Mail überprüfen
+        if (!Util::isValidEmail($comment->email)) {
+            $this->addUserMessage('Du hast eine ungültige E-Mail-Adresse eingegeben', 'Fehler');
+            return false;
+        }
+
+        // IP-Adresse auf Sperre testen
+        if ($this->ncm->isIpBlockedForComments($_SERVER['REMOTE_ADDR'])) {
+            $this->addUserMessage('Dein Kommentar wurde nicht übernommen. Bitte habe ein paar Minuten Geduld, bevor Du einen neuen Kommentar schreibst.', 'Fehler');
+            return false;
+        }
+
+        // Spam-Begriffe prüfen
+        if (Util::checkTextAgainstWordsList($comment->content, Util::getJunkWords())) {
+            $comment->status_code = StatusCode::MODERATION_REQUIRED;
+            $this->addUserMessage('Dein Kommentar wird vor Freischaltung geprüft. Bitte habe etwas Geduld.', 'Geduld, bitte');
+        }
+
+        // Kommentar speichern
+        $this->ncm->blockIpForComments($_SERVER['REMOTE_ADDR']);
+        $this->orm->saveComment($comment);
+        $this->ncm->session->setVar('commentText', '');
+        $this->ncm->session->setVar('commentHeadline', '');
+        $this->commentText = '';
+        $this->commentHeadline = '';
+
+        // TODO E-Mail-Notification senden
+
+        return true;
+    }
+
+    // </editor-fold>
 }

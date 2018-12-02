@@ -38,7 +38,7 @@
 /* Grundfarben für die Seite */
 /* Farbgebung Header / Branding */
 /* Farbgebung Navigationsbereich */
-/*$color-navbg:       #333;*/
+/*$color-navbg:             #333;*/
 /* Farbgebung Metanavigation */
 /* Farbgebung Footer-Bereich */
 /* Größenangaben */
@@ -47,20 +47,22 @@ html {
   line-height: 1.4em; }
 
 body {
-  font-family: "Barlow", "Fira Sans", Lato, Helvetica, Arial, sans-serif; }
+  font-family: "Source Sans Pro", "Fira Sans", Lato, Helvetica, Arial, sans-serif; }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: "Oswald", sans-serif;
   font-weight: normal;
-  line-height: 0.9em; }
+  line-height: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0.5rem; }
 
 h1 {
   font-size: 2.2em;
   font-size: 2.2rem; }
 
 h2 {
-  font-size: 1.5em;
-  font-size: 1.5rem; }
+  font-size: 1.7em;
+  font-size: 1.7rem; }
 
 h3 {
   font-size: 1.2em;
@@ -68,22 +70,25 @@ h3 {
 
 a {
   text-decoration: none;
-  color: #0a94a9; }
+  color: #0a94a9;
+  transition: color .2s ease-in-out, background-color .2s ease-in-out; }
 
 a:hover {
-  text-decoration: underline;
-  color: #0a94a9; }
+  color: #076a79; }
 
 a img {
   border: none; }
 
-tt, code, pre, textarea, kbd {
+tt, code, pre, textarea, kbd,
+textarea.form-control {
   font-family: "Anonymous Pro", DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace; }
+
+ul, ol {
+  margin: 1em 0; }
 
 ul.nobullets {
   list-style: none;
-  padding: 0;
-  margin: 0; }
+  padding: 0; }
 
 .smallcaps {
   font-variant: small-caps; }
@@ -91,37 +96,119 @@ ul.nobullets {
 .articlefooter {
   font-size: 0.8em;
   font-size: 0.8rem;
-  border-top: solid #ddd 1px;
+  border-bottom: solid #ddd 1px;
+  padding-top: 1em;
+  padding-bottom: 1em;
   color: #888;
-  margin-bottom: 2.8em;
-  margin-bottom: 2.8rem;
+  margin-bottom: 2em;
   line-height: 1.2em;
   clear: both; }
+
+.articlefooter p {
+  margin: 0; }
+
+ul.taglist {
+  font-size: 0.8rem;
+  line-height: 1.2em;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: inline; }
+
+ul.taglist li {
+  display: inline; }
+
+ul.taglist li a {
+  background-color: #0a94a9;
+  color: white;
+  font-weight: bold;
+  padding: 0.1em 0.75em;
+  border-radius: 0.25em;
+  display: inline-block; }
+
+ul.taglist li a:hover {
+  background-color: #076a79; }
+
+p {
+  margin: 1em 0; }
 
 p.readmore {
   font-weight: bold;
   margin-top: -0.8rem;
   text-align: left; }
 
-/* <editor-fold desc="Forms"> */
-input {
-  font-size: 1rem;
-  line-height: 1.4em; }
-
-input {
-  width: 100%;
-  padding: 0.2em 0;
+.alert {
+  background-color: blanchedalmond;
+  padding: 0.5em 0;
   border: solid #ddd 1px;
-  border-radius: 0.1em; }
+  border-radius: 0.25em;
+  margin: 1em auto; }
 
-input:focus {
-  -moz-outline-radius: 4px;
-  box-shadow: 0 0 4px #0CADC6; }
+.alert .message {
+  padding: 0 1em; }
+
+/* <editor-fold desc="Forms"> */
+label {
+  line-height: 2em;
+  display: inline-block; }
+
+div.form-group {
+  /*    border: solid silver 1px;*/ }
+
+.form-control {
+  box-sizing: border-box;
+  font-family: inherit;
+  display: block;
+  width: 100%;
+  padding: .3rem .5rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
+
+.form-control:focus {
+  outline: 0;
+  box-shadow: 0 0 4px 1px #0dbed9; }
+
+.button {
+  box-sizing: border-box;
+  font-family: inherit;
+  font-weight: bold;
+  padding: .3rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  border: 1px solid #097f91;
+  border-radius: .25rem;
+  background-color: #0a94a9;
+  color: white;
+  cursor: pointer;
+  transition: border-color .2s ease-in-out, background-color .2s ease-in-out; }
+
+.button:hover,
+.button:focus {
+  border: 1px solid #076a79;
+  background-color: #076a79; }
 
 /* </editor-fold> */
-/* <editor-fold desc="Styles for better responsiveness"> */
+/* <editor-fold desc="Images"> */
 img.banner {
   max-width: 100% !important;
-  height: auto !important; }
+  height: auto !important;
+  display: block; }
+
+img.thumb {
+  display: block; }
+
+a.thumb {
+  float: left;
+  margin-right: 1rem;
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem; }
+
+a.imglink {
+  display: block; }
 
 /* </editor-fold> */

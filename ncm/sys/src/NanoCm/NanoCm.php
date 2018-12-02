@@ -158,14 +158,28 @@ class NanoCm {
      *
      * @var CacheInterface
      */
-    public $ipcache;
+    public $ipCache;
 
     /**
      * Cache für die Medienbearbeitung
      *
      * @var CacheInterface
      */
-    public $mediacache;
+    public $mediaCache;
+
+    /**
+     * Cache für Captchas
+     *
+     * @var CacheInterface
+     */
+    public $captchaCache;
+
+    /**
+     * Cache für das Sperren von IP-Adressen für die Kommentar-Funktion
+     *
+     * @var CacheInterface
+     */
+    public $commentIpCache;
 
     /**
      * Einfaches PDO mit Basisinformationen zur nanocm-Installation
@@ -251,8 +265,10 @@ class NanoCm {
         $this->session->start();
 
         // Caches initialisieren
-        $this->ipcache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
-        $this->mediacache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
+        $this->ipCache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
+        $this->mediaCache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
+        $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
+        $this->commentIpCache = new FileCache($this->cachedir, 60 *2, 'cmt-', $this->log);
 
         $this->log->debug($this->versionInfo);
     }
@@ -457,11 +473,11 @@ class NanoCm {
      * @return string Der ins Ausgabeformat konvertierte String
      */
     public function convertFormattedText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
+        /* @var $converter \Ubergeek\NanoCm\ContentConverter\ContentConverterInterface */
         $classname = 'Ubergeek\NanoCm\ContentConverter\\' . ucfirst($targetFormat) . 'Converter';
 
         if (class_exists($classname)
             && array_key_exists('Ubergeek\NanoCm\ContentConverter\ContentConverterInterface', class_implements($classname))) {
-            /* @var $converter \Ubergeek\NanoCm\ContentConverter\ContentConverterInterface */
             $converter = new $classname();
             return $converter->convertFormattedText($this, $input);
         }
@@ -473,6 +489,7 @@ class NanoCm {
      *
      * @param HttpRequest $request Der aktuelle HTTP-Request
      * @return AccessLogEntry
+     * @throws \Exception
      */
     public function createAccessLogEntry(HttpRequest $request) : AccessLogEntry {
 
@@ -480,7 +497,7 @@ class NanoCm {
         $useragent = $_SERVER['HTTP_USER_AGENT'];       // TODO Sollte aus $request ermittelt werden
         $enableBrowscap = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEBROWSCAP) == '1';
         $enableGeolocation = $this->orm->getSettingValue(Setting::SYSTEM_STATS_ENABLEGEOLOCATION) == '1';
-        $geolocationservice = new GeolocationService($this->ipcache);
+        $geolocationservice = new GeolocationService($this->ipCache);
 
         $entry = new AccessLogEntry();
         $entry->accesstime = new \DateTime();
@@ -544,6 +561,75 @@ class NanoCm {
 
         return $entry;
     }
-    
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Captcha methods">
+
+    /**
+     * Erstellt ein zufälliges Captcha, legt es unter seiner ID im Cache ab und gibt das Captcha zurück
+     *
+     * @return Captcha
+     */
+    public function createCaptcha() : Captcha {
+        $captcha = new Captcha();
+        $this->captchaCache->put($captcha->captchaId, $captcha);
+        return $captcha;
+    }
+
+    /**
+     * Überprüft, die Lösung eines Captchas
+     *
+     * @param string $captchaId ID des zu prüfenden Captchas
+     * @param string $userInput Benutzereingabe (Lösung)
+     * @return bool true, wenn die Benutzereingabe die korrekte Lösung des Captchas enthält
+     */
+    public function isCaptchaSolved(string $captchaId, $userInput) {
+        /* @var $captcha \Ubergeek\NanoCm\Captcha */
+
+        $this->log->debug("Checking captcha with id $captchaId / user input: $userInput");
+
+        if (preg_match('/^[a-z0-9]{32}$/i', $captchaId) !== 1) return false;
+        if (intval($userInput) != $userInput) return false;
+
+        $captcha = $this->captchaCache->get($captchaId);
+        if ($captcha == null) {
+            $this->log->debug("Captcha with id $captchaId not found!");
+            return false;
+        }
+
+        if ($captcha->operator == '-') {
+            $this->log->debug("Solution should be " . ($captcha->valueA -$captcha->valueB));
+            return $userInput == $captcha->valueA -$captcha->valueB;
+        }
+        $this->log->debug("Solution should be " . ($captcha->valueA +$captcha->valueB));
+        return $userInput == $captcha->valueA +$captcha->valueB;
+    }
+
+    /**
+     * Sperrt die angegebene Adresse temporär für die Kommentarfunktion
+     *
+     * IP-Adressen, die erfolgreich einen Kommentar abgesetzt haben, sollen in der Folge mindestens zwei Minuten
+     * lang keine weiteren Kommentare abgeben können. Dieser Mechanismus soll in erster Linie massenhaft abgesetzten
+     * Junk-Kommentaren entgegenwirken.
+     *
+     * @param $ip Zu sperrende IP-Adresse
+     * @return void
+     */
+    public function blockIpForComments($ip) {
+        $this->commentIpCache->put($ip, true);
+    }
+
+    /**
+     * Überprüft, ob die angegebene IP-Adresse (temporär) für die Kommentarfunktion gesperrt ist
+     *
+     * @param $ip Zu überprüfende IP-Adresse
+     * @return bool true, wenn die übergebene IP-Adresse aktuell für die Kommentarfunktion gesperrt ist
+     */
+    public function isIpBlockedForComments($ip) {
+        return $this->commentIpCache->get($ip) != null;
+    }
+
     // </editor-fold>
 }

@@ -1310,6 +1310,32 @@ class Orm {
     }
 
     /**
+     * Liest alle (freigegebenen) Kommentare zu einem Artikel aus und gibt diese in einem Array zurück
+     *
+     * @return Comment[] Die gefundenen Kommentare
+     */
+    public function getCommentsByArticleId(int $articleId, bool $releasedOnly = true) {
+        $params = array();
+        $sql = 'SELECT * FROM comment WHERE article_id = :article_id ';
+        $params['article_id'] = $articleId;
+
+        if ($releasedOnly) {
+            $sql .= ' AND status_code = :status_code ';
+            $params['status_code'] = StatusCode::ACTIVE;
+        }
+        $sql .= ' ORDER BY creation_timestamp DESC ';
+        $stmt = $this->basedb->prepare($sql);
+        $this->bindValues($stmt, $params);
+        $stmt->execute();
+
+        $comments = array();
+        while (($comment = Comment::fetchFromPdoStatement($stmt)) !== null) {
+            $comments[] = $comment;
+        }
+        return $comments;
+    }
+
+    /**
      * Durchsucht die Kommentare
      *
      * @param Comment|null $filter Optionale Filterkriterien

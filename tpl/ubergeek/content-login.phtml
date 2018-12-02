@@ -1,6 +1,6 @@
 <?php /* @var $this \Ubergeek\NanoCm\Module\CoreModule */ ?>
 
-<div class="container spacing">
+<div class="container">
     <h1>Anmelden</h1>
 
     <?php if ($this->loginError) : ?>
@@ -23,6 +23,8 @@
             <input class="form-control" id="input_password" name="password" type="password">
         </div>
 
-        <button type="submit" class="btn btn-primary">Anmelden</button>
+        <p style="text-align: right">
+            <button type="submit" class="button">Anmelden</button>
+        </p>
     </form>
 </div>

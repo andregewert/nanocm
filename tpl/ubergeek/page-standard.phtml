@@ -7,7 +7,7 @@
         <title><?php echo $this->htmlEncode($this->getTitle()); ?></title>
         <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/frame.css'); ?>" />
         <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/content.css'); ?>" />
-        <link href="https://fonts.googleapis.com/css?family=Oswald|Fira+Sans|Anonymous+Pro|Barlow|Open+Sans:400,600" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Oswald|Anonymous+Pro|Source+Sans+Pro:400,400i,600,600i" rel="stylesheet">
         <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/favicon-32x32.png'); ?>">
         <meta name="theme-color" content="#000000">
     </head>
@@ -27,7 +27,7 @@
 
         <footer>
             <div class="container">
-                <div class="column-4">
+                <div class="column-4" style="padding-right: 0.25em">
                     <h1>Neueste Artikel</h1>
                     <?php if (count(($articles = $this->orm->getLatestArticles(6))) > 0) : ?>
                         <ul class="nobullets">
@@ -42,7 +42,7 @@
                         <p>Noch keine Artikel</p>
                     <?php endif; ?>
                 </div>
-                <div class="column-4">
+                <div class="column-4" style="padding: 0 0.25em">
                     <h1>Kommentare</h1>
                     <?php if (count(($comments = $this->orm->getLatestComments())) > 0) : ?>
                         <ul class="nobullets">
@@ -61,7 +61,7 @@
                         <p>Noch keine Kommentare</p>
                     <?php endif; ?>
                 </div>
-                <div class="column-4">
+                <div class="column-4" style="padding-left: 0.25em">
                     <h1>Soziale Medien</h1>
                     <ul class="nobullets">
                         <li><a class="extern" href="http://instagram.com/agewert">Instagram</a></li>

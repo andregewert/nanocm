@@ -21,6 +21,7 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\UserMessage;
 use Ubergeek\NanoCm\Util;
 
 /**
@@ -127,12 +128,14 @@ abstract class AbstractModule implements
     /**
      * Enthält optionale Optionen, die von den Templates (insbesondere den
      * Seiten-Templates) ausgewertet werden können.
+     *
      * @var array
      */
     public $templateOptions = array();
 
     /**
      * Gibt den relativen Pfad zu den Templatedateien an
+     *
      * @var string
      */
     public $templateDir = null;
@@ -149,6 +152,13 @@ abstract class AbstractModule implements
      * @var bool
      */
     public $allowUserTemplates = true;
+
+    /**
+     * Hinweismeldungen für den Anwender
+     *
+     * @var UserMessage[]
+     */
+    public $userMessages = array();
     
     // </editor-fold>
     
@@ -214,10 +224,10 @@ abstract class AbstractModule implements
      * Wandelt eine URL genau so um wie convUrl, kodiert jedoch zusätzlich HTML-Sonderzeichen, so dass der Rückggabewert
      * direkt bzw. ohne weiteren Funktionsaufruf in HTML-Templates ausgegeben werden kann
      *
-     * @param $relativeUrl Auf das Installationsverzeichnis von NanoCM bezogene relative URL
+     * @param $relativeUrl string Auf das Installationsverzeichnis von NanoCM bezogene relative URL
      * @return string Server-absolute und HTML-kodierte URL
      */
-    public function htmlConvUrl($relativeUrl) {
+    public function htmlConvUrl(string $relativeUrl) : string {
         return $this->htmlEncode($this->convUrl($relativeUrl));
     }
 
@@ -388,7 +398,6 @@ abstract class AbstractModule implements
      * @param string $name Name des Parameters
      * @param $default Standardwert, falls Schlüssel weder im Request noch in der Session gesetzt
      * @return mixed
-     * @todo Besseren Namen finden
      */
     public function getOrOverrideSessionVarWithParam(string $name, $default = null) {
         $value = $default;
@@ -405,6 +414,21 @@ abstract class AbstractModule implements
         }
 
         return $value;
+    }
+
+    /**
+     * Fügt eine Hinweismeldung für den Endanwender hinzu
+     *
+     * @param string|null $message Der eigentliche Hinweistext
+     * @param string|null $title Überschrift für die Meldung
+     * @param string $type Der Nachrichtentyp
+     * @return void
+     */
+    public function addUserMessage($message, $title = null, $type = UserMessage::TYPE_INFO) {
+        if (!is_array($this->userMessages)) {
+            $this->userMessages = array();
+        }
+        array_push($this->userMessages, new UserMessage($message, $title, $type));
     }
 
     // </editor-fold>
