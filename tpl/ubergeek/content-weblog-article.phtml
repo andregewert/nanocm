@@ -67,8 +67,7 @@ if (!empty($this->article->medium_id)) {
                             <div class="userimg"><img src="<?php echo $this->htmlEncode(\Ubergeek\NanoCm\Util::getGravatarUserImageUrl($comment->email)); ?>" alt=""></div>
                             <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 
-                            <!-- TODO Einfache Content-Konvertierung implementieren! -->
-                            <p><?php echo nl2br($this->htmlEncode($comment->content)); ?></p>
+                            <p><?php echo $this->ncm->convertCommentText($this->htmlEncode($comment->content)); ?></p>
 
                             <div class="details">
                                 <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>
@@ -99,13 +98,7 @@ if (!empty($this->article->medium_id)) {
                         ergibt
                     </label>
                     <input type="text" class="text form-control" id="input_sc" name="sc" value="" size="2" autocomplete="off">
-<!--
-                    <label for="input_u">Website (optional)</label>
-                    <input type="text" class="text form-control" id="input_u" name="_u" value="<?php echo $this->htmlEncode($this->commentSite); ?>" placeholder="http://" maxlength="128">
 
-                    <label for="input_c">Ort (optional)</label>
-                    <input type="text" class="text form-control" id="input_c" name="_c" value="<?php echo $this->htmlEncode($this->commentLocation); ?>" maxlength="45">
--->
                     <label for="input_h">&Uuml;berschrift (optional)</label>
                     <input type="text" class="text form-control" id="input_h" name="_h" value="<?php echo $this->htmlEncode($this->commentHeadline); ?>" maxlength="100">
                 </p>

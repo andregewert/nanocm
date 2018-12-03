@@ -277,7 +277,7 @@ class NanoCm {
 
     
     // <editor-fold desc="Internal methods">
-    
+
     /**
      * Gibt das Datenbank-Handle für die Standard-System-Datenbank zurück
      *
@@ -448,43 +448,6 @@ class NanoCm {
     }
 
     /**
-     * Fügt eine URL (als String) zusammen
-     *
-     * @param array $parts Bestandteile
-     * @param bool $absolute Gibt an, ob die URL absolut (inklusive Protokoll
-     * und Hostname) sein soll
-     * @return string
-     */
-    public function createUrl(array $parts, bool $absolute = false) : string {
-        // TODO Implementieren
-    }
-
-    /**
-     * Konvertiert einen Eingabestring mit Formatierungs-Auszeichnungen in das
-     * angegebene Zielformat
-     * 
-     * Die Konvertierung soll modular aufgebaut und konfigurierbar sein.
-     * Das Eingabeformat orientiert sich an Markdown, weicht aber in einigen
-     * Punkten davon ab. So ist beispielsweise kein eingebetteter HTML-Code
-     * erlaubt.
-     * 
-     * @param string $input Eingabestring
-     * @param string $targetFormat Das Zielformat
-     * @return string Der ins Ausgabeformat konvertierte String
-     */
-    public function convertFormattedText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
-        /* @var $converter \Ubergeek\NanoCm\ContentConverter\ContentConverterInterface */
-        $classname = 'Ubergeek\NanoCm\ContentConverter\\' . ucfirst($targetFormat) . 'Converter';
-
-        if (class_exists($classname)
-            && array_key_exists('Ubergeek\NanoCm\ContentConverter\ContentConverterInterface', class_implements($classname))) {
-            $converter = new $classname();
-            return $converter->convertFormattedText($this, $input);
-        }
-        return '';
-    }
-
-    /**
      * Erstellt aus dem aktuellen Request ein AccessLogEntry-Objekt mit erweiterten Informationen
      *
      * @param HttpRequest $request Der aktuelle HTTP-Request
@@ -565,7 +528,80 @@ class NanoCm {
     // </editor-fold>
 
 
-    // <editor-fold desc="Captcha methods">
+    // <editor-fold desc="Content converting methods">
+
+    /**
+     * Ersetzt Zeilenumbrüche im übergebenen Eingabe-String durch <br>-Tags
+     *
+     * @param string $string Eingabe-String
+     * @return string Text mit durch <br>-Tag ersetzten Zeilenumbrüchen
+     */
+    public function nl2br(string $string) : string {
+        $string = preg_replace('/(\n|\r\n|\n\r)/i', "<br>", $string);
+        return($string);
+    }
+
+    /**
+     * Konvertiert einen Eingabestring mit Formatierungs-Auszeichnungen in das
+     * angegebene Zielformat
+     *
+     * Die Konvertierung soll modular aufgebaut und konfigurierbar sein.
+     * Das Eingabeformat orientiert sich an Markdown, weicht aber in einigen
+     * Punkten davon ab. So ist beispielsweise kein eingebetteter HTML-Code
+     * erlaubt.
+     *
+     * @param string $input Eingabestring
+     * @param string $targetFormat Das Zielformat
+     * @return string Der ins Ausgabeformat konvertierte String
+     */
+    public function convertFormattedText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
+        /* @var $converter \Ubergeek\NanoCm\ContentConverter\ContentConverterInterface */
+        $classname = 'Ubergeek\NanoCm\ContentConverter\\' . ucfirst($targetFormat) . 'Converter';
+
+        // TODO Optionen an den Converter übergeben
+
+        if (class_exists($classname)
+            && array_key_exists('Ubergeek\NanoCm\ContentConverter\ContentConverterInterface', class_implements($classname))) {
+            $converter = new $classname();
+            return $converter->convertFormattedText($this, $input);
+        }
+        return '';
+    }
+
+    /**
+     * Wandelt einen Kommentartext bzw. einen Text mit simplen Formatierungsoptionen um in das angegebene
+     * Zielformat
+     *
+     * @param string $input Der Eingabestring
+     * @param string $targetFormat Das Zielformat
+     * @return string Ins Zielformat umgewandelter Text
+     */
+    public function convertCommentText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
+        $output = $input;
+
+        switch ($targetFormat) {
+            case Constants::FORMAT_HTML:
+                $output = htmlentities($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+                $output = preg_replace('/(https?:\/\/([^\s]+))/i', '<a href="$1">$2</a>', $output);
+                $output = $this->nl2br($output);
+                $output = str_replace("'", '&rsquo;', $output);
+                $output = str_replace(' ...', '&nbsp;&hellip;', $output);
+                $output = str_replace('...', '&hellip;', $output);
+                $output = str_replace(' -- ', '&nbsp;&ndash; ', $output);
+                $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
+                $output = preg_replace('/\_(.+?)\_/i', '<em>$1</em>', $output);
+                $output = preg_replace('/\*(.+?)\*/i', '<strong>$1</strong>', $output);
+                $output = trim($output);
+                break;
+        }
+
+        return $output;
+    }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Captcha and anti spam methods">
 
     /**
      * Erstellt ein zufälliges Captcha, legt es unter seiner ID im Cache ab und gibt das Captcha zurück

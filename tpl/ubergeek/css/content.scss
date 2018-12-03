@@ -47,8 +47,13 @@ h2 {
 }
 
 h3 {
-    font-size: 1.2em;
-    font-size: 1.2rem;
+    font-size: 1.5em;
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.3em;
+    font-size: 1.3rem;
 }
 
 a {
@@ -70,6 +75,11 @@ textarea.form-control {
     font-family: $font-monospace;
 }
 
+div.shadow,
+li.odd {
+    background-color: $color-lightshadow;
+}
+
 ul, ol {
     margin: 1em 0;
 }
@@ -77,6 +87,57 @@ ul, ol {
 ul.nobullets {
     list-style: none;
     padding: 0;
+}
+
+ul.comments,
+ol.comments
+{
+    list-style: none;
+    padding: 0;
+    margin-left: 0;
+}
+
+ul.comments li,
+ol.comments li
+{
+    border-bottom: solid $color-lightborder 1px;
+    margin: 0;
+    padding: 0.5em 0.5em 0 0.5em;
+}
+
+ul.comments li div.userimg,
+ol.comments li div.userimg
+{
+    margin: 0.5em 0.5em 0 1em;
+    float: right;
+    border-color: $color-lightborder;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    border-radius: 3px;
+}
+
+ul.comments li div.userimg img,
+ol.comments li div.userimg img
+{
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+ul.comments li div.entry,
+ol.comments li div.entry
+{
+    margin-left: 3em;
+}
+
+ul.comments li h3,
+ol.comments li h3
+{
+    float: left;
+    color: $color-lightborder;
+    font-style: italic;
+    font-size: 1.8rem;
+    font-weight: 600;
 }
 
 .smallcaps {
@@ -97,6 +158,14 @@ ul.nobullets {
 
 .articlefooter p {
     margin: 0;
+}
+
+div.details {
+    font-size: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.2em;
+    clear: both;
+    color: $color-darkborder;
 }
 
 ul.taglist {

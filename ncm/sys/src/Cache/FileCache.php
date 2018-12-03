@@ -121,6 +121,7 @@ class FileCache implements CacheInterface {
      *
      * @param string $key Schlüssel
      * @param mixed $value Abzulegender Wert
+     * @return void
      */
     public function put(string $key, $value) {
         $fname = $this->createCacheFileName($key);
@@ -163,6 +164,8 @@ class FileCache implements CacheInterface {
 
     /**
      * Löscht den gesamten Cache
+     *
+     * @return void
      */
     public function clear() {
         if ($this->cachedir == null || !file_exists($this->cachedir)) {
@@ -206,7 +209,7 @@ class FileCache implements CacheInterface {
                 $this->log->debug("Unsetting cache entry $key / removing file $fname");
             }
             try {
-                //return unlink($fname);
+                return unlink($fname);
             } catch (\Exception $ex) {
                 if ($this->log instanceof Logger) {
                     $this->log->debug("Error while deleting cache file: " . $ex->getMessage());
@@ -222,8 +225,40 @@ class FileCache implements CacheInterface {
 
     // <editor-fold desc="Internal Methods">
 
+    /**
+     * Löscht alle abgelaufenen Einträge dieses Caches
+     *
+     * @return void
+     */
     private function removeExpiredEntries() {
-        // TODO implementieren!
+        if ($this->cachedir == null || !file_exists($this->cachedir)) {
+            throw new InvalidConfigurationException("Invalid cache dir: $this->cachedir");
+        }
+
+        $dh = opendir($this->cachedir);
+        if ($dh !== false) {
+            while (($fname = readdir($dh)) !== false) {
+                if ($fname != '.' && $fname != '..') {
+                    if ($this->filePrefix == '' || substr($fname, 0, mb_strlen($this->filePrefix)) == $this->filePrefix) {
+                        $fullname = $this->cachedir . DIRECTORY_SEPARATOR . $fname;
+                        $diff = time() -filemtime($fullname);
+
+                        if ($diff > $this->lifetime) {
+                            if ($this->log != null) $this->log->debug("Removing expired file $fullname");
+                            try {
+                                unlink($fullname);
+                            } catch (\Exception $ex) {
+                                if ($this->log instanceof Logger) {
+                                    $this->log->debug("Error while deleting cache file: " . $ex->getMessage());
+                                    $this->log->debug($ex->getTrace());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            closedir($dh);
+        }
     }
 
     /**

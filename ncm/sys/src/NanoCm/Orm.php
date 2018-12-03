@@ -1312,6 +1312,10 @@ class Orm {
     /**
      * Liest alle (freigegebenen) Kommentare zu einem Artikel aus und gibt diese in einem Array zurück
      *
+     * Die Sortierung erfolgt nach Erstellungs-Zeitpunkt in aufsteigender Reihenfolge.
+     *
+     * @param int $articleId ID des Artikel-Datensatzes
+     * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Kommentare berücksichtigt werden sollen
      * @return Comment[] Die gefundenen Kommentare
      */
     public function getCommentsByArticleId(int $articleId, bool $releasedOnly = true) {
@@ -1323,7 +1327,7 @@ class Orm {
             $sql .= ' AND status_code = :status_code ';
             $params['status_code'] = StatusCode::ACTIVE;
         }
-        $sql .= ' ORDER BY creation_timestamp DESC ';
+        $sql .= ' ORDER BY creation_timestamp ASC ';
         $stmt = $this->basedb->prepare($sql);
         $this->bindValues($stmt, $params);
         $stmt->execute();
