@@ -188,6 +188,20 @@ class NanoCm {
      */
     public $versionInfo;
 
+    /**
+     * Kürzel für die zu verwendende Sprache (z. B. de)
+     *
+     * @var string
+     */
+    public $lang;
+
+    /**
+     * Vollständiges Locale-Kürzel für die Konfiguration von PHP (z. B. de_DE.utf8)
+     *
+     * @var string
+     */
+    public $locale;
+
     // </editor-fold>
 
 
@@ -258,6 +272,14 @@ class NanoCm {
         if ($this->orm->pageLength == 0) {
             $this->orm->pageLength = 20;
             $this->log->debug("Fehlerhafte Konfiguration Seitenlänge! Benutze Standardwert.");
+        }
+
+        // Sprache konfigurieren
+        $this->lang = $this->orm->getSettingValue(Setting::SYSTEM_LANG);
+        $this->locale = $this->orm->getSettingValue(Setting::SYSTEM_LOCALE);
+        if (!empty($this->locale)) {
+            setlocale(LC_ALL, $this->locale);
+            $this->log->debug("Setting locale to $this->locale");
         }
 
         // Session-Initialisierung

@@ -14,7 +14,7 @@ $first = true;
                 <?php if (!$first) : ?>
                     </ul>
                 <?php endif; ?>
-                <h2><?php echo $this->htmlEncode($pubDate->format('F Y')); ?></h2>
+                <h2><?php echo $this->htmlEncode(strftime('%B %Y', $pubDate->getTimestamp())); ?></h2>
                 <ul class="nobullets">
             <?php endif; ?>
             <li>

@@ -90,6 +90,13 @@ class Setting
     public const SYSTEM_LANG = 'system.lang';
 
     /**
+     * Locale-String für PHP
+     *
+     * @var string
+     */
+    public const SYSTEM_LOCALE = 'system.locale';
+
+    /**
      * Gibt an, ob die Kommentierung von Artikel möglich sein soll
      *
      * @var string

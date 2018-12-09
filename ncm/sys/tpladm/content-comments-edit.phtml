@@ -27,6 +27,10 @@ use Ubergeek\NanoCm\StatusCode;
     </select>
 </div>
 <div class="row">
+    <label for="edit_comment_use_gravatar">Gravatar anzeigen</label>
+    <input type="checkbox" style="width: auto; vertical-align: middle" value="1" id="edit_comment_use_gravatar" <?php if ($this->comment->use_gravatar) echo ' checked="checked"'; ?>/>
+</div>
+<div class="row">
     <label for="edit_comment_headline">Headline</label>
     <input type="text" id="edit_comment_headline" class="autofocus" value="<?php echo $this->htmlEncode($this->comment->headline); ?>">
 </div>
@@ -34,5 +38,5 @@ use Ubergeek\NanoCm\StatusCode;
     <label for="edit_comment_content">Kommentar</label>
 </div>
 <div class="row">
-    <textarea style="width: 100%; height: 10rem" id="edit_comment_content"><?php echo nl2br($this->htmlEncode($this->comment->content)); ?></textarea>
+    <textarea style="width: 100%; height: 10rem" id="edit_comment_content"><?php echo $this->htmlEncode($this->comment->content); ?></textarea>
 </div>

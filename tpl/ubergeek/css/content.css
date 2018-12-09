@@ -35,6 +35,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+/*$font-monospace:            'Anonymous Pro', DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;*/
 /* Grundfarben für die Seite */
 /* Farbgebung Header / Branding */
 /* Farbgebung Navigationsbereich */
@@ -85,7 +86,9 @@ a img {
 
 tt, code, pre, textarea, kbd,
 textarea.form-control {
-  font-family: "Anonymous Pro", DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace; }
+  font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+  font-size: 0.85em;
+  font-size: 0.85rem; }
 
 div.shadow,
 li.odd {
@@ -173,15 +176,21 @@ ul.taglist li {
   display: inline; }
 
 ul.taglist li a {
-  background-color: #0a94a9;
-  color: white;
+  /*
+  background-color: $color-accent;
+  color: $color-accent-contrast;
   font-weight: bold;
+  padding: 0.1em 0.75em;
+  border-radius: 0.25em;
+  display: inline-block;
+  */
+  border: solid #0a94a9 1px;
   padding: 0.1em 0.75em;
   border-radius: 0.25em;
   display: inline-block; }
 
 ul.taglist li a:hover {
-  background-color: #076a79; }
+  /*    background-color: darken($color-accent, 10%);*/ }
 
 p {
   margin: 1em 0; }
@@ -201,13 +210,63 @@ p.readmore {
 .alert .message {
   padding: 0 1em; }
 
+/* <editor-fold desc="Media manager"> */
+figure {
+  margin: 1em 0;
+  padding: 0;
+  text-align: center; }
+
+.figurecontainer {
+  display: inline-block;
+  margin: 0 auto;
+  text-align: left;
+  max-width: 100%; }
+
+.imgcontainer {
+  position: relative;
+  word-wrap: break-word;
+  width: inherit; }
+
+.imgcontainer img {
+  display: block;
+  width: 100%;
+  height: auto; }
+
+.figurecontainer .caption {
+  box-sizing: border-box;
+  font-size: 0.9em;
+  font-size: 0.9rem;
+  line-height: 1.2em;
+  width: 100%;
+  padding: 0.25em 0.5em;
+  border-bottom: solid #ddd 1px; }
+
+.imgcontainer .attribution {
+  box-sizing: border-box;
+  background-color: #000;
+  color: white;
+  position: absolute;
+  bottom: 0;
+  opacity: 0.8;
+  font-size: 0.8em;
+  font-size: 0.8rem;
+  line-height: 1.2em;
+  width: 100%;
+  padding: 0.25em 0.5em; }
+
+/* </editor-fold> */
 /* <editor-fold desc="Forms"> */
 label {
   line-height: 2em;
   display: inline-block; }
 
 div.form-group {
-  /*    border: solid silver 1px;*/ }
+  clear: both;
+  margin-bottom: 0.5em; }
+
+div.form-group div.column {
+  width: 60%;
+  float: right; }
 
 .form-control {
   box-sizing: border-box;
@@ -266,3 +325,21 @@ a.imglink {
   display: block; }
 
 /* </editor-fold> */
+.printonly {
+  display: none; }
+
+@media print {
+  .nonprint {
+    display: none !important; }
+
+  .printonly {
+    visibility: visible; } }
+@media screen and (max-width: 840px) {
+  html {
+    font-size: 100%; } }
+@media screen and (max-width: 640px) {
+  html {
+    font-size: 90%; } }
+@media screen and (max-width: 480px) {
+  html {
+    font-size: 80%; } }

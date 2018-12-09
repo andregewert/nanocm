@@ -396,10 +396,14 @@ class AdminMediaModule extends AbstractAdminModule {
         $oldFormat = (strlen($key) == 0)? null : $this->orm->getImageFormatByKey($key);
         $format = ($oldFormat == null)? new ImageFormat() : $oldFormat;
 
+        $format->key = $this->getParam('key');
         $format->title = $this->getParam('title');
         $format->description = $this->getParam('description');
         $format->width = intval($this->getParam('width'));
         $format->height = intval($this->getParam('height'));
+
+        $this->log->debug($format);
+
         return $format;
     }
 

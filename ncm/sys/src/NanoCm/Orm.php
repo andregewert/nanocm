@@ -1473,8 +1473,8 @@ class Orm {
      */
     public function saveComment(Comment $comment) {
         if ($comment->id == 0) $comment->id = null;
-        $sql = 'REPLACE INTO comment (id, article_id, creation_timestamp, status_code, spam_status, username, email, headline, content)
-                VALUES (:id, :article_id, :creation_timestamp, :status_code, :spam_status, :username, :email, :headline, :content) ';
+        $sql = 'REPLACE INTO comment (id, article_id, creation_timestamp, status_code, spam_status, username, email, headline, content, use_gravatar)
+                VALUES (:id, :article_id, :creation_timestamp, :status_code, :spam_status, :username, :email, :headline, :content, :use_gravatar) ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $comment->id);
         $stmt->bindValue('article_id', $comment->article_id);
@@ -1489,6 +1489,7 @@ class Orm {
         $stmt->bindValue('email', $comment->email);
         $stmt->bindValue('headline', $comment->headline);
         $stmt->bindValue('content', $comment->content);
+        $stmt->bindValue('use_gravatar', $comment->use_gravatar? 1 : 0);
         $stmt->execute();
         return $this->basedb->lastInsertId('id');
     }

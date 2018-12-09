@@ -94,6 +94,9 @@ class CoreModule extends AbstractModule {
     /** @var string Benutzereingabe "Text" für Kommentar */
     public $commentText;
 
+    /** @var bool Benutzereingabe füe "Gravatar verwenden" */
+    public $commentUseGravatar;
+
     // </editor-fold>
 
 
@@ -122,6 +125,7 @@ class CoreModule extends AbstractModule {
             $this->commentLocation = $this->getOrOverrideSessionVarWithParam('_c');
             $this->commentHeadline = $this->getOrOverrideSessionVarWithParam('_h');
             $this->commentText = $this->getOrOverrideSessionVarWithParam('_t');
+            $this->commentUseGravatar = $this->getOrOverrideSessionVarWithParam('_g');
         }
 
         switch ($parts[0]) {
@@ -140,14 +144,13 @@ class CoreModule extends AbstractModule {
                             $comment = $this->tryToSaveComment($this->article->id);
                             if ($comment instanceof Comment) {
 
-                                // Nach erfolgreicher Kommentierung erfolgt ein Redirect,
-                                // um das unbeabsichtigte Neu-Absenden zu verhindern
-
                                 // TODO Zugriff auf Request muss schöner gehen ...
                                 $uri = $this->frontController->getHttpRequest()->requestUri->getRequestUrl();
                                 if ($comment->status_code == StatusCode::MODERATION_REQUIRED) {
                                     $uri .= (stristr($uri, '?') === false)? '?s=1' : '&s=1';
                                 }
+                                $this->ncm->session->setVar('_h', '');
+                                $this->ncm->session->setVar('_t', '');
                                 $this->replaceMeta('location', $uri);
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->content = 'Redirect';
@@ -286,6 +289,7 @@ class CoreModule extends AbstractModule {
         $comment->email = $this->commentMail;
         $comment->headline = $this->commentHeadline;
         $comment->content = $this->commentText;
+        $comment->use_gravatar = $this->commentUseGravatar == '1';
 
         $this->log->debug($comment);
 

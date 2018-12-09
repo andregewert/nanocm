@@ -73,6 +73,8 @@ a img {
 tt, code, pre, textarea, kbd,
 textarea.form-control {
     font-family: $font-monospace;
+    font-size: 0.85em;
+    font-size: 0.85rem;
 }
 
 div.shadow,
@@ -182,16 +184,22 @@ ul.taglist li {
 }
 
 ul.taglist li a {
+    /*
     background-color: $color-accent;
     color: $color-accent-contrast;
     font-weight: bold;
     padding: 0.1em 0.75em;
     border-radius: 0.25em;
     display: inline-block;
+    */
+    border: solid $color-accent 1px;
+    padding: 0.1em 0.75em;
+    border-radius: 0.25em;
+    display: inline-block;
 }
 
 ul.taglist li a:hover {
-    background-color: darken($color-accent, 10%);
+/*    background-color: darken($color-accent, 10%);*/
 }
 
 p {
@@ -216,6 +224,60 @@ p.readmore {
     padding: 0 1em;
 }
 
+/* <editor-fold desc="Media manager"> */
+
+figure {
+    margin: 1em 0;
+    padding: 0;
+    text-align: center;
+}
+
+.figurecontainer {
+    display: inline-block;
+    margin: 0 auto;
+    text-align: left;
+    max-width: 100%;
+}
+
+.imgcontainer {
+    position: relative;
+    word-wrap: break-word;
+    width: inherit;
+}
+
+.imgcontainer img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.figurecontainer .caption {
+    box-sizing: border-box;
+    font-size: 0.9em;
+    font-size: 0.9rem;
+    line-height: 1.2em;
+    width: 100%;
+    padding: 0.25em 0.5em;
+    border-bottom: solid $color-lightborder 1px;
+}
+
+.imgcontainer .attribution {
+    box-sizing: border-box;
+    background-color: #000;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    opacity: 0.8;
+    font-size: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.2em;
+    width: 100%;
+    padding: 0.25em 0.5em;
+}
+
+/* </editor-fold> */
+
+
 /* <editor-fold desc="Forms"> */
 
 label {
@@ -224,7 +286,13 @@ label {
 }
 
 div.form-group {
-/*    border: solid silver 1px;*/
+    clear: both;
+    margin-bottom: 0.5em;
+}
+
+div.form-group div.column {
+    width: 60%;
+    float: right;
 }
 
 .form-control {
@@ -295,3 +363,35 @@ a.imglink {
 }
 
 /* </editor-fold> */
+
+.printonly {
+    display: none;
+}
+
+@media print {
+    .nonprint {
+        display: none !important;
+    }
+
+    .printonly {
+        visibility: visible;
+    }
+}
+
+@media screen and (max-width: 840px) {
+    html {
+        font-size: $font-basesize-middle;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    html {
+        font-size: $font-basesize-small;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    html {
+        font-size: $font-basesize-tiny;
+    }
+}

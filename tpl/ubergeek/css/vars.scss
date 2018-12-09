@@ -19,8 +19,12 @@
 
 $font-headlines:            'Oswald', sans-serif;
 $font-text:                 'Source Sans Pro', 'Fira Sans', Lato, Helvetica, Arial, sans-serif;
-$font-monospace:            'Anonymous Pro', DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+/*$font-monospace:            'Anonymous Pro', DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;*/
+$font-monospace:            Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
 $font-basesize:             110%;
+$font-basesize-middle:      100%;
+$font-basesize-small:       90%;
+$font-basesize-tiny:        80%;
 $font-lineheight:           1.4em;
 
 /* Grundfarben für die Seite */

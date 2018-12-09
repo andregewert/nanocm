@@ -91,6 +91,12 @@ class Comment {
      */
     public $content;
 
+    /**
+     * Gibt an, ob bei diesem Kommentar ein Gravatar-Bild angezeigt werden soll
+     * @var bool
+     */
+    public $use_gravatar;
+
 
     // </editor-fold>
 

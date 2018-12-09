@@ -3,11 +3,11 @@
 $items = $this->orm->getReleasedUserListItemsByListKey('metanav');
 ?>
 <?php if (count($items) > 0) : ?>
-    <nav class="metanavigation">
+    <nav class="metanavigation nonprint">
         <ul>
             <?php $first = true; ?>
             <?php foreach ($items as $listItem) : ?>
-                <li><?php if (!$first) echo ' &bullet;&nbsp;'; ?><a href="<?php echo $this->htmlConvUrl($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a></li>
+                <li><?php if (!$first) echo ' &middot;&nbsp;'; ?><a href="<?php echo $this->htmlConvUrl($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a></li>
                 <?php $first = false; ?>
             <?php endforeach; ?>
         </ul>

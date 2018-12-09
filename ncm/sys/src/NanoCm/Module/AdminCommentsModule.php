@@ -173,7 +173,9 @@ class AdminCommentsModule extends AbstractAdminModule {
 
     /**
      * Erstellt ein Comment-Objekt mit den Daten aus dem aktuellen Request
+     *
      * @return Comment
+     * @throws \Exception
      */
     private function createCommentFromRequest() : Comment {
         $comment = new Comment();
@@ -194,6 +196,7 @@ class AdminCommentsModule extends AbstractAdminModule {
         $comment->email = $this->getParam('email');
         $comment->headline = $this->getParam('headline');
         $comment->content = $this->getParam('content');
+        $comment->use_gravatar = $this->getParam('use_gravatar') == '1';
 
         return $comment;
     }

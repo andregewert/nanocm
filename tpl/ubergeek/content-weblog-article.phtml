@@ -25,6 +25,8 @@ if (!empty($this->article->medium_id)) {
 
         <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
 
+        <?php $this->includeUserTemplate('blocks/media-image.phtml'); ?>
+
         <div class="articlefooter">
             <p>Ver&ouml;ffentlicht von
                 <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
@@ -64,7 +66,9 @@ if (!empty($this->article->medium_id)) {
                     <li class="<?php echo ($i %2 == 0)? 'even' : 'odd'; ?>">
                         <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
                         <div class="entry">
-                            <div class="userimg"><img src="<?php echo $this->htmlEncode(\Ubergeek\NanoCm\Util::getGravatarUserImageUrl($comment->email)); ?>" alt=""></div>
+                            <?php if ($comment->use_gravatar) : ?>
+                                <div class="userimg"><img src="<?php echo $this->htmlEncode(\Ubergeek\NanoCm\Util::getGravatarUserImageUrl($comment->email)); ?>" alt=""></div>
+                            <?php endif; ?>
                             <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 
                             <p><?php echo $this->ncm->convertCommentText($this->htmlEncode($comment->content)); ?></p>
@@ -79,38 +83,48 @@ if (!empty($this->article->medium_id)) {
         <?php endif; ?>
 
         <?php if ($this->article->enable_comments) : ?>
-            <h2><a name="comment"></a>Kommentar hinterlassen</h2>
+            <div class="nonprint">
+                <h2><a name="comment"></a>Kommentar hinterlassen</h2>
 
-            <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
+                <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
-            <form action="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comment" method="post" class="stdform">
-                <input type="hidden" name="cpsid" value="<?php echo $this->htmlEncode($this->captcha->captchaId); ?>">
+                <form action="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comment" method="post" class="stdform">
+                    <input type="hidden" name="cpsid" value="<?php echo $this->htmlEncode($this->captcha->captchaId); ?>">
 
-                <p>
-                    <label for="input_n">Dein Name</label>
-                    <input type="text" class="text form-control" id="input_n" name="_n" value="<?php echo $this->htmlEncode($this->commentName); ?>" maxlength="45">
+                    <div class="form-group">
+                        <label for="input_n">Dein Name</label>
+                        <input type="text" class="text form-control" id="input_n" name="_n" value="<?php echo $this->htmlEncode($this->commentName); ?>" maxlength="45">
+                    </div>
+                    <div class="form-group">
+                        <label for="input_e">E-Mail (wird nicht angezeigt)</label>
+                        <input type="text" class="text form-control" id="input_e" name="_e" value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="_g" name="_g" value="1"<?php if ($this->commentUseGravatar == '1') echo ' checked="checked"'; ?>>
+                        <label for="_g">Ich m&ouml;chte, dass mein Gravatar angezeigt wird</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="input_h">&Uuml;berschrift (optional)</label>
+                        <input type="text" class="text form-control" id="input_h" name="_h" value="<?php echo $this->htmlEncode($this->commentHeadline); ?>" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <textarea wrap="soft" id="input_t" name="_t" style="height: 10em" class="form-control"><?php echo $this->htmlEncode($this->commentText); ?></textarea>
+                    </div>
 
-                    <label for="input_e">E-Mail (wird nicht angezeigt)</label>
-                    <input type="text" class="text form-control" id="input_e" name="_e" value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
+                    <div class="form-group">
+                        <label for="input_sc">Sicherheitsfrage:
+                            <?php echo intval($this->captcha->valueA); ?>&nbsp;<?php echo $this->captcha->operator; ?>&nbsp;<?php echo intval($this->captcha->valueB); ?>
+                            ergibt
+                        </label>
+                        <input type="text" class="text form-control" id="input_sc" name="sc" value="" size="2" autocomplete="off">
+                    </div>
 
-                    <label for="input_sc">Sicherheitsfrage:
-                        <?php echo intval($this->captcha->valueA); ?>&nbsp;<?php echo $this->captcha->operator; ?>&nbsp;<?php echo intval($this->captcha->valueB); ?>
-                        ergibt
-                    </label>
-                    <input type="text" class="text form-control" id="input_sc" name="sc" value="" size="2" autocomplete="off">
-
-                    <label for="input_h">&Uuml;berschrift (optional)</label>
-                    <input type="text" class="text form-control" id="input_h" name="_h" value="<?php echo $this->htmlEncode($this->commentHeadline); ?>" maxlength="100">
-                </p>
-                <p style="margin-bottom: 0">
-                    <textarea wrap="soft" id="inpu_t" name="_t" style="height: 10em" class="form-control"><?php echo $this->htmlEncode($this->commentText); ?></textarea>
-                </p>
-
-                <p style="text-align: right">
-                    <input type="hidden" name="ac" value="s" />
-                    <input type="submit" class="button" value="Kommentieren">
-                </p>
-            </form>
+                    <div class="form-group" style="text-align: right">
+                        <input type="hidden" name="ac" value="s" />
+                        <input type="submit" class="button" value="Kommentieren">
+                    </div>
+                </form>
+            </div>
         <?php endif; ?>
     <?php endif; ?>
 </div>
