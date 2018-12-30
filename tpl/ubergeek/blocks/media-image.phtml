@@ -1,3 +1,15 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\CoreModule */
+/* @var $medium \Ubergeek\NanoCm\Medium */
+/* @var $format \Ubergeek\NanoCm\Media\ImageFormat */
+/* @var $articleText string */
+
+$medium = null;
+$format = null;
+if (!empty($this->article->medium_id) && ($format = $this->orm->getImageFormatByKey('banner')) !== null) {
+    $medium = $this->orm->getMediumById($this->article->medium_id);
+}
+?>
 <figure>
     <div class="figurecontainer" style="max-width: 600px">
         <div class="imgcontainer">

@@ -49,9 +49,6 @@ class CoreModule extends AbstractModule {
     /** @var string Generierter Content */
     private $content = '';
 
-    /** @var bool Gibt an, ob es beim letzten Login-Versuch einen Fehler gegeben hat */
-    public $loginError = false;
-
     /** @var Page Gegebenenfalls anzuzeigende Seite */
     public $page = null;
 
@@ -241,7 +238,7 @@ class CoreModule extends AbstractModule {
                     if ($success) {
                         $this->replaceMeta('location', $this->convUrl('index.php'));
                     } else {
-                        $this->loginError = true;
+                        $this->addUserMessage('Die Anmeldung war nicht erfolgreich. Bitte überprüfen Sie Ihre Anmeldedaten.', "Anmeldung fehlgeschlagen");
                     }
                 }
                 $this->content = $this->renderUserTemplate('content-login.phtml');

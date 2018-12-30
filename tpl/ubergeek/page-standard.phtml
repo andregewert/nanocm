@@ -15,7 +15,8 @@
     <body>
         <header>
             <div class="container brand">
-                <a href="<?php echo $this->htmlConvUrl('/'); ?>"><img src="<?php echo $this->htmlConvUrl('tpl/ubergeek/img/ubergeek-logo.png'); ?>" width="368" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
+                <a class="nonprint" href="<?php echo $this->htmlConvUrl('/'); ?>"><img src="<?php echo $this->htmlConvUrl('tpl/ubergeek/img/ubergeek-logo.png'); ?>" width="346" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
+                <img class="printonly" src="<?php echo $this->htmlConvUrl('tpl/ubergeek/img/ubergeek-logo-black.png'); ?>" width="346" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" />
                 <?php echo $this->includeUserTemplate('navigation-meta.phtml'); ?>
             </div>
         </header>

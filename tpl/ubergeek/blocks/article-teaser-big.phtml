@@ -18,12 +18,17 @@ $articleText = $this->ncm->convertFormattedText($articleText);
         <h1><a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>"><?php echo $this->htmlEncode($this->article->headline); ?></a></h1>
 
         <?php if ($format != null && $medium != null) : ?>
-            <a class="imglink <?php echo $this->htmlEncode($format->key); ?>" href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>">
-                <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
-                     class="<?php echo $this->htmlEncode($format->key); ?>"
-                     title="<?php echo $this->htmlEncode($medium->title); ?>"
-                    <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
-                    <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
+            <div class="imgcontainer">
+                <a class="imglink <?php echo $this->htmlEncode($format->key); ?>" href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>">
+                    <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                         class="<?php echo $this->htmlEncode($format->key); ?>"
+                         title="<?php echo $this->htmlEncode($medium->title); ?>"
+                        <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                        <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
+                <?php if (strlen($medium->attribution) > 0) : ?>
+                    <div class="attribution"><?php echo $this->ncm->convertCommentText($medium->attribution); ?></div>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <?php echo $articleText; ?>

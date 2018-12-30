@@ -16,11 +16,16 @@ if (!empty($this->article->medium_id)) {
         <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
 
         <?php if ($format != null && $medium != null) : ?>
-            <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
-                 class="<?php echo $this->htmlEncode($format->key); ?>"
-                 title="<?php echo $this->htmlEncode($medium->title); ?>"
-                <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
-                <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
+            <div class="imgcontainer">
+                <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                     class="<?php echo $this->htmlEncode($format->key); ?>"
+                     title="<?php echo $this->htmlEncode($medium->title); ?>"
+                    <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                    <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
+                <?php if (strlen($medium->attribution) > 0) : ?>
+                    <div class="attribution"><?php echo $this->ncm->convertCommentText($medium->attribution); ?></div>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
@@ -93,11 +98,11 @@ if (!empty($this->article->medium_id)) {
 
                     <div class="form-group">
                         <label for="input_n">Dein Name</label>
-                        <input type="text" class="text form-control" id="input_n" name="_n" value="<?php echo $this->htmlEncode($this->commentName); ?>" maxlength="45">
+                        <input type="text" class="text form-control" id="input_n" name="_n" required value="<?php echo $this->htmlEncode($this->commentName); ?>" maxlength="45">
                     </div>
                     <div class="form-group">
                         <label for="input_e">E-Mail (wird nicht angezeigt)</label>
-                        <input type="text" class="text form-control" id="input_e" name="_e" value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
+                        <input type="email" class="text form-control" id="input_e" name="_e" required value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
                     </div>
                     <div class="form-group">
                         <input type="checkbox" id="_g" name="_g" value="1"<?php if ($this->commentUseGravatar == '1') echo ' checked="checked"'; ?>>
@@ -108,7 +113,7 @@ if (!empty($this->article->medium_id)) {
                         <input type="text" class="text form-control" id="input_h" name="_h" value="<?php echo $this->htmlEncode($this->commentHeadline); ?>" maxlength="100">
                     </div>
                     <div class="form-group">
-                        <textarea wrap="soft" id="input_t" name="_t" style="height: 10em" class="form-control"><?php echo $this->htmlEncode($this->commentText); ?></textarea>
+                        <textarea wrap="soft" id="input_t" name="_t" style="height: 10em" required class="form-control"><?php echo $this->htmlEncode($this->commentText); ?></textarea>
                     </div>
 
                     <div class="form-group">
@@ -116,7 +121,7 @@ if (!empty($this->article->medium_id)) {
                             <?php echo intval($this->captcha->valueA); ?>&nbsp;<?php echo $this->captcha->operator; ?>&nbsp;<?php echo intval($this->captcha->valueB); ?>
                             ergibt
                         </label>
-                        <input type="text" class="text form-control" id="input_sc" name="sc" value="" size="2" autocomplete="off">
+                        <input type="text" class="text form-control" id="input_sc" name="sc" value="" required autocomplete="off">
                     </div>
 
                     <div class="form-group" style="text-align: right">

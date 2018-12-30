@@ -613,6 +613,7 @@ class NanoCm {
                 $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
                 $output = preg_replace('/\_(.+?)\_/i', '<em>$1</em>', $output);
                 $output = preg_replace('/\*(.+?)\*/i', '<strong>$1</strong>', $output);
+                $output = preg_replace('/\(c\)/i', '&copy;', $output);
                 $output = trim($output);
                 break;
         }

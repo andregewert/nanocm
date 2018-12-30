@@ -202,13 +202,13 @@ p.readmore {
 
 .alert {
   background-color: blanchedalmond;
-  padding: 0.5em 0;
+  padding: 0.25em 0.5em;
   border: solid #ddd 1px;
   border-radius: 0.25em;
   margin: 1em auto; }
 
 .alert .message {
-  padding: 0 1em; }
+  padding: 0.25em 0; }
 
 /* <editor-fold desc="Media manager"> */
 figure {
@@ -333,7 +333,13 @@ a.imglink {
     display: none !important; }
 
   .printonly {
-    visibility: visible; } }
+    display: block; }
+
+  header {
+    padding: 0 !important; }
+
+  main {
+    padding-bottom: 0 !important; } }
 @media screen and (max-width: 840px) {
   html {
     font-size: 100%; } }
