@@ -2,8 +2,9 @@
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 $vid = $this->getVar('converter.youtube.vid');
 ?>
-<div class="youtube-preview" data-vid="<?php echo $this->htmlEncode($vid); ?>">
+<div class="video-preview" data-vid="<?php echo $this->htmlEncode($vid); ?>" style="max-width: 600px">
     <a href="https://www.youtube.com/watch?v=<?php echo $this->htmlEncode($vid); ?>" target="_blank">
-        <img src="<?php echo $this->convUrl($this->getYoutubeThumbnailUrl($vid, 'ytthumb')); ?>" alt="Youtube">
+        <img src="<?php echo $this->htmlConvUrl($this->getYoutubeThumbnailUrl($vid, 'ytthumb')); ?>" alt="Youtube">
+        <img src="<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/VideoPlay.png'); ?>" class="overlay">
     </a>
 </div>

@@ -14,10 +14,10 @@ $format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'
             <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
                 <img src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>">
             </a>
-            <?php if (strlen($medium->attribution) > 0) : ?>
-                <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
-            <?php endif; ?>
         </div>
+        <?php if (strlen($medium->attribution) > 0) : ?>
+            <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+        <?php endif; ?>
         <?php if (strlen($medium->description) > 0) : ?>
             <div class="caption shadow">
                 <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>

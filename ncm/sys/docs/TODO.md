@@ -3,9 +3,9 @@
 ## Hohe Priorität
 
 - [x] Nutzung oder Implementierung von LightBox oder etwas ähnlichem
+- [x] Content-Verwaltung: Platzhalter zu Generierung von Twitter-/Youtube-Inhalten
+- [x] Template: Inhalte von Drittseiten (Twitter, YT etc.) sollen per "Click to play" aktivierbar sein (DSGVO)
 - [ ] Content-Verwaltung: Umfangreiche, konfigurierbare Platzhalter für Images
-- [ ] Content-Verwaltung: Platzhalter zu Generierung von Twitter-/Youtube-Inhalten
-- [ ] Template: Inhalte von Drittseiten (Twitter, YT etc.) sollen per "Click to play" aktivierbar sein (DSGVO)
 - [ ] Content-Verwaltung: Überarbeitung JavaScript für Tag-Bearbeitung
 - [ ] Photostream aus dem CMS gespeist
 - [ ] Implementierung Suchfunktion

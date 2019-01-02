@@ -21,6 +21,7 @@
 
 namespace Ubergeek\NanoCm\ContentConverter;
 use Ubergeek\MarkupParser\MarkupParser;
+use Ubergeek\Net\Fetch;
 
 /**
  * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach HTML
@@ -46,9 +47,9 @@ class HtmlConverter extends DecoratedContentConverter {
         $output = $parser->parse($input);
 
         // Erweiterte Platzhalter für die Medienverwaltung
-        $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download)\:([^\]]+?)\]\<\/p\>$/ims', function($matches) use ($module) {
+        $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download|twitter)\:([^\]]+?)\]\<\/p\>$/ims', function($matches) use ($module) {
             $module->setVar('converter.placeholder', $matches[0]);
-            var_dump($matches);
+            //var_dump($matches);
 
             switch (strtolower($matches[1])) {
                 // Youtube-Einbettungen (click-to-play)
@@ -76,6 +77,16 @@ class HtmlConverter extends DecoratedContentConverter {
                 case 'download':
                     $module->setVar('converter.download.id', intval($matches[2]));
                     return $module->renderUserTemplate('blocks/media-download.phtml');
+
+                // Eingebettete Tweets
+                case 'twitter':
+                    $info = $module->ncm->mediaManager->getTweetInfoByUrl($matches[2]);
+                    if ($info != null) {
+                        return preg_replace('/(\<script[^\>]*\>[^\>]*\<\/script\>)/i', '', $info->html);
+                    } else {
+                        return "<p>Einzubettenden Tweet nicht gefunden!</p>";
+                    }
+                    break;
             }
             return $matches[0];
         }, $output);

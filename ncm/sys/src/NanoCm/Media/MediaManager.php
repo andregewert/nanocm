@@ -99,6 +99,59 @@ class MediaManager {
     // <editor-fold desc="Public methods">
 
     /**
+     * Ermittelt über die öffentliche Twitter-API Informationen zu dem Tweet mit der angegebenen ID
+     *
+     * @param $id Tweet-ID
+     * @return TweetInfo|null Verfügbare Tweet-Informationen
+     */
+    public function getTweetInfoById($id) {
+        $cacheKey = 'twitter-' . $id;
+        if ($this->cache instanceof CacheInterface) {
+            $tweetInfo = $this->cache->get($cacheKey);
+            if ($tweetInfo != null) {
+                $this->log->debug("Found tweet info in cache: $id");
+                return $tweetInfo;
+            }
+        }
+
+        $url = "https://api.twitter.com/1/statuses/oembed.json?id=$id";
+        $info = json_decode(Fetch::fetchFromUrl($url));
+
+        $tweetInfo = new TweetInfo();
+        $tweetInfo->url = $info->url;
+        $tweetInfo->author_name = $info->author_name;
+        $tweetInfo->author_url = $info->author_url;
+        $tweetInfo->html = $info->html;
+        $tweetInfo->width = $info->width;
+        $tweetInfo->height = $info->height;
+        $tweetInfo->type = $info->type;
+        $tweetInfo->cache_age = $info->cache_age;
+        $tweetInfo->provider_name = $info->provider_name;
+        $tweetInfo->provider_url = $info->provider_url;
+        $tweetInfo->version = $info->version;
+
+        if ($this->cache instanceof CacheInterface) {
+            $this->cache->put($cacheKey, $tweetInfo);
+        }
+
+        return $tweetInfo;
+    }
+
+    /**
+     * Ermittelt anhand einer Tweet-URL die verfügbaren Tweet-Informationen
+     *
+     * @param $url Tweet-URL
+     * @return TweetInfo|null Verfügbare Tweet-Informationen
+     */
+    public function getTweetInfoByUrl($url) {
+        if (preg_match('/twitter.com\/[^\/]+\/status\/(\d+)/i', $url, $matches)) {
+            $id = $matches[1];
+            return $this->getTweetInfoById($id);
+        }
+        return null;
+    }
+
+    /**
      * Erstellt ein Vorschaubild für das Youtube-Video mit angegebener Video-ID in dem übergebenen Bildformat
      *
      * Diese Methode verwendet den optional konfigurierten Cache.

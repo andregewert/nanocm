@@ -218,14 +218,17 @@ figure {
 
 .figurecontainer {
   display: inline-block;
+  position: relative;
   margin: 0 auto;
   text-align: left;
   max-width: 100%; }
 
 .imgcontainer {
-  position: relative;
   word-wrap: break-word;
   width: inherit; }
+
+.imgcontainer a {
+  display: block; }
 
 .imgcontainer img {
   display: block;
@@ -241,7 +244,7 @@ figure {
   padding: 0.25em 0.5em;
   border-bottom: solid #ddd 1px; }
 
-.imgcontainer .attribution {
+.figurecontainer .attribution {
   box-sizing: border-box;
   background-color: #000;
   color: white;
@@ -253,6 +256,29 @@ figure {
   line-height: 1.2em;
   width: 100%;
   padding: 0.25em 0.5em; }
+
+.video-preview {
+  margin: 0 auto;
+  position: relative; }
+
+.video-preview a {
+  display: block; }
+
+.video-preview a img {
+  max-width: 100%;
+  height: auto;
+  display: block; }
+
+.video-preview a img.overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  opacity: 0.75; }
+
+.video-preview a:hover img.overlay {
+  opacity: 1; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Forms"> */

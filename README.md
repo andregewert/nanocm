@@ -24,8 +24,11 @@ NanoCM versucht bewusst, auf Abhängigkeiten von fremden Komponenten zu verzicht
 Ein kompletter Verzicht ist trotzdem nicht möglich, und so werden folgende Fremdkomponenten
 verwendet:
 
+- [jQuery](https://jquery.com/) (weil es einem so furchtbar viel Arbeit abnimmt)
 - [Fat Cow Icons](http://www.fatcow.com/free-icons) (für Symbole im Administrationsbereich)
-- [Bootstrap](https://getbootstrap.com/) (für das Standard-Seitentemplate)
+- [highlight.js](https://highlightjs.org/) (für das Syntax-Highlighting bei Code-Beispielen)
+- [Lightbox](https://lokeshdhakar.com/projects/lightbox2/) (die Original-Lightbox von Lokesh Dhakar für die Präsentation von Bildern)
+- [Bootstrap](https://getbootstrap.com/) (für das Standard-Seitentemplate - also nicht für ubergeek.de)
 
 # Mitmachen
 

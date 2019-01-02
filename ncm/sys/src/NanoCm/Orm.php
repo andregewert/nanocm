@@ -2156,6 +2156,37 @@ class Orm {
     // <editor-fold desc="Article">
 
     /**
+     * Gibt die mit Artikeln verknüpften Tags und deren relative Häufigkeit zur Gesamtmenge der Tags zurück
+     *
+     * @return array Statistiken über die in Artikeln verwendeten Tags
+     */
+    public function getArticleTagUsage() {
+
+        // TODO Eigentlich dürfen nur Tags berücksichtigt werden von bereits freigeschalteten Artikeln
+
+        $sql = 'SELECT
+                    tag,
+                    count(tag) as tag_count,
+                    (SELECT COUNT(DISTINCT tag) FROM tag_article) AS tag_sum,
+                    CASE WHEN (select COUNT(DISTINCT tag) FROM tag_article) > 0 THEN
+                        (100 /(select COUNT(DISTINCT tag) FROM tag_article)) *COUNT(tag)
+                    ELSE
+                        0
+                    END AS ratio
+                FROM tag_article
+                GROUP BY tag
+                ORDER BY ratio DESC ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->execute();
+
+        $usage = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $usage[] = $row;
+        }
+        return $usage;
+    }
+
+    /**
      * Durchsucht die Artikeldatenbank nach bestimmten Artikeltypen
      *
      * @param string $articleTypeKey Der Key des gesuchten Artikeltyps
