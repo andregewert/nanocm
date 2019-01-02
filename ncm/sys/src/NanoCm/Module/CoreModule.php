@@ -206,9 +206,23 @@ class CoreModule extends AbstractModule {
                             }
                             break;
 
+                        // Youtube-Vorschau
+                        case 'yt':
+                            $youtubeId = $parts[1];
+                            $formatKey = $parts[3];
+                            $format = $this->orm->getImageFormatByKey($formatKey);
+
+                            if ($format != null) {
+                                $imgData = $this->ncm->mediaManager->createImageForYoutubeVideoWithFormat($youtubeId, $format);
+                                $this->setPageTemplate(self::PAGE_NONE);
+                                $this->setContentType('image/jpeg');
+                                $this->content = $imgData;
+                            }
+                            break;
+
                         // Ein Bild in einem bestimmten Format ausgeben
                         case 'image':
-                            $imageResizer = new ImageResizer($this->ncm->mediaCache);
+                            //$imageResizer = new ImageResizer($this->ncm->mediaCache);
                             $mediumHash = $parts[1];
                             $formatKey = $parts[3];
                             $format = $this->orm->getImageFormatByKey($formatKey);
@@ -218,7 +232,7 @@ class CoreModule extends AbstractModule {
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->setContentType('image/jpeg');
                                 $data = $this->orm->getMediumFileContents($medium->id);
-                                $c = $imageResizer->createImageForMediumWithImageFormat($medium, $data, $format, 'jpeg');
+                                $c = $this->ncm->mediaManager->createImageForMediumWithImageFormat($medium, $data, $format, 'jpeg');
                                 $this->content = $c;
                             }
                             break;

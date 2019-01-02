@@ -303,6 +303,15 @@ class AdminMediaModule extends AbstractAdminModule {
 
                                 $this->ncm->mediaCache->clear();
                                 break;
+
+                            // Formatdefinitionen löschen
+                            case 'delete':
+                                $keys = $this->getParam('keys');
+                                if (is_array($keys)) {
+                                    $this->orm->deleteImageFormatsByKeys($keys);
+                                }
+                                $content = json_encode(true);
+                                break;
                         }
                         break;
 

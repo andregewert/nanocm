@@ -1,8 +1,7 @@
 <?php
-
 /**
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017 - 2019 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,16 +18,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\ContentConverter;
+namespace Ubergeek\NanoCm\Media\Exception;
 
 /**
- * Allgemeines Interface für Converter-Klassen
+ * Markierungs-Interface für Exceptions aus der Medienverwaltung
  *
+ * @package Ubergeek\NanoCm\Media\Exception
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2017-11-04
+ * @created 2019-01-02
  */
-interface ContentConverterInterface {
-
-    public function convertFormattedText(\Ubergeek\NanoCm\Module\AbstractModule $module, string $input, array $options = array()) : string;
-    
+interface ExceptionInterface {
 }

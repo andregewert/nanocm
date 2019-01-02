@@ -11,7 +11,7 @@ if (!empty($this->article->medium_id) && ($format = $this->orm->getImageFormatBy
 }
 
 $articleText = (strlen($this->article->teaser) > 0)? $this->article->teaser : $this->article->content;
-$articleText = $this->ncm->convertFormattedText($articleText);
+$articleText = $this->convertTextWithFullMarkup($articleText);
 ?>
 
 <?php if ($this->article instanceof \Ubergeek\NanoCm\Article) : ?>

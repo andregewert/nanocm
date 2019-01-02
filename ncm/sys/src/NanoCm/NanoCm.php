@@ -25,6 +25,7 @@ use Ubergeek\Cache\FileCache;
 use Ubergeek\Controller\HttpRequest;
 use Ubergeek\Log;
 use Ubergeek\Log\Logger;
+use Ubergeek\NanoCm\Media\MediaManager;
 use Ubergeek\Net\GeolocationService;
 use Ubergeek\Net\UserAgentInfo;
 
@@ -76,6 +77,13 @@ class NanoCm {
      * @var \Ubergeek\Session\SessionInterface
      */
     public $session = null;
+
+    /**
+     * Referenz auf den Media-Manager (ohne ORM)
+     *
+     * @var MediaManager
+     */
+    public $mediaManager = null;
 
     /**
      * Log-Instanz
@@ -291,6 +299,9 @@ class NanoCm {
         $this->mediaCache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
         $this->commentIpCache = new FileCache($this->cachedir, 60 *2, 'cmt-', $this->log);
+
+        // Medienverwaltung initialisieren
+        $this->mediaManager = new MediaManager($this->mediaCache, $this->log);
 
         $this->log->debug($this->versionInfo);
     }
@@ -545,80 +556,6 @@ class NanoCm {
         }
 
         return $entry;
-    }
-
-    // </editor-fold>
-
-
-    // <editor-fold desc="Content converting methods">
-
-    /**
-     * Ersetzt Zeilenumbrüche im übergebenen Eingabe-String durch <br>-Tags
-     *
-     * @param string $string Eingabe-String
-     * @return string Text mit durch <br>-Tag ersetzten Zeilenumbrüchen
-     */
-    public function nl2br(string $string) : string {
-        $string = preg_replace('/(\n|\r\n|\n\r)/i', "<br>", $string);
-        return($string);
-    }
-
-    /**
-     * Konvertiert einen Eingabestring mit Formatierungs-Auszeichnungen in das
-     * angegebene Zielformat
-     *
-     * Die Konvertierung soll modular aufgebaut und konfigurierbar sein.
-     * Das Eingabeformat orientiert sich an Markdown, weicht aber in einigen
-     * Punkten davon ab. So ist beispielsweise kein eingebetteter HTML-Code
-     * erlaubt.
-     *
-     * @param string $input Eingabestring
-     * @param string $targetFormat Das Zielformat
-     * @return string Der ins Ausgabeformat konvertierte String
-     */
-    public function convertFormattedText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
-        /* @var $converter \Ubergeek\NanoCm\ContentConverter\ContentConverterInterface */
-        $classname = 'Ubergeek\NanoCm\ContentConverter\\' . ucfirst($targetFormat) . 'Converter';
-
-        // TODO Optionen an den Converter übergeben
-
-        if (class_exists($classname)
-            && array_key_exists('Ubergeek\NanoCm\ContentConverter\ContentConverterInterface', class_implements($classname))) {
-            $converter = new $classname();
-            return $converter->convertFormattedText($this, $input);
-        }
-        return '';
-    }
-
-    /**
-     * Wandelt einen Kommentartext bzw. einen Text mit simplen Formatierungsoptionen um in das angegebene
-     * Zielformat
-     *
-     * @param string $input Der Eingabestring
-     * @param string $targetFormat Das Zielformat
-     * @return string Ins Zielformat umgewandelter Text
-     */
-    public function convertCommentText(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
-        $output = $input;
-
-        switch ($targetFormat) {
-            case Constants::FORMAT_HTML:
-                $output = htmlentities($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
-                $output = preg_replace('/(https?:\/\/([^\s]+))/i', '<a href="$1">$2</a>', $output);
-                $output = $this->nl2br($output);
-                $output = str_replace("'", '&rsquo;', $output);
-                $output = str_replace(' ...', '&nbsp;&hellip;', $output);
-                $output = str_replace('...', '&hellip;', $output);
-                $output = str_replace(' -- ', '&nbsp;&ndash; ', $output);
-                $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
-                $output = preg_replace('/\_(.+?)\_/i', '<em>$1</em>', $output);
-                $output = preg_replace('/\*(.+?)\*/i', '<strong>$1</strong>', $output);
-                $output = preg_replace('/\(c\)/i', '&copy;', $output);
-                $output = trim($output);
-                break;
-        }
-
-        return $output;
     }
 
     // </editor-fold>

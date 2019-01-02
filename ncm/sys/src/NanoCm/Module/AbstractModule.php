@@ -21,6 +21,10 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\Article;
+use Ubergeek\NanoCm\Constants;
+use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
+use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\UserMessage;
 use Ubergeek\NanoCm\Util;
 
@@ -184,7 +188,61 @@ abstract class AbstractModule implements
     public function getAction() {
         return $this->getParam('action');
     }
-    
+
+    /**
+     * Gibt die URL für einen bestimmten Artikel zurück
+     *
+     * Die zurückgegebene URL ist relativ zum NanoCM-Installationsverzeichnis, muss also in der Regel bei der Ausgabe im
+     * Template noch mit convUrl() behandelt werden.
+     *
+     * @param Article $article Der betreffende Artikel
+     * @return string Die URL zum angegebenen Artikel
+     */
+    public function getArticleUrl(Article $article) {
+        return $article->getArticleUrl();
+    }
+
+    /**
+     * Gibt die URL für ein auf das angegebene Format skalierte Vorschaubild für eine bestimmte Mediendatei zurück
+     *
+     * Die zurückgegebene URL ist relativ zum NanoCM-Installationsverzeichnis, muss also in der Regel bei der Ausgabe im
+     * Template noch mit convUrl() behandelt werden.
+     *
+     * @param Medium $medium Die betreffende Mediendatei
+     * @param string $formatKey Schlüssel des gewünschten Ausgabeformats
+     * @return string URL zum skalierten Bild
+     */
+    public function getImageUrl(Medium $medium, string $formatKey) {
+        return $medium->getImageUrl($formatKey);
+    }
+
+    /**
+     * Gibt den Download-Link für eine über die Medienverwaltung verwaltete Datei zurück
+     *
+     * Die zurückgegebene URL ist relativ zum NanoCM-Installationsverzeichnis, muss also in der Regel bei der Ausgabe im
+     * Template noch mit convUrl() behandelt werden.
+     *
+     * @param Medium $medium Das betreffende Medium
+     * @return string Die Download-URL für diese Mediendatei
+     */
+    public function getDownloadUrl(Medium $medium) {
+        return '/media/' . $medium->hash . '/download/';
+    }
+
+    /**
+     * Gibt die URL für ein Youtube-Thumbnail in dem angegebenen Bildformat zurück
+     *
+     * Die zurückgegebene URL ist relativ zum NanoCM-Installationsverzeichnis, muss also in der Regel bei der Ausgabe im
+     * Template noch mit convUrl() behandelt werden.
+     *
+     * @param string $youtubeId Die Youtube-Video-ID
+     * @param string $formatKey Schlüssel für das gewünschte Bildformat
+     * @return string Die URL zum Thumbnail
+     */
+    public function getYoutubeThumbnailUrl(string $youtubeId, string $formatKey) {
+        return "/media/$youtubeId/yt/$formatKey";
+    }
+
     /**
      * Gibt die BaseURL für die NCM-Installation zurück
      *
@@ -432,7 +490,84 @@ abstract class AbstractModule implements
     }
 
     // </editor-fold>
-    
+
+
+    // <editor-fold desc="Erweiterte Formatierungsfunktionen">
+
+    /**
+     * Ersetzt Zeilenumbrüche im übergebenen Eingabe-String durch <br>-Tags
+     *
+     * @param string $string Eingabe-String
+     * @return string Text mit durch <br>-Tag ersetzten Zeilenumbrüchen
+     */
+    public function nl2br(string $string) : string {
+        $string = preg_replace('/(\n|\r\n|\n\r)/i', "<br>", $string);
+        return($string);
+    }
+
+    /**
+     * Konvertiert einen Eingabestring mit Formatierungs-Auszeichnungen in das
+     * angegebene Zielformat
+     *
+     * Die Konvertierung soll modular aufgebaut und konfigurierbar sein.
+     * Das Eingabeformat orientiert sich an Markdown, weicht aber in einigen
+     * Punkten davon ab. So ist beispielsweise kein eingebetteter HTML-Code
+     * erlaubt.
+     *
+     * @param string $input Eingabestring
+     * @param string $targetFormat Das Zielformat
+     * @return string Der ins Ausgabeformat konvertierte String
+     */
+    public function convertTextWithFullMarkup(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
+        switch ($targetFormat) {
+            case Constants::FORMAT_HTML:
+                $converter = new HtmlConverter();
+                $output = $converter->convertFormattedText($this, $input);
+                break;
+
+            default:
+                throw new \InvalidArgumentException("Unsupported target format: $targetFormat");
+        }
+
+        return $output;
+    }
+
+    /**
+     * Wandelt einen Kommentartext bzw. einen Text mit simplen Formatierungsoptionen um in das angegebene
+     * Zielformat
+     *
+     * Aktuell wird als Zielformat ausschließlich HTML unterstützt.
+     *
+     * @param string $input Der Eingabestring
+     * @param string $targetFormat Das Zielformat
+     * @return string Ins Zielformat umgewandelter Text
+     */
+    public function convertTextWithBasicMarkup(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
+        switch ($targetFormat) {
+            case Constants::FORMAT_HTML:
+                $output = htmlentities($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+                $output = preg_replace('/(https?:\/\/([^\s]+))/i', '<a href="$1">$2</a>', $output);
+                $output = $this->nl2br($output);
+                $output = str_replace("'", '&rsquo;', $output);
+                $output = str_replace(' ...', '&nbsp;&hellip;', $output);
+                $output = str_replace('...', '&hellip;', $output);
+                $output = str_replace(' -- ', '&nbsp;&ndash; ', $output);
+                $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
+                $output = preg_replace('/\_(.+?)\_/i', '<em>$1</em>', $output);
+                $output = preg_replace('/\*(.+?)\*/i', '<strong>$1</strong>', $output);
+                $output = preg_replace('/\(c\)/i', '&copy;', $output);
+                $output = trim($output);
+                break;
+
+            default:
+                throw new \InvalidArgumentException("Unsupported target format: $targetFormat");
+        }
+
+        return $output;
+    }
+
+    // </editor-fold>
+
     
     // <editor-fold desc="ControllerInterface">
     

@@ -11,7 +11,7 @@ if (!empty($this->article->medium_id) && ($format = $this->orm->getImageFormatBy
 }
 
 $articleText = (strlen($this->article->teaser) > 0)? $this->article->teaser : $this->article->content;
-$articleText = $this->ncm->convertFormattedText($articleText);
+$articleText = $this->convertTextWithFullMarkup($articleText);
 ?>
 <?php if ($this->article instanceof \Ubergeek\NanoCm\Article) : ?>
     <article>
@@ -26,7 +26,7 @@ $articleText = $this->ncm->convertFormattedText($articleText);
                         <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
                         <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>></a>
                 <?php if (strlen($medium->attribution) > 0) : ?>
-                    <div class="attribution"><?php echo $this->ncm->convertCommentText($medium->attribution); ?></div>
+                    <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

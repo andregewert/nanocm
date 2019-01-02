@@ -69,8 +69,14 @@ class ImageFormat
 
     // <editor-fold desc="Method">
 
+    /**
+     * Liest das Abfrageergebnis am aktuellen Cursor aus und erstellt daraus ein ImageFormat-Objekt
+     *
+     * @param \PDOStatement $stmt
+     * @return null|ImageFormat
+     */
     public static function fetchFromPdoStatement(\PDOStatement $stmt) {
-        /* @var $imageFormat \Ubergeek\NanoCm\ImageFormat */
+        /* @var $imageFormat \Ubergeek\NanoCm\Media\ImageFormat */
         if (($imageFormat = $stmt->fetchObject(__CLASS__)) !== false) {
             return $imageFormat;
         }

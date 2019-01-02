@@ -1,7 +1,7 @@
 <?php
 /**
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017 - 2019 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,10 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\Exception;
+namespace Ubergeek\NanoCm\Media\Exception;
 
 /**
- * Fehler innerhalb der Medienverwaltung
+ * Allgemeiner Ausnahmefehler innerhalb der Medienverwaltung
  *
  * @package \Ubergeek\NanoCm\Exception
  * @author André Gewert <agewert@ubergeek.de>

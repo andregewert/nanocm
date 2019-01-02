@@ -30,24 +30,57 @@ use Ubergeek\MarkupParser\MarkupParser;
  */
 class HtmlConverter extends DecoratedContentConverter {
     
-    public function convertFormattedText(\Ubergeek\NanoCm\NanoCm $nanocm, string $input, array $options = array()): string {
-
-        // TODO Blog-weite Definition von Abkürzungen implementieren
-
-        // TODO Unterschiedliche Converter definieren für Artikel-Texte und Kommentare
+    public function convertFormattedText(\Ubergeek\NanoCm\Module\AbstractModule $module, string $input, array $options = array()): string {
 
         if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($nanocm, $input, $options);
+            $input = $this->decoratedConverter->convertFormattedText($module, $input, $options);
         }
 
+        // "Normales" Markup ersetzen
         $parser = new MarkupParser();
         foreach ($options as $key => $value) {
             if ($key == 'converter.html.idPrefix') {
                 $parser->idPrefix = $value;
             }
         }
-        
-        return $parser->parse($input);
+        $output = $parser->parse($input);
+
+        // Erweiterte Platzhalter für die Medienverwaltung
+        $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download)\:([^\]]+?)\]\<\/p\>$/ims', function($matches) use ($module) {
+            $module->setVar('converter.placeholder', $matches[0]);
+            var_dump($matches);
+
+            switch (strtolower($matches[1])) {
+                // Youtube-Einbettungen (click-to-play)
+                case 'youtube':
+                    if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
+                        $vid = $im[1];
+                        $module->setVar('converter.youtube.vid', $vid);
+                        return $module->renderUserTemplate('blocks/media-youtube.phtml');
+                    }
+                    return '';
+
+                // Bildergalerie aus der Medienverwaltung
+                case 'album':
+                    $module->setVar('converter.album.id', intval($matches[2]));
+                    return $module->renderUserTemplate('blocks/media-album.phtml');
+
+                // Vorschaubild aus der Medienverwaltung
+                case 'image':
+                    list($id, $format) = explode(':', $matches[2], 2);
+                    $module->setVar('converter.image.id', intval($id));
+                    $module->setVar('converter.image.format', $format);
+                    return $module->renderUserTemplate('blocks/media-image.phtml');
+
+                // Download-Link aus der Medienverwaltung
+                case 'download':
+                    $module->setVar('converter.download.id', intval($matches[2]));
+                    return $module->renderUserTemplate('blocks/media-download.phtml');
+            }
+            return $matches[0];
+        }, $output);
+
+        return $output;
     }
 
 }

@@ -23,14 +23,12 @@ if (!empty($this->article->medium_id)) {
                     <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
                     <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
                 <?php if (strlen($medium->attribution) > 0) : ?>
-                    <div class="attribution"><?php echo $this->ncm->convertCommentText($medium->attribution); ?></div>
+                    <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
                 <?php endif; ?>
             </div>
         <?php endif; ?>
 
-        <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
-
-        <?php $this->includeUserTemplate('blocks/media-image.phtml'); ?>
+        <?php echo $this->convertTextWithFullMarkup($this->article->content); ?>
 
         <div class="articlefooter">
             <p>Ver&ouml;ffentlicht von
@@ -76,7 +74,7 @@ if (!empty($this->article->medium_id)) {
                             <?php endif; ?>
                             <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 
-                            <p><?php echo $this->ncm->convertCommentText($this->htmlEncode($comment->content)); ?></p>
+                            <p><?php echo $this->convertTextWithBasicMarkup($this->htmlEncode($comment->content)); ?></p>
 
                             <div class="details">
                                 <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>

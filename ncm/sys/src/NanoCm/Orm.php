@@ -22,7 +22,7 @@
 namespace Ubergeek\NanoCm;
 
 use Ubergeek\NanoCm\Exception\InvalidDataException;
-use Ubergeek\NanoCm\Exception\MediaException;
+use Ubergeek\NanoCm\Media\Exception\MediaException;
 use Ubergeek\NanoCm\Media\ImageFormat;
 
 /**
@@ -1640,6 +1640,29 @@ class Orm {
     // <editor-fold desc="ImageFormat">
 
     /**
+     * Löscht die Formatdefinition mit dem angegebenen Key
+     *
+     * @param string $key Key der zu löschenden Formatdefinition
+     */
+    public function deleteImageFormatByKey(string $key) {
+        $sql = 'DELETE FROM imageformat WHERE key = :key ';
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->bindValue('key', $key);
+        $stmt->execute();
+    }
+
+    /**
+     * Löscht die Formatdefinitionen mit den angegebenen Schlüsseln
+     *
+     * @param string[] $keys Die Keys der zu löschenden Formatdefinitionen.
+     */
+    public function deleteImageFormatsByKeys(array $keys) {
+        foreach ($keys as $key) {
+            $this->deleteImageFormatByKey($key);
+        }
+    }
+
+    /**
      * Speichert eine Bildformat-Definition in der Datenbank
      *
      * @param ImageFormat $format Die zu speichernde Bildformat-Definition
@@ -2140,6 +2163,7 @@ class Orm {
      * @param bool $exclude Gibt an, ob der angegebene Artikeltyp ausgeschlossen werden soll oder darauf eingegrenzt werden soll
      * @param int $limit Maximale Anzahl der Suchergebnisse
      * @return Article[]
+     * @throws \Exception
      */
     public function getLatestArticlesByArticleType(string $articleTypeKey, $releasedOnly = true, $exclude = false, $limit = 5) {
         $params = array();
@@ -2272,6 +2296,7 @@ class Orm {
      * @param int|null $page Angeforderte Seite
      * @param int|null $limit Maximale Anzahl der zurück zu gebenden Artikel
      * @return Article[]|int Ein Array mit den gefundenen Artikeln
+     * @throws \Exception
      */
     public function searchArticles(Article $filter = null, $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $articles = array();
@@ -2366,10 +2391,12 @@ class Orm {
     /**
      * Liest den Artikel mit der angegebenen ID aus und gibt ein entsprechendes Objekt
      * oder null zurück.
+     *
      * @param int $id ID des angeforderten Artikels
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel berücksichtigt werden sollen
      * @return Article|null
      * @todo Verknüpfte komplexe Daten (Autor etc.) müssen auch ausgelesen werden
+     * @throws \Exception
      */
     public function getArticleById(int $id, bool $releasedOnly = true) {
         $sql = 'SELECT * FROM article WHERE id = :id ';
@@ -2387,12 +2414,13 @@ class Orm {
         }
         return $article;
     }
-    
+
     /**
      * Gibt die neuesten freigeschalteten Artikel zurück
      *
      * @param int $limit Maximale Anzahl zurückzugebender Artikel
      * @return Article[]
+     * @throws \Exception
      */
     public function getLatestArticles(int $limit = 5) {
         return $this->searchArticles(null, true, null, false, 0, $limit);
@@ -2404,6 +2432,7 @@ class Orm {
      * @param Article $article Artikeldaten
      * @return int Datensatz-ID
      * @todo Zugriffsrechte prüfen
+     * @throws \Exception
      */
     public function saveArticle(Article $article) {
         // Artikel aktualisieren
@@ -2421,6 +2450,7 @@ class Orm {
 
     /**
      * Löscht den Artikel mit der angegebenen ID
+     *
      * @param $id Datensatz-ID des zu löschenden Artikels
      * @return bool
      */
@@ -2440,6 +2470,7 @@ class Orm {
 
     /**
      * Löscht mehrere Artikel anhand ihrer Datensatz-IDs
+     *
      * @param array $ids IDs der zu löschenden Artikel
      * @return void
      */
@@ -2451,6 +2482,7 @@ class Orm {
 
     /**
      * Sperrt die Artikel mit den übergebenen IDs
+     *
      * @param array $ids IDs der zu sperrenden Artikel
      * @return void
      */
@@ -2467,7 +2499,9 @@ class Orm {
 
     /**
      * Aktualisiert einen Artikel-Datensatz.
+     *
      * @param Article $article
+     * @throws \Exception
      */
     private function updateArticle(Article $article) {
         $article->modification_timestamp = new \DateTime();
@@ -2530,8 +2564,10 @@ class Orm {
 
     /**
      * Speichert den übergebenen Artikel als neuen Datensatz
+     *
      * @param Article $article Der zu speichernde Artikel
      * @return int Die generierte Artikel-ID
+     * @throws \Exception
      */
     private function insertArticle(Article $article) {
         // Grundlegende Validierung
@@ -3083,6 +3119,7 @@ class Orm {
 
     /**
      * Überprüft, ob die angegebene Page-URL bereits vergeben ist
+     *
      * @param string $url Die zu überprüfende Seite
      * @param null $id Optional eine nicht zu berücksichtigende Page-ID (bei Updates)
      * @return bool true, wenn die genannte URL bereits vergeben ist
@@ -3106,6 +3143,7 @@ class Orm {
 
     /**
      * Löscht die Page mit der angegebenen ID
+     *
      * @param int $id Datensatz-ID der zu löschenden Page
      * @return bool true bei Erfolg, ansonsten false
      */
@@ -3125,6 +3163,7 @@ class Orm {
 
     /**
      * Löscht die Pages mit den übergebenen Datensatz-IDs
+     *
      * @param array $ids IDs der zu löschenden Pages
      * @return void
      */
@@ -3136,6 +3175,7 @@ class Orm {
 
     /**
      * Setzt den Status der Seiten mit den übergebenen IDs auf "gesperrt".
+     *
      * @param array $ids IDs der zu sperrenden Pages
      * @return void
      */
@@ -3152,9 +3192,11 @@ class Orm {
 
     /**
      * Speichert eine Page in der Datenbank
+     *
      * @param Page $page Die zu speichernde Page
      * @return int Datensatz-ID
      * @todo Zugriffsrechte prüfen!
+     * @throws \Exception
      */
     public function savePage(Page $page) {
         if ($page->id > 0) {
@@ -3167,8 +3209,10 @@ class Orm {
 
     /**
      * Aktualisiert einen Page-Datensatz
+     *
      * @param Page $page Die zu aktualisierende Page
      * @return void
+     * @throws \Exception
      */
     private function updatePage(Page $page) {
         $page->modification_timestamp = new \DateTime();
@@ -3200,8 +3244,10 @@ class Orm {
 
     /**
      * Speichert eine Page in einem neuen Datensatz
+     *
      * @param Page $page Die zu speichernde Page
      * @return int Die generierte Datensatz-ID
+     * @throws \Exception
      */
     private function insertPage(Page $page) {
         if ($this->isPageUrlAlreadyExisting($page->url)) {
@@ -3247,6 +3293,7 @@ class Orm {
     
     /**
      * Gibt den Copyright-Hinweis / die Footer-Notiz für die Website zurück
+     *
      * @return string
      */
     public function getCopyrightNotice() {
@@ -3259,6 +3306,7 @@ class Orm {
      * Wenn der Seitentitel nicht ermittelt werden kann (weil beispielsweise
      * noch keine Datenbank vorhanden ist), so wird ein Vorgabetitel zurück
      * gegeben.
+     *
      * @return string Seitentitel
      */
     public function getSiteTitle() : string {
@@ -3296,6 +3344,7 @@ class Orm {
      * Benutzer-Datensätze unabhängig von ihrem Status.
      * Alle anderen Funktionen sollten Benutzerdatensätze grundsätzlich in "Echtzeit" überprüfen,
      * d. h. immer aktuelle Informationen aus der Datenbank beziehen.
+     *
      * @param int $userId
      * @return User|null
      */

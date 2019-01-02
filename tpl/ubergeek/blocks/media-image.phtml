@@ -1,27 +1,29 @@
 <?php
-/* @var $this \Ubergeek\NanoCm\Module\CoreModule */
+/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 /* @var $medium \Ubergeek\NanoCm\Medium */
 /* @var $format \Ubergeek\NanoCm\Media\ImageFormat */
-/* @var $articleText string */
 
-$medium = null;
-$format = null;
-if (!empty($this->article->medium_id) && ($format = $this->orm->getImageFormatByKey('banner')) !== null) {
-    $medium = $this->orm->getMediumById($this->article->medium_id);
-}
+$medium = $this->orm->getMediumById($this->getVar('converter.image.id'));
+$format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'));
 ?>
+
+<?php if ($medium != null && $format != null) : ?>
 <figure>
-    <div class="figurecontainer" style="max-width: 600px">
+    <div class="figurecontainer" style="max-width: <?php echo intval($format->width); ?>px">
         <div class="imgcontainer">
-            <a href="/media/cd215eccfd5d84c60f446ba3238b54d6/image/original/" data-lightbox="preview" data-title="Der Stier und das M&auml;dchen">
-                <img src="/media/cd215eccfd5d84c60f446ba3238b54d6/image/preview/" />
+            <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                <img src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>">
             </a>
-            <div class="attribution">Einfacher Copyright-Hinweis mit <a href="javascript:void(0);">Quelle</a>
-                und etwas mehr Text, der im Normalfall &uuml;ber mehr als eine Zeile l&auml;uft.</div>
+            <?php if (strlen($medium->attribution) > 0) : ?>
+                <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+            <?php endif; ?>
         </div>
-        <div class="caption shadow">
-            <figcaption>Beschreibung zu diesem Bild, die in diesem Fall tats&auml;chlich auch
-                mal mehrzeilig ist. Dum di dum di dum. Sogar mit <a href="javascript:void(0)">Link</a>.</figcaption>
-        </div>
+        <?php if (strlen($medium->description) > 0) : ?>
+            <div class="caption shadow">
+                <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>
+            </div>
+        <?php endif; ?>
     </div>
 </figure>
+<?php endif; ?>
+
