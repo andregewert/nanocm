@@ -5,6 +5,11 @@
 - [x] Nutzung oder Implementierung von LightBox oder etwas ähnlichem
 - [x] Content-Verwaltung: Platzhalter zu Generierung von Twitter-/Youtube-Inhalten
 - [x] Template: Inhalte von Drittseiten (Twitter, YT etc.) sollen per "Click to play" aktivierbar sein (DSGVO)
+- [ ] Verlinkung von Kommentaren
+- [ ] Cookie-Hinweis einblenden
+- [ ] Styles für Sidebars
+- [ ] Styles für Download-Links
+- [ ] Styles für Blockquotes, insbesondere eingebettete Tweets
 - [ ] Content-Verwaltung: Umfangreiche, konfigurierbare Platzhalter für Images
 - [ ] Content-Verwaltung: Überarbeitung JavaScript für Tag-Bearbeitung
 - [ ] Photostream aus dem CMS gespeist
