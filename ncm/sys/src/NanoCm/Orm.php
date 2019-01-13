@@ -181,7 +181,7 @@ class Orm {
         }
         $sql .= 'FROM accesslog WHERE
                     strftime(\'%Y\', accesstime) = :year 
-                    AND strftime(\'%m\', accesstime) = :month ';
+                    AND CAST(strftime(\'%m\', accesstime) AS INT) = :month ';
 
         // Begrenzung der Ergebnismenge auf Anzeigeseiten
         if (!$countOnly) {
@@ -320,7 +320,7 @@ class Orm {
         $sql = 'SELECT COUNT(DISTINCT sessionid) AS c
                 FROM accesslog
                 WHERE  strftime(\'%Y\', accesstime) = :year 
-                AND strftime(\'%m\', accesstime) = :month ';
+                AND CAST(strftime(\'%m\', accesstime) AS INT) = :month ';
         $stmt = $this->statsdb->prepare($sql);
         $stmt->bindValue('year', $year, \PDO::PARAM_STR);
         $stmt->bindValue('month', $month, \PDO::PARAM_STR);

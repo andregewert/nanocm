@@ -30,6 +30,12 @@ if (!empty($this->article->medium_id)) {
             </div>
         <?php endif; ?>
 
+        <?php if (strlen($this->article->teaser) > 0) : ?>
+            <div class="lead">
+                <?php echo $this->convertTextWithFullMarkup($this->article->teaser); ?>
+            </div>
+        <?php endif; ?>
+
         <?php echo $this->convertTextWithFullMarkup($this->article->content); ?>
 
         <div class="articlefooter">

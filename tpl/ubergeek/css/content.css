@@ -236,9 +236,6 @@ ul.taglist li a {
   border-radius: 0.25em;
   display: inline-block; }
 
-ul.taglist li a:hover {
-  /*    background-color: darken($color-accent, 10%);*/ }
-
 p {
   margin: 1em 0; }
 
@@ -246,6 +243,11 @@ p.readmore {
   font-weight: bold;
   margin-top: -0.8rem;
   text-align: left; }
+
+div.lead {
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.4em; }
 
 .alert {
   background-color: blanchedalmond;
