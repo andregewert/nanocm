@@ -29,6 +29,8 @@ verwendet:
 - [highlight.js](https://highlightjs.org/) (für das Syntax-Highlighting bei Code-Beispielen)
 - [Lightbox](https://lokeshdhakar.com/projects/lightbox2/) (die Original-Lightbox von Lokesh Dhakar für die Präsentation von Bildern)
 - [Bootstrap](https://getbootstrap.com/) (für das Standard-Seitentemplate - also nicht für ubergeek.de)
+- Source Sans Pro: Copyright 2010, 2012, 2014 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name Source.
+- Oswald: Copyright 2016 The Oswald Project Authors (https://github.com/googlefonts/OswaldFont)
 
 # Mitmachen
 

@@ -16,12 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-// Zentrale Instanz des Content Managers instanziieren
-
-// Standard-Controller ausführen
-
 require 'ncm/sys/src/autoload.php';
-//$var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
-$var = new Ubergeek\NanoCm\FrontController(__DIR__);
+if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'ubergeek.de') {
+    $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
+} else {
+    $var = new Ubergeek\NanoCm\FrontController(__DIR__);
+}
 $var->execute();

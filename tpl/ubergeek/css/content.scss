@@ -79,7 +79,7 @@ textarea.form-control {
 
 div.shadow,
 li.odd {
-    background-color: $color-lightshadow;
+    background-color: $color-sidebarbg;
 }
 
 ul, ol {
@@ -136,7 +136,7 @@ ul.comments li h3,
 ol.comments li h3
 {
     float: left;
-    color: $color-lightborder;
+    color: $color-darkborder;
     font-style: italic;
     font-size: 1.8rem;
     font-weight: 600;
@@ -184,14 +184,6 @@ ul.taglist li {
 }
 
 ul.taglist li a {
-    /*
-    background-color: $color-accent;
-    color: $color-accent-contrast;
-    font-weight: bold;
-    padding: 0.1em 0.75em;
-    border-radius: 0.25em;
-    display: inline-block;
-    */
     border: solid $color-accent 1px;
     padding: 0.1em 0.75em;
     border-radius: 0.25em;
@@ -222,6 +214,25 @@ p.readmore {
 
 .alert .message {
     padding: 0.25em 0;
+}
+
+div.sidebar {
+    background: $color_sidebarbg;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4em;
+}
+
+div.sidebar_right {
+    width: 20rem;
+    float: right;
+    margin: 1rem 0 1rem 1rem;
+}
+
+div.sidebar_left {
+    width: 20rem;
+    float: left;
+    margin: 1rem 1rem 1rem 0;
 }
 
 /* <editor-fold desc="Media manager"> */
@@ -305,6 +316,14 @@ figure {
 
 .video-preview a:hover img.overlay {
     opacity: 1;
+}
+
+blockquote.twitter-tweet {
+    background: $color-sidebarbg;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0.001rem 1rem 1rem 1rem;
+    box-sizing: border-box;
 }
 
 /* </editor-fold> */

@@ -294,17 +294,17 @@ class MarkupParser {
 
         // Sidebar middle
         $input = preg_replace_callback("/^\<p\>\&lt\;\-\-\-\-\&gt\;(\<br\>)?\s*(.*?)\s*(\<br\>)?\&lt\;\-\-\-\-\&gt\;\<\/p\>$/ims", function($matches) {
-            return "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; padding: 0.5rem 0.5rem 0 0.5rem\"><p>" . $matches[2] . "</p></div>";
+            return "<div class=\"sidebar\"><p>" . $matches[2] . "</p></div>";
         }, $input);
 
         // Sidebar right
         $input = preg_replace_callback("/^\<p\>\-\-\-\-\&gt\;(\<br\>)?\s*(.*?)\s*(\<br\>)?\-\-\-\-\&gt\;\<\/p\>$/ims", function ($matches) {
-            return "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: right; width: 20rem; padding: 0.5rem\"><p>" . $matches[2] . "</p></div>";
+            return "<div class=\"sidebar sidebar_right\"><p>" . $matches[2] . "</p></div>";
         }, $input);
 
         // Sidebar left
         $input = preg_replace_callback("/^\<p\>\&lt\;\-\-\-\-(\<br\>)?\s*(.*?)\s*(\<br\>)?\&lt\;\-\-\-\-\<\/p\>$/ims", function ($matches) {
-            return "<div class=\"sidebar\" style=\"background-color: lightgray; border: solid silver 1px; float: left; width: 20rem; padding: 0.5rem\"><p>" . $matches[2] . "</p></div>";
+            return "<div class=\"sidebar sidebar_left\"><p>" . $matches[2] . "</p></div>";
         }, $input);
 
         // Sidebar left

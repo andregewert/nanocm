@@ -4,15 +4,22 @@
     <head>
         <meta charset="utf-8">        
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+        <meta name="robots" content="INDEX,FOLLOW" />
+        <meta name="revisit-after" content="2 days" />
+        <meta name="generator" content="<?php echo $this->htmlEncode($this->ncm->versionInfo->generator); ?>" />
+        <meta http-equiv="content-Type" content="text/html; utf-8" />
+        <meta http-equiv="Pragma" content="cache" />
+        <meta http-equiv="content-Language" content="<?php echo $this->htmlEncode($this->ncm->lang); ?>" />
+
         <title><?php echo $this->htmlEncode($this->getTitle()); ?></title>
         <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/frame.css'); ?>" />
         <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/content.css'); ?>" />
-        <link href="https://fonts.googleapis.com/css?family=Oswald|Source+Sans+Pro:400,400i,600,600i" rel="stylesheet">
+        <!--<link href="https://fonts.googleapis.com/css?family=Oswald|Source+Sans+Pro:400,400i,600,600i" rel="stylesheet">-->
         <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/favicon-32x32.png'); ?>">
         <link href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/lightbox/css/lightbox.css'); ?>" rel="stylesheet">
         <link href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/highlight/styles/default.css'); ?>" rel="stylesheet">
         <script src=" <?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/highlight/highlight.pack.js'); ?>"></script>
-        <meta name="theme-color" content="#000000">
     </head>
     <body>
         <header>
@@ -51,9 +58,10 @@
                     <?php if (count(($comments = $this->orm->getLatestComments())) > 0) : ?>
                         <ul class="nobullets">
                             <?php foreach ($comments as $comment) : ?>
+                                <?php $article = $this->orm->getArticleById($comment->article_id); ?>
                                 <li>
                                     <?php echo $comment->creation_timestamp->format('d.m.'); ?>
-                                    <a href="javascript:void(0)">
+                                    <a href="<?php echo $this->convUrl($article->getCommentUrl($comment)); ?>">
                                         <?php echo $this->htmlEncode($comment->username); ?>
                                         zu
                                         <?php echo $this->htmlEncode($this->orm->getArticleHeadlineById($comment->article_id)); ?>

@@ -1,6 +1,7 @@
 {
   "version":      "0.9",
-  "attribution":  "Copyright © 2017-2018, André Gewert",
+  "generator":    "NanoCM 0.9",
+  "attribution":  "Copyright © 2017-2019, André Gewert",
   "link":         "www.ubergeek.de",
   "mail":         "agewert@ubergeek.de",
   "dbversion":    "1"

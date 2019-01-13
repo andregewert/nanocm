@@ -173,9 +173,10 @@ class MediaManager {
         }
 
         if (preg_match('/^[a-z0-9_\-]+$/i', $youtubeId) !== false) {
-            $srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/hqdefault.jpg");
-            $tgtImgData = $this->resizeImageDataToFormat($srcImgData, $format);
+            //$srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/hqdefault.jpg");
+            $srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/maxresdefault.jpg");
 
+            $tgtImgData = $this->resizeImageDataToFormat($srcImgData, $format);
             if ($tgtImgData != null && $this->cache instanceof CacheInterface) {
                 $this->cache->put($cacheKey, $tgtImgData);
             }
@@ -274,8 +275,33 @@ class MediaManager {
             $destWidth = $format->width;
             $destHeight = $format->height;
 
-            // TODO jeweils beide Seiten soweit skalieren, dass beide passen!
+            $f1 = $destWidth / $originalWidth;
+            $f2 = $destHeight / $originalHeight;
 
+            if (abs(1 -$f1) <= abs(1 -$f2)) {
+                $scalingFactor = $f1;
+                while ($originalHeight *$scalingFactor < $destHeight) {
+                    $scalingFactor += 0.001;
+                }
+                if (abs(1 -$scalingFactor) > abs(1 -$f2)) {
+                    $scalingFactor = $f2;
+                }
+            } else {
+                $scalingFactor = $f2;
+                while ($originalWidth *$scalingFactor < $destWidth) {
+                    $scalingFactor += 0.001;
+                }
+                if (abs(1 -$scalingFactor) > abs(1 -$f1)) {
+                    $scalingFactor = $f1;
+                }
+            }
+
+            $sourceWidth = ceil($destWidth /$scalingFactor);
+            $sourceHeight = ceil($destHeight /$scalingFactor);
+            $offsetLeft = floor($originalWidth /2) -ceil(($destWidth /$scalingFactor) /2);
+            $offsetTop = floor($originalHeight /2) - ceil(($destHeight /$scalingFactor) /2);
+
+            /*
             // Breite ist die lange Seite
             if ($destWidth > $destHeight || ($destWidth == $destHeight && $originalWidth < $originalHeight)) {
                 if ($originalWidth != $destWidth) {
@@ -299,6 +325,7 @@ class MediaManager {
                     $offsetLeft = floor($originalWidth /2) -ceil($destWidth /2);
                 }
             }
+            */
         }
 
         $copy = imagecreatetruecolor($destWidth, $destHeight);

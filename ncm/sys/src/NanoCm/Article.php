@@ -207,6 +207,10 @@ class Article {
         return '/weblog/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
     }
 
+    public function getCommentUrl(Comment $comment) : string {
+        return $this->getArticleUrl() . '#comment-' . intval($comment->id);
+    }
+
     public function getTagSearchUrl(string $tag) : string {
         return '/weblog/tags/' . $tag;
     }
