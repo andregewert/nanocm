@@ -1286,19 +1286,21 @@ class Orm {
     /**
      * Ermittelt die neuesten Kommentare
      *
+     * @param int $limit Maximale Anzahl der zu ermittelnden Kommentare
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Kommentare berücksichtig werden sollen
      * @return Comment[]
      */
-    public function getLatestComments(bool $releasedOnly = true) {
+    public function getLatestComments($limit = 10, bool $releasedOnly = true) {
         $comments = array();
         $params = array();
+        $limit = intval($limit);
 
         $sql = 'SELECT * FROM comment WHERE 1 = 1 ';
         if ($releasedOnly) {
             $sql .= ' AND status_code = :status_code ';
             $params['status_code'] = StatusCode::ACTIVE;
         }
-        $sql .= ' ORDER BY creation_timestamp DESC ';
+        $sql .= " ORDER BY creation_timestamp DESC LIMIT $limit ";
         $stmt = $this->basedb->prepare($sql);
         $this->bindValues($stmt, $params);
         $stmt->execute();

@@ -1,7 +1,7 @@
 <?php
 /**
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017 - 2019 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,14 +21,35 @@
 namespace Ubergeek\Feed;
 
 /**
- * Bildet die Basisdaten ("Kopfdaten") für eine Feed-Quelle ab (Titel der Website etc.)
+ * Bildet einen Personendatensatz (etwa mit Autoreninformationen für einen Artikel oder Kommentar) für Feeds ab
+ *
+ * Die Definition lehnt sich im Moment klar an den Atom-Spezifikationen an, kann bei Bedarf aber auch noch erweitert
+ * werden.
  *
  * @package Ubergeek\Feed
+ * @created 2019-01-20
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2018-11-09
  */
-class FeedInfo {
+class Person
+{
+    /**
+     * Vollständiger bzw. anzuzeigender Name der Person
+     *
+     * @var string
+     */
+    public $name;
 
-    // TODO implementieren
+    /**
+     * Optionaler Link zu einer Homepage o. ä. für diese Person
+     *
+     * @var string
+     */
+    public $uri;
 
+    /**
+     * Optionale, öffentliche E-Mail-Adresse der Person
+     *
+     * @var string
+     */
+    public $email;
 }

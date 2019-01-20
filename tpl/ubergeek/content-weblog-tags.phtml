@@ -7,6 +7,8 @@ $first = true;
 <div class="container spacing">
     <h1>Suche nach Schlagworten: <?php echo $this->htmlEncode(join(', ', $this->searchTags)); ?></h1>
 
+    <p>Feed mit Artikel zu dieser Suche: <a href="<?php echo $this->htmlConvUrl('/weblog/feed/tags/' . join(', ', $this->searchTags)); ?>">Atom</a></p>
+
     <?php if (is_array($this->articles) && count($this->articles) > 0) : ?>
         <?php foreach ($this->articles as $article) : ?>
             <?php $pubDate = ($article->publishing_timestamp == null)? $article->start_timestamp : $article->publishing_timestamp; ?>

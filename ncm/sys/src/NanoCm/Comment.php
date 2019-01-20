@@ -113,10 +113,6 @@ class Comment {
         return null;
     }
 
-    public function getCommentUrl() : string {
-        #return '/weblog/article/' . $this->article_id . '/' . urlencode(Util::simplifyUrlString($this->headline));
-    }
-
     // </editor-fold>
 
 

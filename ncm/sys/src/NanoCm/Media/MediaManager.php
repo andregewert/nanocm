@@ -25,6 +25,7 @@ use Ubergeek\Log\LoggerInterface;
 use Ubergeek\Log\Writer\NullWriter;
 use Ubergeek\NanoCm\Media\Exception\MediaException;
 use Ubergeek\NanoCm\Medium;
+use Ubergeek\NanoCm\Util;
 use Ubergeek\Net\Fetch;
 
 /**
@@ -152,6 +153,39 @@ class MediaManager {
     }
 
     /**
+     * Erstellt einen Gravatar für den angegebenen E-Mail-Hash in einer bestimmten Größe
+     *
+     * @param string $hash MD5-Hash der betreffenden E-Mail-Adresse
+     * @param int $size Angeforderter Größe
+     * @return string|null Die generierten Image-Daten
+     */
+    public function getGravatar(string $hash, int $size = 50) {
+        if (preg_match('/^[a-f0-9]+$/i', $hash) !== false) {
+            $cachekey = 'gravatar-' . $hash . '-' . $size;
+
+            if ($this->cache instanceof CacheInterface) {
+                $image = $this->cache->get($cachekey);
+                if ($image != null) {
+                    $this->log->debug("Found gravatar in cache: $hash / $size");
+                    return $image;
+                }
+            }
+
+            $size = intval($size);
+            $url  = "http://www.gravatar.com/avatar/$hash?default=robohash&size=$size&rating=X";
+            $image = Fetch::fetchFromUrl($url);
+
+            if ($image != null && $this->cache instanceof CacheInterface) {
+                $this->cache->put($cachekey, $image);
+                $this->log->debug("Putting gravatar image in cache: $hash / $size");
+            }
+            return $image;
+        }
+
+        throw new MediaException("Invalid gravatar hash: $hash");
+    }
+
+    /**
      * Erstellt ein Vorschaubild für das Youtube-Video mit angegebener Video-ID in dem übergebenen Bildformat
      *
      * Diese Methode verwendet den optional konfigurierten Cache.
@@ -161,18 +195,18 @@ class MediaManager {
      * @return string|null Rohe Bilddaten (JPEG) oder null, wenn bei der Erstellung ein Fehler auftritt
      */
     public function createImageForYoutubeVideoWithFormat(string $youtubeId, ImageFormat $format) {
-        $cacheKey = 'yt-' . $youtubeId . '-' . $format->key;
-
-        if ($this->cache instanceof CacheInterface) {
-            $image = $this->cache->get($cacheKey);
-            if ($image != null) {
-                $this->log->debug("Found youtube preview in cache: $youtubeId / $format->key");
-                $this->cache->touch($cacheKey);
-                return $image;
-            }
-        }
-
         if (preg_match('/^[a-z0-9_\-]+$/i', $youtubeId) !== false) {
+            $cacheKey = 'yt-' . $youtubeId . '-' . $format->key;
+
+            if ($this->cache instanceof CacheInterface) {
+                $image = $this->cache->get($cacheKey);
+                if ($image != null) {
+                    $this->log->debug("Found youtube preview in cache: $youtubeId / $format->key");
+                    //$this->cache->touch($cacheKey);
+                    return $image;
+                }
+            }
+
             //$srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/hqdefault.jpg");
             $srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/maxresdefault.jpg");
 
@@ -214,7 +248,7 @@ class MediaManager {
             $image = $this->cache->get($cacheKey);
             if ($image != null) {
                 $this->log->debug("Found media thumbnail in cache: $medium->id / $format->key");
-                $this->cache->touch($cacheKey);
+                //$this->cache->touch($cacheKey);
                 return $image;
             }
         }

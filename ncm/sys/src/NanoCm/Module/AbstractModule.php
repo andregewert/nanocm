@@ -278,6 +278,10 @@ abstract class AbstractModule implements
         return $url . $relativeUrl;
     }
 
+    public function convUrlToAbsolute($relativeUrl) {
+        return $this->frontController->createAbsoluteSiteLink($relativeUrl);
+    }
+
     /**
      * Wandelt eine URL genau so um wie convUrl, kodiert jedoch zusätzlich HTML-Sonderzeichen, so dass der Rückggabewert
      * direkt bzw. ohne weiteren Funktionsaufruf in HTML-Templates ausgegeben werden kann

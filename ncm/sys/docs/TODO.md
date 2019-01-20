@@ -5,11 +5,11 @@
 - [x] Nutzung oder Implementierung von LightBox oder etwas ähnlichem
 - [x] Content-Verwaltung: Platzhalter zu Generierung von Twitter-/Youtube-Inhalten
 - [x] Template: Inhalte von Drittseiten (Twitter, YT etc.) sollen per "Click to play" aktivierbar sein (DSGVO)
-- [ ] Verlinkung von Kommentaren
-- [ ] Cookie-Hinweis einblenden
+- [x] Verlinkung von Kommentaren
 - [x] Styles für Sidebars
-- [ ] Styles für Download-Links
 - [x] Styles für Blockquotes, insbesondere eingebettete Tweets
+- [ ] Cookie-Hinweis einblenden
+- [ ] Styles für Download-Links
 - [ ] Content-Verwaltung: Umfangreiche, konfigurierbare Platzhalter für Images
 - [ ] Content-Verwaltung: Überarbeitung JavaScript für Tag-Bearbeitung
 - [ ] Photostream aus dem CMS gespeist
@@ -19,7 +19,7 @@
 ## Mittlere Priorität
 
 - [x] Nutzung von Gravatar optional machen
-- [ ] Medienverwaltung: Korrektur Bild-Zuschnitt
+- [x] Medienverwaltung: Korrektur Bild-Zuschnitt
 - [ ] Templates: Zugehörigkeit zu einer Artikelserie anzeigen (als Inhaltsverzeichnis)
 - [ ] Content-Verwaltung: globale Liste von Abkürzungen verwalten
 - [ ] Versand von E-Mail-Notifications bei neuen Kommentaren etc.
@@ -28,8 +28,8 @@
 
 ## Niedriege Priorität
 
+- [x] Atom-Feed implementieren
 - [ ] Lokalisierbarkeit
 - [ ] Installationsassistent
-- [ ] Atom-Feed implementieren
 - [ ] Trackback-Funktion implementieren
 - [ ] ePub-Generierung implementieren

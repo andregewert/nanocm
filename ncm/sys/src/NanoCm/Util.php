@@ -27,13 +27,10 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
-    public static function getGravatarUserImageUrl($mail, $default = '/images/defuser.gif') {
-        $url  = 'http://www.gravatar.com/avatar.php';
-        $url .= '?gravatar_id=' . md5(trim($mail));
-        $url .= '&default=' . urlencode('http://' . $_SERVER['HTTP_HOST'] . $default);
-        $url .= '&size=50';
-        $url .= '&rating=X';
-        return $url;
+    public static function getGravatarUserImageUrl($mail, $size = 50) {
+        $hash = md5(trim($mail));
+        $size = intval($size);
+        return "/media/$hash/gravatar/$size";
     }
 
     /**

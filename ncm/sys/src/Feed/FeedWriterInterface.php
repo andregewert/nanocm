@@ -22,12 +22,20 @@ namespace Ubergeek\Feed;
 
 /**
  * Bildet ein generisches Interface zum Schreiben (Erstellen) von Feed-Dateien ab
+ *
+ * @todo Eventuell lässt sich dieses Interface auch brauchbar für die Generierung von ePub-Dateien nutzen
  * @package Ubergeek\Feed
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-11-09
  */
 interface FeedWriterInterface {
 
-    // TODO Implementieren
+    /**
+     * Erstellt für das übergebene Feed-Objekt das gewünschte Ausgabeformat
+     *
+     * @param Feed $feed Der zu wandelnde Feed
+     * @return string Das Ergebnis im gewünschten Ausgabeformat
+     */
+    public function writeFeed(Feed $feed) : string;
 
 }

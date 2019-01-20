@@ -20,9 +20,11 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\Feed\AtomWriter;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Captcha;
 use Ubergeek\NanoCm\Comment;
+use Ubergeek\NanoCm\FeedGenerator;
 use Ubergeek\NanoCm\Media\ImageResizer;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
@@ -183,6 +185,62 @@ class CoreModule extends AbstractModule {
                     $this->articles = $this->orm->searchArticles($filter);
                     $this->content = $this->renderUserTemplate('content-weblog-tags.phtml');
                 }
+
+                // Verschiedene Atom-Feeds
+                elseif ($parts[1] == 'feed') {
+
+                    // Neueste Artikel
+                    if (count($parts) >= 2 && $parts[2] == 'index.php') {
+                        $this->setPageTemplate(self::PAGE_NONE);
+                        $this->setContentType('text/xml');
+                        $generator = new FeedGenerator($this);
+                        $feed = $generator->createFeedForArticles(
+                            $this->ncm->orm->getLatestArticles(10),
+                            $this->frontController->getHttpRequest()->requestUri->getRequestUrl(),
+                            $this->ncm->orm->getSiteTitle() . ': Neueste Artikel'
+                        );
+                        $writer = new AtomWriter();
+                        $this->content = $writer->writeFeed($feed);
+                    }
+
+                    // Neueste Kommentare
+                    elseif (count($parts) >= 3 && $parts[2] == 'comments') {
+                        $this->setPageTemplate(self::PAGE_NONE);
+                        $this->setContentType('text/xml');
+
+                        $this->setPageTemplate(self::PAGE_NONE);
+                        $this->setContentType('text/xml');
+
+                        $generator = new FeedGenerator($this);
+                        $feed = $generator->createFeedForComments(
+                            $this->orm->getLatestComments(10),
+                            $this->frontController->getHttpRequest()->requestUri->getRequestUrl(),
+                            $this->ncm->orm->getSiteTitle() . ': Neueste Kommentare'
+                        );
+                        $writer = new AtomWriter();
+                        $this->content = $writer->writeFeed($feed);
+                    }
+
+                    // Artikel zu bestimmten Schlagworten
+                    elseif (count($parts) >= 4 && $parts[2] == 'tags') {
+                        $this->setPageTemplate(self::PAGE_NONE);
+                        $this->setContentType('text/xml');
+
+                        $tags = Tag::splitTagsString(urldecode($parts[3]));
+                        $filter = new Article();
+                        $filter->tags = $tags;
+                        $articles = $this->orm->searchArticles($filter);
+
+                        $generator = new FeedGenerator($this);
+                        $feed = $generator->createFeedForArticles(
+                            $articles,
+                            $this->frontController->getHttpRequest()->requestUri->getRequestUrl(),
+                            $this->ncm->orm->getSiteTitle() . ': Artikel mit Stichworten'
+                        );
+                        $writer = new AtomWriter();
+                        $this->content = $writer->writeFeed($feed);
+                    }
+                }
                 break;
 
             // Mediendateien
@@ -206,6 +264,20 @@ class CoreModule extends AbstractModule {
                             }
                             break;
 
+                        // Gravatar
+                        case 'gravatar':
+                            $hash = $parts[1];
+                            $size = (count($parts) >= 3)? intval($parts[3]) : 50;
+                            $imgData = $this->ncm->mediaManager->getGravatar($hash, $size);
+
+                            if ($imgData != null) {
+                                $this->setPageTemplate(self::PAGE_NONE);
+                                $this->setContentType('image/png');
+                                $this->replaceMeta('content-length', strlen($imgData));
+                                $this->content = $imgData;
+                            }
+                            break;
+
                         // Youtube-Vorschau
                         case 'yt':
                             $youtubeId = $parts[1];
@@ -216,13 +288,13 @@ class CoreModule extends AbstractModule {
                                 $imgData = $this->ncm->mediaManager->createImageForYoutubeVideoWithFormat($youtubeId, $format);
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->setContentType('image/jpeg');
+                                $this->replaceMeta('content-length', strlen($imgData));
                                 $this->content = $imgData;
                             }
                             break;
 
                         // Ein Bild in einem bestimmten Format ausgeben
                         case 'image':
-                            //$imageResizer = new ImageResizer($this->ncm->mediaCache);
                             $mediumHash = $parts[1];
                             $formatKey = $parts[3];
                             $format = $this->orm->getImageFormatByKey($formatKey);
@@ -233,6 +305,7 @@ class CoreModule extends AbstractModule {
                                 $this->setContentType('image/jpeg');
                                 $data = $this->orm->getMediumFileContents($medium->id);
                                 $c = $this->ncm->mediaManager->createImageForMediumWithImageFormat($medium, $data, $format, 'jpeg');
+                                $this->replaceMeta('content-length', strlen($c));
                                 $this->content = $c;
                             }
                             break;
