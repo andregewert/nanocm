@@ -11,6 +11,12 @@ if (!empty($this->article->medium_id)) {
 }
 ?>
 
+<?php if ($this->isPreview) : ?>
+    <div class="container">
+        <div class="watermark preview"><span>Preview</span></div>
+    </div>
+<?php endif; ?>
+
 <div class="container">
     <article class="<?php echo $class; ?>">
         <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>

@@ -8,13 +8,12 @@
 - [x] Verlinkung von Kommentaren
 - [x] Styles für Sidebars
 - [x] Styles für Blockquotes, insbesondere eingebettete Tweets
-- [ ] Cookie-Hinweis einblenden
+- [x] Vorschaufunktion für Artikel und Pages implementieren!
 - [ ] Styles für Download-Links
 - [ ] Content-Verwaltung: Umfangreiche, konfigurierbare Platzhalter für Images
 - [ ] Content-Verwaltung: Überarbeitung JavaScript für Tag-Bearbeitung
 - [ ] Photostream aus dem CMS gespeist
 - [ ] Implementierung Suchfunktion
-- [ ] Vorschaufunktion für Artikel und Pages implementieren!
 
 ## Mittlere Priorität
 
@@ -25,11 +24,14 @@
 - [ ] Versand von E-Mail-Notifications bei neuen Kommentaren etc.
 - [ ] Platz finden für Darstellung von Blogroll
 - [ ] Tag Cloud auf Archivseite oder auf Startseite darstellen?
+- [ ] Integration von openthesaurus.de im Artikeleditor
+- [ ] Evtl. Integration von Openweathermap in Startseite Administration
 
-## Niedriege Priorität
+## Niedrige Priorität
 
 - [x] Atom-Feed implementieren
 - [ ] Lokalisierbarkeit
 - [ ] Installationsassistent
 - [ ] Trackback-Funktion implementieren
 - [ ] ePub-Generierung implementieren
+- [ ] Cookie-Hinweis einblenden (-> da keine Weitergabe von Daten an Dritte eigentlich nicht notwendig -> low pri)

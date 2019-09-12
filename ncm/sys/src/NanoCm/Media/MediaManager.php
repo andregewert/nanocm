@@ -115,24 +115,27 @@ class MediaManager {
             }
         }
 
+        $tweetInfo = null;
         $url = "https://api.twitter.com/1/statuses/oembed.json?id=$id";
         $info = json_decode(Fetch::fetchFromUrl($url));
 
-        $tweetInfo = new TweetInfo();
-        $tweetInfo->url = $info->url;
-        $tweetInfo->author_name = $info->author_name;
-        $tweetInfo->author_url = $info->author_url;
-        $tweetInfo->html = $info->html;
-        $tweetInfo->width = $info->width;
-        $tweetInfo->height = $info->height;
-        $tweetInfo->type = $info->type;
-        $tweetInfo->cache_age = $info->cache_age;
-        $tweetInfo->provider_name = $info->provider_name;
-        $tweetInfo->provider_url = $info->provider_url;
-        $tweetInfo->version = $info->version;
+        if ($info != null) {
+            $tweetInfo = new TweetInfo();
+            $tweetInfo->url = $info->url;
+            $tweetInfo->author_name = $info->author_name;
+            $tweetInfo->author_url = $info->author_url;
+            $tweetInfo->html = $info->html;
+            $tweetInfo->width = $info->width;
+            $tweetInfo->height = $info->height;
+            $tweetInfo->type = $info->type;
+            $tweetInfo->cache_age = $info->cache_age;
+            $tweetInfo->provider_name = $info->provider_name;
+            $tweetInfo->provider_url = $info->provider_url;
+            $tweetInfo->version = $info->version;
 
-        if ($this->cache instanceof CacheInterface) {
-            $this->cache->put($cacheKey, $tweetInfo);
+            if ($this->cache instanceof CacheInterface) {
+                $this->cache->put($cacheKey, $tweetInfo);
+            }
         }
 
         return $tweetInfo;

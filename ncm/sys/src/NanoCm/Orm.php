@@ -2429,14 +2429,18 @@ class Orm {
      * @param bool $releasedOnly Gibt an, ob ausschließlich freigeschaltete Artikel berücksichtigt werden sollen
      * @return Article|null
      * @todo Verknüpfte komplexe Daten (Autor etc.) müssen auch ausgelesen werden
+     * @todo Bei der Überprüfung auf "Freigabe" muss auch der Freischaltungszeitraum berücksichtigt werden!!!
      * @throws \Exception
      */
     public function getArticleById(int $id, bool $releasedOnly = true) {
         $sql = 'SELECT * FROM article WHERE id = :id ';
         if ($releasedOnly) {
-            $sql .= ' AND status_code = ' . StatusCode::ACTIVE;
+            $sql .= '
+                AND (
+                    start_timestamp <= datetime(CURRENT_TIMESTAMP, \'localtime\')
+                    AND (stop_timestamp IS NULL OR stop_timestamp >= datetime(CURRENT_TIMESTAMP, \'localtime\'))
+                ) AND status_code = ' . StatusCode::ACTIVE;
         }
-
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $id);
         $stmt->execute();

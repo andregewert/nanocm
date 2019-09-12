@@ -34,7 +34,7 @@ namespace Ubergeek\MarkupParser;
  * @author agewert@ubergeek.de
  * @package Ubergeek\MarkupParser
  * @created 2018-05-15
- * @todo Alle generierten Klassen etc. konfigurierbar machen!
+ * @todo Alle generierten CSS-Klassen etc. konfigurierbar machen!
  */
 class MarkupParser {
 

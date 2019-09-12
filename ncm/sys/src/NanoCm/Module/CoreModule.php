@@ -25,7 +25,6 @@ use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Captcha;
 use Ubergeek\NanoCm\Comment;
 use Ubergeek\NanoCm\FeedGenerator;
-use Ubergeek\NanoCm\Media\ImageResizer;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
 use Ubergeek\NanoCm\Setting;
@@ -56,6 +55,9 @@ class CoreModule extends AbstractModule {
 
     /** @var Article Gegebenenfalls anzuzeigender Weblog-Artikel */
     public $article = null;
+
+    /** @var bool Gibt an, ob der abgerufene Artikel noch nicht freigeschaltet ist, sondern als Preview angezeigt wird. */
+    public $isPreview = false;
 
     /** @var Comment[] Gegebenfalls anzuzeigende Kommentare zu einem Artikel */
     public $comments = null;
@@ -134,9 +136,19 @@ class CoreModule extends AbstractModule {
 
                 // Artikel-Ansicht
                 if ($parts[1] == 'article') {
-                    $this->article = $this->orm->getArticleById(intval($parts[2]));
+
+                    $this->article = $this->orm->getArticleById(
+                        intval($parts[2]),
+                        !$this->ncm->isUserLoggedIn()
+                    );
 
                     if ($this->article !== null) {
+
+                        // Bestimmung Preview-Modus bei noch nicht freigeschalteten Artiklen
+                        $now = new \DateTime('now');
+                        $this->isPreview = $this->article->status_code != StatusCode::ACTIVE
+                            || ($this->article->start_timestamp != null && $this->article->start_timestamp > $now)
+                            || ($this->article->stop_timestamp != null && $this->article->stop_timestamp < $now);
 
                         // Kommentar abgeben
                         if ($this->commentsEnabled && $this->article->enable_comments && $this->getParam('ac') == 's') {

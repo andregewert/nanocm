@@ -19,6 +19,8 @@
 
 namespace Ubergeek\NanoCm;
 
+use Ubergeek\NanoCm\Module\AbstractModule;
+
 /**
  * Basis-Anwendung für das Nano CM.
  * 
@@ -79,6 +81,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
                     case 'settings':
                     case 'definitions':
                     case 'articleseries':
+                    case 'meta':
                         $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
                         break;
 
@@ -100,7 +103,7 @@ class FrontController extends \Ubergeek\Controller\HttpController {
 
         // TODO Exceptions besser / vernünftig darstellen!
         try {
-            /* @var $module \Ubergeek\NanoCm\Module\AbstractModule */
+            /* @var $module AbstractModule */
             $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
             $module = new $moduleName($this);
             $module->execute();

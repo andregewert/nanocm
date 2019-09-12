@@ -240,7 +240,7 @@
             );
         };
 
-        app.saveArticle = function() {
+        app.saveArticle = function(callback) {
             ncm.showDefaultLoadingIndicator();
             $('#button_save').addClass('disabled');
             app.isBusy = true;
@@ -295,6 +295,10 @@
                 ncm.hideDefaultLoadingIndicator();
                 app.isBusy = false;
                 $('#button_save').removeClass('disabled');
+
+                if (typeof callback == 'function') {
+                    callback();
+                }
             });
         };
 
@@ -307,9 +311,24 @@
             }
         };
 
+        /**
+         * Öffnet die Vorschau des Artikels in einem Popup auf
+         *
+         * Bevor die Vorschau geöffnet wird, wird der aktuelle Stand des Artikels gespeichert.
+         */
         app.openPreview = function() {
-            // TODO implementieren
-            alert('Vorschau öffnen');
+            app.saveArticle(function() {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('admin/meta/getArticleUrl/' + $('#input_article_id').val(), {
+                    cache: false,
+                    type: 'GET',
+                    dataType: 'JSON'
+                }).done(function(data) {
+                    window.open(data.url, 'preview');
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                });
+            });
         };
 
         /**
