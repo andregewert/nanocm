@@ -7,6 +7,9 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
+
+RewriteRule "ncm/sys/" "/index.php" [NC,R,L]
+
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-s
 RewriteCond %{REQUEST_FILENAME} !-l

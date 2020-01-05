@@ -54,6 +54,12 @@ mit dem [Netbeans MindMaps-Plugin](http://www.igormaznitsa.com/netbeans-mmd-plug
 von Igor Maznitsa, das auch als Plugin für die JetBrains-IDEs sowie als
 alleinstehende Anwendung verfügbar ist.
 
+# Voraussetzungen
+- PHP 7.1
+- PHP-Extension pdo_sqlite
+- PHP-Extension curl
+- Apache mit mod_rewrite
+
 # Autor
 
 André Gewert  

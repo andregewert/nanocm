@@ -203,6 +203,7 @@ class AdminArticlesModule extends AbstractAdminModule {
      * Erstellt ein Artikelmodell und füllt es mit den Daten aus dem aktuellen Request
      *
      * @return Article
+     * @throws \Exception
      */
     private function createArticleFromRequest() : Article {
         $id = intval($this->getParam('id'));

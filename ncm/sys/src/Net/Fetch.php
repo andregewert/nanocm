@@ -68,6 +68,7 @@ class Fetch {
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         $result = curl_exec($ch);
 
         if ($result !== false) {
