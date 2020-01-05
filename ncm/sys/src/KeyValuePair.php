@@ -42,7 +42,7 @@ class KeyValuePair {
      * @var mixed
      */
     public $value;
-    
+
     /**
      * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
      *

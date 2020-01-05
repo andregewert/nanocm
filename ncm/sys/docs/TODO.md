@@ -14,7 +14,7 @@
 - [ ] Content-Verwaltung: Überarbeitung JavaScript für Tag-Bearbeitung
 - [ ] Photostream aus dem CMS gespeist
 - [ ] Implementierung Suchfunktion
-- [ ] Weitere Prüfungen im Bootstrap-Prozess: PHP-Module curl, pdo_sqlite, gd
+- [ ] Weitere Prüfungen im Bootstrap-Prozess: PHP-Module curl, pdo_sqlite, gd, zip
 
 ## Mittlere Priorität
 

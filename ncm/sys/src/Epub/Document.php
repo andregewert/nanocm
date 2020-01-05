@@ -26,7 +26,33 @@ namespace Ubergeek\Epub;
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-11-09
  */
-class Document
-{
+class Document {
 
+    // <editor-fold desc="Public properties">
+
+    /**
+     * @var string Titel des Dokumentes
+     */
+    public $title;
+
+    /**
+     * @var string Kurzbeschreibung oder Anrisstext / Klappentext o. ä.
+     */
+    public $description;
+
+    /**
+     * @var string Sprachkürzel (ISO)
+     */
+    public $language = 'en';
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Public methods">
+
+    public function addContent() {
+        // TODO implementieren
+    }
+
+    // </editor-fold>
 }
