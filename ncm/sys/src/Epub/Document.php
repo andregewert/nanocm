@@ -36,14 +36,46 @@ class Document {
     public $title;
 
     /**
-     * @var string Kurzbeschreibung oder Anrisstext / Klappentext o. ä.
+     * @var string Eindeutige Identifikation für dieses Dokument, bspw. eine ISBN
+     */
+    public $identifier = '';
+
+    /**
+     * Kurzbeschreibung oder Anrisstext / Klappentext o. ä.
+     * @var string
      */
     public $description;
 
     /**
-     * @var string Sprachkürzel (ISO)
+     * use ZipArchive;
+     * @var string
      */
     public $language = 'en';
+
+    /**
+     * Optionale Hinweise zum Urheberrecht
+     * @var null|string
+     */
+    public $rights = null;
+
+    /**
+     * Optionale Angabe zum Erscheinungsdatum oder -Jahr
+     * @var null|\DateTime
+     */
+    public $date = null;
+
+    /**
+     * Ein Array der verfügbaren Inhalte bzw. Inhaltsabschnitte
+     * @var array
+     */
+    public $contents;
+
+    /**
+     * Ein Array mit den einzubettenden Inhalten, einschließlich Bilddateien,
+     * Style Sheets und ähnlichem
+     * @var array
+     */
+    public $attachments;
 
     // </editor-fold>
 
@@ -51,6 +83,31 @@ class Document {
     // <editor-fold desc="Public methods">
 
     public function addContent() {
+        // TODO implementieren
+    }
+
+    /**
+     * Erstellt anhand der bisher hinzugefügten Inhaltsdateien ein automatisches
+     * Inhaltsverzeichnis in Form eines XHTML-Strings.
+     *
+     * Das generierte Inhaltsverzeichnis wird nicht automatisch als Inhaltsseite in
+     * das Buch eingebunden. Stattdessen muss es auf Wunsch mit addToc() hinzugefügt werden.
+     *
+     * @return string Ein generiertes Inhaltsverzeichnis als XHTML-Body-Inhalt
+     */
+    public function createToc(bool $includeAttachmentList = false) {
+        // TODO implementieren
+    }
+
+    /**
+     * Fügt dem Dokument eine Dateianlage hinzu
+     *
+     * Die Methode gibt den intern generierten Dateinamen zurück.
+     *
+     * @param string $content
+     * @param string $filename
+     */
+    public function addAttachment(string $content, string $filename) {
         // TODO implementieren
     }
 

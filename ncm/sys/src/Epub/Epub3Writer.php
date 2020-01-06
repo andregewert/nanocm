@@ -20,18 +20,25 @@
 
 namespace Ubergeek\Epub;
 
-use SimpleXMLElement;
+use DOMDocument;
+use ZipArchive;
 use Ubergeek\Epub\Document;
 use Ubergeek\MarkupParser\MarkupParser;
 
+/**
+ * Class Epub3Writer
+ * @package Ubergeek\Epub
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2020-01-05
+ */
 class Epub3Writer {
 
     public function createDocumentFile(Document $document) : string {
         // TODO implementieren
-        $archive = new \ZipArchive();
-        $archive->open("/volume1/webhosts/uberdev/test.zip", \ZipArchive::CREATE);
+        $archive = new ZipArchive();
+        $archive->open("/volume1/webhosts/uberdev/test.zip", ZipArchive::CREATE);
         $archive->addFromString("mimetype", "application/epub+zip");
-        $archive->setCompressionIndex(0, \ZipArchive::CM_STORE);
+        $archive->setCompressionIndex(0, ZipArchive::CM_STORE);
 
         $archive->addEmptyDir('META-INF');
         $archive->addFromString('META-INF/container.xml', $this->createContainerXml());
@@ -46,37 +53,40 @@ class Epub3Writer {
     // <editor-fold desc="Internal methods">
 
     private function createContainerXml() : string {
-        $xml = new SimpleXMLElement("<?xml version=\"1.0\"?><container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\"></container>");
-        $node = $xml->addChild('rootfiles');
-        $node = $node->addChild('rootfile');
-        $node->addAttribute('media-type', 'application/oebps-package+xml');
-        $node->addAttribute('full-path', 'index.opf');
-        return $xml->asXML();
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $rootNode = $dom->appendChild($dom->createElementNS('urn:oasis:names:tc:opendocument:xmlns:container', 'container'));
+        $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '1.0';
+        $fileNode = $rootNode->appendChild($dom->createElement('rootfiles'))->appendChild($dom->createElement('rootfile'));
+        $fileNode->appendChild($dom->createAttribute('media-type'))->nodeValue = 'application/oebps-package+xml';
+        $fileNode->appendChild($dom->createAttribute('full-path'))->nodeValue = 'index.opf';
+        $c = $dom->saveXML();
+        //echo htmlspecialchars(wordwrap($c, 75, "\n", true));
+        return $c;
     }
 
     private function createIndexOpf(Document $document) : string {
-        $root = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://www.idpf.org/2007/opf" 
-         xmlns:opf="http://www.idpf.org/2007/opf"
-         xmlns:dc="http://purl.org/dc/elements/1.1/"
-         version="3.0"
-         unique-identifier="id"
-         prefix="rendition: http://www.idpf.org/vocab/rendition/#"></package>');
-        $root->addAttribute('xml:lang', $document->language, 'xml');
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $rootNode = $dom->appendChild($dom->createElementNS('http://www.idpf.org/2007/opf', 'package'));
+        $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '3.0';
+        $rootNode->appendChild($dom->createAttribute('unique-identifier'))->nodeValue = 'id';
+        $rootNode->appendChild($dom->createAttribute('xmlns:dc'))->nodeValue = 'http://purl.org/dc/elements/1.1/';
+        //$rootNode->appendChild($dom->createAttribute('xmlns:opf'))->nodeValue = 'http://www.idpf.org/2007/opf';
 
-        $metadata = $root->addChild('metadata');
-        $node = $metadata->addChild('dc:identifier', 'dummyid', 'dc');
-        $node->addAttribute('id', 'id');
-        $metadata->addChild('dc:title', $document->title, 'dc');
-        $metadata->addChild('dc:language', $document->language, 'dc');
+        $metadata = $rootNode->appendChild($dom->createElement('metadata'));
+        $metadata->appendChild($dom->createElement('dc:title'))->nodeValue = $document->title;
+        $metadata->appendChild($dom->createElement('dc:identifier'))->nodeValue = 'dummyid';
+        $metadata->appendChild($dom->createElement('dc:language'))->nodeValue = $document->language;
+        $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $document->description;
 
-        $manifest = $root->addChild('manifest');
+        // Alle Dateien einschl. Bildern und CSS-Dateien
+        $manifest = $rootNode->appendChild($dom->createElement('manifest'));
 
-        $spine = $root->addChild('spine');
+        // Nur die anzuzeigenden Inhalts-Elemente, im Normalfall: (generiertes) TOC, Inhalt 1, Inhalt 2 ...
+        $spine = $rootNode->appendChild($dom->createElement('spine'));
 
-        // TODO implementieren
-
-        return $root->asXML();
+        $c = $dom->saveXML();
+        echo htmlspecialchars(wordwrap($c, 75, "\n", true));
+        return $c;
     }
 
     // </editor-fold>

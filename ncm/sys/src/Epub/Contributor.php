@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NanoCM
  * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
@@ -19,20 +18,43 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-require 'ncm/sys/src/autoload.php';
-if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'ubergeek.de') {
-    $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
-} else {
-    $var = new Ubergeek\NanoCm\FrontController(__DIR__);
+namespace Epub;
+
+/**
+ * Bildet einen Autoreneintrag ab
+ * @package Epub
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2020-01-06
+ */
+class Contributor {
+
+    // <editor-fold desc="Public properties">
+
+    /**
+     * Vollständiger Realname des Contributors
+     * @var string
+     */
+    public $name;
+
+    /**
+     * Kurzname bzw. Kürzel des Contributors.
+     * Wird u. a. als ID innerhalb der ePub-Metadaten verwendet.
+     * @var string
+     */
+    public $shortname;
+
+    /**
+     * Katalogname des Contributors
+     * @var string
+     */
+    public $fileAs;
+
+    /**
+     * Optionale Rolle des Contributors (Author, Translator usw.)
+     * @var null|string
+     */
+    public $relation = null;
+
+    // </editor-fold>
+
 }
-$var->execute();
-
-echo '<pre>';
-$creator = new \Ubergeek\Epub\Epub3Writer();
-$doc = new \Ubergeek\Epub\Document();
-$doc->title = "Testdokument";
-$doc->description = "Das hier ist ein Testdokument";
-$doc->language = 'de';
-
-$creator->createDocumentFile($doc);
-echo '</pre>';
