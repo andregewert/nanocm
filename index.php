@@ -34,5 +34,21 @@ $doc->title = "Testdokument";
 $doc->description = "Das hier ist ein Testdokument";
 $doc->language = 'de';
 
+$toc = $doc->createContentFromString(
+    'contents/toc.xhtml',
+    file_get_contents("toc.xhtml"),
+    array('nav'),
+    'toc'
+);
+//$toc->includeInSpine = false;
+$doc->addContent($toc);
+
+$doc->addContent(
+    $doc->createContentFromString(
+        'contents/test.xhtml',
+        file_get_contents("test.xhtml")
+    )
+);
+
 $creator->createDocumentFile($doc);
 echo '</pre>';

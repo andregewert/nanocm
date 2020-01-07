@@ -20,6 +20,8 @@
 
 namespace Ubergeek\Epub;
 
+use Ubergeek\Epub\Exception\DuplicateContentIdException;
+
 /**
  * Bildet ein ePub-Dokument ab
  * @package Ubergeek\Epub
@@ -65,25 +67,56 @@ class Document {
     public $date = null;
 
     /**
+     * Optionale Zeitangabe der letzten Änderung
+     *
+     * Wenn diese Angabe nicht explizit gesetzt wird, so wird der Writer
+     * als Modifikationsdatum den Zeitpunkt der Dateierstellung einsetzen.
+     *
+     * @var null|\DateTime
+     */
+    public $modified = null;
+
+    /**
      * Ein Array der verfügbaren Inhalte bzw. Inhaltsabschnitte
-     * @var array
+     * @var Content[]
      */
     public $contents;
 
-    /**
-     * Ein Array mit den einzubettenden Inhalten, einschließlich Bilddateien,
-     * Style Sheets und ähnlichem
-     * @var array
-     */
-    public $attachments;
+    //public $contentPrefix = 'contents';
 
     // </editor-fold>
 
 
     // <editor-fold desc="Public methods">
 
-    public function addContent() {
-        // TODO implementieren
+    /**
+     * Fügt den Dokument den angegebenen Inhalt hinzu
+     *
+     * @param Content $content Das hinzuzufügende Content-Objekt
+     * @return Content Das hinzugefügte Content-Objekt
+     */
+    public function addContent(Content $content) {
+        if ($this->isContentIdExisting($content->id)) {
+            throw new DuplicateContentIdException("Duplicate content id: id '$content->id' already exists!");
+        }
+        $this->contents[] = $content;
+        return $content;
+    }
+
+    public function createContentFromString(string $filename, string $contents, $properties = array(), string $id = '') : Content {
+        return $this->createContentFromStringWithType($filename, $contents, '', $properties, $id);
+    }
+
+    public function createContentFromStringWithType(string $filename, string $contents, string $type, $properties = array(), string $id = '') : Content {
+        $content = new Content();
+        $content->id = ($id == '')? $this->createContentId() : $id;
+        $content->filename = $filename;
+        $content->contents = $contents;
+        $content->properties = $properties;
+        if ($type != '') {
+            $content->type = $type;
+        }
+        return $content;
     }
 
     /**
@@ -99,17 +132,64 @@ class Document {
         // TODO implementieren
     }
 
+//    /**
+//     * Fügt dem Dokument eine Dateianlage hinzu
+//     *
+//     * Die Methode gibt den intern generierten Dateinamen zurück.
+//     *
+//     * @param string $content
+//     * @param string $filename
+//     */
+//    public function addAttachment(string $content, string $filename) {
+//        // TODO implementieren
+//    }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Internal methods">
+
     /**
-     * Fügt dem Dokument eine Dateianlage hinzu
+     * Gibt ein Array mit den (bisher) vergebenen Content-IDs zurück
      *
-     * Die Methode gibt den intern generierten Dateinamen zurück.
-     *
-     * @param string $content
-     * @param string $filename
+     * @return string[] Eine Array mit den verwendeten Content-IDs
      */
-    public function addAttachment(string $content, string $filename) {
-        // TODO implementieren
+    protected function getContentIds() : array {
+        $ids = array();
+        if (is_array($this->contents)) {
+            foreach ($this->contents as $content) {
+                $ids[] = $content->id;
+            }
+        }
+        $ids = array_unique($ids);
+        return $ids;
+    }
+
+    /**
+     * Überprüft, ob eine bestimmte Content-ID bereits vergeben worden ist
+     *
+     * @param string $id
+     * @return bool true, wenn die angegebene Content-ID bereits verwendet wird
+     */
+    protected function isContentIdExisting(string $id) : bool {
+        return in_array($id, $this->getContentIds());
+    }
+
+    /**
+     * Erstellt eine neue, eindeutige Content-ID
+     *
+     * @param string $prefix Optionales Präfix für die Bezeichnung der ID
+     * @return string Die generierte Content-ID
+     */
+    protected function createContentId(string $prefix = 'content-') {
+        $counter = 1;
+        do {
+            $id = "$prefix$counter";
+            $counter++;
+        } while ($this->isContentIdExisting($id));
+        return $id;
     }
 
     // </editor-fold>
+
 }

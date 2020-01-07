@@ -34,16 +34,28 @@ use Ubergeek\MarkupParser\MarkupParser;
 class Epub3Writer {
 
     public function createDocumentFile(Document $document) : string {
+        $filename = '/volume1/webhosts/uberdev/test.epub';
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
+
         // TODO implementieren
         $archive = new ZipArchive();
-        $archive->open("/volume1/webhosts/uberdev/test.zip", ZipArchive::CREATE);
+        $archive->open($filename, ZipArchive::CREATE);
         $archive->addFromString("mimetype", "application/epub+zip");
-        $archive->setCompressionIndex(0, ZipArchive::CM_STORE);
+        //$archive->setCompressionIndex(0, ZipArchive::CM_STORE);
+        $archive->setCompressionName('mimetype', ZipArchive::CM_STORE);
 
-        $archive->addEmptyDir('META-INF');
+        //$archive->addEmptyDir('META-INF');
         $archive->addFromString('META-INF/container.xml', $this->createContainerXml());
+        //$archive->setCompressionIndex(1, ZipArchive::CM_STORE);
 
         $archive->addFromString('index.opf', $this->createIndexOpf($document));
+        //$archive->setCompressionIndex(2, ZipArchive::CM_STORE);
+
+        foreach ($document->contents as $content) {
+            $archive->addFromString($content->filename, $content->contents);
+        }
 
         $archive->close();
 
@@ -68,21 +80,45 @@ class Epub3Writer {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $rootNode = $dom->appendChild($dom->createElementNS('http://www.idpf.org/2007/opf', 'package'));
         $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '3.0';
-        $rootNode->appendChild($dom->createAttribute('unique-identifier'))->nodeValue = 'id';
+        $rootNode->appendChild($dom->createAttribute('unique-identifier'))->nodeValue = 'pub-id';
         $rootNode->appendChild($dom->createAttribute('xmlns:dc'))->nodeValue = 'http://purl.org/dc/elements/1.1/';
-        //$rootNode->appendChild($dom->createAttribute('xmlns:opf'))->nodeValue = 'http://www.idpf.org/2007/opf';
 
         $metadata = $rootNode->appendChild($dom->createElement('metadata'));
         $metadata->appendChild($dom->createElement('dc:title'))->nodeValue = $document->title;
-        $metadata->appendChild($dom->createElement('dc:identifier'))->nodeValue = 'dummyid';
+        $idNode = $dom->createElement('dc:identifier');
+        $idNode->nodeValue = 'dummyid';
+        $idNode->appendChild($dom->createAttribute('id'))->nodeValue = 'pub-id';
+        $metadata->appendChild($idNode);
         $metadata->appendChild($dom->createElement('dc:language'))->nodeValue = $document->language;
         $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $document->description;
 
+        $modified = ($document->modified === null)? new \DateTime() : $document->modified;
+        $modifiedNode = $dom->createElement('meta');
+        $modifiedNode->appendChild($dom->createAttribute('property'))->nodeValue = 'dcterms:modified';
+        $modifiedNode->nodeValue = $modified->format('Y-m-d\TH:i:s\Z');
+        $metadata->appendChild($modifiedNode);
+
         // Alle Dateien einschl. Bildern und CSS-Dateien
         $manifest = $rootNode->appendChild($dom->createElement('manifest'));
+        foreach ($document->contents as $content) {
+            $item = $manifest->appendChild($dom->createElement('item'));
+            $item->appendChild($dom->createAttribute('id'))->nodeValue = $content->id;
+            if (is_array($content->properties) && count($content->properties) > 0) {
+                $item->appendChild($dom->createAttribute('properties'))->nodeValue = join(' ', $content->properties);
+            }
+            $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
+            $item->appendChild($dom->createAttribute('media-type'))->nodeValue = $content->type;
+        }
 
         // Nur die anzuzeigenden Inhalts-Elemente, im Normalfall: (generiertes) TOC, Inhalt 1, Inhalt 2 ...
         $spine = $rootNode->appendChild($dom->createElement('spine'));
+        foreach ($document->contents as $content) {
+            if ($content->includeInSpine) {
+                $item = $spine->appendChild($dom->createElement('itemref'));
+                $item->appendChild($dom->createAttribute('idref'))->nodeValue = $content->id;
+                $item->appendChild($dom->createAttribute('linear'))->nodeValue = 'yes';
+            }
+        }
 
         $c = $dom->saveXML();
         echo htmlspecialchars(wordwrap($c, 75, "\n", true));
