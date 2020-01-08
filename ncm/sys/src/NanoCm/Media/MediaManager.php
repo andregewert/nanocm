@@ -25,7 +25,6 @@ use Ubergeek\Log\LoggerInterface;
 use Ubergeek\Log\Writer\NullWriter;
 use Ubergeek\NanoCm\Media\Exception\MediaException;
 use Ubergeek\NanoCm\Medium;
-use Ubergeek\NanoCm\Util;
 use Ubergeek\Net\Fetch;
 
 /**

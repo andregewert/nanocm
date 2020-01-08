@@ -43,15 +43,9 @@ class Epub3Writer {
         $archive = new ZipArchive();
         $archive->open($filename, ZipArchive::CREATE);
         $archive->addFromString("mimetype", "application/epub+zip");
-        //$archive->setCompressionIndex(0, ZipArchive::CM_STORE);
         $archive->setCompressionName('mimetype', ZipArchive::CM_STORE);
-
-        //$archive->addEmptyDir('META-INF');
         $archive->addFromString('META-INF/container.xml', $this->createContainerXml());
-        //$archive->setCompressionIndex(1, ZipArchive::CM_STORE);
-
         $archive->addFromString('index.opf', $this->createIndexOpf($document));
-        //$archive->setCompressionIndex(2, ZipArchive::CM_STORE);
 
         foreach ($document->contents as $content) {
             $archive->addFromString($content->filename, $content->contents);
@@ -65,7 +59,8 @@ class Epub3Writer {
     // <editor-fold desc="Internal methods">
 
     private function createContainerXml() : string {
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom->formatOutput = true;
         $rootNode = $dom->appendChild($dom->createElementNS('urn:oasis:names:tc:opendocument:xmlns:container', 'container'));
         $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '1.0';
         $fileNode = $rootNode->appendChild($dom->createElement('rootfiles'))->appendChild($dom->createElement('rootfile'));
@@ -77,7 +72,8 @@ class Epub3Writer {
     }
 
     private function createIndexOpf(Document $document) : string {
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom->formatOutput = true;
         $rootNode = $dom->appendChild($dom->createElementNS('http://www.idpf.org/2007/opf', 'package'));
         $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '3.0';
         $rootNode->appendChild($dom->createAttribute('unique-identifier'))->nodeValue = 'pub-id';
@@ -112,6 +108,9 @@ class Epub3Writer {
 
         // Nur die anzuzeigenden Inhalts-Elemente, im Normalfall: (generiertes) TOC, Inhalt 1, Inhalt 2 ...
         $spine = $rootNode->appendChild($dom->createElement('spine'));
+        if ($document->isNcxExisting()) {
+            $spine->appendChild($dom->createAttribute('toc'))->nodeValue = 'ncx';
+        }
         foreach ($document->contents as $content) {
             if ($content->includeInSpine) {
                 $item = $spine->appendChild($dom->createElement('itemref'));

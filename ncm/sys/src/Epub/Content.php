@@ -47,6 +47,12 @@ class Content {
     public $type = 'application/xhtml+xml';
 
     /**
+     * Lesbarer / anzuzeigender Titel für diesen Inhalt
+     * @var string Inhaltstitel
+     */
+    public $title = '';
+
+    /**
      * Der eigentliche Dateiinhalt in Form eines einzelnen Strings
      * @var string
      */

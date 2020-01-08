@@ -19,6 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+use Ubergeek\Epub\Document;
+use Ubergeek\Epub\Epub3Writer;
+
 require 'ncm/sys/src/autoload.php';
 if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'ubergeek.de') {
     $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
@@ -28,26 +31,29 @@ if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'uber
 $var->execute();
 
 echo '<pre>';
-$creator = new \Ubergeek\Epub\Epub3Writer();
-$doc = new \Ubergeek\Epub\Document();
+$creator = new Epub3Writer();
+$doc = new Document();
 $doc->title = "Testdokument";
 $doc->description = "Das hier ist ein Testdokument";
 $doc->language = 'de';
-
-$toc = $doc->createContentFromString(
-    'contents/toc.xhtml',
-    file_get_contents("toc.xhtml"),
-    array('nav'),
-    'toc'
-);
-//$toc->includeInSpine = false;
-$doc->addContent($toc);
+$doc->identifier = uniqid();
 
 $doc->addContent(
     $doc->createContentFromString(
-        'contents/test.xhtml',
+        'Seite 1',
+        'test.xhtml',
         file_get_contents("test.xhtml")
     )
+);
+
+// Automatisch erstelltes Inhaltsverzeichnis
+$doc->addContentAtBeginning(
+    $doc->createTocContent('Inhalt')
+);
+
+// Kompatibilität zu ePub 2: ein weiteres Inhaltsverzeichnis
+$doc->addContent(
+    $doc->createNcxContent('Inhalt')
 );
 
 $creator->createDocumentFile($doc);
