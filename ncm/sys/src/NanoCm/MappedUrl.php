@@ -1,8 +1,7 @@
 <?php
-
 /**
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,31 +20,42 @@
 
 namespace Ubergeek\NanoCm;
 
-/**
- * Enthält eine Reihe von Standard-Konstanten
- */
-abstract class Constants {
 
-    // <editor-fold desc="Für Convert-Funktionalität">
+class MappedUrl {
 
     /**
-     * Ausgabeformat HTML
+     * Die ursprüngliche (relative bzw. server-absolute) URL
      * @var string
      */
-    const FORMAT_HTML = 'html';
+    public $originalUrl = '';
 
     /**
-     * Ausgabeformat XHTML
+     * Die absolute URL
      * @var string
      */
-    const FORMAT_XHTML = 'xhtml';
-    
+    public $targetUrl = '';
+
     /**
-     * Ausgabeformat Text (unformatiert)
+     * Die virtuelle bzw. automatisiert vergebene URL
      * @var string
      */
-    const FORMAT_PLAINTEXT = "text";
-    
-    // </editor-fold>
-    
+    public $virtualUrl = '';
+
+    /**
+     * Optionaler Titel für den verlinkten Inhalt
+     * @var string
+     */
+    public $title = '';
+
+    /**
+     * Ein möglichst passender Mime-Type für den verlinkten Inhalt
+     * @var string
+     */
+    public $mimeType = 'application/octet-stream';
+
+    /**
+     * Der eigentliche Inhalt der verlinkten Datei
+     * @var string
+     */
+    public $content = '';
 }

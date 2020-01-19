@@ -2,7 +2,7 @@
 
 /**
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,33 +19,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm;
+use Ubergeek\NanoCm\ContentConverter\DecoratedContentConverter;
+use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
 
-/**
- * Enthält eine Reihe von Standard-Konstanten
- */
-abstract class Constants {
+class PlainTextConverter extends DecoratedContentConverter {
 
-    // <editor-fold desc="Für Convert-Funktionalität">
+    public function __construct(HtmlConverter $htmlConverter) {
+        parent::__construct($htmlConverter);
+    }
 
-    /**
-     * Ausgabeformat HTML
-     * @var string
-     */
-    const FORMAT_HTML = 'html';
+    public function convertFormattedText(string $input, array $options = array()): string {
 
-    /**
-     * Ausgabeformat XHTML
-     * @var string
-     */
-    const FORMAT_XHTML = 'xhtml';
-    
-    /**
-     * Ausgabeformat Text (unformatiert)
-     * @var string
-     */
-    const FORMAT_PLAINTEXT = "text";
-    
-    // </editor-fold>
-    
+        if ($this->decoratedConverter !== null) {
+            $input = $this->decoratedConverter->convertFormattedText($input, $options);
+        }
+
+        // TODO vernünftige Implementierung :)
+        return strip_tags($input);
+    }
+
 }

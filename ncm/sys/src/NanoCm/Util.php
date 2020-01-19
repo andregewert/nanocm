@@ -135,12 +135,21 @@ final class Util {
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
      *
+     * Als Zielformate werden Constants::FORMAT_HTML und Constants::FORMAT_XHTML unterstützt.
+     * Wird etwas anderes übergeben, so wird der unveränderte Ausgangsstring zurückgegeben.
+     *
      * @param string|null $string
-     * @return string HTML-kodierter String
+     * @param string $targetFormat Das gewünschte Zielformat
+     * @return string (X)HTML-kodierter String
      */
-    public static function htmlEncode($string) : string {
+    public static function htmlEncode($string, $targetFormat = Constants::FORMAT_HTML) : string {
         $string = (string)$string;
-        return htmlentities($string, ENT_COMPAT, 'utf-8');
+        if ($targetFormat == Constants::FORMAT_HTML) {
+            return htmlentities($string, ENT_COMPAT, 'utf-8');
+        } elseif ($targetFormat == Constants::FORMAT_XHTML) {
+            return htmlentities($string, ENT_COMPAT | ENT_XML1 | ENT_SUBSTITUTE, 'utf-8');
+        }
+        return $string;
     }
     
     /**

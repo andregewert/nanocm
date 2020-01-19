@@ -120,7 +120,7 @@ class Epub3Writer {
         }
 
         $c = $dom->saveXML();
-        echo htmlspecialchars(wordwrap($c, 75, "\n", true));
+        //echo htmlspecialchars(wordwrap($c, 75, "\n", true));
         return $c;
     }
 

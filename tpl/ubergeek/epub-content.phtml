@@ -1,0 +1,15 @@
+<?php
+    /* @var $this Ubergeek\NanoCm\Module\CoreModule */
+    use Ubergeek\NanoCm\Constants;
+?>
+<?php echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n"; ?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
+<head>
+    <title>Testinhalt</title>
+    <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/epub.css'); ?>" type="text/css"/>
+</head>
+    <body>
+        <h1><?php echo $this->htmlEncode($this->article->headline, Constants::FORMAT_XHTML); ?></h1>
+        <?php echo $this->convertTextWithFullMarkup($this->article->content, Constants::FORMAT_XHTML); ?>
+    </body>
+</html>

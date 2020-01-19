@@ -29,6 +29,6 @@ namespace Ubergeek\NanoCm\ContentConverter;
  */
 interface ContentConverterInterface {
 
-    public function convertFormattedText(\Ubergeek\NanoCm\Module\AbstractModule $module, string $input, array $options = array()) : string;
+    public function convertFormattedText(string $input, array $options = array()) : string;
     
 }

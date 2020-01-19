@@ -30,6 +30,7 @@ if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'uber
 }
 $var->execute();
 
+/*
 echo '<pre>';
 $creator = new Epub3Writer();
 $doc = new Document();
@@ -58,3 +59,4 @@ $doc->addContent(
 
 $creator->createDocumentFile($doc);
 echo '</pre>';
+*/

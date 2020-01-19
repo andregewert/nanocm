@@ -133,13 +133,19 @@ class Document {
         return $content;
     }
 
-    public function createContentFromString(string $title, string $filename, string $contents, $properties = array(), string $id = '', $includeInSpine = true) : Content {
+    public function createContentFromString(string $title, string $filename, string $contents, $properties = null, string $id = null, $includeInSpine = true) : Content {
         return $this->createContentFromStringWithType($title, $filename, $contents, '', $properties, $id, $includeInSpine);
     }
 
-    public function createContentFromStringWithType(string $title, string $filename, string $contents, string $type, $properties = array(), string $id = '', $includeInSpine = true) : Content {
+    public function createContentFromStringWithType(string $title, string $filename, string $contents, string $type, $properties = null, string $id = null, $includeInSpine = true) : Content {
+        if (!is_array($properties) && $properties != null) {
+            $properties = array($properties);
+        } else {
+            $properties = array();
+        }
+
         $content = new Content();
-        $content->id = ($id == '')? $this->createContentId() : $id;
+        $content->id = ($id === '' || $id === null)? $this->createContentId() : $id;
         $content->filename = $this->translateFilename($filename);
         $content->title = $title;
         $content->contents = $contents;

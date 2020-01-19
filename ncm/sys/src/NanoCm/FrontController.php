@@ -19,6 +19,7 @@
 
 namespace Ubergeek\NanoCm;
 
+use Ubergeek\Controller\HttpController;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
@@ -34,7 +35,7 @@ use Ubergeek\NanoCm\Module\AbstractModule;
  * 
  * @author agewert@ubergeek.de
  */
-class FrontController extends \Ubergeek\Controller\HttpController {
+class FrontController extends HttpController {
     
     /**
      * Enthält eine Referenz auf den ContentManager
@@ -161,6 +162,9 @@ class FrontController extends \Ubergeek\Controller\HttpController {
         $url .= $this->getHttpRequest()->requestUri->host;
         if ($this->ncm->relativeBaseUrl != '/') {
             $url .= $this->ncm->relativeBaseUrl;
+        }
+        if (substr($url, -1) != '/') {
+            $url .= '/';
         }
         $url .= $relativeLink;
         return $url;

@@ -21,6 +21,7 @@
 
 namespace Ubergeek\NanoCm\ContentConverter;
 use Ubergeek\MarkupParser\MarkupParser;
+use Ubergeek\NanoCm\Module\AbstractModule;
 use Ubergeek\Net\Fetch;
 
 /**
@@ -30,26 +31,51 @@ use Ubergeek\Net\Fetch;
  * @created 2017-11-04
  */
 class HtmlConverter extends DecoratedContentConverter {
-    
-    public function convertFormattedText(\Ubergeek\NanoCm\Module\AbstractModule $module, string $input, array $options = array()): string {
+
+    /**
+     * Referenz auf das aktuell ausgeführte TinyCM-Modul
+     * @var Ubergeek\NanoCm\Module\AbstractModule
+     */
+    private $module;
+
+    /**
+     * Gibt an, ob in der Ausgabe XHTML generiert werden soll (true) oder HTML5 (false)
+     * @var bool
+     */
+    public $generateXhtml = false;
+
+    /**
+     * Der HTML-Converter ist zum korrekten Erzeugen von URLs etc. auf eine Refeferenz
+     * auf das aktuell ausgeführte TinyCM-Modul angewiesen.
+     *
+     * @param AbstractModule $module
+     * @param ContentConverterInterface $decoratedConverter Der zu dekorierende Content-Converter
+     */
+    public function __construct(AbstractModule $module, ContentConverterInterface $decoratedConverter = null) {
+        parent::__construct($decoratedConverter);
+        $this->module = $module;
+    }
+
+    public function convertFormattedText(string $input, array $options = array()): string {
 
         if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($module, $input, $options);
+            $input = $this->decoratedConverter->convertFormattedText($input, $options);
         }
 
         // "Normales" Markup ersetzen
         $parser = new MarkupParser();
+
         foreach ($options as $key => $value) {
             if ($key == 'converter.html.idPrefix') {
                 $parser->idPrefix = $value;
             }
         }
         $output = $parser->parse($input);
+        $module = $this->module;
 
         // Erweiterte Platzhalter für die Medienverwaltung
         $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download|twitter)\:([^\]]+?)\]\<\/p\>$/ims', function($matches) use ($module) {
             $module->setVar('converter.placeholder', $matches[0]);
-            //var_dump($matches);
 
             switch (strtolower($matches[1])) {
                 // Youtube-Einbettungen (click-to-play)
@@ -91,7 +117,31 @@ class HtmlConverter extends DecoratedContentConverter {
             return $matches[0];
         }, $output);
 
+        // Notlösung, um nachträglich XHTML-kompatiblen Output zu erzwingen ...
+        if ($this->generateXhtml) {
+            if (function_exists('tidy_repair_string')) {
+                $output = tidy_repair_string($output, array(
+                    'output-xml' => true
+                ));
+            } else {
+                $output = $this->closeOpenSingleTags($output);
+                $output = $this->replaceNamedEntities($output);
+            }
+        }
+
         return $output;
     }
+
+    // <editor-fold desc="Internal methods">
+
+    private function closeOpenSingleTags(string $input) : string {
+        return preg_replace('/<(img|br|hr)([^>]*)([^\/])?>/i', "<$1$2$3 />", $input);
+    }
+
+    private function replaceNamedEntities(string $input) {
+        return html_entity_decode($input, ENT_NOQUOTES);
+    }
+
+    // </editor-fold>
 
 }

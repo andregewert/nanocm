@@ -24,6 +24,8 @@ use Ubergeek\Feed\AtomWriter;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Captcha;
 use Ubergeek\NanoCm\Comment;
+use Ubergeek\NanoCm\Constants;
+use Ubergeek\NanoCm\EbookGenerator;
 use Ubergeek\NanoCm\FeedGenerator;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
@@ -177,6 +179,24 @@ class CoreModule extends AbstractModule {
                         $this->comments = $this->orm->getCommentsByArticleId($this->article->id);
                         $this->setTitle($this->getSiteTitle() . ' - ' . $this->article->headline);
                         $this->content = $this->renderUserTemplate('content-weblog-article.phtml');
+                    }
+                }
+
+                // E-Book-Export
+                elseif ($parts[1] == 'ebook') {
+                    switch ($parts[2]) {
+                        case 'article':
+                            $this->setPageTemplate(self::PAGE_NONE);
+                            $this->outputFormat = Constants::FORMAT_XHTML;
+
+                            $epub = new EbookGenerator($this);
+                            $c = $epub->createEpubForArticleWithId(
+                                intval($parts[3])
+                            );
+                            $this->content = $c;
+                            break;
+                        case 'series':
+                            break;
                     }
                 }
 

@@ -47,7 +47,12 @@ class Fetch {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($ch);
-            curl_close($ch);
+            $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($http_status < 400) {
+                curl_close($ch);
+            } else {
+                $response = '';
+            }
         } else {
             $response = file_get_contents($url);
         }

@@ -163,6 +163,17 @@ abstract class AbstractModule implements
      * @var UserMessage[]
      */
     public $userMessages = array();
+
+    /**
+     * Gibt das Ausgabeformat an (HTML oder XHTML)
+     *
+     * Im Standardfall sollte das TinyCM HTML5 ausgeben. Bei der Erstellung von
+     * EPub-Inhalten wird diese Option jedoch genutzt, um den Templates zu signalisieren,
+     * dass XHTML erzeugt werden muss.
+     *
+     * @var string
+     */
+    public $outputFormat = Constants::FORMAT_HTML;
     
     // </editor-fold>
     
@@ -352,11 +363,13 @@ abstract class AbstractModule implements
     /**
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
+     *
      * @param string $string
+     * @param string $targetFormat Zielformat
      * @return string HTML-kodierter String
      */
-    public function htmlEncode($string) : string {
-        return Util::htmlEncode($string);
+    public function htmlEncode($string, $targetFormat = Constants::FORMAT_HTML) : string {
+        return Util::htmlEncode($string, $targetFormat);
     }
 
     /**
@@ -519,37 +532,41 @@ abstract class AbstractModule implements
      * erlaubt.
      *
      * @param string $input Eingabestring
-     * @param string $targetFormat Das Zielformat
      * @return string Der ins Ausgabeformat konvertierte String
      */
-    public function convertTextWithFullMarkup(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
-        switch ($targetFormat) {
+    public function convertTextWithFullMarkup(string $input) : string {
+        switch ($this->outputFormat) {
             case Constants::FORMAT_HTML:
-                $converter = new HtmlConverter();
-                $output = $converter->convertFormattedText($this, $input);
+            case Constants::FORMAT_XHTML:
+                $converter = new HtmlConverter($this);
+                if ($this->outputFormat == Constants::FORMAT_XHTML) {
+                    $converter->generateXhtml = true;
+                }
+                $output = $converter->convertFormattedText($input);
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unsupported target format: $targetFormat");
+                throw new \InvalidArgumentException("Unsupported target format: $this->outputFormat");
         }
 
         return $output;
     }
 
     /**
-     * Wandelt einen Kommentartext bzw. einen Text mit simplen Formatierungsoptionen um in das angegebene
+     * Wandelt einen Kommentartext bzw. einen Text mit simplen Formatierungsoptionen um in das aktuelle
      * Zielformat
-     *
-     * Aktuell wird als Zielformat ausschließlich HTML unterstützt.
-     *
      * @param string $input Der Eingabestring
-     * @param string $targetFormat Das Zielformat
      * @return string Ins Zielformat umgewandelter Text
      */
-    public function convertTextWithBasicMarkup(string $input, string $targetFormat = Constants::FORMAT_HTML) : string {
-        switch ($targetFormat) {
+    public function convertTextWithBasicMarkup(string $input) : string {
+        switch ($this->outputFormat) {
             case Constants::FORMAT_HTML:
-                $output = htmlentities($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
+            case Constants::FORMAT_XHTML:
+                if ($this->outputFormat == Constants::FORMAT_XHTML) {
+                    $output = htmlentities($input, ENT_COMPAT | ENT_XHTML | ENT_SUBSTITUTE, 'UTF-8', false);
+                } else {
+                    $output = htmlentities($input, ENT_COMPAT | ENT_HTML5, 'UTF-8', false);
+                }
                 $output = preg_replace('/(https?:\/\/([^\s]+))/i', '<a href="$1">$2</a>', $output);
                 $output = $this->nl2br($output);
                 $output = str_replace("'", '&rsquo;', $output);
@@ -564,7 +581,7 @@ abstract class AbstractModule implements
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unsupported target format: $targetFormat");
+                throw new \InvalidArgumentException("Unsupported target format: $this->outputFormat");
         }
 
         return $output;
