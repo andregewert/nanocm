@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /*!
  * NanoCM
  * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
@@ -17,34 +16,42 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
 ul, ol {
-  margin: 1em 0; }
+    margin: 1em 0;
+}
 
 ul.nobullets {
-  list-style: none;
-  padding: 0; }
+    list-style: none;
+    padding: 0;
+}
 
 div.lead {
-  font-size: 1.1rem;
-  font-style: italic;
-  line-height: 1.4em; }
+    font-size: 1.1rem;
+    font-style: italic;
+    line-height: 1.4em;
+}
 
 div.shadow,
 li.odd {
-  background-color: #f0f0f0; }
+    background-color: #f0f0f0;
+}
 
 div.sidebar {
-  background: #f0f0f0;
-  padding: 0 1rem;
-  font-size: 0.9rem;
-  line-height: 1.4em; }
+    background: #f0f0f0;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4em;
+}
 
 div.sidebar_right {
-  width: 20rem;
-  float: right;
-  margin: 1rem 0 1rem 1rem; }
+    width: 20rem;
+    float: right;
+    margin: 1rem 0 1rem 1rem;
+}
 
 div.sidebar_left {
-  width: 20rem;
-  float: left;
-  margin: 1rem 1rem 1rem 0; }
+    width: 20rem;
+    float: left;
+    margin: 1rem 1rem 1rem 0;
+}

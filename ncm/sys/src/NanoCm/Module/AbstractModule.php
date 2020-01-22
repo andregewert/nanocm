@@ -598,15 +598,21 @@ abstract class AbstractModule implements
             $this->init();
             $this->run();
         } catch (\Ubergeek\NanoCm\Exception\AuthorizationException $ex) {
+            $this->outputFormat = Constants::FORMAT_HTML;
+            $this->setPageTemplate(self::PAGE_STANDARD);
             $this->exception = $ex;
             $this->setContent($this->renderUserTemplate('exception-authorization.phtml'));
         } catch (\Exception $ex) {
+            $this->outputFormat = Constants::FORMAT_HTML;
+            $this->setPageTemplate(self::PAGE_STANDARD);
             $this->exception = $ex;
             $this->setContent($this->renderUserTemplate('exception.phtml'));
         }
         
         // Wenn kein Modul einen Inhalt generiert hat, Fehler 404 anzeigen
         if (strlen($this->getContent()) == 0) {
+            $this->outputFormat = Constants::FORMAT_HTML;
+            $this->setPageTemplate(self::PAGE_STANDARD);
             $this->setTitle($this->getSiteTitle() . ' - Seite nicht gefunden!');
             http_response_code(404);
             $this->setContent($this->renderUserTemplate('error-404.phtml'));

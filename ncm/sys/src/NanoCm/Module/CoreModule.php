@@ -182,24 +182,6 @@ class CoreModule extends AbstractModule {
                     }
                 }
 
-                // E-Book-Export
-                elseif ($parts[1] == 'ebook') {
-                    switch ($parts[2]) {
-                        case 'article':
-                            $this->setPageTemplate(self::PAGE_NONE);
-                            $this->outputFormat = Constants::FORMAT_XHTML;
-
-                            $epub = new EbookGenerator($this);
-                            $c = $epub->createEpubForArticleWithId(
-                                intval($parts[3])
-                            );
-                            $this->content = $c;
-                            break;
-                        case 'series':
-                            break;
-                    }
-                }
-
                 // Archiv
                 elseif ($parts[1] == 'archive') {
                     $this->setTitle($this->getSiteTitle() . ' - Archiv');
@@ -271,6 +253,27 @@ class CoreModule extends AbstractModule {
                         );
                         $writer = new AtomWriter();
                         $this->content = $writer->writeFeed($feed);
+                    }
+                }
+
+                break;
+
+            // E-Book-Export
+            case 'ebook':
+                if (count($parts) >= 2) {
+                    $this->setPageTemplate(self::PAGE_NONE);
+                    $this->outputFormat = Constants::FORMAT_XHTML;
+                    $this->setContentType('application/epub+zip');
+
+                    switch ($parts[1]) {
+                        case 'article':
+                            $epub = new EbookGenerator($this);
+                            $this->content = $epub->createEpubForArticleWithId(intval($parts[2]));
+                            break;
+
+                        case 'series':
+                            // TODO implementieren
+                            break;
                     }
                 }
                 break;
@@ -411,7 +414,7 @@ class CoreModule extends AbstractModule {
 
         // Eingabe auf Vollständigkeit überprüfen
         if (strlen($comment->username) < 1
-            || strlen($comment->content) < 1
+            || strlen(trim($comment->content)) < 1
             || strlen($comment->email) < 1) {
             $this->addUserMessage("Bitte gib mindestens einen Namen, eine E-Mail-Adresse und einen Text ein, um zu kommentieren", "Unvollständige Eingaben");
             return null;
@@ -441,6 +444,9 @@ class CoreModule extends AbstractModule {
             if (Util::checkTextAgainstWordsList($comment->content, Util::getJunkWords())) {
                 $comment->status_code = StatusCode::MODERATION_REQUIRED;
             }
+
+            // TODO Wenn Links enthalten sind, dann einstufen als "zu moderieren"
+
         }
 
         // Kommentar speichern

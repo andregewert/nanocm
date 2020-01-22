@@ -22,9 +22,6 @@ namespace Ubergeek\NanoCm;
 
 use Ubergeek\Epub\Document;
 use Ubergeek\Epub\Epub3Writer;
-use Ubergeek\NanoCm\ContentConverter\ContentConverterInterface;
-use Ubergeek\NanoCm\ContentConverter\DecoratedContentConverter;
-use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
 use Ubergeek\NanoCm\Module\AbstractModule;
 use Ubergeek\NanoCm\Module\CoreModule;
 use Ubergeek\Net\Fetch;
@@ -47,15 +44,10 @@ class EbookGenerator {
     private $ncm;
 
     /**
+     * Referenz auf das aufrufende NanoCM-Modul
      * @var CoreModule
      */
     private $module;
-
-    /**
-     * Liste der übersetzten URLs
-     * @var MappedUrl[]
-     */
-    private $mappedUrls = array();
 
     // </editor-fold>
 
@@ -65,7 +57,6 @@ class EbookGenerator {
     public function __construct(AbstractModule $module) {
         $this->module = $module;
         $this->ncm = $module->ncm;
-        //$this->contentConverter = new HtmlConverter($module);
     }
 
     // </editor-fold>
@@ -73,15 +64,40 @@ class EbookGenerator {
 
     // <editor-fold desc="Public methods">
 
+    /**
+     * Erstellt ein E-Book im ePub-Format und gibt dieses in Form eines Strings zurück
+     *
+     * @param int $id Artikel-ID
+     * @return string Generierte ePub-Datei in einem String
+     * @throws \Exception
+     */
     public function createEpubForArticleWithId(int $id) {
         $article = $this->ncm->orm->getArticleById($id);
-        if ($article != null) {
-            return $this->createEpubForArticles(array($article), $article->headline);
+        if ($article == null) {
+            // TODO Exception werfen
         }
+        return $this->createEpubForArticles(array($article), $article->headline);
     }
 
+    /**
+     * Erstellt ein E-Book im ePub-Format für eine Artikelserie und gibt dieses in Form eines
+     * Strings zurück
+     *
+     * @param int $id ID der Artikelserie
+     * @return string Generierte ePub-Datei in einem String
+     * @throws \Exception
+     */
     public function createEpubForArticleSeriesWithId(int $id) {
-        // TODO implementieren
+        $series = $this->ncm->orm->getArticleseriesById($id);
+        $articles = array();
+
+        if ($series == null) {
+            // TODO Exception werfen
+        }
+
+        // TODO Artikel pro Serie auslesen
+
+        return $this->createEpubForArticles($articles,$series->title, $series->description);
     }
 
     // </editor-fold>
@@ -95,10 +111,11 @@ class EbookGenerator {
      * @param Article[] $articles Die zu verpackenden Artikel
      * @param string $title Titel für das E-Book
      * @param string $description Kurzbeschreibung für das E-Book
+     * @param string $tocTitle Überschrift für das automatisch generierte Inhaltsverzeichnis
      * @return string E-Pub-Daten in String-Form
      * @throws \Exception
      */
-    private function createEpubForArticles(array $articles, string $title = '', string $description = '') {
+    private function createEpubForArticles(array $articles, string $title = '', string $description = '', string $tocTitle = 'Inhalt') {
 
         // TODO Autorennamen automatisch "einsammeln"
 
@@ -113,12 +130,10 @@ class EbookGenerator {
 
         foreach ($articles as $article) {
             $this->module->article = $article;
-            $xhtml = $this->module->renderUserTemplate('epub-content.phtml');
+            $xhtml = $this->module->renderUserTemplate('epub-article.phtml');
             $xhtml = $this->replaceLinkedContents(
                 $document, $xhtml, $mappedUrls
             );
-
-            $this->replaceLinkedContents($document, $xhtml, $mappedUrls);
 
             $document->addContent(
                 $document->createContentFromString(
@@ -127,16 +142,14 @@ class EbookGenerator {
                     $xhtml
                 )
             );
-
-            echo $xhtml;
         }
 
         $document->addContentAtBeginning(
-            $document->createTocContent('Inhalt')
+            $document->createTocContent($tocTitle)
         );
 
         $document->addContent(
-            $document->createNcxContent('Inhalt')
+            $document->createNcxContent($tocTitle)
         );
 
         return $writer->createDocumentFile($document);
@@ -148,53 +161,87 @@ class EbookGenerator {
 
     /**
      * Versucht, verlinkte Inhalte (CSS-Dateien, andere Inhaltsseiten, Images etc.) zu ersetzen
-     * @param string $content
-     * @param $mappedUrls
+     *
+     * @param Document $document Das E-Book-Dokument
+     * @param $mappedUrls Referenz auf die gemappten URLs
+     * @return string Der modifizierte Inhalt
      */
     private function replaceLinkedContents(Document $document, string $content, &$mappedUrls) {
         return preg_replace_callback('/((href=\"|src=\")([^\"]+)(\"))/i', function($matches) use ($document, $mappedUrls) {
+            if ($this->isAnchorLink($matches[3])) {
+                return $matches[1];
+            }
+
             if (!$this->isExternalLink($matches[3])) {
                 $sourceUrl = $matches[3];
                 $targetUrl = $this->module->convUrlToAbsolute($sourceUrl);
-
-                if (!array_key_exists($targetUrl, $mappedUrls)) {
-                    $c = Fetch::fetchFromUrl($targetUrl);
-
-                    if (!empty($c)) {
-
-                        $mc = new MappedUrl();
-                        $mc->originalUrl = $sourceUrl;
-                        $mc->targetUrl = $targetUrl;
-                        $mc->content = $c;
-                        $mc->title = '';
-                        $mc->mimeType = $this->guessMimeType(basename($targetUrl));
-                        $mc->virtualUrl = basename($targetUrl);
-                        $mappedUrls[$mc->targetUrl] = $mc;
-
-                        $document->addContent(
-                            $document->createContentFromStringWithType(
-                                $mc->title,
-                                $mc->virtualUrl,
-                                $mc->content,
-                                $mc->mimeType,
-                                null,
-                                null,
-                                false
-                            )
-                        );
-                        var_dump($mc);
-                    }
-                } else {
-                    $mc = $mappedUrls[$targetUrl];
-                }
-                return $matches[2] . $mc->virtualUrl . $matches[4];
+            } else {
+                $sourceUrl = $matches[3];
+                $targetUrl = $matches[3];
             }
-            return $matches[1];
+
+            $mappedContent = null;
+            if (array_key_exists($targetUrl, $mappedUrls)) {
+                $mappedContent = $mappedUrls[$targetUrl];
+            } elseif ($this->isEmbeddableContent($targetUrl)) {
+                $c = Fetch::fetchFromUrl($targetUrl);
+
+                if (!empty($c)) {
+                    $mappedContent = new MappedUrl();
+                    $mappedContent->originalUrl = $sourceUrl;
+                    $mappedContent->targetUrl = $targetUrl;
+                    $mappedContent->content = $c;
+                    $mappedContent->title = '';
+                    $mappedContent->mimeType = $this->guessMimeType(basename($targetUrl));
+                    $mappedContent->virtualUrl = basename($targetUrl);
+                    $mappedUrls[$mappedContent->targetUrl] = $mappedContent;
+
+                    $document->addContent(
+                        $document->createContentFromStringWithType(
+                            $mappedContent->title,
+                            $mappedContent->virtualUrl,
+                            $mappedContent->content,
+                            $mappedContent->mimeType,
+                            null,
+                            null,
+                            false
+                        )
+                    );
+                }
+            }
+
+            if ($mappedContent !== null) {
+                return $matches[2] . $mappedContent->virtualUrl . $matches[4];
+            }
+
+            return $matches[2] . $targetUrl . $matches[4];
         }, $content);
+    }
+
+    private function isAnchorLink($link) {
+        return substr($link, 0, 1) == '#';
     }
 
     private function isExternalLink($link) {
         return preg_match('/^([a-z]+\:)/i', $link) !== 0;
+    }
+
+    private function isEmbeddableContent($url) {
+        $embeddable = array(
+            'text/css',
+            'image/png',
+            'image/jpeg',
+            'image/gif',
+            'image/bmp',
+            'image/svg+xml',
+        );
+
+        $type = Fetch::getContentTypeForUrl($url);
+        if ($type != null) {
+            $type = trim(explode(';', $type)[0]);
+        }
+
+        return in_array($type, $embeddable);
     }
 
     private function guessMimeType($filename) : string {

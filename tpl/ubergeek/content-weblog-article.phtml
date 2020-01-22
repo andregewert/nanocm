@@ -1,5 +1,8 @@
 <?php
 /* @var $this Ubergeek\NanoCm\Module\CoreModule */
+
+use Ubergeek\NanoCm\Util;
+
 $medium = null;
 $format = null;
 $class = ($this->article->articleType instanceof \Ubergeek\NanoCm\Definition)? $this->article->articleType->value : '';
@@ -52,8 +55,10 @@ if (!empty($this->article->medium_id)) {
                 &bullet;
                 <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comments">Kommentieren</a>
                 &bullet;
+                <a href="<?php echo $this->htmlConvUrl($this->article->getEbookUrl()); ?>">ePub laden</a>
+                &bullet;
                 <a href="<?php echo $this->htmlEncode(
-                    \Ubergeek\NanoCm\Util::getTweetThisUrl(
+                    Util::getTweetThisUrl(
                         $this->frontController->createAbsoluteSiteLink(
                             $this->article->getArticleUrl()
                         ),
@@ -84,7 +89,7 @@ if (!empty($this->article->medium_id)) {
                         <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
                         <div class="entry">
                             <?php if ($comment->use_gravatar) : ?>
-                                <div class="userimg"><img src="<?php echo $this->htmlConvUrl(\Ubergeek\NanoCm\Util::getGravatarUserImageUrl($comment->email, 50)); ?>" alt="" width="50" height="50"></div>
+                                <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" alt="" width="50" height="50"></div>
                             <?php endif; ?>
                             <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 

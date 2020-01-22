@@ -139,7 +139,12 @@ class HtmlConverter extends DecoratedContentConverter {
     }
 
     private function replaceNamedEntities(string $input) {
-        return html_entity_decode($input, ENT_NOQUOTES);
+        $table = get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES);
+        unset($table['<']);
+        unset($table['>']);
+
+        return str_replace(array_values($table), array_keys($table), $input);
+        //return html_entity_decode($input, ENT_NOQUOTES);
     }
 
     // </editor-fold>

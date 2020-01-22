@@ -22,8 +22,6 @@ namespace Ubergeek\Epub;
 
 use DOMDocument;
 use ZipArchive;
-use Ubergeek\Epub\Document;
-use Ubergeek\MarkupParser\MarkupParser;
 
 /**
  * Class Epub3Writer
@@ -33,28 +31,30 @@ use Ubergeek\MarkupParser\MarkupParser;
  */
 class Epub3Writer {
 
-    public function createDocumentFile(Document $document) : string {
-        $filename = '/volume1/webhosts/uberdev/test.epub';
-        if (file_exists($filename)) {
-            unlink($filename);
-        }
+    // <editor-fold desc="Public methods">
 
-        // TODO implementieren
+    public function createDocumentFile(Document $document) : string {
+
+        // TODO Brauchbare temporäre Datei verwenden, evtl. mit Caching verbinden
+
+        $filename = '/volume1/webhosts/uberdev/test.epub';
+        if (file_exists($filename)) unlink($filename);
+
         $archive = new ZipArchive();
         $archive->open($filename, ZipArchive::CREATE);
         $archive->addFromString("mimetype", "application/epub+zip");
         $archive->setCompressionName('mimetype', ZipArchive::CM_STORE);
         $archive->addFromString('META-INF/container.xml', $this->createContainerXml());
         $archive->addFromString('index.opf', $this->createIndexOpf($document));
-
         foreach ($document->contents as $content) {
             $archive->addFromString($content->filename, $content->contents);
         }
-
         $archive->close();
-
-        return "";
+        return file_get_contents($filename);
     }
+
+    // </editor-fold>
+
 
     // <editor-fold desc="Internal methods">
 
@@ -66,9 +66,7 @@ class Epub3Writer {
         $fileNode = $rootNode->appendChild($dom->createElement('rootfiles'))->appendChild($dom->createElement('rootfile'));
         $fileNode->appendChild($dom->createAttribute('media-type'))->nodeValue = 'application/oebps-package+xml';
         $fileNode->appendChild($dom->createAttribute('full-path'))->nodeValue = 'index.opf';
-        $c = $dom->saveXML();
-        //echo htmlspecialchars(wordwrap($c, 75, "\n", true));
-        return $c;
+        return $dom->saveXML();
     }
 
     private function createIndexOpf(Document $document) : string {
@@ -119,9 +117,7 @@ class Epub3Writer {
             }
         }
 
-        $c = $dom->saveXML();
-        //echo htmlspecialchars(wordwrap($c, 75, "\n", true));
-        return $c;
+        return $dom->saveXML();
     }
 
     // </editor-fold>

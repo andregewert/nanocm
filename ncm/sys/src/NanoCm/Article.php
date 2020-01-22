@@ -207,6 +207,10 @@ class Article {
         return '/weblog/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
     }
 
+    public function getEbookUrl() : string {
+        return '/ebook/article/' . $this->id . '/' . urlencode(Util::simplifyUrlString($this->headline));
+    }
+
     public function getCommentUrl(Comment $comment) : string {
         return $this->getArticleUrl() . '#comment-' . intval($comment->id);
     }

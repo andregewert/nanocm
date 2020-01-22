@@ -163,7 +163,7 @@ class FrontController extends HttpController {
         if ($this->ncm->relativeBaseUrl != '/') {
             $url .= $this->ncm->relativeBaseUrl;
         }
-        if (substr($url, -1) != '/') {
+        if (substr($url, -1) != '/' && substr($relativeLink, 0, 1) != '/') {
             $url .= '/';
         }
         $url .= $relativeLink;

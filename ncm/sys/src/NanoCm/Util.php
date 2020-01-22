@@ -62,7 +62,12 @@ final class Util {
             'casino',
             'penis',
             'rolex',
-            'visit'
+            'visit',
+            'pussy',
+            'porn',
+            'porno',
+            'drug',
+            'prices'
         );
     }
 

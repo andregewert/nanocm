@@ -60,6 +60,29 @@ class Fetch {
     }
 
     /**
+     * Ermittelt den Content-Type für den angegebenen URL
+     *
+     * @param string $url Der abzufragende URL
+     * @param null $cache Optionale Cache-Instanz (wird aktuell noch nicht verwendet)
+     * @return mixed|null Content-Type oder null
+     */
+    public static function getContentTypeForUrl(string $url, $cache = null) {
+        // TODO Cache abfragen
+
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+            curl_exec($ch);
+            $type = curl_getinfo($ch,  CURLINFO_CONTENT_TYPE);
+        } else {
+            $type = null;
+        }
+        return $type;
+    }
+
+    /**
      * Überprüft, ob die angegebene URL fehlerfrei abgerufen werden kann
      *
      * Hinweis: Für diese Funktionalität muss die PHP-Extension curl installiert sein.
