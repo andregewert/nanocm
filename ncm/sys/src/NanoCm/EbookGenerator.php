@@ -116,18 +116,34 @@ class EbookGenerator {
      * @throws \Exception
      */
     private function createEpubForArticles(array $articles, string $title = '', string $description = '', string $tocTitle = 'Inhalt') {
-
-        // TODO Autorennamen automatisch "einsammeln"
-
         $mappedUrls = array();
 
         $writer = new Epub3Writer();
         $document = new Document();
+        $this->module->ebook = $document;
+
         $document->title = $title;
         $document->description = $description;
         $document->language = $this->ncm->lang;
         $document->identifier = uniqid();
 
+        // Titelseite, wenn mehr als ein Artikel enthalten ist
+        if (count($articles) > 0) {
+            $this->module->articles = $articles;
+            $xhtml = $this->module->renderUserTemplate('epub-cover.phtml');
+            $xhtml = $this->replaceLinkedContents(
+                $document, $xhtml, $mappedUrls
+            );
+            $document->addContent(
+                $document->createContentFromString(
+                    $document->title,
+                    'title.phtml',
+                    $xhtml
+                )
+            );
+        }
+
+        // Einzelartikel
         foreach ($articles as $article) {
             $this->module->article = $article;
             $xhtml = $this->module->renderUserTemplate('epub-article.phtml');
@@ -144,6 +160,7 @@ class EbookGenerator {
             );
         }
 
+        // Inhaltsverzeichnis
         $document->addContentAtBeginning(
             $document->createTocContent($tocTitle)
         );
@@ -218,14 +235,35 @@ class EbookGenerator {
         }, $content);
     }
 
+    /**
+     * Überprüft, ob der Link einen Anker bezeichnet
+     *
+     * @param $link Der zu prüfende Link
+     * @return bool true, wenn der Link (nur) auf einen Anker zeigt
+     */
     private function isAnchorLink($link) {
         return substr($link, 0, 1) == '#';
     }
 
+    /**
+     * Überprüft, ob es sich beim übergebenen Link um einen externen Link handelt
+     *
+     * Die Überprüfung beschränkt sich darauf, ob der Link mit einer Protokollangabe
+     * (HTTP, HTTPS, MAILTO etc.) beginnt.
+     * @param $link Der zu prüfende Link
+     * @return bool true, wenn es sich um einen externen Link handelt
+     */
     private function isExternalLink($link) {
         return preg_match('/^([a-z]+\:)/i', $link) !== 0;
     }
 
+    /**
+     * Überprüft, ob es sich bei dem hinter dem übergebenen URL liegenden Inhalt
+     * um einen in das E-Book einbettbaren Inhalt handelt
+     *
+     * @param $url Der zu prüfende URL
+     * @return bool true, wenn es sich um einen einbettbaren Inhalt handelt
+     */
     private function isEmbeddableContent($url) {
         $embeddable = array(
             'text/css',
@@ -244,6 +282,12 @@ class EbookGenerator {
         return in_array($type, $embeddable);
     }
 
+    /**
+     * Versucht, den MIME-Type anhand eines Dateinames zu ermitteln
+     *
+     * @param $filename Der zu prüfende Dateiname
+     * @return string MIME-Type
+     */
     private function guessMimeType($filename) : string {
         $mime_types = array(
             'txt' => 'text/plain',

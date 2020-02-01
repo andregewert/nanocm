@@ -20,6 +20,7 @@
  */
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\Epub\Document;
 use Ubergeek\Feed\AtomWriter;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Captcha;
@@ -57,6 +58,9 @@ class CoreModule extends AbstractModule {
 
     /** @var Article Gegebenenfalls anzuzeigender Weblog-Artikel */
     public $article = null;
+
+    /** @var Document Zu erzeugendes E-Book-Dokument */
+    public $ebook = null;
 
     /** @var bool Gibt an, ob der abgerufene Artikel noch nicht freigeschaltet ist, sondern als Preview angezeigt wird. */
     public $isPreview = false;

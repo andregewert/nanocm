@@ -253,11 +253,9 @@ class Document {
 
     /**
      * Erstellt anhand der bereits vorhandenen Inhalte ein Inhaltsverzeichnis im NCX-Format
-     *
-     * @param string $title Überschrift bzw. Titel für das Inhaltsverzeichnis
      * @return string Die generierte NCX-Datei
      */
-    private function createNcx(string $title) {
+    private function createNcx() {
         $counter = 1;
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
@@ -292,7 +290,6 @@ class Document {
 
         $docTitleNode = $rootNode->appendChild($dom->createElement('docTitle'));
         $docTitleNode->appendChild($dom->createElement('text'))->nodeValue = $this->title;
-        //$docTitleNode->appendChild($dom->createElement('text'))->nodeValue = $title;
 
         $navMapNode = $rootNode->appendChild($dom->createElement('navMap'));
         foreach ($this->contents as $content) {
