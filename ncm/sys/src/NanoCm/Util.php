@@ -67,7 +67,11 @@ final class Util {
             'porn',
             'porno',
             'drug',
-            'prices'
+            'prices',
+            'pharmacy',
+            'prednisolone',
+            'capsules',
+            'levitra'
         );
     }
 
@@ -167,6 +171,16 @@ final class Util {
         $str = str_replace(array('ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß'), array('ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss'), $string);
         $str = trim(preg_replace('/[^a-z0-9\-\_ ]/i', '', $str));
         return $str;
+    }
+
+    public static function shortenText($input, $length = 80) {
+        if ($input == null) return '';
+        $i = $length;
+
+        while (substr($input, $i -1, 1) != ' ' && $i > 0) {
+            $i--;
+        }
+        return substr($input, 0, $i);
     }
 
     /**

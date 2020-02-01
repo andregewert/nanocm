@@ -1,6 +1,7 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AdminCommentsModule */
 use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\NanoCm\Util;
 ?>
     <table class="list">
         <thead>
@@ -24,7 +25,10 @@ use Ubergeek\NanoCm\StatusCode;
                     <td class="textright pre"><?php echo $comment->creation_timestamp->format('Y-m-d H:i'); ?></td>
                     <td>
                         <a href="javascript:void(0);" data-id="<?php echo $this->htmlEncode($comment->id); ?>" onclick="module.editClickedComment(this);">
-                            <?php echo $this->htmlEncode($comment->headline); ?>
+                            <?php if (strlen(trim($comment->headline)) > 0) : ?>
+                                <?php echo $this->htmlEncode($comment->headline); ?><br>
+                            <?php endif; ?>
+                            <?php echo $this->htmlEncode(Util::shortenText($comment->content, 80)); ?>
                         </a>
                     </td>
                     <td><?php echo $this->htmlEncode($comment->username); ?></td>

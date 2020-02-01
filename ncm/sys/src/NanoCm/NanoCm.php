@@ -298,7 +298,7 @@ class NanoCm {
         $this->ipCache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
         $this->mediaCache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
-        $this->commentIpCache = new FileCache($this->cachedir, 60 *2, 'cmt-', $this->log);
+        $this->commentIpCache = new FileCache($this->cachedir, 60 *5, 'cmt-', $this->log);
 
         // Medienverwaltung initialisieren
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);

@@ -449,8 +449,10 @@ class CoreModule extends AbstractModule {
                 $comment->status_code = StatusCode::MODERATION_REQUIRED;
             }
 
-            // TODO Wenn Links enthalten sind, dann einstufen als "zu moderieren"
-
+            // Wenn Links enthalten sind, pauschal einstufen als "zu moderieren"
+            if (preg_match('/https?\:/i', $comment->content) > 0) {
+                $comment->status_code = StatusCode::MODERATION_REQUIRED;
+            }
         }
 
         // Kommentar speichern
