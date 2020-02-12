@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NanoCM
  * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
@@ -19,10 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-require 'ncm/sys/src/autoload.php';
-if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'ubergeek.de') {
-    $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
-} else {
-    $var = new Ubergeek\NanoCm\FrontController(__DIR__);
+namespace Ubergeek\Epub\Exception;
+
+/**
+ * Wird geworfen, wenn keine temporäre Datei erzeugt werden konnte
+ *
+ * @package Ubergeek\Epub\Exception
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2020-02-12
+ */
+class CouldNotCreateTempFileException
+    extends \RuntimeException
+    implements ExceptionInterface {
 }
-$var->execute();

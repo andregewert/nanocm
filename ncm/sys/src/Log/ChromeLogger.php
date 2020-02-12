@@ -110,13 +110,12 @@ class ChromeLogger {
     
     /**
      * Bereitet eine PHP-Variable für ChromeLogger-komforme JSON-Kodierung vor
+     *
      * @param mixed $var
      * @return mixed
      */
     protected function convertVar($var) {
-        if (is_string($var)) {
-            $var = array(str_replace(array("\n", "\r"), '', $var));
-        } else {
+        if (!is_array($var)) {
             $var = array($var);
         }
         return $var;

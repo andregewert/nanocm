@@ -6,10 +6,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
     <head>
         <title>Testinhalt</title>
-        <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/epub.css'); ?>" type="text/css"/>
+        <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/epub.css'); ?>" type="text/css" />
     </head>
     <body>
-        <h1><?php echo $this->htmlEncode($this->article->headline, Constants::FORMAT_XHTML); ?></h1>
+        <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
 
         <?php if (strlen($this->article->teaser) > 0) : ?>
             <div class="lead">
@@ -21,15 +21,15 @@
 
         <div class="articlefooter">
             <p>Veröffentlicht von
-                <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false), Constants::FORMAT_XHTML); ?>
+                <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
                 am
-                <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y'), Constants::FORMAT_XHTML); ?>
+                <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
             </p>
             <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
                 Schlagworte:
                 <ul class="taglist">
                     <?php foreach ($this->article->tags as $tag) : ?>
-                        <li><a href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag, Constants::FORMAT_XHTML); ?></a></li>
+                        <li><a href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a></li>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>

@@ -19,6 +19,9 @@
 
 namespace Ubergeek\Log\Writer;
 
+use Ubergeek\Log\ChromeLogger;
+use Ubergeek\Log\Event;
+
 /**
  * Nutzt das ChromeLogger-Protokoll, um die Debug-Ausgabe per HTTP-Header an
  * den Web-Browser zu übergeben
@@ -30,14 +33,14 @@ class ChromeLoggerWriter extends AbstractWriter {
     
     public function __construct($filters = null) {
         parent::__construct($filters);
-        $this->chromeLogger = new \Ubergeek\Log\ChromeLogger();
+        $this->chromeLogger = new ChromeLogger();
     }
 
     public function flush() {
-        header(\Ubergeek\Log\ChromeLogger::HEADER_NAME . ': ' . $this->chromeLogger->createOutputString());
+        header(ChromeLogger::HEADER_NAME . ': ' . $this->chromeLogger->createOutputString());
     }
 
-    public function doWrite(\Ubergeek\Log\Event $event) {
+    public function doWrite(Event $event) {
         $this->chromeLogger->log($event->message, 'log');
     }
 

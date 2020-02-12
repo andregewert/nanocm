@@ -71,7 +71,9 @@ final class Util {
             'pharmacy',
             'prednisolone',
             'capsules',
-            'levitra'
+            'levitra',
+            'chlorthalidone',
+            'hydrochlorothiazide'
         );
     }
 
@@ -156,7 +158,8 @@ final class Util {
         if ($targetFormat == Constants::FORMAT_HTML) {
             return htmlentities($string, ENT_COMPAT, 'utf-8');
         } elseif ($targetFormat == Constants::FORMAT_XHTML) {
-            return htmlentities($string, ENT_COMPAT | ENT_XML1 | ENT_SUBSTITUTE, 'utf-8');
+            //return htmlentities($string, ENT_COMPAT | ENT_XML1 | ENT_SUBSTITUTE, 'utf-8');
+            return htmlspecialchars($string, ENT_COMPAT | ENT_XML1, 'UTF-8');
         }
         return $string;
     }

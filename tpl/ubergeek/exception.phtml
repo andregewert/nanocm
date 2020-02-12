@@ -7,8 +7,13 @@
         wenden Sie sich gerne an den Webseiten-Betreuer!</p>
 
     <?php if ($this->exception !== null && $this->ncm->showExceptions) : ?>
-        <p><b><?php echo $this->htmlEncode($this->exception->getMessage()); ?></b></p>
-        <?php echo nl2br($this->exception->getTraceAsString()); ?>
-        <?php $this->debug($this->exception->getTrace()); ?>
+        <?php $ex = $this->exception; ?>
+
+        <?php do { ?>
+            <p><b><?php echo $this->htmlEncode($ex->getMessage()); ?></b></p>
+            <?php echo nl2br($ex->getTraceAsString()); ?>
+            <?php $this->debug($ex->getTraceAsString()); ?>
+        <?php } while (($ex = $ex->getPrevious()) != null); ?>
+
     <?php endif; ?>
 </div>

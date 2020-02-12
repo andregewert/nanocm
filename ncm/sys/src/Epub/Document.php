@@ -24,6 +24,7 @@ use Ubergeek\Epub\Exception\DuplicateContentIdException;
 
 /**
  * Bildet ein ePub-Dokument ab
+ *
  * @package Ubergeek\Epub
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-11-09
@@ -49,16 +50,34 @@ class Document {
     public $description;
 
     /**
-     * use ZipArchive;
+     * (Haupt-)Sprache des Dokumentes
      * @var string
      */
     public $language = 'en';
+
+    /**
+     * Optionale Autorenangabe
+     * @var null|string
+     */
+    public $creator = null;
+
+    /**
+     * Optionale Publisher-Angabe
+     * @var null|string
+     */
+    public $publisher = null;
 
     /**
      * Optionale Hinweise zum Urheberrecht
      * @var null|string
      */
     public $rights = null;
+
+    /**
+     * Zusatzangaben (Stichworte) zum Inhalt
+     * @var null|string
+     */
+    public $subject = null;
 
     /**
      * Optionale Angabe zum Erscheinungsdatum oder -Jahr

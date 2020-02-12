@@ -20,8 +20,10 @@
 
 namespace Ubergeek\NanoCm;
 
+use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Epub\Document;
 use Ubergeek\Epub\Epub3Writer;
+use Ubergeek\NanoCm\Exception\ContentNotFoundException;
 use Ubergeek\NanoCm\Module\AbstractModule;
 use Ubergeek\NanoCm\Module\CoreModule;
 use Ubergeek\Net\Fetch;
@@ -67,6 +69,9 @@ class EbookGenerator {
     /**
      * Erstellt ein E-Book im ePub-Format und gibt dieses in Form eines Strings zurück
      *
+     * Diese Methode verwendet (indirekt) den in der NCM-Instanz konfigurierten E-Book-Cache, falls vorhanden!
+     * Hierbei sollte es sich im Normalfall um einen langfristigen (mehrtägigen) Cache handeln.
+     *
      * @param int $id Artikel-ID
      * @return string Generierte ePub-Datei in einem String
      * @throws \Exception
@@ -74,36 +79,149 @@ class EbookGenerator {
     public function createEpubForArticleWithId(int $id) {
         $article = $this->ncm->orm->getArticleById($id);
         if ($article == null) {
-            // TODO Exception werfen
+            throw new ContentNotFoundException("Could not find requested article!");
         }
-        return $this->createEpubForArticles(array($article), $article->headline);
+        return $this->createEpubForArticle($article);
+    }
+
+    /**
+     * Erstellt eine E-Pub-Datei für den übergebenen Artikel
+     *
+     * Diese Methode verwendet den in der NCM-Instanz konfigurierten E-Book-Cache, falls vorhanden!
+     * Hierbei sollte es sich im Normalfall um einen langfristigen (mehrtägigen) Cache handeln.
+     *
+     * @param Article $article Der als E-Pub zu schreibende Artikel
+     * @return string E-Pub-Inhalt in Form eines String
+     * @throws \Exception Bei einem Fehler
+     */
+    public function createEpubForArticle(Article $article) {
+        $cacheKey = 'ebook-article-' . $article->id;
+        $ebook = $this->getContentFromEbookCache($cacheKey);
+        if ($ebook == null) {
+            $ebook = $this->createEpubForArticles(array($article), $article->headline);
+            $this->putContentToEbookCache($cacheKey, $ebook);
+        }
+        return $ebook;
     }
 
     /**
      * Erstellt ein E-Book im ePub-Format für eine Artikelserie und gibt dieses in Form eines
      * Strings zurück
      *
+     * Diese Methode verwendet den in der NCM-Instanz konfigurierten E-Book-Cache, falls vorhanden!
+     * Hierbei sollte es sich im Normalfall um einen langfristigen (mehrtägigen) Cache handeln.
+     *
      * @param int $id ID der Artikelserie
      * @return string Generierte ePub-Datei in einem String
      * @throws \Exception
      */
     public function createEpubForArticleSeriesWithId(int $id) {
-        $series = $this->ncm->orm->getArticleseriesById($id);
-        $articles = array();
+        $cacheKey = 'ebook-series-' . $id;
+        $ebook = $this->getContentFromEbookCache($cacheKey);
 
-        if ($series == null) {
-            // TODO Exception werfen
+        if ($ebook == null) {
+            $series = $this->ncm->orm->getArticleseriesById($id);
+            $articles = array();
+
+            if ($series == null) {
+                // TODO Exception werfen
+            }
+
+            // TODO Artikel pro Serie auslesen
+
+            $ebook = $this->createEpubForArticles($articles, $series->title, $series->description);
+
+            // TODO E-Book ggf. in den Cache schreiben
         }
-
-        // TODO Artikel pro Serie auslesen
-
-        return $this->createEpubForArticles($articles,$series->title, $series->description);
+        return $ebook;
     }
 
     // </editor-fold>
 
 
     // <editor-fold desc="Internal methods">
+
+    /**
+     * Ermittelt das jüngste enthaltene Veröffentlichungsdatum aus den übergebenen Artikeln
+     *
+     * @param Article[] $articles Die zu durchsuchenden Artikel
+     * @return \DateTime Das jüngste enthaltene Veröffentlichungsdatum
+     * @throws \Exception
+     */
+    private function getLatestDateFromArticles(array $articles) : \DateTime {
+        $date = null;
+        foreach ($articles as $article) {
+            if ($article->publishing_timestamp != null && ($date == null || $article->publishing_timestamp > $date)) {
+                $date = $article->publishing_timestamp;
+            }
+        }
+        if ($date == null) $date = new \DateTime('now');
+        return $date;
+    }
+
+    /**
+     * Fasst alle in den übergebenen Artikeln genutzten Tags in einem einzelnen String zusammen
+     *
+     * @param Article[] $articles Die zu durchsuchenden Artikel
+     * @return string Alle enthaltenen Tags in Form eines einzelnen String
+     */
+    private function getTagsAsStringFromArticles(array $articles) : string {
+        $tags = array();
+        foreach ($articles as $article) {
+            if ($article->tags != null) {
+                $tags = array_unique(array_merge($tags, $article->tags));
+            }
+        }
+        sort($tags);
+        return join(', ', $tags);
+    }
+
+    /**
+     * Erstellt aus den übergebenen Artikeln eine gemeinsame Autorenangabe (sofern möglich)
+     *
+     * @param Article[] $articles Die zu durchsuchenden Artikel
+     * @return string Eine zusammengefasste Autorenangabe
+     */
+    private function getCreatorInfoFromArticles(array $articles) : string {
+        $authorIds = array();
+        foreach ($articles as $article) {
+            if (!in_array($article->author_id, $authorIds)) {
+                $authorIds[] = $article->author_id;
+            }
+        }
+
+        $authorStrings = array();
+        foreach ($authorIds as $id) {
+            $author = $this->ncm->orm->getUserById($id, true);
+            if ($author != null) {
+                $authorStrings[] = $author->getFullName();
+            }
+        }
+
+        if (count($authorStrings) == 1) {
+            return $authorStrings[0];
+        } elseif (count($authorStrings) >= 2) {
+            return $authorStrings[0] . " et al.";
+        }
+
+        return "";
+    }
+
+    private function getContentFromEbookCache(string $cacheKey) {
+        if ($this->ncm->ebookCache instanceof CacheInterface) {
+            $book = $this->ncm->ebookCache->get($cacheKey);
+            if ($book !== null) return $book;
+        }
+        return $book;
+    }
+
+    private function putContentToEbookCache(string $cacheKey, string $content) {
+        if ($this->ncm->ebookCache instanceof CacheInterface) {
+            $this->ncm->ebookCache->put($cacheKey, $content);
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Erstellt ein E-Book für die übergebenen Artikel mit angegebenem Titel und angegebener Kurzbeschreibung
@@ -118,7 +236,7 @@ class EbookGenerator {
     private function createEpubForArticles(array $articles, string $title = '', string $description = '', string $tocTitle = 'Inhalt') {
         $mappedUrls = array();
 
-        $writer = new Epub3Writer();
+        $writer = new Epub3Writer($this->ncm->cachedir);
         $document = new Document();
         $this->module->ebook = $document;
 
@@ -126,6 +244,11 @@ class EbookGenerator {
         $document->description = $description;
         $document->language = $this->ncm->lang;
         $document->identifier = uniqid();
+        $document->rights = $this->ncm->orm->getCopyrightNotice();
+        $document->publisher = $this->ncm->orm->getSiteTitle();
+        $document->date = $this->getLatestDateFromArticles($articles);
+        $document->subject = $this->getTagsAsStringFromArticles($articles);
+        $document->creator = $this->getCreatorInfoFromArticles($articles);
 
         // Titelseite, wenn mehr als ein Artikel enthalten ist
         if (count($articles) > 0) {

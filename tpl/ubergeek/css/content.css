@@ -19,7 +19,7 @@
  */
 /*!
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -91,6 +91,24 @@
   src: local("Oswald SemiBold"), local("Oswald-SemiBold"), url("../fonts/oswald-v16-latin_latin-ext-600.eot?#iefix") format("embedded-opentype"), url("../fonts/oswald-v16-latin_latin-ext-600.woff2") format("woff2"), url("../fonts/oswald-v16-latin_latin-ext-600.woff") format("woff"), url("../fonts/oswald-v16-latin_latin-ext-600.ttf") format("truetype"), url("../fonts/oswald-v16-latin_latin-ext-600.svg#Oswald") format("svg");
   /* Legacy iOS */ }
 /* </editor-fold> */
+/*!
+ * NanoCM
+ * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 /* Grundfarben für die Seite */
 /*$color-sidebarbg:           #d3d4d9;*/
 /* Farbgebung Header / Branding */

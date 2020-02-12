@@ -24,6 +24,8 @@ namespace Ubergeek\NanoCm\Module;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Constants;
 use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
+use Ubergeek\NanoCm\Exception\AuthorizationException;
+use Ubergeek\NanoCm\Exception\ContentNotFoundException;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\UserMessage;
 use Ubergeek\NanoCm\Util;
@@ -173,7 +175,7 @@ abstract class AbstractModule implements
      *
      * @var string
      */
-    public $outputFormat = Constants::FORMAT_HTML;
+    public $targetFormat = Constants::FORMAT_HTML;
     
     // </editor-fold>
     
@@ -365,11 +367,12 @@ abstract class AbstractModule implements
      * Der Eingabestring muss UTF8-kodiert sein.
      *
      * @param string $string
-     * @param string $targetFormat Zielformat
+     * @param string $overrideTargetFormat Zielformat angeben, um dieses zu erzwingen
      * @return string HTML-kodierter String
      */
-    public function htmlEncode($string, $targetFormat = Constants::FORMAT_HTML) : string {
-        return Util::htmlEncode($string, $targetFormat);
+    public function htmlEncode($string, $overrideTargetFormat = null) : string {
+        $format = ($overrideTargetFormat == null)? $this->targetFormat : $overrideTargetFormat;
+        return Util::htmlEncode($string, $format);
     }
 
     /**
@@ -535,18 +538,18 @@ abstract class AbstractModule implements
      * @return string Der ins Ausgabeformat konvertierte String
      */
     public function convertTextWithFullMarkup(string $input) : string {
-        switch ($this->outputFormat) {
+        switch ($this->targetFormat) {
             case Constants::FORMAT_HTML:
             case Constants::FORMAT_XHTML:
                 $converter = new HtmlConverter($this);
-                if ($this->outputFormat == Constants::FORMAT_XHTML) {
+                if ($this->targetFormat == Constants::FORMAT_XHTML) {
                     $converter->generateXhtml = true;
                 }
                 $output = $converter->convertFormattedText($input);
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unsupported target format: $this->outputFormat");
+                throw new \InvalidArgumentException("Unsupported target format: $this->targetFormat");
         }
 
         return $output;
@@ -559,10 +562,10 @@ abstract class AbstractModule implements
      * @return string Ins Zielformat umgewandelter Text
      */
     public function convertTextWithBasicMarkup(string $input) : string {
-        switch ($this->outputFormat) {
+        switch ($this->targetFormat) {
             case Constants::FORMAT_HTML:
             case Constants::FORMAT_XHTML:
-                if ($this->outputFormat == Constants::FORMAT_XHTML) {
+                if ($this->targetFormat == Constants::FORMAT_XHTML) {
                     $output = htmlentities($input, ENT_COMPAT | ENT_XHTML | ENT_SUBSTITUTE, 'UTF-8', false);
                 } else {
                     $output = htmlentities($input, ENT_COMPAT | ENT_HTML5, 'UTF-8', false);
@@ -581,7 +584,7 @@ abstract class AbstractModule implements
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unsupported target format: $this->outputFormat");
+                throw new \InvalidArgumentException("Unsupported target format: $this->targetFormat");
         }
 
         return $output;
@@ -589,6 +592,36 @@ abstract class AbstractModule implements
 
     // </editor-fold>
 
+
+    // <editor-fold desc="Internal methods">
+
+    private function render404Content() {
+        http_response_code(404);
+        $this->setContentType('text/html');
+        $this->replaceMeta('content-disposition', 'inline');
+        $this->targetFormat = Constants::FORMAT_HTML;
+        $this->setPageTemplate(self::PAGE_STANDARD);
+        $this->setTitle($this->getSiteTitle() . ' - Seite nicht gefunden!');
+        $this->setContent($this->renderUserTemplate('error-404.phtml'));
+    }
+
+    private function renderExceptionContent() {
+        $this->setContentType('text/html');
+        $this->replaceMeta('content-disposition', 'inline');
+        $this->targetFormat = Constants::FORMAT_HTML;
+        $this->setPageTemplate(self::PAGE_STANDARD);
+        $this->setContent($this->renderUserTemplate('exception.phtml'));
+    }
+
+    private function renderAuthorizationExceptionContent() {
+        $this->setContentType('text/html');
+        $this->replaceMeta('content-disposition', 'inline');
+        $this->targetFormat = Constants::FORMAT_HTML;
+        $this->setPageTemplate(self::PAGE_STANDARD);
+        $this->setContent($this->renderUserTemplate('exception-authorization.phtml'));
+    }
+
+    // </editor-fold>
     
     // <editor-fold desc="ControllerInterface">
     
@@ -597,25 +630,20 @@ abstract class AbstractModule implements
         try {
             $this->init();
             $this->run();
-        } catch (\Ubergeek\NanoCm\Exception\AuthorizationException $ex) {
-            $this->outputFormat = Constants::FORMAT_HTML;
-            $this->setPageTemplate(self::PAGE_STANDARD);
+        } catch (AuthorizationException $ex) {
             $this->exception = $ex;
-            $this->setContent($this->renderUserTemplate('exception-authorization.phtml'));
+            $this->renderAuthorizationExceptionContent();
+        } catch (ContentNotFoundException $ex) {
+            $this->exception = $ex;
+            $this->render404Content();
         } catch (\Exception $ex) {
-            $this->outputFormat = Constants::FORMAT_HTML;
-            $this->setPageTemplate(self::PAGE_STANDARD);
             $this->exception = $ex;
-            $this->setContent($this->renderUserTemplate('exception.phtml'));
+            $this->renderExceptionContent();
         }
         
         // Wenn kein Modul einen Inhalt generiert hat, Fehler 404 anzeigen
         if (strlen($this->getContent()) == 0) {
-            $this->outputFormat = Constants::FORMAT_HTML;
-            $this->setPageTemplate(self::PAGE_STANDARD);
-            $this->setTitle($this->getSiteTitle() . ' - Seite nicht gefunden!');
-            http_response_code(404);
-            $this->setContent($this->renderUserTemplate('error-404.phtml'));
+            $this->render404Content();
         }
 
         // Äußeres Template rendern

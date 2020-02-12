@@ -183,6 +183,13 @@ class NanoCm {
     public $captchaCache;
 
     /**
+     * Cache für generierte E-Books
+     *
+     * @var CacheInterface
+     */
+    public $ebookCache;
+
+    /**
      * Cache für das Sperren von IP-Adressen für die Kommentar-Funktion
      *
      * @var CacheInterface
@@ -298,7 +305,8 @@ class NanoCm {
         $this->ipCache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
         $this->mediaCache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
-        $this->commentIpCache = new FileCache($this->cachedir, 60 *5, 'cmt-', $this->log);
+        $this->commentIpCache = new FileCache($this->cachedir, 60 *60, 'cmt-', $this->log);
+        $this->ebookCache = new FileCache($this->cachedir, 60 *60 *24 *7, 'ebook-', $this->log);
 
         // Medienverwaltung initialisieren
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);

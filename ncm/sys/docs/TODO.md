@@ -31,8 +31,8 @@
 ## Niedrige Priorität
 
 - [x] Atom-Feed implementieren
+- [x] ePub-Generierung implementieren
+- [ ] Trackback-Funktion implementieren
 - [ ] Lokalisierbarkeit
 - [ ] Installationsassistent
-- [ ] Trackback-Funktion implementieren
-- [ ] ePub-Generierung implementieren
 - [ ] Cookie-Hinweis einblenden (-> da keine Weitergabe von Daten an Dritte eigentlich nicht notwendig -> low pri)

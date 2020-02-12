@@ -27,12 +27,14 @@ use Ubergeek\NanoCm\Captcha;
 use Ubergeek\NanoCm\Comment;
 use Ubergeek\NanoCm\Constants;
 use Ubergeek\NanoCm\EbookGenerator;
+use Ubergeek\NanoCm\Exception\ContentNotFoundException;
 use Ubergeek\NanoCm\FeedGenerator;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\Page;
 use Ubergeek\NanoCm\Setting;
 use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\Tag;
+use Ubergeek\NanoCm\UserType;
 use Ubergeek\NanoCm\Util;
 
 /**
@@ -83,6 +85,13 @@ class CoreModule extends AbstractModule {
     /** @var bool Gibt an, ob die Trackback-Funktion grundsätzlich eingeschaltet ist */
     public $trackbacksEnabled = false;
 
+    /**
+     * Gibt an, ob der angemeldete (oder anonyme) Nutzer Vorschau-Ansichten von noch nicht freigeschalteten
+     * Artikeln sehen darf
+     * @var bool
+     */
+    public $isPreviewEnabled = false;
+
     /** @var string Benutzereingabe "Name" für Kommentar */
     public $commentName;
 
@@ -103,6 +112,9 @@ class CoreModule extends AbstractModule {
 
     /** @var bool Benutzereingabe füe "Gravatar verwenden" */
     public $commentUseGravatar;
+
+    /** @var bool Zusätzliches Eingabefeld für Kommentare (soll leer bleiben -> verzweifelter Versucht, Bots abzuhalten) */
+    public $commentAdditionalInput;
 
     // </editor-fold>
 
@@ -133,7 +145,11 @@ class CoreModule extends AbstractModule {
             $this->commentHeadline = $this->getOrOverrideSessionVarWithParam('_h');
             $this->commentText = $this->getOrOverrideSessionVarWithParam('_t');
             $this->commentUseGravatar = $this->getOrOverrideSessionVarWithParam('_g');
+            $this->commentAdditionalInput = $this->getOrOverrideSessionVarWithParam('_i');
         }
+
+        // Vorschau ist dann aktiviert, wenn ein Benutzer angemeldet ist, der mindestens Redakteurs-Rechte besitzt
+        $this->isPreviewEnabled = $this->ncm->isUserLoggedIn() && $this->ncm->getLoggedInUser()->usertype >= UserType::EDITOR;
 
         switch ($parts[0]) {
             
@@ -145,7 +161,7 @@ class CoreModule extends AbstractModule {
 
                     $this->article = $this->orm->getArticleById(
                         intval($parts[2]),
-                        !$this->ncm->isUserLoggedIn()
+                        !$this->isPreviewEnabled
                     );
 
                     if ($this->article !== null) {
@@ -266,13 +282,20 @@ class CoreModule extends AbstractModule {
             case 'ebook':
                 if (count($parts) >= 2) {
                     $this->setPageTemplate(self::PAGE_NONE);
-                    $this->outputFormat = Constants::FORMAT_XHTML;
+                    $this->targetFormat = Constants::FORMAT_XHTML;
                     $this->setContentType('application/epub+zip');
 
                     switch ($parts[1]) {
                         case 'article':
+                            $article = $this->orm->getArticleById(intval($parts[2]), !$this->isPreviewEnabled);
+                            if ($article == null) {
+                                throw new ContentNotFoundException("Could not find requested article!");
+                            }
+
                             $epub = new EbookGenerator($this);
-                            $this->content = $epub->createEpubForArticleWithId(intval($parts[2]));
+                            $fname = Util::simplifyUrlString($article->headline) . '.epub';
+                            $this->replaceMeta('content-disposition', "attachment; filename=\"$fname\"");
+                            $this->content = $epub->createEpubForArticle($article);
                             break;
 
                         case 'series':
@@ -401,6 +424,8 @@ class CoreModule extends AbstractModule {
     // <editor-fold desc="Internal methods">
 
     private function tryToSaveComment($articleId) {
+        if (strlen($this->commentAdditionalInput) != 0) return null;
+
         $captchaId = $this->getParam('cpsid', '');
         $captchaInput = $this->getParam('sc', '');
 
@@ -413,8 +438,6 @@ class CoreModule extends AbstractModule {
         $comment->headline = $this->commentHeadline;
         $comment->content = $this->commentText;
         $comment->use_gravatar = $this->commentUseGravatar == '1';
-
-        $this->log->debug($comment);
 
         // Eingabe auf Vollständigkeit überprüfen
         if (strlen($comment->username) < 1
@@ -446,7 +469,7 @@ class CoreModule extends AbstractModule {
 
             // Spam-Begriffe prüfen
             if (Util::checkTextAgainstWordsList($comment->content, Util::getJunkWords())) {
-                $comment->status_code = StatusCode::MODERATION_REQUIRED;
+                $comment->status_code = StatusCode::MARKED_AS_JUNK;
             }
 
             // Wenn Links enthalten sind, pauschal einstufen als "zu moderieren"

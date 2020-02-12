@@ -19,6 +19,9 @@
 
 namespace Ubergeek\Log\Writer;
 
+use Ubergeek\Log\Event;
+use Ubergeek\Log\Filter\FilterInterface;
+
 abstract class AbstractWriter implements WriterInterface {
     
     /**
@@ -30,17 +33,17 @@ abstract class AbstractWriter implements WriterInterface {
     /**
      * Dem Konstruktor können ein Filter oder ein Array mit mehreren Filtern
      * übergeben werden
-     * @param \Ubergeek\Log\Filter\FilterInterface|mixed $filters
+     * @param FilterInterface|mixed $filters
      */
     public function __construct($filters = null) {
         if (is_array($filters)) {
             $this->filters = $filters;
-        } elseif ($filters instanceof \Ubergeek\Log\Filter\FilterInterface) {
+        } elseif ($filters instanceof FilterInterface) {
             $this->filters = array($filters);
         }
     }
     
-    public final function addFilter(\Ubergeek\Log\Filter\FilterInterface $filter) {
+    public final function addFilter(FilterInterface $filter) {
         if (!is_array($this->filters)) {
             $this->filters = array();
         }
@@ -57,9 +60,9 @@ abstract class AbstractWriter implements WriterInterface {
      * Erweitert die write-Methode um die Anwendung der konfigurierten Filter.
      * Nur wenn das übergebene Event von allen Filtern akzeptiert wird, wird
      * es an die doWrite()-Methode weitergereicht.
-     * @param \Ubergeek\Log\Event $event Das zu protokollierende Event
+     * @param Event $event Das zu protokollierende Event
      */
-    public final function write(\Ubergeek\Log\Event $event) {
+    public final function write(Event $event) {
         $accepted = true;
         
         if (is_array($this->filters)) {
@@ -76,5 +79,5 @@ abstract class AbstractWriter implements WriterInterface {
         }
     }
 
-    abstract function doWrite(\Ubergeek\Log\Event $event);
+    abstract function doWrite(Event $event);
 }

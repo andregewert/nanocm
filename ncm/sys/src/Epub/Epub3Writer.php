@@ -31,13 +31,32 @@ use ZipArchive;
  */
 class Epub3Writer {
 
+    // <editor-fold desc="Properties">
+
+    /**
+     * @var string Pfad zur Ablage von temporären Dateien
+     */
+    private $tempDir = '/tmp';
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Constructor">
+
+    public function __construct($tempDir = null) {
+        if ($tempDir != null) {
+            $this->tempDir = $tempDir;
+        }
+    }
+
+    // </editor-fold>
+
+
     // <editor-fold desc="Public methods">
 
     public function createDocumentFile(Document $document) : string {
 
-        // TODO Brauchbare temporäre Datei verwenden, evtl. mit Caching verbinden
-
-        $filename = '/volume1/webhosts/uberdev/test.epub';
+        $filename = $this->createTempFileName();
         if (file_exists($filename)) unlink($filename);
 
         $archive = new ZipArchive();
@@ -50,13 +69,49 @@ class Epub3Writer {
             $archive->addFromString($content->filename, $content->contents);
         }
         $archive->close();
-        return file_get_contents($filename);
+
+        $contents = file_get_contents($filename);
+        unlink($filename);
+        return $contents;
     }
 
     // </editor-fold>
 
 
     // <editor-fold desc="Internal methods">
+
+    /**
+     * Erzeugt einen Namen für eine neu anzulegende temporäre Datei
+     * @return string Absoluter Dateipfad zur temporären Datei
+     */
+    private function createTempFileName() : string {
+        if (!file_exists($this->tempDir)) {
+            throw new CouldNotCreateTempFileException("Configured temp dir does exist!");
+        }
+        if (!is_writable($this->tempDir)) {
+            throw new CouldNotCreateTempFileException("Configured temp dir is not writable");
+        }
+
+        $i = 0;
+        do {
+            if ($i == 0) {
+                $path = $this->tempDir . DIRECTORY_SEPARATOR . 'epub-temp';
+            } else {
+                $path = $this->tempDir . DIRECTORY_SEPARATOR . 'epub-temp-' . $i;
+            }
+            $i++;
+        } while (file_exists($path) && $i <= 99);
+
+        if ($i == 99) {
+            throw new CouldNotCreateTempFileException("Could not find unused file name!");
+        }
+
+        return $path;
+    }
+
+    private function quoteXmlContent(string $content) {
+        return htmlspecialchars($content, ENT_COMPAT | ENT_XML1);
+    }
 
     private function createContainerXml() : string {
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -78,13 +133,29 @@ class Epub3Writer {
         $rootNode->appendChild($dom->createAttribute('xmlns:dc'))->nodeValue = 'http://purl.org/dc/elements/1.1/';
 
         $metadata = $rootNode->appendChild($dom->createElement('metadata'));
-        $metadata->appendChild($dom->createElement('dc:title'))->nodeValue = $document->title;
+        $metadata->appendChild($dom->createElement('dc:title'))->nodeValue = $this->quoteXmlContent($document->title);
         $idNode = $dom->createElement('dc:identifier');
-        $idNode->nodeValue = 'dummyid';
+        $idNode->nodeValue = $document->identifier;
         $idNode->appendChild($dom->createAttribute('id'))->nodeValue = 'pub-id';
         $metadata->appendChild($idNode);
-        $metadata->appendChild($dom->createElement('dc:language'))->nodeValue = $document->language;
-        $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $document->description;
+        $metadata->appendChild($dom->createElement('dc:language'))->nodeValue = $this->quoteXmlContent($document->language);
+        $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $this->quoteXmlContent($document->description);
+
+        if ($document->creator != null) {
+            $metadata->appendChild($dom->createElement('dc:creator'))->nodeValue = $this->quoteXmlContent($document->creator);
+        }
+        if ($document->publisher != null) {
+            $metadata->appendChild($dom->createElement('dc:publisher'))->nodeValue = $this->quoteXmlContent($document->publisher);
+        }
+        if ($document->rights != null) {
+            $metadata->appendChild($dom->createElement('dc:rights'))->nodeValue = $this->quoteXmlContent($document->rights);
+        }
+        if ($document->subject != null) {
+            $metadata->appendChild($dom->createElement('dc:subject'))->nodeValue = $this->quoteXmlContent($document->subject);
+        }
+        if ($document->date instanceof \DateTime) {
+            $metadata->appendChild($dom->createElement('dc:date'))->nodeValue = $document->date->format('Y-m-d');
+        }
 
         $modified = ($document->modified === null)? new \DateTime() : $document->modified;
         $modifiedNode = $dom->createElement('meta');
