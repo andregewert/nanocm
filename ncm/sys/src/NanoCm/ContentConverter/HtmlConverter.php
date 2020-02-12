@@ -119,14 +119,14 @@ class HtmlConverter extends DecoratedContentConverter {
 
         // Notlösung, um nachträglich XHTML-kompatiblen Output zu erzwingen ...
         if ($this->generateXhtml) {
-            if (function_exists('tidy_repair_string')) {
-                $output = tidy_repair_string($output, array(
-                    'output-xml' => true
-                ));
-            } else {
+            //if (function_exists('tidy_repair_string')) {
+            //    $output = tidy_repair_string($output, array(
+            //        'output-xml' => true
+            //    ));
+            //} else {
                 $output = $this->closeOpenSingleTags($output);
                 $output = $this->replaceNamedEntities($output);
-            }
+            //}
         }
 
         return $output;

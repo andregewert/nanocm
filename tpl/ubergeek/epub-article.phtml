@@ -1,6 +1,15 @@
 <?php
     /* @var $this Ubergeek\NanoCm\Module\CoreModule */
     use Ubergeek\NanoCm\Constants;
+
+    $medium = null;
+    $format = null;
+
+    if (!empty($this->article->medium_id)) {
+        if (($format = $this->orm->getImageFormatByKey('banner')) !== null) {
+            $medium = $this->orm->getMediumById($this->article->medium_id);
+        }
+    }
 ?>
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n"; ?>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
@@ -10,6 +19,21 @@
     </head>
     <body>
         <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
+
+        <?php if ($format != null && $medium != null) : ?>
+            <div class="figurecontainer">
+                <div class="imgcontainer">
+                    <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                         class="<?php echo $this->htmlEncode($format->key); ?>"
+                         title="<?php echo $this->htmlEncode($medium->title); ?>"
+                        <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                        <?php if ($format->height > 0) echo "height=\"$format->height\""; ?> />
+                </div>
+                <?php if (strlen($medium->attribution) > 0) : ?>
+                    <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <?php if (strlen($this->article->teaser) > 0) : ?>
             <div class="lead">

@@ -45,6 +45,8 @@ class Fetch {
 
         if (function_exists('curl_init')) {
             $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($ch);
             $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -67,13 +69,13 @@ class Fetch {
      * @return mixed|null Content-Type oder null
      */
     public static function getContentTypeForUrl(string $url, $cache = null) {
-        // TODO Cache abfragen
-
         if (function_exists('curl_init')) {
             $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
             curl_setopt($ch, CURLOPT_NOBODY, true);
-            //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
             curl_exec($ch);
             $type = curl_getinfo($ch,  CURLINFO_CONTENT_TYPE);
         } else {
@@ -95,6 +97,8 @@ class Fetch {
         if (!function_exists('curl_init')) return true;
 
         $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_NOBODY, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         $result = curl_exec($ch);
