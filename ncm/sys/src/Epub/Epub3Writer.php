@@ -184,6 +184,7 @@ class Epub3Writer {
             if ($content->includeInSpine) {
                 $item = $spine->appendChild($dom->createElement('itemref'));
                 $item->appendChild($dom->createAttribute('idref'))->nodeValue = $content->id;
+                $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
                 $item->appendChild($dom->createAttribute('linear'))->nodeValue = 'yes';
             }
         }

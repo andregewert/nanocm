@@ -68,7 +68,7 @@ class Fetch {
      * @param null $cache Optionale Cache-Instanz (wird aktuell noch nicht verwendet)
      * @return mixed|null Content-Type oder null
      */
-    public static function getContentTypeForUrl(string $url, $cache = null) {
+    public static function getContentTypeHeaderForUrl(string $url, $cache = null) {
         if (function_exists('curl_init')) {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);

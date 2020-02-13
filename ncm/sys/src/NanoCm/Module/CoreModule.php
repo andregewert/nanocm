@@ -292,10 +292,10 @@ class CoreModule extends AbstractModule {
                                 throw new ContentNotFoundException("Could not find requested article!");
                             }
 
-                            $epub = new EbookGenerator($this);
+                            $ebookGenerator = new EbookGenerator($this);
                             $fname = Util::simplifyUrlString($article->headline) . '.epub';
                             $this->replaceMeta('content-disposition', "attachment; filename=\"$fname\"");
-                            $this->content = $epub->createEpubForArticle($article);
+                            $this->content = $ebookGenerator->createEpubForArticle($article);
                             break;
 
                         case 'series':

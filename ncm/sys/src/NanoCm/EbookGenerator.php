@@ -250,7 +250,7 @@ class EbookGenerator {
         $document->subject = $this->getTagsAsStringFromArticles($articles);
         $document->creator = $this->getCreatorInfoFromArticles($articles);
 
-        // Titelseite, wenn mehr als ein Artikel enthalten ist
+        // Titelseite, wenn mindestens ein Artikel enthalten ist
         if (count($articles) > 0) {
             $this->module->articles = $articles;
             $xhtml = $this->module->renderUserTemplate('epub-cover.phtml');
@@ -260,7 +260,7 @@ class EbookGenerator {
             $document->addContent(
                 $document->createContentFromString(
                     $document->title,
-                    'title.phtml',
+                    'cover.xhtml',
                     $xhtml
                 )
             );
@@ -323,30 +323,38 @@ class EbookGenerator {
             $mappedContent = null;
             if (array_key_exists($targetUrl, $mappedUrls)) {
                 $mappedContent = $mappedUrls[$targetUrl];
-            } elseif ($this->isEmbeddableContent($targetUrl)) {
-                $c = Fetch::fetchFromUrl($targetUrl);
+            } else {
+                $mimeType = $this->getMimeTypeByUrl($targetUrl);
+                if ($this->isMimeTypeEmbeddable($mimeType)) {
+                    $content = Fetch::fetchFromUrl($targetUrl);
+                    if (!empty($content)) {
+                        $virtualUrl = basename($targetUrl);
+                        $extension = $this->getDefaultFileExtensionByMimeType($mimeType);
+                        if (strtolower(substr($virtualUrl, -strlen($extension))) != $extension) {
+                            $virtualUrl .= ".$extension";
+                        }
 
-                if (!empty($c)) {
-                    $mappedContent = new MappedUrl();
-                    $mappedContent->originalUrl = $sourceUrl;
-                    $mappedContent->targetUrl = $targetUrl;
-                    $mappedContent->content = $c;
-                    $mappedContent->title = '';
-                    $mappedContent->mimeType = $this->guessMimeType(basename($targetUrl));
-                    $mappedContent->virtualUrl = basename($targetUrl);
-                    $mappedUrls[$mappedContent->targetUrl] = $mappedContent;
+                        $mappedContent = new MappedUrl();
+                        $mappedContent->originalUrl = $sourceUrl;
+                        $mappedContent->targetUrl = $targetUrl;
+                        $mappedContent->content = $content;
+                        $mappedContent->title = '';
+                        $mappedContent->mimeType = $mimeType;
+                        $mappedContent->virtualUrl = $virtualUrl;
+                        $mappedUrls[$mappedContent->targetUrl] = $mappedContent;
 
-                    $document->addContent(
-                        $document->createContentFromStringWithType(
-                            $mappedContent->title,
-                            $mappedContent->virtualUrl,
-                            $mappedContent->content,
-                            $mappedContent->mimeType,
-                            null,
-                            null,
-                            false
-                        )
-                    );
+                        $document->addContent(
+                            $document->createContentFromStringWithType(
+                                $mappedContent->title,
+                                $mappedContent->virtualUrl,
+                                $mappedContent->content,
+                                $mappedContent->mimeType,
+                                null,
+                                null,
+                                false
+                            )
+                        );
+                    }
                 }
             }
 
@@ -387,6 +395,7 @@ class EbookGenerator {
      * @param $url Der zu prüfende URL
      * @return bool true, wenn es sich um einen einbettbaren Inhalt handelt
      */
+    /*
     private function isEmbeddableContent($url) {
         $embeddable = array(
             'text/css',
@@ -397,12 +406,59 @@ class EbookGenerator {
             'image/svg+xml',
         );
 
-        $type = Fetch::getContentTypeForUrl($url);
+        $type = Fetch::getContentTypeHeaderForUrl($url);
         if ($type != null) {
             $type = trim(explode(';', $type)[0]);
         }
 
         return in_array($type, $embeddable);
+    }
+    */
+
+    /**
+     * Überprüft, ob es sich beim übergebenen MIME-Type um einen in das E-Book einbettbares Dateiformat handelt
+     *
+     * @param $mimeType Der zu prüfende MIME-Type
+     * @return bool true, wenn es sich um einen einbettbaren Inhaltstyp handelt
+     */
+    private function isMimeTypeEmbeddable($mimeType) {
+        $mimeType = strtolower($mimeType);
+        $embeddable = array(
+            'text/css',
+            'image/png',
+            'image/jpeg',
+            'image/gif',
+            'image/bmp',
+            'image/svg+xml',
+        );
+        return $mimeType != null && in_array($mimeType, $embeddable);
+    }
+
+    /**
+     * Ermittelt die Standard-Dateiendung für den angegebenen MIME-Type
+     *
+     * @param $mimeType Der zu prüfende MIME-Type
+     * @return string Die zugehörige Standard-Dateiendung
+     */
+    private function getDefaultFileExtensionByMimeType($mimeType) {
+        $mimeType = strtolower($mimeType);
+        if ($mimeType == 'image/svg+xml') return 'svg';
+        return strtolower(explode('/', $mimeType)[1]);
+    }
+
+    /**
+     * Ermittelt den MIME-Type für eine URL
+     *
+     * @param string $url Zu überprüfende URL
+     * @return string|null Der ermittelte MIME-Type oder null
+     */
+    private function getMimeTypeByUrl(string $url) {
+        $type = null;
+        $typeHeader = Fetch::getContentTypeHeaderForUrl($url);
+        if ($typeHeader != null) {
+            $type = strtolower(trim(explode(';', $typeHeader)[0]));
+        }
+        return $type;
     }
 
     /**
@@ -411,6 +467,7 @@ class EbookGenerator {
      * @param $filename Der zu prüfende Dateiname
      * @return string MIME-Type
      */
+    /*
     private function guessMimeType($filename) : string {
         $mime_types = array(
             'txt' => 'text/plain',
@@ -474,6 +531,6 @@ class EbookGenerator {
             return 'application/octet-stream';
         }
     }
-
+    */
     // </editor-fold>
 }
