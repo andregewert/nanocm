@@ -28,6 +28,7 @@ use Ubergeek\Log\Logger;
 use Ubergeek\NanoCm\Media\MediaManager;
 use Ubergeek\Net\GeolocationService;
 use Ubergeek\Net\UserAgentInfo;
+use Ubergeek\Session\SimpleSession;
 
 /**
  * Basis-Logikklasse für das CMS
@@ -298,19 +299,21 @@ class NanoCm {
         }
 
         // Session-Initialisierung
-        $this->session = new \Ubergeek\Session\SimpleSession('ncm');
+        $this->session = new SimpleSession('ncm');
         $this->session->start();
 
         // Caches initialisieren
-        $this->ipCache = new FileCache($this->cachedir, 60 *60 *24, 'ip-', $this->log);
-        $this->mediaCache = new FileCache($this->cachedir, 60 *60 *24 *100, 'media-', $this->log);
+        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_GEOLOCATION_TTL, 24));
+        $this->ipCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ip-', $this->log);
+        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_MEDIA_TTL, 24 *100));
+        $this->mediaCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'media-', $this->log);
+        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_COMMENTS_TTL, 1));
+        $this->commentIpCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'cmt-', $this->log);
+        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_EBOOKS_TTL, 24 *7));
+        $this->ebookCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ebook-', $this->log);
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
-        $this->commentIpCache = new FileCache($this->cachedir, 60 *60, 'cmt-', $this->log);
-        $this->ebookCache = new FileCache($this->cachedir, 60 *60 *24 *7, 'ebook-', $this->log);
 
-        // Medienverwaltung initialisieren
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);
-
         $this->log->debug($this->versionInfo);
     }
 

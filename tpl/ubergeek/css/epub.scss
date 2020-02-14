@@ -1,0 +1,280 @@
+/*!
+ * NanoCM
+ * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+@import 'vars';
+
+html {
+    background-color: $color-contentbg;
+    font-family: $font-text;
+    font-size: $font-basesize-epub;
+    line-height: $font-lineheight;
+    padding: 0;
+}
+
+body {
+    background-color: $color-contentbg;
+    font-family: $font-text;
+    font-size: $font-basesize-epub;
+    line-height: $font-lineheight;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-headlines;
+    font-weight: normal;
+    line-height: 1.2em;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+a {
+    text-decoration: none;
+    color: $color-link;
+}
+
+a img {
+    border: none;
+}
+
+tt, code, pre, textarea, kbd,
+textarea.form-control {
+    font-family: $font-monospace;
+    font-size: 0.85em;
+    font-size: 0.85rem;
+}
+
+div.shadow,
+li.odd {
+    background-color: $color-sidebarbg;
+}
+
+ul, ol {
+    margin: 1em 0;
+}
+
+ul.nobullets {
+    list-style: none;
+    padding: 0;
+}
+
+.smallcaps {
+    font-variant: small-caps;
+}
+
+.articlefooter {
+    font-size: 0.8em;
+    font-size: 0.8rem;
+    border-bottom: solid $color-lightborder 1px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    color: $color-darkborder;
+    margin-bottom: 2em;
+    line-height: 1.2em;
+    clear: both;
+}
+
+.articlefooter p {
+    margin: 0;
+}
+
+div.details {
+    font-size: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.2em;
+    clear: both;
+    color: $color-darkborder;
+}
+
+ul.taglist {
+    font-size: 0.8rem;
+    line-height: 1.2em;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline;
+}
+
+ul.taglist li {
+    display: inline;
+}
+
+ul.taglist li a {
+    border: solid $color-accent 1px;
+    padding: 0.1em 0.75em;
+    border-radius: 0.25em;
+    display: inline-block;
+}
+
+p {
+    margin: 1em 0;
+}
+
+p.readmore {
+    font-weight: bold;
+    margin-top: -0.8rem;
+    text-align: left;
+}
+
+div.lead {
+    font-size: 1.1rem;
+    font-style: italic;
+    line-height: 1.4em;
+}
+
+div.sidebar {
+    background: $color_sidebarbg;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4em;
+}
+
+div.sidebar_right {
+    width: 20rem;
+    float: right;
+    margin: 1rem 0 1rem 1rem;
+}
+
+div.sidebar_left {
+    width: 20rem;
+    float: left;
+    margin: 1rem 1rem 1rem 0;
+}
+
+/* <editor-fold desc="Media manager"> */
+
+figure {
+    margin: 1em 0;
+    padding: 0;
+    text-align: center;
+}
+
+.figurecontainer {
+    display: inline-block;
+    position: relative;
+    margin: 0 auto;
+    text-align: left;
+    max-width: 100%;
+}
+
+.imgcontainer {
+    word-wrap: break-word;
+    width: inherit;
+}
+
+.imgcontainer a {
+    display: block;
+}
+
+.imgcontainer img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.figurecontainer .caption {
+    box-sizing: border-box;
+    font-size: 0.9em;
+    font-size: 0.9rem;
+    line-height: 1.2em;
+    width: 100%;
+    padding: 0.25em 0.5em;
+    border-bottom: solid $color-lightborder 1px;
+}
+
+.figurecontainer .attribution {
+    box-sizing: border-box;
+    background-color: #000;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    opacity: 0.8;
+    font-size: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.2em;
+    width: 100%;
+    padding: 0.25em 0.5em;
+}
+
+.video-preview {
+    margin: 0 auto;
+    position: relative;
+}
+
+.video-preview a {
+    display: block;
+}
+
+.video-preview a img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.video-preview a img.overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    opacity: 0.75;
+}
+
+.video-preview a:hover img.overlay {
+    opacity: 1;
+}
+
+blockquote.twitter-tweet {
+    background: $color-sidebarbg;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0.001rem 1rem 1rem 1rem;
+    box-sizing: border-box;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="Images"> */
+
+img {
+    max-width:100%;
+}
+
+img.banner {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+}
+
+img.thumb {
+    display: block;
+}
+
+a.thumb {
+    float: left;
+    margin-right: 1rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+}
+
+a.imglink {
+    display: block;
+}
+
+/* </editor-fold> */

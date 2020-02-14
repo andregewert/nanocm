@@ -91,10 +91,33 @@ class Setting
 
     /**
      * Locale-String für PHP
-     *
      * @var string
      */
     public const SYSTEM_LOCALE = 'system.locale';
+
+    /**
+     * Lebensdauer des Geolocation-Caches (wird in Stunden angegeben)
+     * @var string
+     */
+    public const SYSTEM_CACHE_GEOLOCATION_TTL = 'system.cache.geolocation.ttl';
+
+    /**
+     * Lebensdauer des Medien-Caches (wird in Stunden angegeben)
+     * @var string
+     */
+    public const SYSTEM_CACHE_MEDIA_TTL = 'system.cache.media.ttl';
+
+    /**
+     * Lebensdauer des Kommentar-Sperr-Caches (wird in Stunden angegeben)
+     * @var string
+     */
+    public const SYSTEM_CACHE_COMMENTS_TTL = 'system.cache.comment.ttl';
+
+    /**
+     * Lebensdauer des E-Book-Caches (wird in Stunden angegeben)
+     * @var string
+     */
+    public const SYSTEM_CACHE_EBOOKS_TTL = 'system.cache.ebooks.ttl';
 
     /**
      * Gibt an, ob die Kommentierung von Artikel möglich sein soll
