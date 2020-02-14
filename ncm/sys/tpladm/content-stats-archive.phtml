@@ -1,6 +1,5 @@
-<?php
-/* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */
-?>
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */ ?>
+<script type="text/javascript" src="ncm/js/StatsArchive.js"></script>
 
 <div class="container spacing">
     <h1>Statistiken</h1>
@@ -48,35 +47,6 @@
 </div>
 
 <script type="text/javascript">
-    function StatsArchive() {
-        let app = this;
-
-        app.addArchivDialog = function() {
-            // TODO implementieren
-            console.log('Dialog öffnen: Archiv erstellen');
-        };
-
-        app.refresh = function() {
-            // TODO implementieren
-            console.log('Liste aktualisieren');
-        };
-
-        /**
-         * Initialisiert Event-Handler etc.
-         */
-        app.init = function () {
-            $('#button_refresh').click(function () {
-                app.refresh();
-            });
-            $('#button_add').click(function() {
-                app.addArchivDialog();
-            });
-            app.refresh();
-        };
-
-        app.init();
-    }
-
     $(document).ready(function() {
         module = new StatsArchive();
     });

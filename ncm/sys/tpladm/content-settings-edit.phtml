@@ -1,7 +1,4 @@
-<?php
-/* @var $this \Ubergeek\NanoCm\Module\AdminSettingsModule */
-?>
-
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminSettingsModule */ ?>
 <div class="row">
     <label for="edit_setting_key">Einstellung</label>
     <input type="text" id="edit_setting_key"<?php if (empty($this->setting->key)) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->setting->key); ?>">

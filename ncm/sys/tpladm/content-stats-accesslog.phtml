@@ -1,6 +1,5 @@
-<?php
-/* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */
-?>
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */ ?>
+<script type="text/javascript" src="ncm/js/AccessLog.js"></script>
 
 <div class="container spacing">
     <h1>Statistiken</h1>
@@ -59,46 +58,6 @@
 </div>
 
 <script type="text/javascript">
-    function AccessLog() {
-        let app = this;
-        app.page = $('#input_searchPage').val();
-
-        /**
-         * Initialisiert Event-Handler etc.
-         */
-        app.init = function() {
-            $('#button_refresh').click(function() {
-                app.refresh();
-            });
-            app.refresh();
-        };
-
-        /**
-         * Aktualisiert den angezeigten Ausschnitt aus dem AccessLog
-         */
-        app.refresh = function(page) {
-            ncm.showDefaultLoadingIndicator();
-            if (typeof page === 'undefined') page = app.page;
-
-            $.ajax('admin/stats/html/listaccesslog', {
-                cache:      false,
-                type:       'GET',
-                dataType:   'HTML',
-                data: {
-                    searchYear:         $('#input_searchYear').val(),
-                    searchMonth:        $('#select_searchMonth').val(),
-                    searchPage:         page
-                }
-            }).done(function(data) {
-                $('#placeholder_accesslog .content').html(data);
-            }).always(function() {
-                ncm.hideDefaultLoadingIndicator();
-                $('#input_searchYear').focus();
-            });
-        };
-        app.init();
-    }
-
     $(document).ready(function() {
         module = new AccessLog();
     });

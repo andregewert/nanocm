@@ -1,6 +1,4 @@
-<?php
-/* @var $this \Ubergeek\NanoCm\Module\AdminDefinitionsModule */
-?>
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminDefinitionsModule */ ?>
 <div class="row">
     <label for="edit_definition_definitiontype">Definitionstyp</label>
     <input type="text" id="edit_definition_definitiontype"<?php if (empty($this->definition->definitiontype)) echo ' class="autofocus"'; ?> value="<?php echo $this->htmlEncode($this->definition->definitiontype); ?>">

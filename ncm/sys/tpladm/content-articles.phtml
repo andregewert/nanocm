@@ -2,6 +2,7 @@
     /* @var $this \Ubergeek\NanoCm\Module\AdminArticlesModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
+<script type="text/javascript" src="ncm/js/Articles.js"></script>
 <div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
         <h1>Artikel verwalten</h1>
@@ -50,118 +51,6 @@
     </form>
 </div>
 <script type="text/javascript">
-    function Articles() {
-        let app = this;
-        app.page = $('#input_searchPage').val();
-
-        /**
-         * Initialisiert EventHandler etc.
-         */
-        app.init = function() {
-            $('#button_refresh').click(function() {
-                app.refresh();
-            });
-
-            $('#button_edit').click(function() {
-                app.editSelected();
-            });
-
-            $('#button_lock').click(function() {
-                app.lockSelected();
-            });
-
-            $('#button_delete').click(function() {
-                app.deleteSelected();
-            });
-
-            app.refresh();
-        };
-
-        /**
-         * Aktualisiert die Artikelliste
-         * @param {int} page
-         */
-        app.refresh = function(page) {
-            ncm.showDefaultLoadingIndicator();
-            if (typeof page === 'undefined') page = app.page;
-
-            $.ajax('admin/articles/html/list', {
-                cache:      false,
-                type:       'GET',
-                dataType:   'HTML',
-                data:       {
-                    searchTerm:         $('#input_searchTerm').val(),
-                    searchStatusCode:   $('#select_searchStatusCode').val(),
-                    searchPage:         page
-                }
-            }).done(function(data) {
-                $('#placeholder_articles .content').html(data);
-                $('.selectall').click(function() {
-                    ncm.toggleAllRowsSelection(this);
-                });
-            }).always(function() {
-                ncm.hideDefaultLoadingIndicator();
-                $('#input_searchTerm').focus();
-            });
-        };
-
-        /**
-         * Ruft die Bearbeitungsmaske für den ersten ausgewählten Artikel auf
-         */
-        app.editSelected = function() {
-            let id = ncm.getFirstSelectedRowId();
-            if (id != null) {
-                document.location.href = 'admin/articles/edit/' + id;
-            }
-        };
-
-        /**
-         * Löscht alle ausgewählten Artikel
-         */
-        app.deleteSelected = function() {
-            let ids = ncm.getSelectedRowIds();
-            if (ids.length > 0) {
-                if (confirm('Wollen Sie die ausgewählten Artikel wirklich endgültig löschen?')) {
-                    ncm.showDefaultLoadingIndicator();
-                    $.ajax('admin/articles/ajax/delete', {
-                        cache: false,
-                        type: 'GET',
-                        dataType: 'JSON',
-                        data: {
-                            ids: ids
-                        }
-                    }).always(function () {
-                        ncm.hideDefaultLoadingIndicator();
-                        app.refresh();
-                    });
-                }
-            }
-        };
-
-        /**
-         * Sperrt die ausgewählten Artikel
-         */
-        app.lockSelected = function()  {
-            let ids = ncm.getSelectedRowIds();
-            if (ids.length > 0) {
-                ncm.showDefaultLoadingIndicator();
-                $.ajax('admin/articles/ajax/lock', {
-                    cache:      false,
-                    type:       'GET',
-                    dataType:   'JSON',
-                    data:       {
-                        ids: ids
-                    }
-                }).always(function() {
-                    ncm.hideDefaultLoadingIndicator();
-                    app.refresh();
-                });
-            }
-        };
-
-        app.init();
-    }
-
     $(document).ready(function() {
         module = new Articles();
     });
