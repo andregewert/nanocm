@@ -346,15 +346,6 @@ class Document {
         $counter = 1;
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
-        $imp = new \DOMImplementation();
-
-        /*
-        $dom->appendChild($imp->createDocumentType(
-            'ncx',
-            '-//NISO//DTD ncx 2005-1//EN',
-            'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd'
-        ));
-        */
 
         $rootNode = $dom->appendChild($dom->createElement('ncx'));
         $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '2005-1';
@@ -364,7 +355,6 @@ class Document {
         $metaNode = $headNode->appendChild($dom->createElement('meta'));
         $metaNode->appendChild($dom->createAttribute('name'))->nodeValue = 'dtb:uid';
         $metaNode->appendChild($dom->createAttribute('content'))->nodeValue = $this->identifier;
-        //$metaNode->appendChild($dom->createAttribute('content'))->nodeValue = 'urn:uuid:' . $this->identifier;
 
         $metaNode = $headNode->appendChild($dom->createElement('meta'));
         $metaNode->appendChild($dom->createAttribute('name'))->nodeValue = 'dtb:depth';
