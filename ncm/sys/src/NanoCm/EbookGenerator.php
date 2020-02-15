@@ -23,7 +23,6 @@ namespace Ubergeek\NanoCm;
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Epub\Document;
 use Ubergeek\Epub\Epub3Writer;
-use Ubergeek\NanoCm\Exception\ContentNotFoundException;
 use Ubergeek\NanoCm\Module\AbstractModule;
 use Ubergeek\NanoCm\Module\CoreModule;
 use Ubergeek\Net\Fetch;
@@ -65,24 +64,6 @@ class EbookGenerator {
 
 
     // <editor-fold desc="Public methods">
-
-    /**
-     * Erstellt ein E-Book im ePub-Format und gibt dieses in Form eines Strings zurück
-     *
-     * Diese Methode verwendet (indirekt) den in der NCM-Instanz konfigurierten E-Book-Cache, falls vorhanden!
-     * Hierbei sollte es sich im Normalfall um einen langfristigen (mehrtägigen) Cache handeln.
-     *
-     * @param int $id Artikel-ID
-     * @return string Generierte ePub-Datei in einem String
-     * @throws \Exception
-     */
-    public function createEpubForArticleWithId(int $id) {
-        $article = $this->ncm->orm->getArticleById($id);
-        if ($article == null) {
-            throw new ContentNotFoundException("Could not find requested article!");
-        }
-        return $this->createEpubForArticle($article);
-    }
 
     /**
      * Erstellt eine E-Pub-Datei für den übergebenen Artikel
@@ -207,6 +188,12 @@ class EbookGenerator {
         return "";
     }
 
+    /**
+     * Versucht, ein E-Book aus dem Cache zu laden
+     *
+     * @param string $cacheKey Eindeutiger Cache-Schlüssel für den gesuchten Inhalte
+     * @return string|null Der Dateiinhalt als String oder null
+     */
     private function getContentFromEbookCache(string $cacheKey) {
         if ($this->ncm->ebookCache instanceof CacheInterface) {
             $book = $this->ncm->ebookCache->get($cacheKey);
@@ -215,12 +202,17 @@ class EbookGenerator {
         return $book;
     }
 
+    /**
+     * Legt den übergebenen E-Book-Inhalt unter dem angegebenen Schlüssel im E-Book-Cache ab
+     *
+     * @param string $cacheKey Eindeutiger Cache-Schlüssel für das zu speichernde E-Book
+     * @param string $content Der zu speichernde E-Book-Inhalt
+     * @return void
+     */
     private function putContentToEbookCache(string $cacheKey, string $content) {
         if ($this->ncm->ebookCache instanceof CacheInterface) {
             $this->ncm->ebookCache->put($cacheKey, $content);
-            return true;
         }
-        return false;
     }
 
     /**
@@ -229,11 +221,12 @@ class EbookGenerator {
      * @param Article[] $articles Die zu verpackenden Artikel
      * @param string $title Titel für das E-Book
      * @param string $description Kurzbeschreibung für das E-Book
-     * @param string $tocTitle Überschrift für das automatisch generierte Inhaltsverzeichnis
+     * @param bool $createCoverPage Gibt an, ob eine Seite mit dem Buch-Umschlag bzw. -Titel erstellt werden soll
+     * @param bool $createTitlePage Gibt an, ob eine Titelseite vor dem Buch-Inhalt erstellt werden soll
      * @return string E-Pub-Daten in String-Form
      * @throws \Exception
      */
-    private function createEpubForArticles(array $articles, string $title = '', string $description = '', string $tocTitle = 'Inhalt') {
+    private function createEpubForArticles(array $articles, string $title = '', string $description = '', $createCoverPage = true, $createTitlePage = true) {
         $mappedUrls = array();
 
         $writer = new Epub3Writer($this->ncm->cachedir);
@@ -250,17 +243,32 @@ class EbookGenerator {
         $document->subject = $this->getTagsAsStringFromArticles($articles);
         $document->creator = $this->getCreatorInfoFromArticles($articles);
 
-        // Titelseite, wenn mindestens ein Artikel enthalten ist
-        if (count($articles) > 0) {
-            $this->module->articles = $articles;
+        // Optionale Umschlagseite
+        if ($createCoverPage) {
             $xhtml = $this->module->renderUserTemplate('epub-cover.phtml');
             $xhtml = $this->replaceLinkedContents(
                 $document, $xhtml, $mappedUrls
             );
             $document->addContent(
                 $document->createContentFromString(
-                    $document->title,
+                    $document->coverTitle,
                     'cover.xhtml',
+                    $xhtml
+                )
+            );
+        }
+
+        // Optionale Titelseite
+        if ($createTitlePage) {
+            $this->module->articles = $articles;
+            $xhtml = $this->module->renderUserTemplate('epub-titlepage.phtml');
+            $xhtml = $this->replaceLinkedContents(
+                $document, $xhtml, $mappedUrls
+            );
+            $document->addContent(
+                $document->createContentFromString(
+                    $document->titlePageTitle,
+                    'titlepage.xhtml',
                     $xhtml
                 )
             );
@@ -285,11 +293,10 @@ class EbookGenerator {
 
         // Inhaltsverzeichnis
         $document->addContentAtBeginning(
-            $document->createTocContent($tocTitle)
+            $document->createTocContent($document->tocTitle)
         );
-
         $document->addContent(
-            $document->createNcxContent($tocTitle)
+            $document->createNcxContent($document->tocTitle)
         );
 
         return $writer->createDocumentFile($document);
@@ -389,33 +396,6 @@ class EbookGenerator {
     }
 
     /**
-     * Überprüft, ob es sich bei dem hinter dem übergebenen URL liegenden Inhalt
-     * um einen in das E-Book einbettbaren Inhalt handelt
-     *
-     * @param $url Der zu prüfende URL
-     * @return bool true, wenn es sich um einen einbettbaren Inhalt handelt
-     */
-    /*
-    private function isEmbeddableContent($url) {
-        $embeddable = array(
-            'text/css',
-            'image/png',
-            'image/jpeg',
-            'image/gif',
-            'image/bmp',
-            'image/svg+xml',
-        );
-
-        $type = Fetch::getContentTypeHeaderForUrl($url);
-        if ($type != null) {
-            $type = trim(explode(';', $type)[0]);
-        }
-
-        return in_array($type, $embeddable);
-    }
-    */
-
-    /**
      * Überprüft, ob es sich beim übergebenen MIME-Type um einen in das E-Book einbettbares Dateiformat handelt
      *
      * @param $mimeType Der zu prüfende MIME-Type
@@ -461,76 +441,5 @@ class EbookGenerator {
         return $type;
     }
 
-    /**
-     * Versucht, den MIME-Type anhand eines Dateinames zu ermitteln
-     *
-     * @param $filename Der zu prüfende Dateiname
-     * @return string MIME-Type
-     */
-    /*
-    private function guessMimeType($filename) : string {
-        $mime_types = array(
-            'txt' => 'text/plain',
-            'htm' => 'text/html',
-            'html' => 'text/html',
-            'php' => 'text/html',
-            'css' => 'text/css',
-            'js' => 'application/javascript',
-            'json' => 'application/json',
-            'xml' => 'application/xml',
-            'swf' => 'application/x-shockwave-flash',
-            'flv' => 'video/x-flv',
-
-            // images
-            'png' => 'image/png',
-            'jpe' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'jpg' => 'image/jpeg',
-            'gif' => 'image/gif',
-            'bmp' => 'image/bmp',
-            'ico' => 'image/vnd.microsoft.icon',
-            'tiff' => 'image/tiff',
-            'tif' => 'image/tiff',
-            'svg' => 'image/svg+xml',
-            'svgz' => 'image/svg+xml',
-
-            // archives
-            'zip' => 'application/zip',
-            'rar' => 'application/x-rar-compressed',
-            'exe' => 'application/x-msdownload',
-            'msi' => 'application/x-msdownload',
-            'cab' => 'application/vnd.ms-cab-compressed',
-
-            // audio/video
-            'mp3' => 'audio/mpeg',
-            'qt' => 'video/quicktime',
-            'mov' => 'video/quicktime',
-
-            // adobe
-            'pdf' => 'application/pdf',
-            'psd' => 'image/vnd.adobe.photoshop',
-            'ai' => 'application/postscript',
-            'eps' => 'application/postscript',
-            'ps' => 'application/postscript',
-
-            // ms office
-            'doc' => 'application/msword',
-            'rtf' => 'application/rtf',
-            'xls' => 'application/vnd.ms-excel',
-            'ppt' => 'application/vnd.ms-powerpoint',
-
-            // open office
-            'odt' => 'application/vnd.oasis.opendocument.text',
-            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
-        );
-
-        $ext = strtolower(array_pop(explode('.', $filename)));
-        if (array_key_exists($ext, $mime_types)) {
-            return $mime_types[$ext];
-        } else {
-            return 'application/octet-stream';
-        }
-    }
-    */
     // </editor-fold>
 }

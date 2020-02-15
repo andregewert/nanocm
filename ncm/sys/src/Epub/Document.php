@@ -39,6 +39,21 @@ class Document {
     public $title;
 
     /**
+     * @var string Titel bzw. Überschrift für die Seite mit dem Buch-Umschlag
+     */
+    public $coverTitle = 'Cover';
+
+    /**
+     * @var string Titel bzw. Überschrift für das Inhaltsverzeichnis (falls vorhanden)
+     */
+    public $tocTitle = 'Inhalt';
+
+    /**
+     * @var string Titel bzw. Überschrift für die Titelseite zwischen Cover und eigentlichem Buchinhalt
+     */
+    public $titlePageTitle = 'Übersicht';
+
+    /**
      * @var string Eindeutige Identifikation für dieses Dokument, bspw. eine ISBN
      */
     public $identifier = '';

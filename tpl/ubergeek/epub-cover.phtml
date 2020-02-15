@@ -1,47 +1,16 @@
-<?php
-/* @var $this Ubergeek\NanoCm\Module\CoreModule */
-?>
+<?php /* @var $this Ubergeek\NanoCm\Module\CoreModule */ ?>
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n"; ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
     <head>
-        <title><?php echo $this->htmlEncode($this->ebook->title); ?></title>
-        <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/epub.css'); ?>" type="text/css"/>
+        <title><?php echo $this->htmlEncode($this->ebook->coverTitle); ?></title>
     </head>
     <body>
-        <div class="titleplage">
-            <h1><?php echo $this->htmlEncode($this->ebook->title); ?></h1>
-
-            <?php if ($this->ebook->creator != null || $this->ebook->date instanceof \DateTime) : ?>
-                <div class="creators">
-                    <p>
-                        <?php if ($this->ebook->creator != null) : ?>
-                            <?php echo $this->htmlEncode($this->ebook->creator); ?>
-                            <?php if ($this->ebook->date instanceof \DateTime) : ?>
-                                <br />
-                            <?php endif; ?>
-                        <?php endif; ?>
-                        <?php if ($this->ebook->date instanceof \DateTime) : ?>
-                            <?php echo $this->ebook->date->format('d.m.Y'); ?>
-                        <?php endif; ?>
-                    </p>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($this->ebook->rights != null || $this->ebook->publisher) : ?>
-                <div class="rights">
-                    <p>
-                        <?php if ($this->ebook->publisher != null) : ?>
-                            Veröffentlicht durch <?php echo $this->htmlEncode($this->ebook->publisher); ?>
-                            <?php if ($this->ebook->rights != null) : ?>
-                                <br />
-                            <?php endif; ?>
-                        <?php endif; ?>
-                        <?php if ($this->ebook->rights != null) : ?>
-                            <?php echo $this->htmlEncode($this->ebook->rights); ?>
-                        <?php endif; ?>
-                    </p>
-                </div>
-            <?php endif; ?>
+        <div class="cover-img">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" height="100%" viewBox="0 0 565 800">
+                <image width="565" height="800" xlink:href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/EBookCover.jpeg'); ?>" />
+                <text x="12" y="250" style="font-size:38pt; font-family:Oswald"><?php echo $this->htmlEncode($this->ebook->title); ?></text>
+            </svg>
         </div>
     </body>
 </html>
