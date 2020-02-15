@@ -19,23 +19,68 @@
 
 namespace Ubergeek\Log\Writer;
 
+use Ubergeek\Log\Event;
+
 /**
  * Protokolliert die übergebenen Events in eine Log-Datei
  * @author André Gewert <agewert@ubergeek.de>
- * @todo Implementieren
  */
 class FileWriter extends AbstractWriter {
-    
+
+    /**
+     * Pfad zur Logdatei
+     * @var string
+     */
+    private $filename;
+
+    /**
+     * Datei-Handle für die Logdatei
+     * @var false|resource
+     */
+    private $fileHandle;
+
+    // <editor-fold desc="Constructor">
+
+    public function __construct($filename, $filters = null) {
+        parent::__construct($filters);
+        $this->filename = $filename;
+        $this->fileHandle = fopen($this->filename, 'a+');
+    }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="WriterInterface">
+
+    /**
+     * Schließt durch den Writer geöffnete Ressourcen wieder
+     */
     public function close() {
-        
+        if (is_resource($this->fileHandle)) {
+            fclose($this->fileHandle);
+        }
     }
 
+    /**
+     * Leert den Ausgabepuffer der Logdatei
+     */
     public function flush() {
-        
+        if (is_resource($this->fileHandle)) {
+            flush($this->fileHandle);
+        }
     }
 
-    public function doWrite(\Ubergeek\Log\Event $event) {
-        
+    /**
+     * Schreibt ein Ereignis in die Logdatei
+     * @param Event $event Das zu protokollierende Ereignis
+     */
+    public function doWrite(Event $event) {
+        if (!is_resource($this->fileHandle)) {
+            $this->fileHandle = fopen($this->filename, 'a+');
+        }
+        fwrite($this->fileHandle, $event->toString());
     }
+
+    // </editor-fold>
 
 }

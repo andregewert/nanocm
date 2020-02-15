@@ -167,14 +167,25 @@ class Document {
         return $content;
     }
 
-    public function createContentFromString(string $title, string $filename, string $contents, $properties = null, string $id = null, $includeInSpine = true) : Content {
+    public function createContentFromString(string $title,
+                                            string $filename,
+                                            string $contents,
+                                            $properties = null,
+                                            string $id = null,
+                                            $includeInSpine = true) : Content {
         return $this->createContentFromStringWithType($title, $filename, $contents, '', $properties, $id, $includeInSpine);
     }
 
-    public function createContentFromStringWithType(string $title, string $filename, string $contents, string $type, $properties = null, string $id = null, $includeInSpine = true) : Content {
+    public function createContentFromStringWithType(string $title,
+                                                    string $filename,
+                                                    string $contents,
+                                                    string $mimeType,
+                                                    $properties = null,
+                                                    string $id = null,
+                                                    $includeInSpine = true) : Content {
         if (!is_array($properties) && $properties != null) {
             $properties = array($properties);
-        } else {
+        } elseif (!is_array($properties)) {
             $properties = array();
         }
 
@@ -184,44 +195,49 @@ class Document {
         $content->title = $title;
         $content->contents = $contents;
         $content->properties = $properties;
-        if ($type != '') {
-            $content->type = $type;
+        if ($mimeType != '') {
+            $content->mimeType = $mimeType;
         }
         $content->includeInSpine = $includeInSpine;
         return $content;
     }
 
+    /**
+     * Erstellt ein Inhaltsverzeichnis (in Form einer XHTML-Datei) für alle bisher hinzugefügten Einzelinhalte
+     * (Kompatibilität zu ePub3)
+     *
+     * @param string $title Titel bzw. Überschrift für das Verzeichnis
+     * @param bool $includeAttachmentList Gibt an, ob Attachments (Bilder etc.) im Inhaltsverzeichnis aufgeführt werden sollen
+     * @param string $filename Der intern zu verwendende Dateiname
+     * @return Content Das Inhaltsverzeichnis in Form eines Content-Datenmodells
+     */
     public function createTocContent(string $title, bool $includeAttachmentList = false, string $filename = 'toc.xhtml') {
         $content = new Content();
         $content->id =  $this->createContentId('toc-');
-        $content->filename = $this->translateFilename($filename);
+        $content->filename = 'toc.xhtml';
         $content->title = $title;
         $content->contents = $this->createToc($title, $includeAttachmentList);
-        $content->properties = array('nav');
-        $content->type = 'application/xhtml+xml';
+        $content->properties = array('nav', 'toc');
+        $content->mimeType = 'application/xhtml+xml';
         $content->includeInSpine = false;
         return $content;
     }
 
+    /**
+     * Erstellt ein Inhaltsverzeichnis im NCX-Format (Kompatibilität zu ePub2)
+     *
+     * @param string $title Titel bzw. Überschrift für das Inhaltsverzeichnis
+     * @return Content Das Inhaltsverzeichnis in Form eines Content-Datenmodells
+     */
     public function createNcxContent(string $title) {
         $content = new Content();
         $content->id = 'ncx';
         $content->filename = 'toc.ncx';
         $content->title = $title;
         $content->contents = $this->createNcx($title);
-        $content->type = 'application/x-dtbncx+xml';
+        $content->mimeType = 'application/x-dtbncx+xml';
         $content->includeInSpine = false;
         return $content;
-    }
-
-    /**
-     * Überprüft, ob in den bereits hinzugefügten Inhalten ein Inhaltsverzeichnis vorhanden ist
-     *
-     * @return bool true, wenn bereits ein Inhaltsverzeichnis vorhanden ist
-     */
-    public function isTocExisting() : bool {
-        // TODO implementieren
-        return false;
     }
 
     /**
@@ -238,6 +254,41 @@ class Document {
         return false;
     }
 
+    /**
+     * Gibt alle Inhalte zurück, die die angegebene Property besitzen
+     *
+     * @param string $property Die gesuchte Property
+     * @return array Ein Array mit allen zutreffenden Inhalten
+     */
+    public function getContentsWithProperty(string $property) {
+        $found = array();
+        foreach ($this->contents as $content) {
+            if (is_array($content->properties) && in_array(strtolower($property), $content->properties)) {
+                $found[] = $content;
+            }
+        }
+        return $found;
+    }
+
+    /**
+     * Gibt den ersten Content zurück, der die angegebene Property besitzt
+     *
+     * @param string $property Die gesuchte Property
+     * @return Content|null Der erste zutreffende Content oder null
+     */
+    public function getFirstContentWithProperty(string $property) {
+        $temp = $this->getContentsWithProperty($property);
+        if (is_array($temp) && count($temp) >= 1) return $temp[0];
+        return null;
+    }
+
+    public function getFirstNonSpecialContent() {
+        foreach ($this->contents as $content) {
+            if (!is_array($content->properties)) return $content;
+        }
+        return null;
+    }
+
     // </editor-fold>
 
 
@@ -245,7 +296,7 @@ class Document {
 
     /**
      * Erstellt anhand der bisher hinzugefügten Inhaltsdateien ein automatisches
-     * Inhaltsverzeichnis in Form eines XHTML-Strings.
+     * Inhaltsverzeichnis in Form eines XHTML-Strings (Kompitibilität zu ePub3).
      *
      * Das generierte Inhaltsverzeichnis wird nicht automatisch als Inhaltsseite in
      * das Buch eingebunden. Stattdessen muss es auf Wunsch mit addToc() hinzugefügt werden.
@@ -287,6 +338,8 @@ class Document {
 
     /**
      * Erstellt anhand der bereits vorhandenen Inhalte ein Inhaltsverzeichnis im NCX-Format
+     * (Kompatibilität zu ePub2)
+     *
      * @return string Die generierte NCX-Datei
      */
     private function createNcx() {
@@ -295,11 +348,13 @@ class Document {
         $dom->formatOutput = true;
         $imp = new \DOMImplementation();
 
+        /*
         $dom->appendChild($imp->createDocumentType(
             'ncx',
             '-//NISO//DTD ncx 2005-1//EN',
             'http://www.daisy.org/z3986/2005/ncx-2005-1.dtd'
         ));
+        */
 
         $rootNode = $dom->appendChild($dom->createElement('ncx'));
         $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '2005-1';
@@ -308,7 +363,8 @@ class Document {
         $headNode = $rootNode->appendChild($dom->createElement('head'));
         $metaNode = $headNode->appendChild($dom->createElement('meta'));
         $metaNode->appendChild($dom->createAttribute('name'))->nodeValue = 'dtb:uid';
-        $metaNode->appendChild($dom->createAttribute('content'))->nodeValue = 'urn:uuid:' . $this->identifier;
+        $metaNode->appendChild($dom->createAttribute('content'))->nodeValue = $this->identifier;
+        //$metaNode->appendChild($dom->createAttribute('content'))->nodeValue = 'urn:uuid:' . $this->identifier;
 
         $metaNode = $headNode->appendChild($dom->createElement('meta'));
         $metaNode->appendChild($dom->createAttribute('name'))->nodeValue = 'dtb:depth';
@@ -339,6 +395,7 @@ class Document {
                 $contentNode->appendChild($dom->createAttribute('src'))->nodeValue = $content->filename;
 
                 $navMapNode->appendChild($navPointNode);
+                $counter++;
             }
         }
 

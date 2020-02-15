@@ -48,6 +48,7 @@ class Fetch {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             $response = curl_exec($ch);
             $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             if ($http_status < 400) {
@@ -75,7 +76,7 @@ class Fetch {
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
             curl_setopt($ch, CURLOPT_NOBODY, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
             curl_exec($ch);
             $type = curl_getinfo($ch,  CURLINFO_CONTENT_TYPE);
         } else {

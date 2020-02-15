@@ -72,4 +72,9 @@ class Event {
         $this->backtrace = $backtrace;
         $this->line = $line;
     }
+
+    public function toString() {
+        $string = "$this->line: [$this->level] $this->message\n";
+        return $string;
+    }
 }

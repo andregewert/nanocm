@@ -54,6 +54,13 @@ class Epub3Writer {
 
     // <editor-fold desc="Public methods">
 
+    /**
+     * Erstellt aus dem übergebenen E-Book-Datenmodell eine ePub3-Datei und gibt den Inhalt
+     * als String zurück
+     *
+     * @param Document $document Das zu schreibende Dokument
+     * @return string Das E-Book im ePub3-Format
+     */
     public function createDocumentFile(Document $document) : string {
 
         $filename = $this->createTempFileName();
@@ -79,6 +86,15 @@ class Epub3Writer {
 
 
     // <editor-fold desc="Internal methods">
+
+    /**
+     * Kodiert den übergebenen String für die Ausagbe in einer XML-Datei
+     * @param string $content Der zu kodierende String
+     * @return string Der XML-kodierte String
+     */
+    private function quoteXmlContent(string $content) {
+        return htmlspecialchars($content, ENT_COMPAT | ENT_XML1);
+    }
 
     /**
      * Erzeugt einen Namen für eine neu anzulegende temporäre Datei
@@ -109,10 +125,6 @@ class Epub3Writer {
         return $path;
     }
 
-    private function quoteXmlContent(string $content) {
-        return htmlspecialchars($content, ENT_COMPAT | ENT_XML1);
-    }
-
     private function createContainerXml() : string {
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
@@ -125,6 +137,7 @@ class Epub3Writer {
     }
 
     private function createIndexOpf(Document $document) : string {
+        $supportedSpineTypes = array('nav', 'svg');
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
         $rootNode = $dom->appendChild($dom->createElementNS('http://www.idpf.org/2007/opf', 'package'));
@@ -139,7 +152,9 @@ class Epub3Writer {
         $idNode->appendChild($dom->createAttribute('id'))->nodeValue = 'pub-id';
         $metadata->appendChild($idNode);
         $metadata->appendChild($dom->createElement('dc:language'))->nodeValue = $this->quoteXmlContent($document->language);
-        $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $this->quoteXmlContent($document->description);
+        if (strlen($document->description) > 0) {
+            $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $this->quoteXmlContent($document->description);
+        }
 
         if ($document->creator != null) {
             $metadata->appendChild($dom->createElement('dc:creator'))->nodeValue = $this->quoteXmlContent($document->creator);
@@ -168,14 +183,20 @@ class Epub3Writer {
         foreach ($document->contents as $content) {
             $item = $manifest->appendChild($dom->createElement('item'));
             $item->appendChild($dom->createAttribute('id'))->nodeValue = $content->id;
-            if (is_array($content->properties) && count($content->properties) > 0) {
-                $item->appendChild($dom->createAttribute('properties'))->nodeValue = join(' ', $content->properties);
+            $props = array();
+            if (is_array($content->properties)) {
+                foreach ($content->properties as $property) {
+                    if (in_array($property, $supportedSpineTypes)) $props[] = $property;
+                }
+                if (count($props) > 0) {
+                    $item->appendChild($dom->createAttribute('properties'))->nodeValue = join(' ', $props);
+                }
             }
             $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
-            $item->appendChild($dom->createAttribute('media-type'))->nodeValue = $content->type;
+            $item->appendChild($dom->createAttribute('media-type'))->nodeValue = $content->mimeType;
         }
 
-        // Nur die anzuzeigenden Inhalts-Elemente, im Normalfall: (generiertes) TOC, Inhalt 1, Inhalt 2 ...
+        // Spine
         $spine = $rootNode->appendChild($dom->createElement('spine'));
         if ($document->isNcxExisting()) {
             $spine->appendChild($dom->createAttribute('toc'))->nodeValue = 'ncx';
@@ -184,9 +205,28 @@ class Epub3Writer {
             if ($content->includeInSpine) {
                 $item = $spine->appendChild($dom->createElement('itemref'));
                 $item->appendChild($dom->createAttribute('idref'))->nodeValue = $content->id;
-                $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
                 $item->appendChild($dom->createAttribute('linear'))->nodeValue = 'yes';
             }
+        }
+
+        // Guide
+        $guide = $rootNode->appendChild($dom->createElement('guide'));
+        foreach (array('cover', 'title-page', 'toc') as $type) {
+            $content = $document->getFirstContentWithProperty($type);
+            if ($content != null) {
+                $item = $guide->appendChild($dom->createElement('reference'));
+                $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
+                $item->appendChild($dom->createAttribute('title'))->nodeValue = $this->quoteXmlContent($content->title);
+                $item->appendChild($dom->createAttribute('type'))->nodeValue = $type;
+            }
+        }
+
+        $content = $document->getFirstNonSpecialContent();
+        if ($content != null) {
+            $item = $guide->appendChild($dom->createElement('reference'));
+            $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
+            $item->appendChild($dom->createAttribute('title'))->nodeValue = $this->quoteXmlContent($content->title);
+            $item->appendChild($dom->createAttribute('type'))->nodeValue = 'text';
         }
 
         return $dom->saveXML();

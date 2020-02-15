@@ -201,7 +201,7 @@ figure {
     box-sizing: border-box;
     background-color: #000;
     color: white;
-    position: absolute;
+/*    position: absolute;*/
     bottom: 0;
     opacity: 0.8;
     font-size: 0.8em;
@@ -227,7 +227,7 @@ figure {
 }
 
 .video-preview a img.overlay {
-    position: absolute;
+/*    position: absolute;*/
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

@@ -22,6 +22,8 @@
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\Epub\Document;
 use Ubergeek\Feed\AtomWriter;
+use Ubergeek\Log\Logger;
+use Ubergeek\Log\Writer\FileWriter;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Captcha;
 use Ubergeek\NanoCm\Comment;

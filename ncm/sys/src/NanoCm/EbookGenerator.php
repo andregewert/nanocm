@@ -23,6 +23,7 @@ namespace Ubergeek\NanoCm;
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Epub\Document;
 use Ubergeek\Epub\Epub3Writer;
+use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Module\AbstractModule;
 use Ubergeek\NanoCm\Module\CoreModule;
 use Ubergeek\Net\Fetch;
@@ -50,14 +51,21 @@ class EbookGenerator {
      */
     private $module;
 
+    /**
+     * Optionale Referenz auf einen Logger
+     * @var LoggerInterface
+     */
+    private $log;
+
     // </editor-fold>
 
 
     // <editor-fold desc="Constructor">
 
-    public function __construct(AbstractModule $module) {
+    public function __construct(AbstractModule $module, $log = null) {
         $this->module = $module;
         $this->ncm = $module->ncm;
+        $this->log = $log;
     }
 
     // </editor-fold>
@@ -253,7 +261,8 @@ class EbookGenerator {
                 $document->createContentFromString(
                     $document->coverTitle,
                     'cover.xhtml',
-                    $xhtml
+                    $xhtml,
+                    array('cover', 'svg')
                 )
             );
         }
@@ -269,7 +278,8 @@ class EbookGenerator {
                 $document->createContentFromString(
                     $document->titlePageTitle,
                     'titlepage.xhtml',
-                    $xhtml
+                    $xhtml,
+                    array('title-page')
                 )
             );
         }
@@ -310,11 +320,12 @@ class EbookGenerator {
      * Versucht, verlinkte Inhalte (CSS-Dateien, andere Inhaltsseiten, Images etc.) zu ersetzen
      *
      * @param Document $document Das E-Book-Dokument
+     * @param string $content Der zu modifizierende Inhalt
      * @param $mappedUrls Referenz auf die gemappten URLs
      * @return string Der modifizierte Inhalt
      */
     private function replaceLinkedContents(Document $document, string $content, &$mappedUrls) {
-        return preg_replace_callback('/((href=\"|src=\")([^\"]+)(\"))/i', function($matches) use ($document, $mappedUrls) {
+        return preg_replace_callback('/((href=\"|src=\")([^\"]+)(\"))/i', function($matches) use ($document, &$mappedUrls) {
             if ($this->isAnchorLink($matches[3])) {
                 return $matches[1];
             }
@@ -332,8 +343,10 @@ class EbookGenerator {
                 $mappedContent = $mappedUrls[$targetUrl];
             } else {
                 $mimeType = $this->getMimeTypeByUrl($targetUrl);
+
                 if ($this->isMimeTypeEmbeddable($mimeType)) {
                     $content = Fetch::fetchFromUrl($targetUrl);
+
                     if (!empty($content)) {
                         $virtualUrl = basename($targetUrl);
                         $extension = $this->getDefaultFileExtensionByMimeType($mimeType);

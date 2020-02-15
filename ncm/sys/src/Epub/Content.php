@@ -44,7 +44,7 @@ class Content {
      * Der MIME-Type dieses Inhalts. Wird vorbelegt mit 'application/xhtml+xml'
      * @var string
      */
-    public $type = 'application/xhtml+xml';
+    public $mimeType = 'application/xhtml+xml';
 
     /**
      * Lesbarer / anzuzeigender Titel für diesen Inhalt
