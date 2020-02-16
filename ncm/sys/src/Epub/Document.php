@@ -282,9 +282,28 @@ class Document {
         return null;
     }
 
+    /**
+     * Gibt den ersten Content ohne besondere Bedeutung (also in der Regel die erste tatsächliche Inhaltsseite) zurück
+     *
+     * @return Content|null Den gefundenen Conten oder null
+     */
     public function getFirstNonSpecialContent() {
         foreach ($this->contents as $content) {
             if (!is_array($content->properties)) return $content;
+        }
+        return null;
+    }
+
+    /**
+     * Ermittelt den ersten Inhalt, der (ohne Berücksichtiung des Pfades) einen bestimmten Dateinamen besitzt
+     *
+     * @param string $filename Der gesuchte Dateiname
+     * @return Content|null Der gefundene Inhalt oder null
+     */
+    public function getContentWithFilename(string $filename) {
+        foreach ($this->contents as $content) {
+            $dummy = strtolower(basename($content->filename));
+            if (strtolower($filename) == $dummy) return $content;
         }
         return null;
     }

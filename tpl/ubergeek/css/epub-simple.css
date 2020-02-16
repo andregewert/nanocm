@@ -18,6 +18,25 @@
  */
 
 body {
+    font-family: "Source Sans Pro", "Fira Sans", Lato, Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Oswald", sans-serif;
+    font-weight: normal;
+    line-height: 1.2em;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+tt, code, pre, textarea, kbd,
+textarea.form-control {
+    font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
+    font-size: 0.85em;
+    font-size: 0.85rem;
+}
+
+body {
     background-color: #fff;
     line-height: 1.2;
     padding: 0;
@@ -68,6 +87,10 @@ ul.taglist {
 
 ul.taglist li {
     display: inline;
+}
+
+p {
+    margin: 1em 0;
 }
 
 div.lead {

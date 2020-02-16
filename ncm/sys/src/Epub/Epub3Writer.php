@@ -71,7 +71,7 @@ class Epub3Writer {
         $archive->addFromString("mimetype", "application/epub+zip");
         $archive->setCompressionName('mimetype', ZipArchive::CM_STORE);
         $archive->addFromString('META-INF/container.xml', $this->createContainerXml());
-        $archive->addFromString('index.opf', $this->createIndexOpf($document));
+        $archive->addFromString('content.opf', $this->createContentOpf($document));
         foreach ($document->contents as $content) {
             $archive->addFromString($content->filename, $content->contents);
         }
@@ -132,11 +132,11 @@ class Epub3Writer {
         $rootNode->appendChild($dom->createAttribute('version'))->nodeValue = '1.0';
         $fileNode = $rootNode->appendChild($dom->createElement('rootfiles'))->appendChild($dom->createElement('rootfile'));
         $fileNode->appendChild($dom->createAttribute('media-type'))->nodeValue = 'application/oebps-package+xml';
-        $fileNode->appendChild($dom->createAttribute('full-path'))->nodeValue = 'index.opf';
+        $fileNode->appendChild($dom->createAttribute('full-path'))->nodeValue = 'content.opf';
         return $dom->saveXML();
     }
 
-    private function createIndexOpf(Document $document) : string {
+    private function createContentOpf(Document $document) : string {
         $supportedSpineTypes = array('nav', 'svg');
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->formatOutput = true;
@@ -177,6 +177,13 @@ class Epub3Writer {
         $modifiedNode->appendChild($dom->createAttribute('property'))->nodeValue = 'dcterms:modified';
         $modifiedNode->nodeValue = $modified->format('Y-m-d\TH:i:s\Z');
         $metadata->appendChild($modifiedNode);
+
+        $coverImage = $document->getContentWithFilename('EBookCover.jpeg');
+        if ($coverImage != null) {
+            $imageNode = $metadata->appendChild($dom->createElement('meta'));
+            $imageNode->appendChild($dom->createAttribute('name'))->nodeValue = 'cover';
+            $imageNode->appendChild($dom->createAttribute('content'))->nodeValue = $coverImage->id;
+        }
 
         // Alle Dateien einschl. Bildern und CSS-Dateien
         $manifest = $rootNode->appendChild($dom->createElement('manifest'));
