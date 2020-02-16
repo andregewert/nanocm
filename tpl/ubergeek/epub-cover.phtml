@@ -4,6 +4,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de">
     <head>
         <title><?php echo $this->htmlEncode($this->ebook->coverTitle); ?></title>
+        <style type="text/css" title="override_css">
+            @page {padding: 0pt; margin:0pt}
+            body { text-align: center; padding:0pt; margin: 0pt; }
+        </style>
     </head>
     <body>
         <div class="cover-img">
