@@ -73,7 +73,7 @@ class Captcha {
 
         // Captcha-ID
         if (function_exists('random_bytes')) {
-            $this->captchaId = random_bytes(32);
+            $this->captchaId = md5(random_bytes(1096));
         } else {
             $this->captchaId = md5(rand());
         }
