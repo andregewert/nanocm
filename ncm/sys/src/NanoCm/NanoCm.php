@@ -299,7 +299,7 @@ class NanoCm {
         }
 
         // Session-Initialisierung
-        session_cache_limiter('private');
+        session_cache_limiter('public');
         $this->session = new SimpleSession('ncm');
         $this->session->start();
 
