@@ -204,7 +204,6 @@ class MediaManager {
                 $image = $this->cache->get($cacheKey);
                 if ($image != null) {
                     $this->log->debug("Found youtube preview in cache: $youtubeId / $format->key");
-                    //$this->cache->touch($cacheKey);
                     return $image;
                 }
             }
@@ -234,12 +233,12 @@ class MediaManager {
      * ist.
      *
      * @param Medium $medium Metadaten zur ursprünglichen Mediendatei (aus der Medienverwaltung)
-     * @param string $data Die eigentlichen Daten des Ausgangsbildes (aus dem Dateisystem)
+     * @param string $imagefile Absoluter Pfad für die Bild-Datei
      * @param ImageFormat $format Die Definition für das Ausgabeformat (aus der Medienverwaltung)
      * @param string $outputImageType Typ des Ausgabebildes
      * @return null|string Die genrierten Bilddaten als String
      */
-    public function createImageForMediumWithImageFormat(Medium $medium, string $data, ImageFormat $format, $outputImageType = 'jpeg') {
+    public function createImageForMediumWithImageFormat(Medium $medium, string $imagefile, ImageFormat $format, $outputImageType = 'jpeg') {
         if (!in_array($medium->type, $this->supportedTypes)) {
             throw new MediaException("Not supported mime type: $medium->type");
         }
@@ -250,11 +249,11 @@ class MediaManager {
             $image = $this->cache->get($cacheKey);
             if ($image != null) {
                 $this->log->debug("Found media thumbnail in cache: $medium->id / $format->key");
-                //$this->cache->touch($cacheKey);
                 return $image;
             }
         }
 
+        $data = @file_get_contents($imagefile);
         $image = $this->resizeImageDataToFormat($data, $format, $outputImageType);
         if ($image != null && $this->cache instanceof CacheInterface) {
             $this->cache->put($cacheKey, $image);

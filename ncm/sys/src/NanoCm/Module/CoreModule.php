@@ -349,7 +349,9 @@ class CoreModule extends AbstractModule {
                             $format = $this->orm->getImageFormatByKey($formatKey);
 
                             if ($format != null) {
-                                $imgData = $this->ncm->mediaManager->createImageForYoutubeVideoWithFormat($youtubeId, $format);
+                                $imgData = $this->ncm->mediaManager->createImageForYoutubeVideoWithFormat(
+                                    $youtubeId, $format
+                                );
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->setContentType('image/jpeg');
                                 $this->replaceMeta('content-length', strlen($imgData));
@@ -367,8 +369,12 @@ class CoreModule extends AbstractModule {
                             if ($medium != null) {
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->setContentType('image/jpeg');
-                                $data = $this->orm->getMediumFileContents($medium->id);
-                                $c = $this->ncm->mediaManager->createImageForMediumWithImageFormat($medium, $data, $format, 'jpeg');
+
+                                $filename = Util::createPath($this->ncm->mediadir, $medium->id);
+                                $c = $this->ncm->mediaManager->createImageForMediumWithImageFormat(
+                                    $medium, $filename, $format, 'jpeg'
+                                );
+
                                 $this->replaceMeta('content-length', strlen($c));
                                 $this->content = $c;
                             }

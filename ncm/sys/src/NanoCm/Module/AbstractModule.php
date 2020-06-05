@@ -21,6 +21,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\Controller\ControllerInterface;
+use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Constants;
 use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
@@ -60,8 +62,8 @@ use Ubergeek\NanoCm\Util;
  * @created 2017-11-11
  */
 abstract class AbstractModule implements
-    \Ubergeek\Controller\ControllerInterface,
-    \Ubergeek\Log\LoggerInterface {
+    ControllerInterface,
+    LoggerInterface {
 
     // <editor-fold desc="Constants">
     
@@ -193,6 +195,8 @@ abstract class AbstractModule implements
         $this->orm = $frontController->ncm->orm;
         $this->log = $frontController->ncm->log;
         $this->templateDir = $frontController->ncm->tpldir;
+
+        $this->replaceMeta('Cache-control', 'private, max-age=10800, must-revalidate');
     }
 
     

@@ -347,7 +347,7 @@ figure {
 blockquote.blockquote {
   background-image: url("../img/quotes.png");
   background-repeat: no-repeat;
-  background-position: top left;
+  background-position: 0.5em 0.5em;
   background-color: #f8f8f8;
   border-top: solid #f8f8f8 1px;
   border-bottom: solid #f8f8f8 1px;
