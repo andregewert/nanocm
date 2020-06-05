@@ -408,6 +408,17 @@ figure {
     opacity: 1;
 }
 
+blockquote.blockquote {
+    background-image: url("../img/quotes.png");
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-color: $color-lightshadow;
+    border-top: solid $color-lightshadow 1px;
+    border-bottom: solid $color-lightshadow 1px;
+    margin: 0;
+    padding: 0 1em;
+}
+
 blockquote.twitter-tweet {
     background: $color-sidebarbg;
     max-width: 600px;

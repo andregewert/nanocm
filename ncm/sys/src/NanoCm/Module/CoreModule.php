@@ -451,7 +451,7 @@ class CoreModule extends AbstractModule {
 
         // Captcha überprüfen
         if (!$this->ncm->isCaptchaSolved($captchaId, $captchaInput)) {
-            $this->addUserMessage('Du hast die Sicherheitsfrage nicht korrekt beantwortet', 'Fehler');
+            $this->addUserMessage('Du hast die Sicherheitsfrage nicht korrekt beantwortet. Bitte gib die Antwort in Ziffern und nicht in Worten ein.', 'Fehler');
             return null;
         }
 

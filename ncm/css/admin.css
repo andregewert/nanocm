@@ -433,6 +433,14 @@ th.pre {
 .imgtoolbar a.button span {
   padding: 0 0 0 4px; }
 
+.imgtoolbar span.separator {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 1rem;
+  border-left: solid white 1px;
+  border-right: solid silver 1px; }
+
 .imgtoolbar_popupbutton {
   position: relative; }
 
@@ -529,16 +537,25 @@ ul.imgtoolbar_keyboard li a:hover {
 .inlinepopup div.popupcontent label {
   display: inline-block;
   width: 35%;
+  height: 1.6em;
+  line-height: 1.6em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  vertical-align: top; }
+  vertical-align: bottom; }
 
 .inlinepopup div.popupcontent input,
 .inlinepopup div.popupcontent textarea,
 .inlinepopup div.popupcontent select {
   width: 60%;
   vertical-align: text-top; }
+
+.inlinepopup div.info {
+  background-color: #eee;
+  border: solid #eee 1px;
+  font-size: 0.95em;
+  padding: 0.5em;
+  border: solid #ddd 1px; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Virtual Keyboard (Emojis) "> */

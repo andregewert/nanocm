@@ -41,6 +41,7 @@ $toolbar-bg:        #f8f8f8;
 $toolbar-bg-header: #ddd;
 $border-color:      #ddd;
 $border-color-heavy: silver;
+$shading-color:     #eee;
 
 /* <editor-fold desc="Base elements"> */
 
@@ -551,6 +552,15 @@ th.pre {
     padding: 0 0 0 4px;
 }
 
+.imgtoolbar span.separator {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0;
+    height: 1rem;
+    border-left: solid white 1px;
+    border-right: solid silver 1px;
+}
+
 .imgtoolbar_popupbutton {
     position: relative;
 }
@@ -667,10 +677,12 @@ ul.imgtoolbar_keyboard li a:hover {
 .inlinepopup div.popupcontent label {
     display: inline-block;
     width: 35%;
+    height: 1.6em;
+    line-height: 1.6em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    vertical-align: top;
+    vertical-align: bottom;
 }
 
 .inlinepopup div.popupcontent input,
@@ -678,6 +690,14 @@ ul.imgtoolbar_keyboard li a:hover {
 .inlinepopup div.popupcontent select {
     width: 60%;
     vertical-align: text-top;
+}
+
+.inlinepopup div.info {
+    background-color: $shading-color;
+    border: solid $shading-color 1px;
+    font-size: 0.95em;
+    padding: 0.5em;
+    border: solid $border-color 1px;
 }
 
 /* </editor-fold> */

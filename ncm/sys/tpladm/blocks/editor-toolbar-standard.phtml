@@ -1,5 +1,6 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AbstractAdminModule */
+use Ubergeek\NanoCm\Util;
 ?>
 <div class="row imgtoolbar" style="margin-bottom: -1em">
     <a class="button edit_bold" title="Fett" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_bold.png" /></a>
@@ -15,7 +16,7 @@
     <span class="imgtoolbar_popupbutton">
         <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
             <ul class="imgtoolbar_keyboard">
-                <?php foreach (\Ubergeek\NanoCm\Util::getSpecialCharDictionary() as $char => $desc) : ?>
+                <?php foreach (Util::getSpecialCharDictionary() as $char => $desc) : ?>
                     <li>
                         <a href="javascript:void(0);" class="edit_insert_char" data-char="<?php echo '&#' . $char . ';'; ?>" title="<?php echo $this->htmlEncode($desc); ?>" tabindex="9"><?php echo '&#' . $char . ';'; ?></a>
                     </li>
@@ -27,12 +28,15 @@
 
     <!-- TODO Dialogfenster für Bildauswahl öffnen -->
     <a class="button edit_insert_image" title="Bild einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
+    <a class="button edit_insert_video" title="Youtube-Link einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/youtube.png" />Youtube</a>
+
+    <span class="separator"></span>
 
     <!-- Emoji-Tastatur -->
     <span class="imgtoolbar_popupbutton">
         <span class="imgtoolbar_popup" style="width: 500px; height: 320px; overflow: auto">
             <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $emojis) : ?>
-                <label class="small"><?php echo \Ubergeek\NanoCm\Util::htmlEncode($group); ?></label>
+                <label class="small"><?php echo Util::htmlEncode($group); ?></label>
                 <ul class="imgtoolbar_keyboard">
                     <?php foreach ($emojis as $emoji) : ?>
                         <li class="tone_<?php echo $this->htmlEncode($emoji->tone); ?>">

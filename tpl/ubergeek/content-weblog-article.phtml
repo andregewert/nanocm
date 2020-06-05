@@ -50,8 +50,10 @@ if (!empty($this->article->medium_id)) {
         <div class="articlefooter">
             <p>Ver&ouml;ffentlicht von
                 <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
-                am
-                <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
+                <?php if ($this->article->publishing_timestamp instanceof DateTime) : ?>
+                    am
+                    <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
+                <?php endif; ?>
                 &bullet;
                 <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comments">Kommentieren</a>
                 &bullet;
@@ -108,6 +110,10 @@ if (!empty($this->article->medium_id)) {
             <div class="nonprint">
                 <h2><a name="comment"></a>Kommentar hinterlassen</h2>
 
+                <?php
+                    $digits = array('Null', 'Eins', 'Zwei', 'Drei', 'Vier', 'Fünf', 'Sechs', 'Sieben', 'Acht', 'Neun', 'Zehn');
+                ?>
+
                 <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
                 <form action="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comment" method="post" class="stdform">
@@ -135,8 +141,8 @@ if (!empty($this->article->medium_id)) {
 
                     <div class="form-group">
                         <label for="input_sc">Sicherheitsfrage:
-                            <?php echo intval($this->captcha->valueA); ?>&nbsp;<?php echo $this->captcha->operator; ?>&nbsp;<?php echo intval($this->captcha->valueB); ?>
-                            ergibt
+                            <?php echo $this->htmlEncode($digits[intval($this->captcha->valueA)]); ?>&nbsp;<?php echo ($this->captcha->operator == '+')? 'plus' : 'minus'; ?>&nbsp;<?php echo $this->htmlEncode($digits[intval($this->captcha->valueB)]); ?>
+                            ergibt (als Zahl, nicht als Wort eingeben)
                         </label>
                         <input type="text" class="text form-control" id="input_sc" name="sc" value="" required autocomplete="off">
                     </div>

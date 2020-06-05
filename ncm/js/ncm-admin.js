@@ -154,6 +154,10 @@ function Ncm() {
             app.insertTextAtCaret(textareaElem[0], $(this).attr('data-char'));
         });
 
+        $(toolbarElem).find('.edit_insert_video').click(function() {
+            app.openInsertVideoLinkPopup(textareaElem[0]);
+        });
+
         $(toolbarElem).find('.edit_insert_image').click(function() {
             let dlg = new app.InlinePopup('admin/media/html/imageselection', {
                 param: 'param'
@@ -169,6 +173,38 @@ function Ncm() {
                 }
             });
         });
+    };
+
+    /**
+     * Öffnet das Dialog-Popup für das Einfügen von Videolinks
+     * @param textArea Referenz auf die Textarea, in die der Link eingefügt werden soll
+     */
+    app.openInsertVideoLinkPopup = function(textArea) {
+        let dlg = new app.InlinePopup('admin/media/html/insertvideolink', {
+            param:  'param'
+        }, {
+            headline:   'Videolink einfügen',
+            width:      500,
+            height:     240,
+            loaded:     function() {
+                ncm.focusDefaultElement();
+            }
+        }, {
+            cancel:  {
+                caption:    'Abbrechen',
+                clicked:    function() {
+                    dlg.close();
+                }
+            },
+            insert: {
+                caption:    'Einfügen',
+                clicked:    function() {
+                    let url = $('#input_media_videolink').val();
+                    app.insertTextAtCaret(textArea, "\n" + '[Youtube:' + url + ']' + "\n");
+                    dlg.close();
+                }
+            }
+        })
     };
 
     /**

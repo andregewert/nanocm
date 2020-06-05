@@ -72,6 +72,10 @@ class Captcha {
         );
 
         // Captcha-ID
-        $this->captchaId = md5(rand());
+        if (function_exists('random_bytes')) {
+            $this->captchaId = random_bytes(32);
+        } else {
+            $this->captchaId = md5(rand());
+        }
     }
 }

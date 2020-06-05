@@ -277,6 +277,10 @@ class AdminMediaModule extends AbstractAdminModule {
                         $content = $this->renderUserTemplate('media-imageselection.phtml');
                         break;
 
+                    // Videolink einfügen
+                    case 'insertvideolink':
+                        $content = $this->renderUserTemplate('media-insertvideolink.phtml');
+                        break;
                 }
                 break;
 
@@ -367,7 +371,10 @@ class AdminMediaModule extends AbstractAdminModule {
         return 'file_extension_bin.png';
     }
 
-    private function createFileFromRequest() : Medium {
+    /**
+     * @return Medium|null
+     */
+    private function createFileFromRequest() {
         $id = intval($this->getParam('id'));
         $medium = $this->orm->getMediumById($id, Medium::TYPE_FILE, false);
         if ($medium == null) return null;

@@ -73,7 +73,9 @@ final class Util {
             'capsules',
             'levitra',
             'chlorthalidone',
-            'hydrochlorothiazide'
+            'hydrochlorothiazide',
+            'adult',
+            'dating'
         );
     }
 

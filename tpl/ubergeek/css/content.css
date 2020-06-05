@@ -344,6 +344,16 @@ figure {
 .video-preview a:hover img.overlay {
   opacity: 1; }
 
+blockquote.blockquote {
+  background-image: url("../img/quotes.png");
+  background-repeat: no-repeat;
+  background-position: top left;
+  background-color: #f8f8f8;
+  border-top: solid #f8f8f8 1px;
+  border-bottom: solid #f8f8f8 1px;
+  margin: 0;
+  padding: 0 1em; }
+
 blockquote.twitter-tweet {
   background: #f0f0f0;
   max-width: 600px;

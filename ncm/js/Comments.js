@@ -131,8 +131,8 @@ function Comments() {
                 id: id
             }, {
                 headline:   'Kommentar bearbeiten',
-                width:      500,
-                height:     480,
+                width:      550,
+                height:     580,
                 loaded:     function() {
                     ncm.focusDefaultElement();
                 }
@@ -142,7 +142,8 @@ function Comments() {
                     clicked:  function() {
                         dlg.close();
                     }
-                }, save: {
+                },
+                save: {
                     caption: 'Speichern',
                     clicked: function() {
                         ncm.showDefaultLoadingIndicator();
