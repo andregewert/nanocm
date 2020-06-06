@@ -129,7 +129,7 @@ class AdminStatsModule extends AbstractAdminModule {
                         $this->statsUrls = $this->orm->getMonthlyUrlStats($this->searchYear, $this->searchMonth);
                         $this->statsBrowsers = $this->orm->getMonthlyBrowserStats($this->searchYear, $this->searchMonth);
                         $this->statsOses = $this->orm->getMonthlyOsStats($this->searchYear, $this->searchMonth);
-                        $this->statsCountry = $this->orm->getMonthlyRegionStats($this->searchYear, $this->searchMonth);
+                        $this->statsCountry = $this->orm->getMonthlyCountryStats($this->searchYear, $this->searchMonth);
                         $this->statsSessionId = $this->orm->countUniqueSessionIds($this->searchYear, $this->searchMonth);
                         $content = $this->renderUserTemplate('content-stats-list.phtml');
                         break;

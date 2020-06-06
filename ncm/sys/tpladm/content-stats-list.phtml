@@ -1,32 +1,40 @@
 <?php /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */ ?>
 
-<h2>Abgerufene URLs</h2>
+<h2>Abgerufene URLs (Top 25)</h2>
 <table class="list">
     <thead>
         <tr>
             <th>URL</th>
             <th width="10%" class="textright">Abrufe</th>
+            <th width="10%" class="textright">Anteil in %</th>
         </tr>
     </thead>
     <tbody>
         <?php if (is_array($this->statsUrls) && count($this->statsUrls) > 0) : ?>
-            <?php $sum = 0; ?>
+            <?php
+                $sum = 0; $sumPercent = 0;
+                foreach ($this->statsUrls as $url) { $sum += $url['sumcount']; }
+            ?>
             <?php foreach ($this->statsUrls as $url) : ?>
                 <tr>
                     <td><?php echo $this->htmlEncode($url['url']); ?></td>
                     <td class="textright pre"><?php echo $this->formatInt($url['sumcount']); ?></td>
+                    <td class="textright pre"><?php echo $this->formatFloat(($url['sumcount'] /$sum) *100); ?></td>
                 </tr>
-                <?php $sum += $url['sumcount']; ?>
+                <?php $sumPercent += ($url['sumcount'] /$sum) *100; ?>
             <?php endforeach; ?>
             <tr>
                 <th>Summe</th>
                 <th class="textright pre">
                     <?php echo $this->formatInt($sum); ?>
                 </th>
+                <th class="textright pre">
+                    <?php echo $this->formatFloat($sumPercent); ?>
+                </th>
             </tr>
         <?php else : ?>
             <tr class="noresult">
-                <td colspan="2">
+                <td colspan="3">
                     &mdash;&nbsp;Keine Ergebnisse&nbsp;&mdash;
                 </td>
             </tr>
@@ -40,27 +48,35 @@
     <tr>
         <th>Browser</th>
         <th width="10%" class="textright">Abrufe</th>
+        <th width="10%" class="textright">Anteil in %</th>
     </tr>
     </thead>
     <tbody>
     <?php if (is_array($this->statsBrowsers) && count($this->statsBrowsers) > 0) : ?>
-        <?php $sum = 0; ?>
+        <?php
+            $sum = 0; $sumPercent = 0;
+            foreach ($this->statsBrowsers as $browser) { $sum += $browser['sumcount']; }
+        ?>
         <?php foreach ($this->statsBrowsers as $browser) : ?>
             <tr>
                 <td><?php echo $this->htmlEncode($browser['browsername']); ?></td>
                 <td class="textright pre"><?php echo $this->formatInt($browser['sumcount']); ?></td>
+                <td class="textright pre"><?php echo $this->formatFloat(($browser['sumcount'] /$sum) *100); ?></td>
             </tr>
-            <?php $sum += $browser['sumcount']; ?>
+            <?php $sumPercent += ($browser['sumcount'] /$sum) *100; ?>
         <?php endforeach; ?>
         <tr>
             <th>Summe</th>
             <th class="textright pre">
                 <?php echo $this->formatInt($sum); ?>
             </th>
+            <th class="textright pre">
+                <?php echo $this->formatFloat($sumPercent); ?>
+            </th>
         </tr>
     <?php else : ?>
         <tr class="noresult">
-            <td colspan="2">
+            <td colspan="3">
                 &mdash;&nbsp;Keine Ergebnisse&nbsp;&mdash;
             </td>
         </tr>
@@ -74,25 +90,31 @@
     <tr>
         <th>Betriebssystem</th>
         <th width="10%" class="textright">Abrufe</th>
+        <th width="10%" class="textright">Anteil in %</th>
     </tr>
     </thead>
     <tbody>
     <?php if (is_array($this->statsOses) && count($this->statsOses) > 0) : ?>
-        <?php $sum = 0; ?>
+        <?php
+            $sum = 0; $sumPercent = 0;
+            foreach ($this->statsOses as $os) { $sum += $os['sumcount']; }
+        ?>
         <?php foreach ($this->statsOses as $os) : ?>
             <tr>
                 <td><?php echo $this->htmlEncode($os['osname']); ?></td>
                 <td class="textright pre"><?php echo $this->formatInt($os['sumcount']); ?></td>
+                <td class="textright pre"><?php echo $this->formatInt(($os['sumcount'] /$sum) *100); ?></td>
             </tr>
-            <?php $sum += $os['sumcount']; ?>
+            <?php $sumPercent += ($os['sumcount'] /$sum) *100; ?>
         <?php endforeach; ?>
         <tr>
             <th>Summe</th>
             <th class="textright pre"><?php echo $this->formatInt($sum); ?></th>
+            <th class="textright pre"><?php echo $this->formatFloat($sumPercent); ?></th>
         </tr>
     <?php else : ?>
         <tr class="noresult">
-            <td colspan="2">
+            <td colspan="3">
                 &mdash;&nbsp;Keine Ergebnisse&nbsp;&mdash;
             </td>
         </tr>
@@ -105,24 +127,30 @@
     <thead>
     <tr>
         <th>Land</th>
-        <th>Region</th>
+        <!--<th>Region</th>-->
         <th width="10%" class="textright">Abrufe</th>
+        <th width="10%" class="textright">Anteil in %</th>
     </tr>
     </thead>
     <tbody>
     <?php if (is_array($this->statsCountry) && count($this->statsCountry) > 0) : ?>
-        <?php $sum = 0; ?>
+        <?php
+            $sum = 0; $sumPercent = 0;
+            foreach ($this->statsCountry as $country) {  $sum += $country['sumcount']; }
+        ?>
         <?php foreach ($this->statsCountry as $country) : ?>
             <tr>
                 <td><?php echo $this->htmlEncode($country['country']); ?></td>
-                <td><?php echo $this->htmlEncode($country['regionname']); ?></td>
+                <!--<td><?php echo $this->htmlEncode($country['regionname']); ?></td>-->
                 <td class="textright pre"><?php echo $this->formatInt($country['sumcount']); ?></td>
+                <td class="textright pre"><?php echo $this->formatFloat(($country['sumcount'] /$sum) *100); ?></td>
             </tr>
-            <?php $sum += $country['sumcount']; ?>
+            <?php $sumPercent += ($country['sumcount'] /$sum) *100; ?>
         <?php endforeach; ?>
         <tr>
             <th>Summe</th>
-            <th colspan="2" class="textright pre"><?php echo $this->formatInt($sum); ?></th>
+            <th colspan="1" class="textright pre"><?php echo $this->formatInt($sum); ?></th>
+            <th colspan="1" class="textright pre"><?php echo $this->formatFloat($sumPercent); ?></th>
         </tr>
     <?php else : ?>
         <tr class="noresult">

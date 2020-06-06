@@ -283,6 +283,31 @@ class Orm {
     }
 
     /**
+     * Ermittelt die Monatssatistiken zu den Herkunftsländern für den angegebenen Monat
+     *
+     * @param int $year Jahreszahl (vierstellig)
+     * @param int $month Monatszahl (1-12)
+     * @return array Zugriffszahlen für den angegebenen Monat
+     */
+    public function getMonthlyCountryStats($year, $month) {
+        $sql = 'SELECT year, month, country, sum(count) AS sumcount
+                FROM monthlyregion
+                WHERE year = :year AND month = :month
+                GROUP BY year, month, country
+                ORDER BY sumcount DESC, country ASC ';
+        $stmt = $this->statsdb->prepare($sql);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
+        $stmt->execute();
+
+        $stats = array();
+        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+            $stats[] = $row;
+        }
+        return $stats;
+    }
+
+    /**
      * Ermittelt die Monatsstatistiken zu den abgerufenen URLs für den angegebenen Monat
      *
      * @param int $year Jahreszahl (vierstellig)
@@ -294,7 +319,8 @@ class Orm {
                 FROM monthlyurl
                 WHERE year = :year AND month = :month
                 GROUP BY year, month, url
-                ORDER BY sumcount DESC, url ASC ';
+                ORDER BY sumcount DESC, url ASC 
+                LIMIT 25 ';
         $stmt = $this->statsdb->prepare($sql);
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
