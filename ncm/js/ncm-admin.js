@@ -272,10 +272,62 @@ function Ncm() {
         }
     };
 
+    /**
+     * Macht einen Container "draggable"
+     * @param element Das zu modifizierende DOM-Element
+     */
+    app.makeDraggable = function(element) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            element.style.top = (element.offsetTop - pos2) + "px";
+            element.style.left = (element.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+
+        if ($(element).find('.headline').length > 0) {
+            $(element).find('.headline').addClass('draggable');
+            $(element).find('.headline').mousedown(dragMouseDown);
+        } else {
+            $(element).addClass('draggable');
+            $(element).mousedown(dragMouseDown);
+        }
+    };
+
+    /**
+     * Öffnet ein Inline-Popup, dessen Inhalt per AJAX dynamisch geladen wird
+     *
+     * @param {string} url
+     * @param params
+     * @param options
+     * @param buttonsRight
+     * @param buttonsLeft
+     * @returns {Ncm.InlinePopup}
+     * @constructor
+     */
     app.InlinePopup = function(url, params, options, buttonsRight, buttonsLeft) {
         let dlg = this;
         let dummy;
-        let ch;
+        //let ch;
 
         /**
          * Wird aufgerufen, wenn das Dialog-Fenster (tatsächlich) geschlossen worden ist
@@ -310,6 +362,7 @@ function Ncm() {
                     ncm.hideGlobalBlanker();
                 }
                 dlg._closed();
+                delete dlg;
             }
         };
 
@@ -364,14 +417,13 @@ function Ncm() {
         options.width = (typeof options.width !== 'undefined')? parseInt(options.width, 10) : 700;
         options.height = (typeof options.height !== 'undefined')? parseInt(options.height, 10) : 500;
         dlg.loaded = false;
-        ch = options.height -60;
+        //ch = options.height -60;
 
         dlg.container = document.createElement('div');
         dlg.container.Dialog = this;
         dlg.container.className = 'inlinepopup loading';
         dlg.container.style.width = options.width + 'px';
         dlg.container.style.height = options.height + 'px';
-        dlg.container.style.marginTop = '-25px';
 
         dlg.controls = document.createElement('div');
         dlg.controls.className = 'controls';
@@ -381,7 +433,6 @@ function Ncm() {
         dlg.closeButton.className = 'imgbutton nolabel';
         dlg.closeButton.setAttribute('href', 'javascript:void(0)');
         dlg.closeButton.setAttribute('title', 'Schließen');
-        dlg.closeButton.style.margin = '2px';
         dlg.closeButton.onclick = function() {
             dlg.close();
         };
@@ -392,10 +443,10 @@ function Ncm() {
         dummy.setAttribute('width', '16');
         dummy.setAttribute('height', '16');
         dummy.setAttribute('border', '0');
-        dummy.setAttribute('style', 'margin: 2px');
         dummy.setAttribute('alt', '[X]');
         dlg.closeButton.appendChild(dummy);
 
+        // Headline / Titlebar initialisieren
         if (typeof options.headline !== 'undefined') {
             dlg.headline = document.createElement('div');
             dlg.headline.className = 'headline';
@@ -403,56 +454,69 @@ function Ncm() {
             $(dummy).text(options.headline);
             dlg.headline.appendChild(dummy);
             dlg.container.appendChild(dlg.headline);
-            ch = ch -24;
+            //ch = ch -32;
         } else {
             dlg.headline = null;
         }
 
+        // Inhalts-Container initialisieren
         dlg.content = document.createElement('div');
         dlg.content.className = 'popupcontent';
         dlg.content.style.overflow = 'auto';
         dlg.container.appendChild(dlg.content);
 
+        // Button-Leiste
         dlg.buttonbar = document.createElement('div');
         dlg.buttonbar.className = 'buttons';
+        const spacer = document.createElement('div');
+        spacer.className = 'spacer';
+        dlg.buttonbar.appendChild(spacer);
 
         var i = 0;
 
-        // Buttons auf der linken Seite des Dialogs
         for (var prop in buttonsLeft) {
             if (buttonsLeft.hasOwnProperty(prop)) {
-                dlg.buttonbar.appendChild(
+                spacer.appendChild(
                     dlg.createButton(buttonsLeft[prop], 'left')
                 );
                 i++;
             }
         }
 
-        // Buttons auf der rechten Dialog-Seite
         for (var prop in buttonsRight) {
             if (buttonsRight.hasOwnProperty(prop)) {
-                dlg.buttonbar.appendChild(
+                spacer.appendChild(
                     dlg.createButton(buttonsRight[prop], 'right')
                 );
                 i++;
             }
         }
-
         if (i > 0) {
             dlg.container.appendChild(dlg.buttonbar);
-        } else {
-            ch = ch -20;
-            //dlg.content.style.height = (options.height -20) + 'px';
         }
 
-        // Höhe des Content-Bereichs setzen
-        dlg.content.style.height = (ch) + 'px';
+        // Auf Escape-Taste reagieren
+        dlg.container.onkeyup = function(e) {
+            if (e.key == 'Escape') {
+                dlg.close();
+            }
+        };
+
         document.body.appendChild(dlg.container);
-
         if (!ncm.isGlobalBlankerOpen()) ncm.showGlobalBlanker();
-        $(dlg.container).css("top", ( $(window).height() - $(dlg.container).height()) / 2 +$(window).scrollTop() + "px");
-        $(dlg.container).css("left", ( $(window).width() - $(dlg.container).width()) / 2 +$(window).scrollLeft() + "px");
 
+        // Initiale Position des Popups bestimmen
+        let top = ($(window).height() - ($(window).height() / 4) - $(dlg.container).height()) / 2 + $(window).scrollTop();
+        if (top < 0) top = 0;
+        let left = ($(window).width() - $(dlg.container).width()) / 2 + $(window).scrollLeft();
+        if (left < 0) left = 0;
+        $(dlg.container).css("top", top + "px");
+        $(dlg.container).css("left", left + "px");
+
+        // Drag and drop initialisieren
+        app.makeDraggable(dlg.container);
+
+        // Inhalt laden
         $.ajax(url, {
             cache:          false,
             type:           'POST',
