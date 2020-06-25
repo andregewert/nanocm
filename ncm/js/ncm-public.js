@@ -59,7 +59,7 @@ function Ncm(baseUrl) {
                 _a:         articleId,
                 _n:         $('#input_n').val(),
                 _e:         $('#input_e').val(),
-                _g:         ($('#input_g').attr('checked'))? '1' : '0',
+                _g:         ($('#input_g').prop('checked'))? '1' : '0',
                 _h:         $('#input_h').val(),
                 _t:         $('#input_t').val()
             };

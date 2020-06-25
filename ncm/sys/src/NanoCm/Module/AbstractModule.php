@@ -196,7 +196,7 @@ abstract class AbstractModule implements
         $this->log = $frontController->ncm->log;
         $this->templateDir = $frontController->ncm->tpldir;
         //$this->replaceMeta('Cache-control', 'private, must-revalidate');
-        //$this->replaceMeta('Cache-control', 'no-cache, no-store');
+        $this->replaceMeta('Cache-control', 'no-cache, no-store');
     }
 
     
