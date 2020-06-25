@@ -92,7 +92,7 @@ function Ncm(baseUrl) {
         // Kommentar-Button ausblenden und Captcha einblenden
         $(app.container).find('.submit').hide(400, function() {
             $(app.container).find('.captcha_container'). append("<div class=\"captcha\">\n" +
-                "                            <span class=\"checkbox\"><span>X</span></span>\n" +
+                "                            <span class=\"checkbox\"><span>&times;</span></span>\n" +
                 "                            <span class=\"label\">Ich bin kein Roboter</span>\n" +
                 "                        </div>");
             $(app.container).find('.captcha_container span.checkbox').click(function() {

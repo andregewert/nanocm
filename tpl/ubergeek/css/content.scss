@@ -465,6 +465,10 @@ blockquote.twitter-tweet {
     background: $color-accent;
 }
 
+.captcha span.checkbox:hover span {
+    visibility: visible;
+}
+
 .captcha span.label {
     margin-left: 1em;
 }

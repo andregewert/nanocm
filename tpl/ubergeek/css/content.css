@@ -392,6 +392,9 @@ blockquote.twitter-tweet {
 .captcha span.checkbox:hover {
   background: #0a94a9; }
 
+.captcha span.checkbox:hover span {
+  visibility: visible; }
+
 .captcha span.label {
   margin-left: 1em; }
 
