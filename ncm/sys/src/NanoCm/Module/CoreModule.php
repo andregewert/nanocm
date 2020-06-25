@@ -22,10 +22,7 @@
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\Epub\Document;
 use Ubergeek\Feed\AtomWriter;
-use Ubergeek\Log\Logger;
-use Ubergeek\Log\Writer\FileWriter;
 use Ubergeek\NanoCm\Article;
-use Ubergeek\NanoCm\Captcha;
 use Ubergeek\NanoCm\Comment;
 use Ubergeek\NanoCm\Constants;
 use Ubergeek\NanoCm\EbookGenerator;
@@ -71,9 +68,6 @@ class CoreModule extends AbstractModule {
 
     /** @var Comment[] Gegebenfalls anzuzeigende Kommentare zu einem Artikel */
     public $comments = null;
-
-    /** @var Captcha Gegenenfalls zu lösendes Captcha */
-    public $captcha = null;
 
     /** @var Article[] Gegebenenfalls anzuzeigende Weblog-Artikel */
     public $articles = null;
@@ -136,7 +130,7 @@ class CoreModule extends AbstractModule {
             $this->orm->logSimplifiedStats($entry, $geolocation);
         }
 
-        // Kommentare und Trackback
+        // Kommentare und Trackbacks
         $this->commentsEnabled = $this->orm->getSettingValue(Setting::SYSTEM_ENABLECOMMENTS) == '1';
         $this->trackbacksEnabled = $this->orm->getSettingValue(Setting::SYSTEM_ENABLETRACKBACKS) == '1';
         if ($this->commentsEnabled) {
@@ -154,50 +148,71 @@ class CoreModule extends AbstractModule {
         $this->isPreviewEnabled = $this->ncm->isUserLoggedIn() && $this->ncm->getLoggedInUser()->usertype >= UserType::EDITOR;
 
         switch ($parts[0]) {
-            
+
+            // Verschiedene Datenabrufe
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/javascript');
+
+                switch ($parts[1]) {
+
+                    // Kommentar-Captcha anfordern
+                    case 'captcha':
+                        $captcha = $this->ncm->createCaptcha();
+                        $tempContent = array(
+                            'status'        => 0,
+                            'message'       => 'comment-captcha',
+                            'operand1'      => $captcha->valueA,
+                            'operand2'      => $captcha->valueB,
+                            'operator'      => $captcha->operator,
+                            'captchaId'     => $captcha->captchaId
+                        );
+                        break;
+
+                    // Kommentar zu Artikel speichern
+                    case 'comment':
+                        $articleId = $this->getParam('_a', 0);
+                        $article = $this->orm->getArticleById($articleId);
+                        if ($this->commentsEnabled && $article !== null && $article->enable_comments) {
+                            $comment = $this->tryToSaveComment($articleId);
+                            $tempContent = array(
+                                'status' => ($comment instanceof Comment) ? 0 : 100,
+                                'message' => ($comment instanceof Comment) ? 'comment saved' : $comment,
+                                'comment' => $comment
+                            );
+                        } else {
+                            $tempContent = array(
+                                'status'    => 100,
+                                'message'   => 'Kommentarfunktion ist deaktiviert',
+                                'comment'   => null
+                            );
+                        }
+                        break;
+
+                    // Ungültiger bzw. undefiniert Aufruf
+                    default:
+                        $tempContent = array(
+                            'status'        => 100,
+                            'message'       => 'Invalid request'
+                        );
+                }
+                $this->content = json_encode($tempContent);
+                break;
+
             // Integrierte Weblog-Funktionen
             case 'weblog':
 
                 // Artikel-Ansicht
                 if ($parts[1] == 'article') {
-
-                    $this->article = $this->orm->getArticleById(
-                        intval($parts[2]),
-                        !$this->isPreviewEnabled
-                    );
-
+                    $this->article = $this->orm->getArticleById(intval($parts[2]), !$this->isPreviewEnabled);
                     if ($this->article !== null) {
-
                         // Bestimmung Preview-Modus bei noch nicht freigeschalteten Artiklen
                         $now = new \DateTime('now');
                         $this->isPreview = $this->article->status_code != StatusCode::ACTIVE
                             || ($this->article->start_timestamp != null && $this->article->start_timestamp > $now)
                             || ($this->article->stop_timestamp != null && $this->article->stop_timestamp < $now);
 
-                        // Kommentar abgeben
-                        if ($this->commentsEnabled && $this->article->enable_comments && $this->getParam('ac') == 's') {
-                            $comment = $this->tryToSaveComment($this->article->id);
-                            if ($comment instanceof Comment) {
-
-                                // TODO Zugriff auf Request muss schöner gehen ...
-                                $uri = $this->frontController->getHttpRequest()->requestUri->getRequestUrl();
-                                if ($comment->status_code == StatusCode::MODERATION_REQUIRED) {
-                                    $uri .= (stristr($uri, '?') === false)? '?s=1' : '&s=1';
-                                }
-                                $this->ncm->session->setVar('_h', '');
-                                $this->ncm->session->setVar('_t', '');
-                                $this->replaceMeta('location', $uri);
-                                $this->setPageTemplate(self::PAGE_NONE);
-                                $this->content = 'Redirect';
-                                break;
-                            }
-                        }
-
                         // Darstellung des Artikels
-                        if ($this->getParam('s') == '1') {
-                            $this->addUserMessage('Dein Kommentar wird vor Freischaltung geprüft. Bitte habe etwas Geduld.', 'Geduld, bitte');
-                        }
-                        $this->captcha = $this->ncm->createCaptcha();
                         $this->comments = $this->orm->getCommentsByArticleId($this->article->id);
                         $this->setTitle($this->getSiteTitle() . ' - ' . $this->article->headline);
                         $this->content = $this->renderUserTemplate('content-weblog-article.phtml');
@@ -309,6 +324,7 @@ class CoreModule extends AbstractModule {
 
             // Mediendateien
             case 'media':
+                $this->replaceMeta('Cache-control', 'private, must-revalidate');
                 if (count($parts) >= 3) {
                     switch ($parts[2]) {
 
@@ -431,9 +447,15 @@ class CoreModule extends AbstractModule {
 
     // <editor-fold desc="Internal methods">
 
+    /**
+     * Validiert und speichert ggf. einen Kommentar
+     *
+     * @param integer $articleId
+     * @return string|Comment
+     * @todo Es sollten keine Strings zurückgegeben werden, sondern Status-Codes, die an anderer Stelle in
+     *       lokalisierte Meldungen übersetzt werden können
+     */
     private function tryToSaveComment($articleId) {
-        if (strlen($this->commentAdditionalInput) != 0) return null;
-
         $captchaId = $this->getParam('cpsid', '');
         $captchaInput = $this->getParam('sc', '');
 
@@ -451,28 +473,25 @@ class CoreModule extends AbstractModule {
         if (strlen($comment->username) < 1
             || strlen(trim($comment->content)) < 1
             || strlen($comment->email) < 1) {
-            $this->addUserMessage("Bitte gib mindestens einen Namen, eine E-Mail-Adresse und einen Text ein, um zu kommentieren", "Unvollständige Eingaben");
-            return null;
+            return "Bitte gib mindestens einen Namen, eine E-Mail-Adresse und einen Text ein, um zu kommentieren";
         }
 
         // Captcha überprüfen
         if (!$this->ncm->isCaptchaSolved($captchaId, $captchaInput)) {
-            $this->addUserMessage('Du hast die Sicherheitsfrage nicht korrekt beantwortet. Bitte gib die Antwort in Ziffern und nicht in Worten ein.', 'Fehler');
-            return null;
+            return 'Du hast die Sicherheitsfrage nicht korrekt beantwortet. Bitte gib die Antwort in Ziffern und nicht in Worten ein.';
         }
 
         // E-Mail überprüfen
         if (!Util::isValidEmail($comment->email)) {
-            $this->addUserMessage('Du hast eine ungültige E-Mail-Adresse eingegeben', 'Fehler');
-            return null;
+            return 'Du hast eine ungültige E-Mail-Adresse eingegeben';
         }
 
         // Spam-Prüfung und zeitliche Einschränkungen nur, wenn kein Benutzer angemeldet ist
         if (!$this->ncm->isUserLoggedIn()) {
+
             // IP-Adresse auf Sperre testen
             if ($this->ncm->isIpBlockedForComments($_SERVER['REMOTE_ADDR'])) {
-                $this->addUserMessage('Dein Kommentar wurde nicht übernommen. Bitte habe ein paar Minuten Geduld, bevor Du einen neuen Kommentar schreibst.', 'Fehler');
-                return null;
+                return 'Dein Kommentar wurde nicht übernommen. Bitte habe ein paar Minuten Geduld, bevor Du einen neuen Kommentar schreibst.';
             }
 
             // Spam-Begriffe prüfen
@@ -488,7 +507,7 @@ class CoreModule extends AbstractModule {
 
         // Kommentar speichern
         $this->ncm->blockIpForComments($_SERVER['REMOTE_ADDR']);
-        $this->orm->saveComment($comment);
+        $comment->id = $this->orm->saveComment($comment);
         $this->ncm->session->setVar('commentText', '');
         $this->ncm->session->setVar('commentHeadline', '');
         $this->commentText = '';

@@ -13,12 +13,18 @@
         <meta http-equiv="content-Language" content="<?php echo $this->htmlEncode($this->ncm->lang); ?>" />
 
         <title><?php echo $this->htmlEncode($this->getTitle()); ?></title>
+
         <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/frame.css'); ?>" />
         <link rel="stylesheet" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/css/content.css'); ?>" />
         <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/favicon-32x32.png'); ?>">
         <link href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/lightbox/css/lightbox.css'); ?>" rel="stylesheet">
         <link href="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/highlight/styles/default.css'); ?>" rel="stylesheet">
+
+        <script src="<?php echo $this->htmlConvUrl('/ncm/js/jquery-3.3.1.min.js'); ?>"></script>
+        <script src="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/lightbox/js/lightbox.js'); ?>"></script>
         <script src="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/highlight/highlight.pack.js'); ?>"></script>
+        <script src="<?php echo $this->htmlConvUrl('/ncm/js/ncm-public.js'); ?>"></script>
+
         <link rel="alternate" type="application/atom+xml" title="Neueste Artikel" href="<?php echo $this->htmlConvUrl('/weblog/feed/'); ?>" />
         <link rel="alternate" type="application/atom+xml" title="Neueste Kommentare" href="<?php echo $this->htmlConvUrl('/weblog/feed/comments/'); ?>" />
     </head>
@@ -96,8 +102,6 @@
                 </div>
             </div>
         </footer>
-        <script src="<?php echo $this->htmlConvUrl('/ncm/js/jquery-3.3.1.min.js'); ?>"></script>
-        <script src="<?php echo $this->htmlConvUrl('/tpl/ubergeek/ext/lightbox/js/lightbox.js'); ?>"></script>
         <script>
             lightbox.option({
                 'fadeDuration':         200,
