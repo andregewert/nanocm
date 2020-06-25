@@ -180,6 +180,8 @@ class CoreModule extends AbstractModule {
                                 'message' => ($comment instanceof Comment) ? 'comment saved' : $comment,
                                 'comment' => $comment
                             );
+                            $this->ncm->session->setVar('_h', '');
+                            $this->ncm->session->setVar('_t', '');
                         } else {
                             $tempContent = array(
                                 'status'    => 100,
