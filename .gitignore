@@ -2,6 +2,7 @@
 /ncm/sys/cache/
 /ncm/sys/db/site.sqlite
 /ncm/sys/db/stats.sqlite
+/ncm/sys/db/versions/version
 /ncm/sys/db/*.ini
 /.idea/
 .DS_Store*

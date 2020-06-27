@@ -23,6 +23,8 @@ namespace Ubergeek\NanoCm;
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Cache\FileCache;
 use Ubergeek\Controller\HttpRequest;
+use Ubergeek\DatabaseUpdater\SqliteDatabase;
+use Ubergeek\DatabaseUpdater\Updater;
 use Ubergeek\Log;
 use Ubergeek\Log\Logger;
 use Ubergeek\NanoCm\Media\MediaManager;
@@ -316,6 +318,18 @@ class NanoCm {
 
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);
         $this->log->debug($this->versionInfo);
+
+        /*
+        // Test: Datenbank-Updater
+        $updater = new Updater(
+            Util::createPath($this->sysdir, 'db', 'versions'),
+            new SqliteDatabase(
+                Util::createPath($this->sysdir, 'db')
+            ),
+            $this->log
+        );
+        $updater->updateDatabaseToLatestVersion();
+        */
     }
 
     // </editor-fold>

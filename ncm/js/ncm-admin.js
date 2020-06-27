@@ -17,14 +17,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * Diese zentrale Klasse stellt grundlegende Funktionen für den Administrationsbereich zur Verfügung
+ *
+ * @constructor
+ */
 function Ncm() {
     let app = this;
 
     /**
      * Blendet das globale Abblend-Element ein
-     * @param blanker
+     * @param {Node} blanker Das Blanker-Element
      */
-    app.showGlobalBlanker = function(blanker) {
+    Ncm.prototype.showGlobalBlanker = function(blanker) {
+//    app.showGlobalBlanker = function(blanker) {
+        console.log('showGlobalBlanker');
         if (typeof blanker == 'undefined') {
             blanker = document.getElementById('globalblanker');
         }
@@ -362,7 +369,7 @@ function Ncm() {
                     ncm.hideGlobalBlanker();
                 }
                 dlg._closed();
-                delete dlg;
+                //delete dlg;
             }
         };
 
