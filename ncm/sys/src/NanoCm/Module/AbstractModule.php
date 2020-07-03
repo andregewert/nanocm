@@ -72,13 +72,7 @@ abstract class AbstractModule implements
      * @var string
      */
     const PAGE_STANDARD = 'page-standard.phtml';
-    
-    /**
-     * Vereinfachtes Template für das Setup
-     * @var string
-     */
-    const PAGE_SETUP = 'page-setup.phtml';
-    
+
     /**
      * Kann genutzt werden, wenn der Seiteninhalt nicht in ein Seiten-Template
      * eingebunden werden soll
@@ -423,7 +417,7 @@ abstract class AbstractModule implements
         $fname = Util::createPath($this->templateDir, $file);
 
         if ($this->allowUserTemplates && !file_exists($fname)) {
-            $fname = Util::createPath(array($this->ncm->pubdir, 'tpl', 'default'));
+            $fname = Util::createPath($this->ncm->pubdir, 'tpl', 'default');
         }
 
         if (!file_exists($fname)) {

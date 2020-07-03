@@ -5,14 +5,9 @@
     <div class="container">
         <h1>Anmelden</h1>
 
-        <?php if ($this->loginError) : ?>
-            <div class="alert alert-warning" role="alert">
-                <strong>Anmeldung fehlgeschlagen</strong><br>
-                Die Anmeldung war nicht erfolgreich. Bitte &uuml;berpr&uuml;fen Sie Ihre Anmeldedaten.
-            </div>
-        <?php endif; ?>
+        <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
-        <form action="login.php">
+        <form action="<?php echo $this->htmlConvUrl('/login.php'); ?>" method="post">
             <input type="hidden" name="action" value="login" />
             
             <div class="form-group">

@@ -57,52 +57,56 @@ class FrontController extends HttpController {
     /**
      * Arbeitet den aktuellen Request ab und erzeugt eine entsprechende Antwort
      * (Response)
+     * @TODO Generisches Mapping von URL-Strings auf Modulnamen
      */
     public function run() {
-        // TODO Generisches Mapping von URL-Strings auf Modulnamen
-
-        // TODO Gegebenenfalls Setup-Modul ausführen
-        if (!$this->ncm->isNanoCmConfigured()) {
-            $this->ncm->log->debug("Setup durchführen!");
-        }
-
         $moduleName = null;
-        switch ($this->getRelativeUrlPart(0)) {
-            
-            // Admin-Modul (Web-Interface)
-            case 'admin':
-                switch ($this->getRelativeUrlPart(1)) {
-                    case 'articles':
-                    case 'comments':
-                    case 'pages':
-                    case 'lists':
-                    case 'users':
-                    case 'media':
-                    case 'stats':
-                    case 'settings':
-                    case 'definitions':
-                    case 'articleseries':
-                    case 'meta':
-                        $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
-                        break;
 
-                    default:
-                        $moduleName = 'AdminDashboardModule';
-                        break;
-                }
-                break;
-
-            // SOAP-Schnittstelle (für Remote-Administration)
-            case 'soap':
-                break;
+        // Gegebenenfalls Setup-Modul ausführen
+        if (!$this->ncm->isNanoCmConfigured()) {
+            $moduleName = 'SetupModule';
         }
 
-        // Im Standardfall auf das Kernmodul gehen
-        if ($moduleName == null) {
-            $moduleName = 'CoreModule';
+        // Ansonsten: Standard-Ausführung für benannte Module
+        else {
+            switch ($this->getRelativeUrlPart(0)) {
+
+                // Admin-Modul (Web-Interface)
+                case 'admin':
+                    switch ($this->getRelativeUrlPart(1)) {
+                        case 'articles':
+                        case 'comments':
+                        case 'pages':
+                        case 'lists':
+                        case 'users':
+                        case 'media':
+                        case 'stats':
+                        case 'settings':
+                        case 'definitions':
+                        case 'articleseries':
+                        case 'meta':
+                            $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
+                            break;
+
+                        default:
+                            $moduleName = 'AdminDashboardModule';
+                            break;
+                    }
+                    break;
+
+                // SOAP-Schnittstelle (für Remote-Administration)
+                case 'soap':
+                    // TODO implementieren
+                    break;
+            }
+
+            // Im Standardfall auf das Kernmodul gehen
+            if ($moduleName == null) {
+                $moduleName = 'CoreModule';
+            }
         }
 
-        // TODO Exceptions besser / vernünftig darstellen!
+        // Modul ausführen
         try {
             /* @var $module AbstractModule */
             $moduleName = '\Ubergeek\\NanoCm\\Module\\' . $moduleName;
@@ -110,8 +114,7 @@ class FrontController extends HttpController {
             $module->execute();
         } catch (\Exception $ex) {
             http_response_code(500);
-            $this->setTitle($this->ncm->orm->getSiteTitle() . ' - Systemfehler!');
-            var_dump($ex);
+            $this->setTitle('Systemfehler!');
         }
         
         $this->ncm->log->flushWriters();

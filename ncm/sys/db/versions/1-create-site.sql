@@ -1,6 +1,5 @@
--- TODO Daten generieren
 --
--- File generated with SQLiteStudio v3.2.1 on Sa. Juni 27 01:59:57 2020
+-- File generated with SQLiteStudio v3.2.1 on So. Juni 28 21:07:31 2020
 --
 -- Text encoding used: UTF-8
 --
@@ -25,9 +24,11 @@ CREATE TABLE article (
                                                               DEFAULT (datetime('now', 'localtime') ),
                          modification_timestamp DATETIME      NOT NULL
                                                               DEFAULT (datetime('now', 'localtime') ),
-                         author_id              INTEGER       REFERENCES user (id)
-                                                              NOT NULL,
-                         medium_id              INTEGER       REFERENCES medium (id)
+                         author_id              INTEGER       REFERENCES user (id) ON DELETE SET NULL
+                                                                  ON UPDATE SET NULL
+                             NOT NULL,
+                         medium_id              INTEGER       REFERENCES medium (id) ON DELETE SET DEFAULT
+                             ON UPDATE SET DEFAULT
                                                               DEFAULT NULL,
                          status_code            INTEGER       NOT NULL
                                                               DEFAULT (0),
@@ -79,7 +80,7 @@ CREATE TABLE comment (
                              UNIQUE
                                                          NOT NULL,
                          article_id             INTEGER  NOT NULL
-                             REFERENCES article (id),
+                             REFERENCES article (id) ON DELETE CASCADE,
                          creation_timestamp     DATETIME NOT NULL
                              DEFAULT (datetime('now', 'localtime') ),
                          modification_timestamp DATETIME NOT NULL
@@ -119,6 +120,66 @@ CREATE TABLE definition (
 )
     WITHOUT ROWID;
 
+INSERT INTO definition (
+    definitiontype,
+    [key],
+    title,
+    value,
+    parameters
+)
+VALUES (
+           'articleseriessort',
+           'default',
+           'Publikationsdatum',
+           'publishing_timestamp',
+           ''
+       );
+
+INSERT INTO definition (
+    definitiontype,
+    [key],
+    title,
+    value,
+    parameters
+)
+VALUES (
+           'articleseriessort',
+           'title',
+           'Artikeltitel',
+           'headline',
+           ''
+       );
+
+INSERT INTO definition (
+    definitiontype,
+    [key],
+    title,
+    value,
+    parameters
+)
+VALUES (
+           'articletype',
+           'default',
+           'Standardartikel',
+           'articledefault',
+           ''
+       );
+
+INSERT INTO definition (
+    definitiontype,
+    [key],
+    title,
+    value,
+    parameters
+)
+VALUES (
+           'articletype',
+           'mini',
+           'Mini-Artikel',
+           'articlemini',
+           ''
+       );
+
 
 -- Table: imageformat
 CREATE TABLE imageformat (
@@ -133,6 +194,81 @@ CREATE TABLE imageformat (
                              height      INTEGER       NOT NULL
                                  DEFAULT (0)
 );
+
+INSERT INTO imageformat (
+    [key],
+    title,
+    description,
+    width,
+    height
+)
+VALUES (
+           'original',
+           'Originalformat',
+           '',
+           0,
+           0
+       );
+
+INSERT INTO imageformat (
+    [key],
+    title,
+    description,
+    width,
+    height
+)
+VALUES (
+           'thumb',
+           'Thumbnail',
+           'Vorschaubild',
+           180,
+           120
+       );
+
+INSERT INTO imageformat (
+    [key],
+    title,
+    description,
+    width,
+    height
+)
+VALUES (
+           'banner',
+           'Bannerformat',
+           'Full-Width-Banner',
+           920,
+           240
+       );
+
+INSERT INTO imageformat (
+    [key],
+    title,
+    description,
+    width,
+    height
+)
+VALUES (
+           'preview',
+           'Preview',
+           'Preview für Einbettung in Content',
+           600,
+           600
+       );
+
+INSERT INTO imageformat (
+    [key],
+    title,
+    description,
+    width,
+    height
+)
+VALUES (
+           'ytthumb',
+           'Youtube-Thumbnail',
+           'Vorschau für eingebettete Youtube-Videos',
+           600,
+           400
+       );
 
 
 -- Table: medium
@@ -178,8 +314,8 @@ CREATE TABLE page (
                                                        DEFAULT (datetime('now', 'localtime') ),
                       modification_timestamp DATETIME  NOT NULL
                                                        DEFAULT (datetime('now', 'localtime') ),
-                      author_id              INTEGER   REFERENCES user (id)
-                                                       NOT NULL,
+                      author_id              INTEGER   REFERENCES user (id) ON DELETE SET NULL
+                          NOT NULL,
                       status_code            INTEGER   NOT NULL
                                                        DEFAULT (0),
                       url                    TEXT (50) UNIQUE
@@ -201,12 +337,199 @@ CREATE TABLE setting (
                              NOT NULL
 );
 
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.pagetitle',
+           '',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.copyrightnotice',
+           '',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.template.path',
+           'default',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.enabletrackbacks',
+           '1',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.enablecomments',
+           '1',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.webmaster.name',
+           '',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.webmaster.email',
+           '',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.webmaster.url',
+           '',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.stats.enablegeolocation',
+           '1',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.stats.enablebrowscap',
+           '0',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.debug.showexceptions',
+           '0',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.debug.enablechromelogger',
+           '0',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.admin.pagelength',
+           '50',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.stats.enablelogging',
+           '1',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.stats.enableaccesslog',
+           '1',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.locale',
+           'de_DE.utf8',
+           ''
+       );
+
+INSERT INTO setting (
+    name,
+    setting,
+    params
+)
+VALUES (
+           'system.lang',
+           'de',
+           ''
+       );
+
 
 -- Table: tag_article
 CREATE TABLE tag_article (
                              tag        VARCHAR (50) NOT NULL
                                  COLLATE NOCASE,
-                             article_id INTEGER      REFERENCES article (id)
+                             article_id INTEGER      REFERENCES article (id) ON DELETE CASCADE
                                                      NOT NULL,
                              PRIMARY KEY (
                                           tag COLLATE NOCASE ASC,
@@ -222,7 +545,7 @@ CREATE TABLE tag_medium (
                             tag       VARCHAR (50) NOT NULL
                                 COLLATE NOCASE,
                             medium_id INTEGER      NOT NULL
-                                REFERENCES medium (id),
+                                REFERENCES medium (id) ON DELETE CASCADE,
                             PRIMARY KEY (
                                          tag COLLATE NOCASE ASC,
                                          medium_id
@@ -273,6 +596,40 @@ CREATE TABLE userlist (
                               DEFAULT (datetime('now', 'localtime') )
 );
 
+INSERT INTO userlist (
+    id,
+    [key],
+    title,
+    status_code,
+    creation_timestamp,
+    modification_timestamp
+)
+VALUES (
+           1,
+           'mainnav',
+           'Hauptnavigation',
+           0,
+           '2018-11-11 18:46:40',
+           '2018-11-11 18:48:36'
+       );
+
+INSERT INTO userlist (
+    id,
+    [key],
+    title,
+    status_code,
+    creation_timestamp,
+    modification_timestamp
+)
+VALUES (
+           2,
+           'metanav',
+           'Metanavigation',
+           0,
+           '2018-11-11 18:48:19',
+           '2018-11-11 18:48:19'
+       );
+
 
 -- Table: userlistitem
 CREATE TABLE userlistitem (
@@ -295,6 +652,56 @@ CREATE TABLE userlistitem (
                               sorting_code           INTEGER  NOT NULL
                                   DEFAULT (0)
 );
+
+INSERT INTO userlistitem (
+    id,
+    userlist_id,
+    parent_id,
+    status_code,
+    creation_timestamp,
+    modification_timestamp,
+    title,
+    content,
+    parameters,
+    sorting_code
+)
+VALUES (
+           14,
+           1,
+           0,
+           0,
+           '2018-11-11 19:07:08',
+           '2018-11-11 19:21:08',
+           'Home',
+           '/',
+           '',
+           0
+       );
+
+INSERT INTO userlistitem (
+    id,
+    userlist_id,
+    parent_id,
+    status_code,
+    creation_timestamp,
+    modification_timestamp,
+    title,
+    content,
+    parameters,
+    sorting_code
+)
+VALUES (
+           15,
+           1,
+           0,
+           0,
+           '2018-11-11 19:20:57',
+           '2018-11-11 19:36:22',
+           'Archiv',
+           '/weblog/archive',
+           '',
+           10
+       );
 
 
 -- Index: setting_name_uindex

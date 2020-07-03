@@ -72,12 +72,12 @@ class Script {
         }
 
         $basename = basename($absoluteFilePath);
-        if (preg_match('/^(\d+)\-(create|update)\-(.+)\.sql$/i', $absoluteFilePath, $matches) === false) {
+        if (preg_match('/^(\d+)\-(create|update)\-(.+)\.sql$/i', $basename, $matches) === false) {
             throw new Exception\InvalidFileException('Invalid script file: ' . $basename);
         }
 
         $this->filename = $basename;
-        $this->version = intval($matches[1]);
+        $this->version = (int)$matches[1];
         $this->type = $matches[2];
         $this->databaseName = $matches[3];
         $this->contents = file_get_contents($absoluteFilePath);

@@ -1,22 +1,20 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\DatabaseUpdater;
 
@@ -194,7 +192,7 @@ class Updater {
     private function getCurrentDatabaseVersion() {
         $versionFile = $this->getVersionFilename();
         if (file_exists($versionFile)) {
-            $version = intval(file_get_contents($versionFile));
+            $version = (int)file_get_contents($versionFile);
         } else {
             $version = 0;
         }
@@ -227,7 +225,7 @@ class Updater {
         if (($dh = opendir($this->ddlPath)) !== false) {
             while (($fname = readdir($dh)) !== false) {
                 if ($fname != '.' && $fname != '..' && preg_match("/^(\d+)\-$type\-.+\.sql$/i", $fname, $matches) !== false) {
-                    $fileVersion = intval($matches[1]);
+                    $fileVersion = (int)$matches[1];
                     if ($fileVersion > $version) {
                         $scripts[] = new Script($this->ddlPath . DIRECTORY_SEPARATOR . $fname);
                     }
@@ -246,7 +244,7 @@ class Updater {
     private function executeScript($script) {
         $this->log->info("Running script $script->filename");
         $pdo = $this->databaseInterface->createDatabaseConnection($script->databaseName);
-        //$pdo->exec($script->contents);
+        $pdo->exec($script->contents);
     }
 
     // </editor-fold>

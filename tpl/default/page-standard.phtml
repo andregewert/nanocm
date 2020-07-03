@@ -10,6 +10,7 @@
         <base href="<?php echo $mod->getBaseUrl(); ?>">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <title><?php echo $mod->htmlEncode($mod->getTitle()); ?></title>
+        <script src="<?php echo $this->htmlConvUrl('/ncm/js/jquery-3.3.1.min.js'); ?>"></script>
         <style type="text/css">
             body {
                 padding-top: 3.5rem;
@@ -29,17 +30,15 @@
             <hr>
             <footer>
                 <p><?php echo $mod->htmlEncode($mod->ncm->orm->getCopyrightNotice()); ?>&nbsp;&middot;
-                    <?php if ($mod->ncm->isUserLoggedIn()) : ?>
-                        <a href="/logout.php">Abmelden (<?php echo $mod->htmlEncode($mod->ncm->getLoggedInUser()->getFullName()); ?>)</a>&nbsp;&middot;
-                        <a href="/admin/index.php">Seite verwalten</a>
+                    <?php if ($this->ncm->isUserLoggedIn()) : ?>
+                        <a href="<?php echo $this->htmlConvUrl('/admin/index.php'); ?>">Verwaltung</a>
+                        &middot;&nbsp;<a href="<?php echo $this->htmlConvUrl('/logout.php'); ?>">Abmelden</a>
                     <?php else : ?>
-                        <a href="/login.php">Anmelden</a>
+                        <a href="<?php echo $this->htmlConvUrl('/login.php'); ?>">Anmelden</a>
                     <?php endif; ?>
                 </p>
             </footer>
         </div>
-
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     </body>

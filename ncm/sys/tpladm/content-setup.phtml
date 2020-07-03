@@ -1,0 +1,63 @@
+<h1>
+    <img src="ncm/img/nanocm-logo.png" alt="NanoCM" title="NanoCM" width="120">
+</h1>
+
+<h2>Willkommen bei nanoCM!</h2>
+
+<div class="label">
+    <p>Die Einrichtung von nanoCM ist schnell erledigt und ben&ouml;tigt nur wenige Angaben.
+        &Uuml;berpr&uuml;fen Sie Ihre Eingaben dennoch sorgf&auml;ltigt.<br>
+        Notieren Sie insbesondere das vergebene Passwort an geeigneter Stelle&nbsp;&ndash;
+        Sie werden es im Anschluss ben&ouml;tigen, um die Seite und ihre Inhalte zu verwalten.</p>
+
+    <form id="form_setup" method="post">
+
+        <input type="hidden" name="action" value="save">
+
+        <div class="row">
+            <label>Titel der Website</label>
+            <input name="pagetitle" data-label="Titel der Website" class="text" type="text" id="input_pagetitle" value="" placeholder="www.example.com" required>
+        </div>
+        <div class="row">
+            <label>Sprache der Website</label>
+            <input name="lang" data-label="Sprache der Website" class="text" type="text" id="input_lang" value="de" placeholder="de" required>
+        </div>
+        <div class="row">
+            <label>Vorname(n) des Seitenbetreibers</label>
+            <input name="webmaster_firstname" data-label="Vorname(n) des Seitenbetreibers" class="text" type="text" id="input_webmaster_firstname" value="" placeholder="Max" required>
+        </div>
+        <div class="row">
+            <label>Nachname des Seitenbetreibers</label>
+            <input name="webmaster_lastname" data-label="Nachname des Seitenbetreibers" class="text" type="text" id="input_webmaster_lastname" value="" placeholder="Mustermann" required>
+        </div>
+        <div class="row">
+            <label>E-Mail-Adresse des Seitenbetreibers</label>
+            <input name="webmaster_email" data-label="E-Mail-Adresse des Seitenbetreibers" class="text" type="email" id="input_webmaster_email" value="" placeholder="max.mustermann@example.com" required>
+        </div>
+
+        <div class="row">
+            <label>Benutzername f&uuml;r den Zugang zum Verwaltungsbereich</label>
+            <input name="admin_name" data-label="Benutzername f&uuml;r den Zugang zum Verwaltungsbereich" class="text" type="text" id="input_admin_name" value="" placeholder="admin" required>
+        </div>
+        <div class="row">
+            <label>Passwort f&uuml;r den Zugang zum Verwaltungsbereich</label>
+            <input name="admin_password1" data-label="Passwort f&uuml;r den Zugang zum Verwaltungsbereich" class="text" type="password" id="input_admin_password1" value="" required>
+        </div>
+        <div class="row">
+            <label>Passwort zur Best&auml;tigung bitte wiederholen</label>
+            <input name="admin_password2" data-label="Passwort zur Best&auml;tigung bitte wiederholen" class="text" type="password" id="input_admin_password2" value="" required>
+        </div>
+
+        <div class="row submit">
+            <input type="hidden" name="action" value="save">
+            <input class="submit" type="submit" value="Einrichtung abschlie&szlig;en">
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var ncmSetup = new NcmSetup('<?php echo $this->convUrl('/'); ?>');
+        ncmSetup.initSetupForm();
+    });
+</script>

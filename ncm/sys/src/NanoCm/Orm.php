@@ -738,7 +738,7 @@ class Orm {
     /**
      * Speichert einen Setting-Datensatz in der Datenbank
      * @param Setting $setting Der zu speichernde Setting-Datensatz
-     * @return string
+     * @return integer
      */
     public function saveSetting(Setting $setting) {
         $sql = 'REPLACE INTO setting (name, setting, params) VALUES (:name, :settings, :params) ';
@@ -748,6 +748,18 @@ class Orm {
         $stmt->bindValue('params', $setting->params);
         $stmt->execute();
         return $this->basedb->lastInsertId('key');
+    }
+
+    /**
+     * Speichert eine bestimmte Einstellung in der Datenbank
+     * @param string $key Eindeutiger Schlüssel für die Einstellung
+     * @param string $value Wert der Einstellung
+     * @param string|null $param Optionaler Parameter für die Einstellung
+     * @return integer Datensatz-ID
+     */
+    public function setSettingValue($key, $value, $param = null) {
+        $setting = new Setting($key, $value, $param);
+        return $this->saveSetting($setting);
     }
 
     /**
@@ -3377,6 +3389,7 @@ class Orm {
         } catch (\Exception $ex) {
             $this->log->warn($ex);
         }
+        if ($title === null) $title = '';
         return $title;
     }
     

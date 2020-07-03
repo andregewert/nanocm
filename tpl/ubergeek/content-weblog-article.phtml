@@ -145,7 +145,7 @@ if (!empty($this->article->medium_id)) {
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
-        var ncm = new Ncm('<?php echo $this->convUrl('/'); ?>');
-        ncm.initCommentForm($('#form_comment'));
+        var ncmPublic = new NcmPublic('<?php echo $this->convUrl('/'); ?>');
+        ncmPublic.initCommentForm($('#form_comment'));
     });
 </script>

@@ -318,18 +318,6 @@ class NanoCm {
 
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);
         $this->log->debug($this->versionInfo);
-
-        /*
-        // Test: Datenbank-Updater
-        $updater = new Updater(
-            Util::createPath($this->sysdir, 'db', 'versions'),
-            new SqliteDatabase(
-                Util::createPath($this->sysdir, 'db')
-            ),
-            $this->log
-        );
-        $updater->updateDatabaseToLatestVersion();
-        */
     }
 
     // </editor-fold>
@@ -488,21 +476,14 @@ class NanoCm {
      * @return true, wenn die Installation korrekt konfiguriert ist
      */
     public function isNanoCmConfigured() : bool {
-        
+
         // Prüfen, ob Datenbank vorhanden
         if (!file_exists($this->getSiteDbFilename())) return false;
         
-        // Wenn Datenbank(-datei) vorhanden: prüfen, ob geforderte Tabellen
-        // vorhanden
+        // Wenn Datenbank(-datei) vorhanden: prüfen, ob geforderte Tabellen vorhanden
         $pdo = $this->getDbHandle();
         if (!$this->isTableExisting($pdo, 'setting')) return false;
 
-        // Basiseinstellungen validieren
-        // ...
-        
-        // Eventuell auch die Datenbank-Version überprüfen?
-        // ...
-        
         return true;
     }
 

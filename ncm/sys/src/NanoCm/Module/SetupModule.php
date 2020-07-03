@@ -19,6 +19,14 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\DatabaseUpdater\Updater;
+use Ubergeek\DatabaseUpdater\SqliteDatabase;
+use Ubergeek\NanoCm\Setting;
+use Ubergeek\NanoCm\StatusCode;
+use Ubergeek\NanoCm\User;
+use Ubergeek\NanoCm\UserType;
+use Ubergeek\NanoCm\Util;
+
 /**
  * Kapselt ein einfaches Setup für die Ersteinrichtung des NanoCM.
  * 
@@ -40,22 +48,46 @@ class SetupModule extends AbstractModule {
     /** @var string Generierter Content */
     private $content = null;
 
-    public function run() {
-        // TODO implementieren
-        $this->setPageTemplate(self::PAGE_SETUP);
+    public function init() {
+        $this->allowUserTemplates = false;
+        $this->templateDir = Util::createPath($this->ncm->sysdir, 'tpladm');
+        $this->setPageTemplate('page-setup.phtml');
+        $this->replaceMeta('Cache-control', 'no-cache, no-store, must-revalidate, max-age=0');
+        $this->replaceMeta('Pragma', 'no-cache');
+    }
 
+    public function run() {
         if ($this->getAction() == 'save') {
-            // Datenbank erstellen
-            
-            // Grundlegende Konfiguration speichern
-            
-            // Redirect auf Startseite oder Anzeige einer Erfolgsmeldung
-            
-            $this->content = '';
+
+            // TODO Fehler abfangen
+
+            // Datenbank einrichten
+            $updater = new Updater(
+                Util::createPath($this->ncm->sysdir, 'db', 'versions'),
+                new SqliteDatabase(Util::createPath($this->ncm->sysdir, 'db')),
+                $this->log
+            );
+            $updater->updateDatabaseToLatestVersion();
+
+            // Admin-User anlegen
+            $user = new User();
+            $user->firstname = $this->getParam('webmaster_firstname');
+            $user->lastname = $this->getParam('webmaster_lastname');
+            $user->username = $this->getParam('admin_name');
+            $user->email = $this->getParam('webmaster_email');
+            $user->password = $this->getParam('admin_password1');
+            $user->status_code = StatusCode::ACTIVE;
+            $user->usertype = UserType::ADMIN;
+            $this->ncm->orm->saveUser($user);
+
+            // Basiseinstellungen speichern
+            $this->ncm->orm->setSettingValue(Setting::SYSTEM_LANG, $this->getParam('lang'));
+            $this->ncm->orm->setSettingValue(Setting::SYSTEM_SITETITLE, $this->getParam('pagetitle'));
+
+            $this->content = $this->renderUserTemplate('content-setup-done.phtml');
             
         } else {
-            // TODO Dieses Template sollte im SYS-Verzeichnis liegen
-            $this->content = $this->renderUserTemplate('page-setup');
+            $this->content = $this->renderUserTemplate('content-setup.phtml');
         }
         
         $this->setContent($this->content);
