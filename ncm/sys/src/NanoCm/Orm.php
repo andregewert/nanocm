@@ -19,6 +19,7 @@
 
 namespace Ubergeek\NanoCm;
 
+use Ubergeek\Log\Logger;
 use Ubergeek\NanoCm\Exception\InvalidDataException;
 use Ubergeek\NanoCm\Media\Exception\MediaException;
 use Ubergeek\NanoCm\Media\ImageFormat;
@@ -115,7 +116,7 @@ class Orm {
         $this->log = $log;
         
         if ($this->log == null) {
-            $this->log = new \Ubergeek\Log\Logger();
+            $this->log = new Logger();
         }
     }
 

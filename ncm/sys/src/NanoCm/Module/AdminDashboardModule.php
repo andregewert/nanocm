@@ -78,8 +78,14 @@ class AdminDashboardModule extends AbstractAdminModule {
      */
     public $sizeOfStatsDb = 0;
 
+    /**
+     * @var int Size of cache directory in bytes
+     */
     public $sizeOfCacheDir = 0;
 
+    /**
+     * @var int Size of media directory in bytes
+     */
     public $sizeOfMediaDir = 0;
 
     // </editor-fold>

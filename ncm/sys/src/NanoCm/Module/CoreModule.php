@@ -133,6 +133,7 @@ class CoreModule extends AbstractModule {
         // Kommentare und Trackbacks
         $this->commentsEnabled = $this->orm->getSettingValue(Setting::SYSTEM_ENABLECOMMENTS) == '1';
         $this->trackbacksEnabled = $this->orm->getSettingValue(Setting::SYSTEM_ENABLETRACKBACKS) == '1';
+
         if ($this->commentsEnabled) {
             $this->commentName = $this->getOrOverrideSessionVarWithParam('_n');
             $this->commentMail = $this->getOrOverrideSessionVarWithParam('_e');
@@ -190,6 +191,16 @@ class CoreModule extends AbstractModule {
                             );
                         }
                         break;
+
+                    // Accepting privacy policy / cookie usage
+                    case 'privacypolicy':
+                        if (count($parts) >= 3 && $parts[2] == 'accept') {
+                            $this->ncm->setPrivacyPolicyCookie();
+                            $tempContent = array(
+                                'status' => 0
+                            );
+                            break;
+                        }
 
                     // Ungültiger bzw. undefiniert Aufruf
                     default:

@@ -30,14 +30,12 @@ class Tag {
     // <editor-fold desc="Properties">
 
     /**
-     * Datensatz-ID
-     * @var integer
+     * @var integer Dataset id
      */
     public $id;
 
     /**
-     * Eigentliches Schlagwort
-     * @var string
+     * @var string Actual tag
      */
     public $title;
 

@@ -1,0 +1,25 @@
+<div class="container fixed-bottom" id="div_privacy">
+    <div class="alert alert-info" role="alert">
+        <p>
+            <span>Diese Seite verwendet Cookies.<br>
+            Auf dieser Website werden sogenannte Session-Cookies verwendet, um wiederkehrende
+            Besucher zu erkennen. Ben&ouml;tigt wird diese Funktion, um Artikel zu kommentieren
+            und um sich an der Seite anzumelden (nur Redakteure).
+            Wenn Sie mit der Nutzung von Cookies nicht einverstanden sind, k&ouml;nnen Sie
+            die Seite problemlos nutzen, lediglich die oben genannten Funktion sind dann
+            nicht verf&uuml;gbar. Da wir eine Ablehnung nicht speichern k&ouml;nnen bzw.
+            Sie bei folgenden Seitenabrufen nicht wiedererkennen, erscheint dieser Hinweis
+            in diesem Fall immer wieder.</span>
+        </p>
+        <p class="mb-0">
+            <input type="button" class="btn btn-secondary btn-sm" id="button_privacy_deny" value="Cookies ablehnen">
+            <input type="button" class="btn btn-primary btn-sm" id="button_privacy_accept" value="Cookies akzeptieren">
+        </p>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        ncmPublic.initPrivacyForm();
+    });
+    console.log($.ajax);
+</script>

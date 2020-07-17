@@ -21,6 +21,7 @@ namespace Ubergeek\NanoCm\Module;
 
 use Ubergeek\DatabaseUpdater\Updater;
 use Ubergeek\DatabaseUpdater\SqliteDatabase;
+use Ubergeek\NanoCm\NanoCm;
 use Ubergeek\NanoCm\Setting;
 use Ubergeek\NanoCm\StatusCode;
 use Ubergeek\NanoCm\User;
@@ -45,8 +46,18 @@ use Ubergeek\NanoCm\Util;
  */
 class SetupModule extends AbstractModule {
 
+    // <editor-fold desc="Properties">
+
     /** @var string Generierter Content */
     private $content = null;
+
+    /** @var string[] A list of missing php modules / extensions */
+    public $missingPhpModules = array();
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="ControllerInterface">
 
     public function init() {
         $this->allowUserTemplates = false;
@@ -59,7 +70,15 @@ class SetupModule extends AbstractModule {
     public function run() {
         if ($this->getAction() == 'save') {
 
-            // TODO Fehler abfangen
+            // TODO Error handling!
+
+            // TODO Requirements should be checked
+            // Result should be shown on the setup page
+
+            // Requirements are:
+            // PHP modules
+            // sys directory has to be writable
+            $this->missingPhpModules = $this->checkRequiredPhpModules();
 
             // Datenbank einrichten
             $updater = new Updater(
@@ -79,10 +98,14 @@ class SetupModule extends AbstractModule {
             $user->status_code = StatusCode::ACTIVE;
             $user->usertype = UserType::ADMIN;
             $this->ncm->orm->saveUser($user);
+            $this->ncm->orm->setUserPasswordByUsername($user->username, $user->password);
 
             // Basiseinstellungen speichern
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_LANG, $this->getParam('lang'));
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_SITETITLE, $this->getParam('pagetitle'));
+            $this->ncm->orm->setSettingValue(Setting::SYSTEM_COPYRIGHTNOTICE, 'Copyright ' . $user->firstname . ' ' . $user->lastname);
+            $this->ncm->orm->setSettingValue(Setting::SYSTEM_WEBMASTER_NAME, $user->firstname . ' ' . $user->lastname);
+            $this->ncm->orm->setSettingValue(Setting::SYSTEM_WEBMASTER_EMAIL, $user->email);
 
             $this->content = $this->renderUserTemplate('content-setup-done.phtml');
             
@@ -93,4 +116,22 @@ class SetupModule extends AbstractModule {
         $this->setContent($this->content);
     }
 
+    // </editor-fold>
+
+
+    // <editor-fold desc="Internal methods">
+
+    private function checkRequiredPhpModules() {
+        $missing = array();
+
+        foreach (NanoCm::$requiredPhpModules as $moduleName) {
+            if (!extension_loaded($moduleName)) {
+                $missing[] = $moduleName;
+            }
+        }
+
+        return $missing;
+    }
+
+    // </editor-fold>
 }

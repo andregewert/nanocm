@@ -18,14 +18,15 @@
  */
 
 /**
- * Eine simple Autoloader-Implementierung
+ * Simple auto load implementation
+ *
+ * This auto load implementation is specifically developed to be used by nanoCM.
+ * It is *not* meant to be a generic solution.
+ *
  * @todo Konfigurierbares Mapping von Namespaces auf Verzeichnisse implementieren
+ * @author André Gewert <agewert@ubergeek.de>
  */
 spl_autoload_register(function($class) {
-
-    // TODO Der Autoloader sollte erweitert werden um konfigurierbare
-    // Pfade mit entsprechenden Präfixes
-
     $filename = preg_replace('/^Ubergeek/', '', str_replace('\\', DIRECTORY_SEPARATOR, $class));
     $filename = __DIR__ . $filename . '.php';
 

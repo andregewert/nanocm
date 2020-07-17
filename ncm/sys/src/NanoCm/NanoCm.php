@@ -23,8 +23,6 @@ namespace Ubergeek\NanoCm;
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Cache\FileCache;
 use Ubergeek\Controller\HttpRequest;
-use Ubergeek\DatabaseUpdater\SqliteDatabase;
-use Ubergeek\DatabaseUpdater\Updater;
 use Ubergeek\Log;
 use Ubergeek\Log\Logger;
 use Ubergeek\NanoCm\Media\MediaManager;
@@ -33,7 +31,12 @@ use Ubergeek\Net\UserAgentInfo;
 use Ubergeek\Session\SimpleSession;
 
 /**
- * Basis-Logikklasse für das CMS
+ * Includes the base logic for nanoCM
+ *
+ * This class includes the central business logic for nanoCM.
+ * It should be instantiates once only at runtime, so it implemented as a singleton.
+ * The constructor initializes all needed dependencies.
+ *
  * @author André Gewert <agewert@ubergeek.de>
  * @package Ubergeek\NanoCm
  * @todo Lokalisierungsoptionen implementieren
@@ -52,7 +55,22 @@ class NanoCm {
     
     
     // <editor-fold desc="Public properties">
-    
+
+    /**
+     * A list of php modules which have to be enabled to run nanoCM correctly.
+     * This one is used by the setup module.
+     * @var string[]
+     */
+    public static $requiredPhpModules = array(
+        'curl',
+        'dom',
+        'pcre',
+        'PDO',
+        'pdo_sqlite',
+        'SimpleXML',
+        'zip'
+    );
+
     /**
      * Handle für die Basis-Datenbank
      *
@@ -302,17 +320,19 @@ class NanoCm {
 
         // Session-Initialisierung
         session_cache_limiter('public');
-        $this->session = new SimpleSession('ncm');
-        $this->session->start();
+        if ($this->hasCurrentUserAcceptedPrivacyPolicy()) {
+            $this->session = new SimpleSession('ncm');
+            $this->session->start();
+        }
 
         // Caches initialisieren
-        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_GEOLOCATION_TTL, 24));
+        $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_GEOLOCATION_TTL, 24);
         $this->ipCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ip-', $this->log);
-        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_MEDIA_TTL, 24 *100));
+        $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_MEDIA_TTL, 24 * 100);
         $this->mediaCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'media-', $this->log);
-        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_COMMENTS_TTL, 1));
+        $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_COMMENTS_TTL, 1);
         $this->commentIpCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'cmt-', $this->log);
-        $ttl = intval($this->orm->getSettingValue(Setting::SYSTEM_CACHE_EBOOKS_TTL, 24 *7));
+        $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_EBOOKS_TTL, 24 * 7);
         $this->ebookCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ebook-', $this->log);
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
 
@@ -380,6 +400,28 @@ class NanoCm {
     // <editor-fold desc="Public methods">
 
     /**
+     * Returns true if the current user (which runs the current request) has accepted the
+     * privacy policy.
+     *
+     * This methods just uses the superglobal $_COOKIE array. This should be replaced by
+     * some accessors in the Request interfaces.
+     *
+     * @return bool
+     */
+    public function hasCurrentUserAcceptedPrivacyPolicy() {
+        return $_COOKIE['privacypolicy_accepted'] == 1;
+    }
+
+    public function setPrivacyPolicyCookie() {
+        setcookie(
+            'privacypolicy_accepted',
+            '1',
+            time() + (60 *60 *24 *365),
+            $this->relativeBaseUrl
+        );
+    }
+
+    /**
      * Gibt die (einzige) CM-Instanz zurück bzw erzeugt sie bei Bedarf
      *
      * @param string $basepath
@@ -435,6 +477,7 @@ class NanoCm {
      * @return User|null
      */
     public function getLoggedInUser() {
+        if ($this->session === null) return null;
         return $this->session->getVar('loggedInUser');
     }
     
@@ -463,7 +506,9 @@ class NanoCm {
      * Meldet den aktuellen Benutzer von der Session ab
      */
     public function logoutUser() {
-        $this->session->setVar('loggedInUser', null);
+        if ($this->session !== null) {
+            $this->session->setVar('loggedInUser', null);
+        }
     }
 
     /**
@@ -508,7 +553,7 @@ class NanoCm {
         $entry->method = $_SERVER['REQUEST_METHOD'];    // TODO Sollte aus $request ermittelt werden
         $entry->url = $request->requestUri->document;
         $entry->fullurl = $request->requestUri->getRequestUrl();
-        $entry->sessionid = $this->session->getSessionId();
+        $entry->sessionid = ($this->session !== null)? $this->session->getSessionId() : '';
 
         // Browser- und Betriebssystem-Informationen abrufen
         $browser = null;

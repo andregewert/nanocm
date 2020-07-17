@@ -28,42 +28,87 @@ namespace Ubergeek\Session;
  */
 class SimpleSession implements SessionInterface {
 
+    // <editor-fold desc="Internal properties">
+
+    /**
+     * @var string Name of the session
+     */
     private $namespace;
+
+    /**
+     * @var string ID of the session
+     */
     private $id;
 
+    // </editor-fold>
+
+
+    // <editor-fold desc="Constructor">
+
+    /**
+     * SimpleSession constructor.
+     * @param string $namespace Namespace of the new session
+     * @param string|null $name Name of the new session
+     */
     public function __construct($namespace = 'default', $name = null) {
         if ($name != null) {
             session_name($name);
         }
         $this->namespace = $namespace;
     }
-    
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="SessionInterface">
+
+    /**
+     * @inheritDoc
+     */
     public function getNamespace(): string {
         return $this->namespace;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getSessionId(): string {
         return session_id();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getSessionName(): string {
         return session_name();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function start() {
         session_start();
         $this->id = session_id();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function stop() {
         session_write_close();
     }
-    
+
+    /**
+     * @inheritDoc
+     */
     public function clear() {
         $_SESSION[$this->namespace] = array();
-        session_commit();
+        session_write_close();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getVar(string $key, $default = null) {
         $this->checkNamespace();
         if (!array_key_exists($key, $_SESSION[$this->namespace])) {
@@ -72,29 +117,48 @@ class SimpleSession implements SessionInterface {
         return $_SESSION[$this->namespace][$key];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isVarExisting(string $key): bool {
         $this->checkNamespace();
         return array_key_exists($key, $_SESSION[$this->namespace]);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getVars() {
         $this->checkNamespace();
         return $_SESSION[$this->namespace];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setVar(string $key, $value) {
         $this->checkNamespace();
         $_SESSION[$this->namespace][$key] = $value;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setVars(array $values) {
         $_SESSION[$this->namespace] = $values;
     }
-    
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Internal methods">
+
     private function checkNamespace() {
         if (!array_key_exists($this->namespace, $_SESSION) || !is_array($_SESSION[$this->namespace])) {
             $_SESSION[$this->namespace] = array();
         }
     }
+
+    // </editor-fold>
 
 }

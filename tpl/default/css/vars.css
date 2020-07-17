@@ -1,0 +1,56 @@
+/*
+Error: Undefined variable: "$color-pagebg".
+        on line 31 of vars.scss
+
+26: $color-accent:              $color-link;
+27: $color-accent-contrast:     white;
+28: $color-lightshadow:         #f8f8f8;
+29: 
+30: /* Farbgebung Header / Branding *\/
+31: $color-headerbg:            $color-pagebg;
+32: $color-headerfg:            $color-link;
+33: 
+34: /* Farbgebung Navigationsbereich *\/
+35: $color-navbg:               #531253;
+36: $color-navfg:               #fff;
+
+Backtrace:
+vars.scss:31
+/usr/lib/ruby/vendor_ruby/sass/script/tree/variable.rb:49:in `_perform'
+/usr/lib/ruby/vendor_ruby/sass/script/tree/node.rb:58:in `perform'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:471:in `visit_variable'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:160:in `block in visit'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:79:in `block in with_base'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:115:in `with_frame'
+/usr/lib/ruby/vendor_ruby/sass/stack.rb:79:in `with_base'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:160:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:52:in `map'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:52:in `visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:169:in `block in visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:181:in `with_environment'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:168:in `visit_children'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `block in visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:188:in `visit_root'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/base.rb:36:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:159:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/visitors/perform.rb:8:in `visit'
+/usr/lib/ruby/vendor_ruby/sass/tree/root_node.rb:36:in `css_tree'
+/usr/lib/ruby/vendor_ruby/sass/tree/root_node.rb:20:in `render'
+/usr/lib/ruby/vendor_ruby/sass/engine.rb:281:in `render'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:494:in `update_stylesheet'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:209:in `each'
+/usr/lib/ruby/vendor_ruby/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/usr/lib/ruby/vendor_ruby/sass/plugin.rb:82:in `update_stylesheets'
+/usr/lib/ruby/vendor_ruby/sass/exec/sass_scss.rb:336:in `watch_or_update'
+/usr/lib/ruby/vendor_ruby/sass/exec/sass_scss.rb:51:in `process_result'
+/usr/lib/ruby/vendor_ruby/sass/exec/base.rb:52:in `parse'
+/usr/lib/ruby/vendor_ruby/sass/exec/base.rb:19:in `parse!'
+/usr/bin/scss:8:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: Undefined variable: \"$color-pagebg\".\A         on line 31 of vars.scss\A \A 26: $color-accent:              $color-link;\A 27: $color-accent-contrast:     white;\A 28: $color-lightshadow:         #f8f8f8;\A 29: \A 30: /* Farbgebung Header / Branding */\A 31: $color-headerbg:            $color-pagebg;\A 32: $color-headerfg:            $color-link;\A 33: \A 34: /* Farbgebung Navigationsbereich */\A 35: $color-navbg:               #531253;\A 36: $color-navfg:               #fff;"; }

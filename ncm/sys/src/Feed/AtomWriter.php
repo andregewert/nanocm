@@ -37,7 +37,6 @@ class AtomWriter implements FeedWriterInterface  {
      * @return string Das Ergebnis im Atom-XML-Format
      */
     public function writeFeed(Feed $feed): string {
-        /* @var $xml \SimpleXMLElement */
         $xml = new \SimpleXMLElement("<?xml version=\"1.0\" encoding=\"utf-8\" ?><feed xmlns=\"http://www.w3.org/2005/Atom\"></feed>");
         $xml->addChild('title', $feed->title);
         if (mb_strlen($feed->subtitle) > 0) {

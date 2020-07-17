@@ -1,11 +1,152 @@
 <?php
 /* @var $this Ubergeek\NanoCm\Module\CoreModule */
+
+use Ubergeek\NanoCm\Util;
+
+$medium = null;
+$format = null;
+$class = ($this->article->articleType instanceof \Ubergeek\NanoCm\Definition)? $this->article->articleType->value : '';
+
+if (!empty($this->article->medium_id)) {
+    if (($format = $this->orm->getImageFormatByKey('banner')) !== null) {
+        $medium = $this->orm->getMediumById($this->article->medium_id);
+    }
+}
 ?>
 
-<div style="padding-top: 3.5em">
-    <div class="container">
+<div class="container mt-4">
+    <?php if ($this->isPreview) : ?>
+        <div class="container">
+            <div class="watermark preview"><span>Preview</span></div>
+        </div>
+    <?php endif; ?>
+
+    <article class="<?php echo $class; ?>">
         <h1><?php echo $this->htmlEncode($this->article->headline); ?></h1>
 
-        <?php echo $this->ncm->convertFormattedText($this->article->content); ?>
-    </div>
+        <?php if ($format != null && $medium != null) : ?>
+            <div class="figurecontainer">
+                <div class="imgcontainer">
+                    <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                         class="<?php echo $this->htmlEncode($format->key); ?>"
+                         title="<?php echo $this->htmlEncode($medium->title); ?>"
+                        <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
+                        <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
+                </div>
+                <?php if (strlen($medium->attribution) > 0) : ?>
+                    <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (strlen($this->article->teaser) > 0) : ?>
+            <div class="lead">
+                <?php echo $this->convertTextWithFullMarkup($this->article->teaser); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php echo $this->convertTextWithFullMarkup($this->article->content); ?>
+
+        <div class="articlefooter">
+            <hr>
+            <p>Ver&ouml;ffentlicht von
+                <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
+                <?php if ($this->article->publishing_timestamp instanceof DateTime) : ?>
+                    am
+                    <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>
+                <?php endif; ?>
+                &bullet;
+                <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comments">Kommentieren</a>
+                &bullet;
+                <a href="<?php echo $this->htmlConvUrl($this->article->getEbookUrl()); ?>">ePub</a>
+                &bullet;
+                <a href="<?php echo $this->htmlEncode(
+                    Util::getTweetThisUrl(
+                        $this->frontController->createAbsoluteSiteLink(
+                            $this->article->getArticleUrl()
+                        ),
+                        $this->article->headline
+                    )
+                ); ?>" target="_blank">Twittern</a>
+            </p>
+            <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
+                Schlagworte:
+                <ul class="taglist">
+                    <?php foreach ($this->article->tags as $tag) : ?>
+                        <li><a href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </article>
+
+    <?php if ($this->commentsEnabled) : ?>
+        <?php if (is_array($this->comments) && count($this->comments) > 0) : ?>
+            <h2>Kommentare</h2>
+
+            <ol class="comments">
+                <?php $i = 0; ?>
+                <?php foreach ($this->comments as $comment) : ?>
+                    <?php $i++; ?>
+                    <li class="<?php echo ($i %2 == 0)? 'even' : 'odd'; ?>">
+                        <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
+                        <div class="entry">
+                            <?php if ($comment->use_gravatar) : ?>
+                                <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" alt="" width="50" height="50"></div>
+                            <?php endif; ?>
+                            <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
+
+                            <p><?php echo $this->convertTextWithBasicMarkup($this->htmlEncode($comment->content)); ?></p>
+
+                            <div class="details">
+                                <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        <?php endif; ?>
+
+        <?php if ($this->article->enable_comments) : ?>
+            <div class="nonprint" id="form_comment">
+                <h2><a name="comment"></a>Kommentar hinterlassen</h2>
+
+                <?php
+                $digits = array('Null', 'Eins', 'Zwei', 'Drei', 'Vier', 'Fünf', 'Sechs', 'Sieben', 'Acht', 'Neun', 'Zehn');
+                ?>
+                <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
+
+                <div class="form-group">
+                    <label for="input_n">Dein Name</label>
+                    <input type="text" class="text form-control" id="input_n" name="_n" required value="<?php echo $this->htmlEncode($this->commentName); ?>" maxlength="45">
+                </div>
+                <div class="form-group">
+                    <label for="input_e">E-Mail (wird nicht angezeigt)</label>
+                    <input type="email" class="text form-control" id="input_e" name="_e" required value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="input_g" name="_g" value="1"<?php if ($this->commentUseGravatar == '1') echo ' checked="checked"'; ?>>
+                    <label for="input_g">Ich m&ouml;chte, dass mein Gravatar angezeigt wird</label>
+                </div>
+                <div class="form-group">
+                    <label for="input_h">&Uuml;berschrift (optional)</label>
+                    <input type="text" class="text form-control" id="input_h" name="_h" value="<?php echo $this->htmlEncode($this->commentHeadline); ?>" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <textarea wrap="soft" id="input_t" name="_t" style="height: 10em" required class="form-control"><?php echo $this->htmlEncode($this->commentText); ?></textarea>
+                </div>
+
+                <div class="form-group captcha_container" style="text-align: right">
+                    <input type="hidden" name="ac" value="s" />
+                    <input type="button" class="btn btn-primary submit" value="Kommentieren">
+                </div>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            ncmPublic.initCommentForm($('#form_comment'));
+        });
+    </script>
 </div>

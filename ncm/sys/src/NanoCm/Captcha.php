@@ -18,45 +18,49 @@
 
 namespace Ubergeek\NanoCm;
 
-use Ubergeek\Cache\CacheInterface;
-
 /**
- * Einfach Captcha-Implementierung
+ * Simple captcha implementation
+ *
  * @package Ubergeek\NanoCm
  * @author André Gewert <agewert@gmail.com>
  * @created 2018-12-02
  */
 class Captcha {
 
+    // <editor-fold desc="Properties">
+
     /**
-     * @var int Erster Operand
+     * @var int First operand
      */
     public $valueA;
 
     /**
-     * @var int Zweiter Operand
+     * @var int Second operand
      */
     public $valueB;
 
     /**
-     * @var string Rechen-Operator (+ oder -)
+     * @var string Operator (+ or -)
      */
     public $operator;
 
     /**
-     * @var string Möglichst eindeutige ID des Captchas
+     * @var string Unique captcha id
      */
     public $captchaId;
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Constructor">
 
     /**
      * Der Konstruktor erstellt einen Captcha mit
      * zufälligen Werten
      */
     public function __construct() {
-        // Rechenmodus
         $this->operator = (rand(0, 1) == 1)? '-' : '+';
 
-        // Operanden
         if ($this->operator == '-')
             $this->valueA = rand(3, 10);
         else
@@ -69,11 +73,12 @@ class Captcha {
             || ($this->operator == '-' && $this->valueB > $this->valueA)
         );
 
-        // Captcha-ID
         if (function_exists('random_bytes')) {
             $this->captchaId = md5(random_bytes(1096));
         } else {
             $this->captchaId = md5(rand());
         }
     }
+
+    // </editor-fold>
 }
