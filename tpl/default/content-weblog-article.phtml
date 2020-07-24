@@ -13,7 +13,6 @@ if (!empty($this->article->medium_id)) {
     }
 }
 ?>
-
 <div class="container mt-4">
     <?php if ($this->isPreview) : ?>
         <div class="container">
@@ -47,9 +46,9 @@ if (!empty($this->article->medium_id)) {
 
         <?php echo $this->convertTextWithFullMarkup($this->article->content); ?>
 
-        <div class="articlefooter">
+        <div class="articlefooter small mb-4">
             <hr>
-            <p>Ver&ouml;ffentlicht von
+            <p class="mb-0">Ver&ouml;ffentlicht von
                 <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
                 <?php if ($this->article->publishing_timestamp instanceof DateTime) : ?>
                     am
@@ -71,49 +70,44 @@ if (!empty($this->article->medium_id)) {
             </p>
             <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
                 Schlagworte:
-                <ul class="taglist">
-                    <?php foreach ($this->article->tags as $tag) : ?>
-                        <li><a href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a></li>
-                    <?php endforeach; ?>
-                </ul>
+                <?php foreach ($this->article->tags as $tag) : ?>
+                    <a class="badge badge-secondary" href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a>
+                <?php endforeach; ?>
             <?php endif; ?>
         </div>
     </article>
 
-    <?php if ($this->commentsEnabled) : ?>
-        <?php if (is_array($this->comments) && count($this->comments) > 0) : ?>
-            <h2>Kommentare</h2>
+    <?php if (is_array($this->comments) && count($this->comments) > 0) : ?>
+        <h2>Kommentare</h2>
 
-            <ol class="comments">
-                <?php $i = 0; ?>
-                <?php foreach ($this->comments as $comment) : ?>
-                    <?php $i++; ?>
-                    <li class="<?php echo ($i %2 == 0)? 'even' : 'odd'; ?>">
-                        <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
-                        <div class="entry">
-                            <?php if ($comment->use_gravatar) : ?>
-                                <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" alt="" width="50" height="50"></div>
-                            <?php endif; ?>
-                            <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
+        <ol class="comments">
+            <?php $i = 0; ?>
+            <?php foreach ($this->comments as $comment) : ?>
+                <?php $i++; ?>
+                <li class="<?php echo ($i %2 == 0)? 'even' : 'odd'; ?>">
+                    <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
+                    <div class="entry">
+                        <?php if ($comment->use_gravatar) : ?>
+                            <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" alt="" width="50" height="50"></div>
+                        <?php endif; ?>
+                        <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 
-                            <p><?php echo $this->convertTextWithBasicMarkup($this->htmlEncode($comment->content)); ?></p>
+                        <p><?php echo $this->convertTextWithBasicMarkup($this->htmlEncode($comment->content)); ?></p>
 
-                            <div class="details">
-                                <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>
-                            </div>
+                        <div class="details">
+                            <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>
                         </div>
-                    </li>
-                <?php endforeach; ?>
-            </ol>
-        <?php endif; ?>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    <?php endif; ?>
 
-        <?php if ($this->article->enable_comments) : ?>
+    <?php if ($this->commentsEnabled && $this->article->enable_comments) : ?>
+        <?php if ($this->ncm->hasCurrentUserAcceptedPrivacyPolicy()) : ?>
             <div class="nonprint" id="form_comment">
                 <h2><a name="comment"></a>Kommentar hinterlassen</h2>
 
-                <?php
-                $digits = array('Null', 'Eins', 'Zwei', 'Drei', 'Vier', 'Fünf', 'Sechs', 'Sieben', 'Acht', 'Neun', 'Zehn');
-                ?>
                 <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
                 <div class="form-group">
@@ -141,12 +135,16 @@ if (!empty($this->article->medium_id)) {
                     <input type="button" class="btn btn-primary submit" value="Kommentieren">
                 </div>
             </div>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    ncmPublic.initCommentForm($('#form_comment'));
+                });
+            </script>
+        <?php else : ?>
+            <h2><a name="comment"></a>Kommentare</h2>
+            <div class="alert alert-secondary" role="alert">
+                <p class="mb-0">Sie m&uuml;ssen der Verwendung von Cookies zustimmen, bevor Sie einen Kommentar hinterlassen k&ouml;nnen.</p>
+            </div>
         <?php endif; ?>
     <?php endif; ?>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            ncmPublic.initCommentForm($('#form_comment'));
-        });
-    </script>
 </div>

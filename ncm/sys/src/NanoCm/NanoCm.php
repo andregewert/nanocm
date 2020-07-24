@@ -131,6 +131,11 @@ class NanoCm {
      * @var string
      */
     public $tpldir;
+
+    /**
+     * @var string Name of the current template dir (relative to ncm/tpl)
+     */
+    public $tplname;
     
     /**
      * Absoluter Dateipfad zum NCM-Untervezeichnis
@@ -259,6 +264,7 @@ class NanoCm {
         $this->cachedir = Util::createPath($this->pubdir, 'ncm', 'sys', 'cache');
         $this->relativeBaseUrl = substr($this->pubdir, strlen($_SERVER['DOCUMENT_ROOT']));
         $this->browscappath = Util::createPath($this->sysdir, 'db', 'lite_php_browscap.ini');
+
         if (empty($this->relativeBaseUrl)) {
             $this->relativeBaseUrl = '/';
         } else if (substr($this->relativeBaseUrl, -1) != '/') {
@@ -289,6 +295,7 @@ class NanoCm {
         if (empty($tpl)) {
             $tpl = 'default';
         }
+        $this->tplname = $tpl;
         $this->tpldir = Util::createPath($this->pubdir, 'tpl', $tpl);
 
         // ChromeLoggerWriter instanziieren, wenn eingeschaltet
@@ -333,7 +340,8 @@ class NanoCm {
         $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_COMMENTS_TTL, 1);
         $this->commentIpCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'cmt-', $this->log);
         $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_EBOOKS_TTL, 24 * 7);
-        $this->ebookCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ebook-', $this->log);
+        //$this->ebookCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ebook-', $this->log);
+        $this->ebookCache = null;
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
 
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);
@@ -491,6 +499,9 @@ class NanoCm {
      *  false
      */
     public function tryToLoginUser(string $username, string $passwdClear) : bool {
+        // Login is not possible / allowed when user didnt accept privacy policy
+        if ($this->session == null) return false;
+
         $user = $this->orm->getUserByCredentials($username, $passwdClear);
         $this->session->setVar('loggedInUser', $user);
         if ($user != null) {

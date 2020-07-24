@@ -1,0 +1,29 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
+/* @var $medium \Ubergeek\NanoCm\Medium */
+/* @var $format \Ubergeek\NanoCm\Media\ImageFormat */
+
+$medium = $this->orm->getMediumById($this->getVar('converter.image.id'));
+$format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'));
+?>
+
+<?php if ($medium != null && $format != null) : ?>
+<figure>
+    <div class="figurecontainer" style="max-width: <?php echo intval($format->width); ?>px">
+        <div class="imgcontainer">
+            <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                <img src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>">
+            </a>
+        </div>
+        <?php if (strlen($medium->attribution) > 0) : ?>
+            <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+        <?php endif; ?>
+        <?php if (strlen($medium->description) > 0) : ?>
+            <div class="caption shadow">
+                <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>
+            </div>
+        <?php endif; ?>
+    </div>
+</figure>
+<?php endif; ?>
+

@@ -340,6 +340,7 @@ textarea {
     font-family: $font-monospace;
     font-size: 1.1rem;
     border: 1px solid $border-color;
+    resize: vertical;
 }
 
 .editform {

@@ -41,6 +41,7 @@ function NcmPublic(baseUrl) {
                 dataType:   'JSON'
             }).done(function() {
                 $('#div_privacy').hide();
+                location.reload();
             });
         });
     };

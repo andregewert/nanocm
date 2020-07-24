@@ -3,23 +3,30 @@
 <div class="container">
     <h1>Anmelden</h1>
 
-    <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
+    <?php if ($this->ncm->hasCurrentUserAcceptedPrivacyPolicy()) : ?>
+        <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
-    <form action="<?php echo $this->htmlConvUrl('/login.php'); ?>" method="post">
-        <input type="hidden" name="action" value="login" />
+        <form action="<?php echo $this->htmlConvUrl('/login.php'); ?>" method="post">
+            <input type="hidden" name="action" value="login" />
 
-        <div class="form-group">
-            <label for="input_username">Benutzername</label>
-            <input class="form-control" id="input_username" name="username" type="text" autofocus required>
+            <div class="form-group">
+                <label for="input_username">Benutzername</label>
+                <input class="form-control" id="input_username" name="username" type="text" autofocus required>
+            </div>
+
+            <div class="form-group">
+                <label for="input_password">Passwort</label>
+                <input class="form-control" id="input_password" name="password" type="password" required>
+            </div>
+
+            <p style="text-align: right">
+                <button type="submit" class="button">Anmelden</button>
+            </p>
+        </form>
+    <?php else : ?>
+        <div class="alert">
+            <p>Sie m&uuml;ssen der Verwendung von Cookies zustimmen,
+                bevor Sie sich mit Ihren Zugangsdaten an dieser Seite anmelden k&ouml;nnen.</p>
         </div>
-
-        <div class="form-group">
-            <label for="input_password">Passwort</label>
-            <input class="form-control" id="input_password" name="password" type="password" required>
-        </div>
-
-        <p style="text-align: right">
-            <button type="submit" class="button">Anmelden</button>
-        </p>
-    </form>
+    <?php endif; ?>
 </div>

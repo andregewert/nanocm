@@ -289,6 +289,21 @@ abstract class AbstractModule implements
         return $url . $relativeUrl;
     }
 
+    /**
+     * Translates an path (or url) relative to the current template dir to a server-absolute path resp. url
+     *
+     * @param string $tplRelativeUrl Path or url relative to the current template dir
+     */
+    public function convTplUrl($tplRelativeUrl) {
+        if (preg_match('/^[a-z]+\:/i', $tplRelativeUrl)) return $tplRelativeUrl;
+        $url = Util::createPath($this->ncm->relativeBaseUrl, 'tpl', $this->ncm->tplname) . '/';
+
+        if (substr($tplRelativeUrl, 0, 1) === '/') {
+            $tplRelativeUrl = substr($tplRelativeUrl, 1);
+        }
+        return $url . $tplRelativeUrl;
+    }
+
     public function convUrlToAbsolute($relativeUrl) {
         return $this->frontController->createAbsoluteSiteLink($relativeUrl);
     }
@@ -302,6 +317,16 @@ abstract class AbstractModule implements
      */
     public function htmlConvUrl(string $relativeUrl) : string {
         return $this->htmlEncode($this->convUrl($relativeUrl));
+    }
+
+    /**
+     * Converts a path or url relative to the current template directory into an server-absolute path
+     *
+     * @param string $tplRelativeUrl Path or url relative to current template directory
+     * @return string Server-absolute path
+     */
+    public function htmlConvTplUrl(string $tplRelativeUrl) : string {
+        return $this->htmlEncode($this->convTplUrl($tplRelativeUrl));
     }
 
     /**

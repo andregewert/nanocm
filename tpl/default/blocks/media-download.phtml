@@ -1,0 +1,7 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
+$medium = $this->orm->getMediumById($this->getVar('converter.download.id'));
+?>
+<p><a href="<?php echo $this->htmlConvUrl($this->getDownloadUrl($medium)); ?>">Download: <?php echo $this->htmlEncode($medium->title); ?></a>
+(<?php echo \Ubergeek\NanoCm\Util::sizeHumanReadable($medium->filesize); ?>)
+</p>

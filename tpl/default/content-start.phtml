@@ -5,7 +5,6 @@ $latestArticles = $this->orm->getLatestArticles(8);
 ?>
 
 <?php if (count($latestArticles) >= 1) : ?>
-
     <?php
         $this->article = array_shift($latestArticles);
         $this->includeUserTemplate('blocks/article-teaser-big.phtml');
@@ -14,10 +13,8 @@ $latestArticles = $this->orm->getLatestArticles(8);
         <?php $this->includeUserTemplate('blocks/article-teaser-normal.phtml'); ?>
     <?php endwhile; ?>
 <?php else : ?>
-    <div style="padding-top: 3.5em">
-        <div class="container">
-            <h1>Noch keine Inhalte vorhanden</h1>
-            <p>Leider gibt es hier noch nichts zu sehen!</p>
-        </div>
+    <div class="container mt-4">
+        <h1>Noch keine Inhalte vorhanden</h1>
+        <p>Leider gibt es hier noch nichts zu sehen!</p>
     </div>
 <?php endif; ?>

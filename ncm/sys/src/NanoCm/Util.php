@@ -141,6 +141,7 @@ final class Util {
      * @return string Der zusammengesetzte Pfad
      */
     public static function createPath(string ...$parts) : string {
+        if ($parts[0] === '/') $parts[0] = '';
         return join(DIRECTORY_SEPARATOR, $parts);
     }
 

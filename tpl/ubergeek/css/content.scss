@@ -526,11 +526,11 @@ div.form-group div.column {
     box-sizing: border-box;
     font-family: inherit;
     font-weight: bold;
-    padding: .3rem 1rem;
+    padding: .3em 1em;
     font-size: 1rem;
-    line-height: 1.5rem;
+    line-height: 1.5em;
     border: 1px solid darken($color-accent, 5%);
-    border-radius: .25rem;
+    border-radius: .25em;
     background-color: $color-accent;
     color: $color-accent-contrast;
     cursor: pointer;
@@ -541,6 +541,14 @@ div.form-group div.column {
 .button:focus {
     border: 1px solid darken($color-accent, 10%);
     background-color: darken($color-accent, 10%);
+}
+
+.button-small {
+    font-size: 0.8rem;
+}
+
+.button-tiny {
+    font-size: 0.6rem;
 }
 
 /* </editor-fold> */

@@ -2,16 +2,14 @@
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 ?>
 <?php if (is_array($this->userMessages) && count($this->userMessages) > 0) : ?>
-    <div class="container">
-        <div class="alert alert-warning" role="alert">
-            <?php foreach ($this->userMessages as $message) : ?>
-                <div class="message <?php echo $this->htmlEncode($message->type); ?>">
-                    <?php if (!empty($message->title)) : ?>
-                        <strong><?php echo $this->htmlEncode($message->title); ?></strong><br>
-                    <?php endif; ?>
-                    <?php echo nl2br($this->htmlEncode($message->message)); ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
+    <div class="alert alert-warning" role="alert">
+        <?php foreach ($this->userMessages as $message) : ?>
+            <div class="message <?php echo $this->htmlEncode($message->type); ?>">
+                <?php if (!empty($message->title)) : ?>
+                    <strong><?php echo $this->htmlEncode($message->title); ?></strong><br>
+                <?php endif; ?>
+                <?php echo nl2br($this->htmlEncode($message->message)); ?>
+            </div>
+        <?php endforeach; ?>
     </div>
 <?php endif; ?>

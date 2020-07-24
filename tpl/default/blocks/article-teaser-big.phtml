@@ -1,21 +1,4 @@
 <?php
-// NanoCM
-// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 /* @var $this \Ubergeek\NanoCm\Module\CoreModule */
 
 use Ubergeek\NanoCm\Article;
@@ -55,13 +38,17 @@ $articleText = $this->convertTextWithFullMarkup($articleText);
                 </div>
             <?php endif; ?>
 
-            <?php echo $articleText; ?>
             <?php if (strlen($this->article->teaser) > 0) : ?>
-                <p><a class="btn btn-primary btn-lg" href="<?php echo $this->htmlEncode($this->article->getArticleUrl()); ?>" role="button">Weiterlesen</a></p>
+                <div class="lead">
+                    <?php echo $articleText; ?>
+                </div>
+                <p><a class="btn btn-outline-primary" href="<?php echo $this->htmlEncode($this->article->getArticleUrl()); ?>" role="button">Weiterlesen</a></p>
+            <?php else : ?>
+                <?php echo $articleText; ?>
             <?php endif; ?>
 
-            <div class="articlefooter">
-                <p>Ver&ouml;ffentlicht von
+            <div class="articlefooter small">
+                <p class="mb-0">Ver&ouml;ffentlicht von
                     <?php echo $this->htmlEncode($this->orm->convertUserIdToName($this->article->author_id, false)); ?>
                     am
                     <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>&nbsp;&bullet;
@@ -78,11 +65,9 @@ $articleText = $this->convertTextWithFullMarkup($articleText);
                 </p>
                 <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
                     Schlagworte:
-                    <ul class="taglist">
-                        <?php foreach ($this->article->tags as $tag) : ?>
-                            <li><a href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a></li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <?php foreach ($this->article->tags as $tag) : ?>
+                        <a class="badge badge-secondary" href="<?php echo $this->htmlConvUrl($this->article->getTagSearchUrl($tag)); ?>"><?php echo $this->htmlEncode($tag); ?></a>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>

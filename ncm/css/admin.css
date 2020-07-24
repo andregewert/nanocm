@@ -262,7 +262,8 @@ input, select, option, textarea {
 textarea {
   font-family: Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
   font-size: 1.1rem;
-  border: 1px solid #ddd; }
+  border: 1px solid #ddd;
+  resize: vertical; }
 
 .editform {
   position: relative;

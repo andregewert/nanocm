@@ -1,15 +1,15 @@
 <?php
     /* @var $this \Ubergeek\NanoCm\Module\CoreModule */
 ?>
-<div style="padding-top: 3.5em">
-    <div class="container">
-        <h1>Anmelden</h1>
+<div class="container mt-4">
+    <h1>Anmelden</h1>
 
+    <?php if ($this->ncm->hasCurrentUserAcceptedPrivacyPolicy()) : ?>
         <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
         <form action="<?php echo $this->htmlConvUrl('/login.php'); ?>" method="post">
             <input type="hidden" name="action" value="login" />
-            
+
             <div class="form-group">
                 <label for="input_username">Benutzername</label>
                 <input class="form-control" id="input_username" name="username" type="text" autofocus="autofocus">
@@ -22,5 +22,10 @@
 
             <button type="submit" class="btn btn-primary">Anmelden</button>
         </form>
-    </div>
+    <?php else : ?>
+        <div class="alert alert-secondary" role="alert">
+            <p class="mb-0">Sie m&uuml;ssen der Verwendung von Cookies zustimmen,
+                bevor Sie sich mit Ihren Zugangsdaten an dieser Seite anmelden k&ouml;nnen.</p>
+        </div>
+    <?php endif; ?>
 </div>
