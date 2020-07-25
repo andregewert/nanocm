@@ -19,8 +19,8 @@
 
 <div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
-        <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
-        <input type="hidden" id="input_searchParentId" name="searchParentId" value="<?php echo intval($this->searchParentId); ?>" />
+        <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo (int)$this->searchPage; ?>" />
+        <input type="hidden" id="input_searchParentId" name="searchParentId" value="<?php echo (int)$this->searchParentId; ?>" />
         <div class="toolbar">
             <span class="left">
                 <a id="button_addfolder" class="button" href="javascript:void(0);" role="button" title="Neuen Ordner erstellen">

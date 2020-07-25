@@ -52,7 +52,7 @@ abstract class AbstractAdminModule extends AbstractModule {
             $this->allowUserTemplates = false;
             $this->setPageTemplate('page-admin.phtml');
             $this->templateDir = Util::createPath($this->ncm->sysdir, 'tpladm');
-            $this->replaceMeta('Cache-control', 'no-cache, must-revalidate, max-age=0');
+            $this->replaceMeta('Cache-control', 'no-cache, no-store, must-revalidate, max-age=0');
             $this->replaceMeta('Pragma', 'no-cache');
         } else {
             throw new Exception\AuthorizationException("Authentifizierung notwendig!");

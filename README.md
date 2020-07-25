@@ -55,6 +55,7 @@ von Igor Maznitsa, das auch als Plugin für die JetBrains-IDEs sowie als
 alleinstehende Anwendung verfügbar ist.
 
 # Voraussetzungen
+
 - PHP 7.1
 - PHP-Extension pdo_sqlite
 - PHP-Extension curl
@@ -63,5 +64,5 @@ alleinstehende Anwendung verfügbar ist.
 # Autor
 
 André Gewert  
-agewert@gmail.com  
+agewert@ubergeek.de  
 www.ubergeek.de

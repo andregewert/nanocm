@@ -39,8 +39,10 @@ $articleText = $this->convertTextWithFullMarkup($articleText);
                 <div class="imgcontainer">
                     <a class="imglink <?php echo $this->htmlEncode($format->key); ?>" href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>">
                         <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                             srcset="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key, 2)); ?> 2x"
                              class="<?php echo $this->htmlEncode($format->key); ?>"
                              title="<?php echo $this->htmlEncode($medium->title); ?>"
+                             loading="lazy"
                             <?php if ($format->width > 0) echo "width=\"$format->width\""; ?>
                             <?php if ($format->height > 0) echo "height=\"$format->height\""; ?>>
                     </a>

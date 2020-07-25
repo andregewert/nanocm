@@ -8,22 +8,22 @@ $format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'
 ?>
 
 <?php if ($medium != null && $format != null) : ?>
-<figure>
-    <div class="figurecontainer" style="max-width: <?php echo intval($format->width); ?>px">
-        <div class="imgcontainer">
-            <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
-                <img src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>">
-            </a>
-        </div>
-        <?php if (strlen($medium->attribution) > 0) : ?>
-            <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
-        <?php endif; ?>
-        <?php if (strlen($medium->description) > 0) : ?>
-            <div class="caption shadow">
-                <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>
+    <figure>
+        <div class="figurecontainer" style="max-width: <?php echo (int)$format->width; ?>px">
+            <div class="imgcontainer">
+                <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                    <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
+                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x">
+                </a>
             </div>
-        <?php endif; ?>
-    </div>
-</figure>
+            <?php if (strlen($medium->attribution) > 0) : ?>
+                <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+            <?php endif; ?>
+            <?php if (strlen($medium->description) > 0) : ?>
+                <div class="caption shadow">
+                    <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>
+                </div>
+            <?php endif; ?>
+        </div>
+    </figure>
 <?php endif; ?>
-

@@ -1,0 +1,9 @@
+{
+  "version":      "1.0",
+  "title":        "Default",
+  "description":  "Default template for nano cm based on Bootstrap",
+  "author":       "André Gewert",
+  "attribution":  "Copyright © 2017-2020 André Gewert",
+  "mail":         "agewert@ubergeek.de",
+  "link":         "https://www.ubergeek.de/"
+}

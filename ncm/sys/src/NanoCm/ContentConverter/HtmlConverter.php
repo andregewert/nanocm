@@ -74,7 +74,7 @@ class HtmlConverter extends DecoratedContentConverter {
         $module = $this->module;
 
         // Erweiterte Platzhalter für die Medienverwaltung
-        $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download|twitter)\:([^\]]+?)\]\<\/p\>$/ims', function($matches) use ($module) {
+        $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download|twitter)\:([^\]]+?)\]\<\/p\>$/ims', static function($matches) use ($module) {
             $module->setVar('converter.placeholder', $matches[0]);
 
             switch (strtolower($matches[1])) {
@@ -89,19 +89,19 @@ class HtmlConverter extends DecoratedContentConverter {
 
                 // Bildergalerie aus der Medienverwaltung
                 case 'album':
-                    $module->setVar('converter.album.id', intval($matches[2]));
+                    $module->setVar('converter.album.id', (int)$matches[2]);
                     return $module->renderUserTemplate('blocks/media-album.phtml');
 
                 // Vorschaubild aus der Medienverwaltung
                 case 'image':
                     list($id, $format) = explode(':', $matches[2], 2);
-                    $module->setVar('converter.image.id', intval($id));
+                    $module->setVar('converter.image.id', (int)$id);
                     $module->setVar('converter.image.format', $format);
                     return $module->renderUserTemplate('blocks/media-image.phtml');
 
                 // Download-Link aus der Medienverwaltung
                 case 'download':
-                    $module->setVar('converter.download.id', intval($matches[2]));
+                    $module->setVar('converter.download.id', (int)$matches[2]);
                     return $module->renderUserTemplate('blocks/media-download.phtml');
 
                 // Eingebettete Tweets
@@ -119,14 +119,8 @@ class HtmlConverter extends DecoratedContentConverter {
 
         // Notlösung, um nachträglich XHTML-kompatiblen Output zu erzwingen ...
         if ($this->generateXhtml) {
-            //if (function_exists('tidy_repair_string')) {
-            //    $output = tidy_repair_string($output, array(
-            //        'output-xml' => true
-            //    ));
-            //} else {
-                $output = $this->closeOpenSingleTags($output);
-                $output = $this->replaceNamedEntities($output);
-            //}
+            $output = $this->closeOpenSingleTags($output);
+            $output = $this->replaceNamedEntities($output);
         }
 
         return $output;
@@ -140,11 +134,8 @@ class HtmlConverter extends DecoratedContentConverter {
 
     private function replaceNamedEntities(string $input) {
         $table = get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES);
-        unset($table['<']);
-        unset($table['>']);
-
+        unset($table['<'], $table['>']);
         return str_replace(array_values($table), array_keys($table), $input);
-        //return html_entity_decode($input, ENT_NOQUOTES);
     }
 
     // </editor-fold>

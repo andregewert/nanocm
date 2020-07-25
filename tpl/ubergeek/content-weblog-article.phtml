@@ -28,6 +28,7 @@ if (!empty($this->article->medium_id)) {
             <div class="figurecontainer">
                 <div class="imgcontainer">
                     <img src="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key)); ?>"
+                         srcset="<?php echo $this->htmlConvUrl($medium->getImageUrl($format->key, 2)); ?> 2x"
                          class="<?php echo $this->htmlEncode($format->key); ?>"
                          title="<?php echo $this->htmlEncode($medium->title); ?>"
                          loading="lazy"
@@ -92,7 +93,7 @@ if (!empty($this->article->medium_id)) {
                     <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
                     <div class="entry">
                         <?php if ($comment->use_gravatar) : ?>
-                            <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" alt="" width="50" height="50" loading="lazy"></div>
+                            <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" srcset="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 100)); ?> 2x" alt="" width="50" height="50" loading="lazy"></div>
                         <?php endif; ?>
                         <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 

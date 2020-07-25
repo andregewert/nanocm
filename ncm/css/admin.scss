@@ -398,6 +398,19 @@ input.big {
     font-size: 2rem;
 }
 
+fieldset {
+    border: solid $border-color 2px;
+    border-radius: 4px;
+    margin: 0 0 1em 0;
+    padding: 0.5em;
+    font-size: 1.1rem;
+}
+
+fieldset legend {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
 /* </editor-fold> */
 
 

@@ -862,7 +862,7 @@ class Orm {
      * @param bool $countOnly
      * @param int $page = null
      * @param int $limit = null
-     * @return Setting[]
+     * @return Setting[]|int
      */
     public function searchSettings(Setting $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $settings = array();

@@ -1,23 +1,21 @@
 <?php
 
-/**
- * NanoCM
- * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\NanoCm\Module;
 use Ubergeek\Epub\Document;
@@ -360,10 +358,10 @@ class CoreModule extends AbstractModule {
                         // Gravatar
                         case 'gravatar':
                             $hash = $parts[1];
-                            $size = (count($parts) >= 3)? intval($parts[3]) : 50;
+                            $size = (count($parts) >= 3)? (int)$parts[3] : 50;
                             $imgData = $this->ncm->mediaManager->getGravatar($hash, $size);
 
-                            if ($imgData != null) {
+                            if ($imgData !== null) {
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->setContentType('image/png');
                                 $this->replaceMeta('content-length', strlen($imgData));
@@ -392,16 +390,18 @@ class CoreModule extends AbstractModule {
                         case 'image':
                             $mediumHash = $parts[1];
                             $formatKey = $parts[3];
+                            $scaling = (count($parts) >= 5)? (int)$parts[4] : 1;
+                            if ($scaling > 4) $scaling = 4;
                             $format = $this->orm->getImageFormatByKey($formatKey);
                             $medium = $this->orm->getMediumByHash($mediumHash, Medium::TYPE_FILE, true);
 
-                            if ($medium != null) {
+                            if ($medium !== null) {
                                 $this->setPageTemplate(self::PAGE_NONE);
                                 $this->setContentType('image/jpeg');
 
                                 $filename = Util::createPath($this->ncm->mediadir, $medium->id);
                                 $c = $this->ncm->mediaManager->createImageForMediumWithImageFormat(
-                                    $medium, $filename, $format, 'jpeg'
+                                    $medium, $filename, $format, 'jpeg', $scaling
                                 );
 
                                 $this->replaceMeta('content-length', strlen($c));

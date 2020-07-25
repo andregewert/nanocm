@@ -1,21 +1,21 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\NanoCm;
 
@@ -27,9 +27,9 @@ namespace Ubergeek\NanoCm;
  */
 final class Util {
 
-    public static function getGravatarUserImageUrl($mail, $size = 50) {
+    public static function getGravatarUserImageUrl($mail, $size = 50) : string {
         $hash = md5(trim($mail));
-        $size = intval($size);
+        $size = (int)$size;
         return "/media/$hash/gravatar/$size";
     }
 
@@ -87,7 +87,7 @@ final class Util {
      * @param String $email
      * @return Boolean
      */
-    public static function isValidEmail($email) {
+    public static function isValidEmail($email) : bool {
         // formale Überprüfung
         if (preg_match('/^[a-z0-9]+[a-z0-9\+\-\._]*@([a-z0-9\-]+[\.])+[a-z]{2,8}$/i', $email) !== 1)
             return(false);
@@ -109,10 +109,10 @@ final class Util {
         return $tweetUrl;
     }
 
-    public static function getDirectorySize($path){
+    public static function getDirectorySize($path) : int {
         $bytestotal = 0;
         $path = realpath($path);
-        if($path!==false && $path!='' && file_exists($path)){
+        if($path !== false && $path !== '' && file_exists($path)){
             foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)) as $object){
                 $bytestotal += $object->getSize();
             }
@@ -120,14 +120,14 @@ final class Util {
         return $bytestotal;
     }
 
-    public static function getFileExtension(string $filename) {
+    public static function getFileExtension(string $filename) : string {
         if (preg_match("/\.([^\.]+?)$/i", $filename, $matches) > 0) {
             return strtolower($matches[1]);
         }
         return '';
     }
 
-    public static function sizeHumanReadable($bytes, $decimals = 2) {
+    public static function sizeHumanReadable($bytes, $decimals = 2) : string {
         $size = array('B','KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB');
         $factor = floor((strlen($bytes) - 1) / 3);
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . @$size[$factor];

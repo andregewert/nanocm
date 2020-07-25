@@ -221,10 +221,11 @@ abstract class AbstractModule implements
      *
      * @param Medium $medium Die betreffende Mediendatei
      * @param string $formatKey Schlüssel des gewünschten Ausgabeformats
+     * @param integer $scaling Skalierung
      * @return string URL zum skalierten Bild
      */
-    public function getImageUrl(Medium $medium, string $formatKey) {
-        return $medium->getImageUrl($formatKey);
+    public function getImageUrl(Medium $medium, string $formatKey, $scaling = 1) {
+        return $medium->getImageUrl($formatKey, $scaling);
     }
 
     /**

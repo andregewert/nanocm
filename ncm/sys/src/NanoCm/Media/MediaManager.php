@@ -1,12 +1,13 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/*
+ * NanoCM
+ * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\NanoCm\Media;
@@ -236,26 +238,30 @@ class MediaManager {
      * @param string $imagefile Absoluter Pfad für die Bild-Datei
      * @param ImageFormat $format Die Definition für das Ausgabeformat (aus der Medienverwaltung)
      * @param string $outputImageType Typ des Ausgabebildes
+     * @param int $scaling Skalierungsfaktor
      * @return null|string Die genrierten Bilddaten als String
      */
-    public function createImageForMediumWithImageFormat(Medium $medium, string $imagefile, ImageFormat $format, $outputImageType = 'jpeg') {
+    public function createImageForMediumWithImageFormat(Medium $medium, string $imagefile, ImageFormat $format, $outputImageType = 'jpeg', $scaling = 1) {
         if (!in_array($medium->type, $this->supportedTypes)) {
             throw new MediaException("Not supported mime type: $medium->type");
         }
 
+        if ($scaling < 1) $scaling = 1;
+
         // Bild aus dem Cache laden, wenn möglich
-        $cacheKey = $medium->id . '-' . $format->key . '-' . $outputImageType;
+        $cacheKey = $medium->id . '-' . $format->key . '-' . $outputImageType . '-' . $scaling;
+
         if ($this->cache instanceof CacheInterface) {
             $image = $this->cache->get($cacheKey);
-            if ($image != null) {
+            if ($image !== null) {
                 $this->log->debug("Found media thumbnail in cache: $medium->id / $format->key");
                 return $image;
             }
         }
 
         $data = @file_get_contents($imagefile);
-        $image = $this->resizeImageDataToFormat($data, $format, $outputImageType);
-        if ($image != null && $this->cache instanceof CacheInterface) {
+        $image = $this->resizeImageDataToFormat($data, $format, $outputImageType, $scaling);
+        if ($image !== null && $this->cache instanceof CacheInterface) {
             $this->cache->put($cacheKey, $image);
         }
         return $image;
@@ -276,9 +282,10 @@ class MediaManager {
      * @param string $imgData Rohe Bilddaten
      * @param ImageFormat $format Gewünschtes Ausgabeformat
      * @param string $outputImageType Ausgabetyp (JPEG oder PNG)
+     * @param int $scaling Skalierungsfaktor (für HiDPI-Ausgabe)
      * @return string Rohe Bilddaten für das Thumbnail
      */
-    private function resizeImageDataToFormat(string $imgData, ImageFormat $format, $outputImageType = 'jpeg') {
+    private function resizeImageDataToFormat(string $imgData, ImageFormat $format, $outputImageType = 'jpeg', $scaling = 1) {
         list($sourceWidth, $sourceHeight, $sourceType) = getimagesizefromstring($imgData);
         $originalWidth = $sourceWidth;
         $originalHeight = $sourceHeight;
@@ -286,29 +293,30 @@ class MediaManager {
         $src = imagecreatefromstring($imgData);
         $offsetTop = 0;
         $offsetLeft = 0;
+        if ($scaling < 1) $scaling = 1;
 
         // Höhe ist variabel
         if ($format->width > 0 && $format->height == 0) {
-            $destWidth = $format->width;
+            $destWidth = $format->width *$scaling;
             $destHeight = $format->width /$ratio;
         }
 
         // Breite ist variabel
         else if ($format->width == 0 && $format->height > 0) {
-            $destHeight = $format->height;
+            $destHeight = $format->height *$scaling;
             $destWidth = $format->height *$ratio;
         }
 
         // Ursprungsformat verwenden
         else if ($format->width == 0 && $format->height == 0) {
-            $destWidth = $sourceWidth;
-            $destHeight = $sourceHeight;
+            $destWidth = $sourceWidth *$scaling;
+            $destHeight = $sourceHeight *$scaling;
         }
 
         // Festes Format; Ausschnitt dynamisch wählen
         else {
-            $destWidth = $format->width;
-            $destHeight = $format->height;
+            $destWidth = $format->width *$scaling;
+            $destHeight = $format->height *$scaling;
 
             $f1 = $destWidth / $originalWidth;
             $f2 = $destHeight / $originalHeight;
@@ -335,35 +343,11 @@ class MediaManager {
             $sourceHeight = ceil($destHeight /$scalingFactor);
             $offsetLeft = floor($originalWidth /2) -ceil(($destWidth /$scalingFactor) /2);
             $offsetTop = floor($originalHeight /2) - ceil(($destHeight /$scalingFactor) /2);
-
-            /*
-            // Breite ist die lange Seite
-            if ($destWidth > $destHeight || ($destWidth == $destHeight && $originalWidth < $originalHeight)) {
-                if ($originalWidth != $destWidth) {
-                    $scalingFactor = $destWidth /$originalWidth;
-                    $sourceWidth = ceil($destWidth /$scalingFactor);
-                    $sourceHeight = ceil($destHeight /$scalingFactor);
-                    $offsetTop = floor($originalHeight /2) - ceil(($destHeight /$scalingFactor) /2);
-                } else {
-                    $offsetTop = floor($originalHeight /2) - ceil($destHeight /2);
-                }
-            }
-
-            // Höhe ist die lange Seite
-            else {
-                if ($originalHeight != $destHeight) {
-                    $scalingFactor = $destHeight /$originalHeight;
-                    $sourceWidth = ceil($destWidth /$scalingFactor);
-                    $sourceHeight = ceil($destHeight /$scalingFactor);
-                    $offsetLeft = floor($originalWidth /2) -ceil(($destWidth /$scalingFactor) /2);
-                } else {
-                    $offsetLeft = floor($originalWidth /2) -ceil($destWidth /2);
-                }
-            }
-            */
         }
 
         $copy = imagecreatetruecolor($destWidth, $destHeight);
+        imagefill($copy, 0, 0, imagecolorallocate($copy, 255, 255, 255));
+
         imagecopyresampled(
             $copy,  $src,
             0, 0,
