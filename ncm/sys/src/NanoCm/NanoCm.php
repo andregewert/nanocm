@@ -1,23 +1,21 @@
 <?php
 
-/**
- * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\NanoCm;
 use Ubergeek\Cache\CacheInterface;
@@ -49,7 +47,7 @@ class NanoCm {
      * Beinhaltet die ContentManager-Instanz
      * @var \Ubergeek\NanoCm\NanoCm
      */
-    private static $ncm = null;
+    private static $ncm;
 
     // </editor-fold>
     
@@ -76,35 +74,41 @@ class NanoCm {
      *
      * @var \PDO
      */
-    public $basedb = null;
+    public $basedb;
 
     /**
      * PDO-Handle für die Statistik-Datenbank
      *
      * @var \PDO
      */
-    public $statsdb = null;
+    public $statsdb;
     
     /**
      * Referenz auf eine Instanz der ORM-Klasse
      *
      * @var Orm
      */
-    public $orm = null;
+    public $orm;
     
     /**
      * Session-Manager
      *
      * @var \Ubergeek\Session\SessionInterface
      */
-    public $session = null;
+    public $session;
 
     /**
      * Referenz auf den Media-Manager (ohne ORM)
      *
      * @var MediaManager
      */
-    public $mediaManager = null;
+    public $mediaManager;
+
+    /**
+     * Reference to the installation manager
+     * @var InstallationManager
+     */
+    public $installationManager;
 
     /**
      * Log-Instanz
@@ -340,9 +344,11 @@ class NanoCm {
         $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_COMMENTS_TTL, 1);
         $this->commentIpCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'cmt-', $this->log);
         $ttl = (int)$this->orm->getSettingValue(Setting::SYSTEM_CACHE_EBOOKS_TTL, 24 * 7);
-        //$this->ebookCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ebook-', $this->log);
-        $this->ebookCache = null;
+        $this->ebookCache = new FileCache($this->cachedir, 60 *60 *$ttl, 'ebook-', $this->log);
         $this->captchaCache = new FileCache($this->cachedir, 60 *60 *4, 'cpt-', $this->log);
+
+        // Installation manager
+        $this->installationManager = new InstallationManager($this);
 
         $this->mediaManager = new MediaManager($this->mediaCache, $this->log);
         $this->log->debug($this->versionInfo);
@@ -406,6 +412,31 @@ class NanoCm {
     
     
     // <editor-fold desc="Public methods">
+
+    /**
+     * Clears all caches used by nano|cm
+     *
+     * At the moment there are caches for:
+     * - Geolocation requests
+     * - Automatically scaled image files
+     * - IP addresses that already commented
+     * - Generated e-books
+     * - Captchas generated for the commenting function
+     *
+     * Clearing the caches can be useful after chaging templates
+     * that affect e-book generation or if image format definitions
+     * have changed. At the moment, the media cache is cleared every
+     * time a format definition changes, so the only reason to clear
+     * caches manually seems to be problems related to changes on the
+     * templates for e-book generation.
+     */
+    public function clearAllCaches() {
+        $this->ipCache->clear();
+        $this->mediaCache->clear();
+        $this->commentIpCache->clear();
+        $this->ebookCache->clear();
+        $this->captchaCache->clear();
+    }
 
     /**
      * Returns true if the current user (which runs the current request) has accepted the

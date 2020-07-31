@@ -18,12 +18,10 @@
  */
 
 function Settings() {
-    console.log('Settings');
     let app = this;
     app.page = $('#input_searchPage').val();
 
     app.init = function() {
-        console.log('init');
         $('#button_refresh').click(function() {
             app.refresh();
         });
@@ -38,6 +36,10 @@ function Settings() {
 
         $('#button_delete').click(function() {
             app.deleteSelected();
+        });
+
+        $('#button_clearcaches').click(function() {
+            app.clearCaches();
         });
 
         app.refresh();
@@ -64,6 +66,17 @@ function Settings() {
             $('.selectall').click(function() {
                 ncm.toggleAllRowsSelection(this);
             });
+        }).always(function() {
+            ncm.hideDefaultLoadingIndicator();
+        });
+    };
+
+    app.clearCaches = function() {
+        ncm.showDefaultLoadingIndicator();
+        $.ajax('admin/settings/ajax/clearcaches', {
+            cache:      false,
+            type:       'post',
+            dataType:   'json'
         }).always(function() {
             ncm.hideDefaultLoadingIndicator();
         });

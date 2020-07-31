@@ -102,7 +102,7 @@ class SetupModule extends AbstractModule {
 
             // Basiseinstellungen speichern
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_LANG, $this->getParam('lang'));
-            $this->ncm->orm->setSettingValue(Setting::SYSTEM_SITETITLE, $this->getParam('pagetitle'));
+            $this->ncm->orm->setSettingValue(Setting::SYSTEM_PAGETITLE, $this->getParam('pagetitle'));
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_COPYRIGHTNOTICE, 'Copyright ' . $user->firstname . ' ' . $user->lastname);
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_WEBMASTER_NAME, $user->firstname . ' ' . $user->lastname);
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_WEBMASTER_EMAIL, $user->email);

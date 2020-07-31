@@ -20,6 +20,7 @@
 namespace Ubergeek\NanoCm;
 
 use Ubergeek\Log\Logger;
+use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Exception\InvalidDataException;
 use Ubergeek\NanoCm\Media\Exception\MediaException;
 use Ubergeek\NanoCm\Media\ImageFormat;
@@ -77,7 +78,7 @@ class Orm {
     /**
      * Optionale Log-Instanz
      *
-     * @var \Ubergeek\Log\LoggerInterface
+     * @var LoggerInterface
      */
     private $log;
 
@@ -107,9 +108,9 @@ class Orm {
      * @param \PDO $dbhandle PDO-Handle für die Site-Datenbank
      * @param \PDO $statshandle PDO-Handle für die Statistik-Datenbank
      * @param string $mediadir Absoluter Pfad zum Ablageverzeichnis für die Medienverwaltung
-     * @param \Ubergeek\Log\LoggerInterface|null $log
+     * @param LoggerInterface|null $log
      */
-    public function __construct(\PDO $dbhandle, \PDO $statshandle, string $mediadir, \Ubergeek\Log\LoggerInterface $log = null) {
+    public function __construct(\PDO $dbhandle, \PDO $statshandle, string $mediadir, LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
         $this->statsdb = $statshandle;
         $this->mediadir = $mediadir;
@@ -855,6 +856,19 @@ class Orm {
     }
 
     /**
+     * Reads and returns all currently existing settings from the site database
+     * @return Setting[]
+     */
+    public function getAllSettings() {
+        $settings = array();
+        $stmt = $this->basedb->query('SELECT * FROM setting');
+        while (($setting = Setting::fetchFromPdoStatement($stmt)) !== null) {
+            $settings[$setting->key] = $setting;
+        }
+        return $settings;
+    }
+
+    /**
      * Durchsucht die Systemeinstellungen und gibt ein Array mit den gefundenen
      * Datensätzen zurück
      * @param Setting|null $filter Filterkriterien
@@ -867,7 +881,7 @@ class Orm {
     public function searchSettings(Setting $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $settings = array();
         $params = array();
-        $limit = ($limit == null)? $this->pageLength : intval($limit);
+        $limit = ($limit === null)? $this->pageLength : (int)$limit;
 
         // SQL zusammenstellen
         if ($countOnly) {
@@ -970,7 +984,7 @@ class Orm {
      * @param bool $countOnly
      * @param int $page
      * @param int $limit
-     * @return User[] Liste der gefundenen Benutzerdatensätze
+     * @return User[]|int Liste der gefundenen Benutzerdatensätze oder Anzahl der gefundenen Datensätze
      */
     public function searchUsers(User $filter = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $params = array();
@@ -3386,7 +3400,7 @@ class Orm {
     public function getSiteTitle() : string {
         $title = 'NanoCM';
         try {
-            $title = $this->getSettingValue(Setting::SYSTEM_SITETITLE);
+            $title = $this->getSettingValue(Setting::SYSTEM_PAGETITLE);
         } catch (\Exception $ex) {
             $this->log->warn($ex);
         }

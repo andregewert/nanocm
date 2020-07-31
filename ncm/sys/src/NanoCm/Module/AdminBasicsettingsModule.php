@@ -18,7 +18,9 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\NanoCm\Module;
+use Ubergeek\NanoCm\AjaxResponse;
 use Ubergeek\NanoCm\Setting;
+use Ubergeek\NanoCm\TemplateInfo;
 
 /**
  * Management of basic settings
@@ -29,12 +31,63 @@ use Ubergeek\NanoCm\Setting;
  */
 class AdminBasicsettingsModule extends AbstractAdminModule {
 
+    // <editor-fold desc="Additional public properties">
+
+    /**
+     * Array of all currently existing settings
+     * @var Setting[]
+     */
+    public $currentSettings;
+
+    /**
+     * Generated response to an ajax request
+     * @var AjaxResponse
+     */
+    public $ajaxResponse;
+
+    /**
+     * An array including information for available templates
+     * @var TemplateInfo[]
+     */
+    public $availableTemplates;
+
+    // </editor-fold>
+
+
     public function run() {
         $content = '';
         $this->setTitle($this->getSiteTitle() . ' - Grundlegende Einstellungen verwalten');
+        $this->currentSettings = $this->ncm->orm->getAllSettings();
+        $this->availableTemplates = $this->ncm->installationManager->getAvailableTemplates();
 
         switch ($this->getRelativeUrlPart(2)) {
-            // Übersichtsseite
+
+            // AJAX requests
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/javascript');
+                $this->ajaxResponse = new AjaxResponse();
+
+                switch ($this->getRelativeUrlPart(3)) {
+                    case 'savesettings':
+                        $this->ajaxResponse->message = 'Settings saved';
+                        foreach ($this->getParam('settings') as $key => $value) {
+                            try {
+                                $setting = new Setting($key, $value);
+                                $this->ncm->orm->saveSetting($setting);
+                            } catch (\Exception $ex) {
+                                $this->log->warn("Exception while saving setting", $ex);
+                                $this->ajaxResponse->status = AjaxResponse::STATUS_ERROR;
+                                $this->ajaxResponse->message = 'Error while saving some settings';
+                            }
+                        }
+                        break;
+                }
+
+                $content = json_encode($this->ajaxResponse);
+                break;
+
+            // Carrying page
             case 'index.php':
             case '':
                 $content = $this->renderUserTemplate('content-basicsettings.phtml');

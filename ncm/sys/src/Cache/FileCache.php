@@ -1,22 +1,20 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\Cache;
 
@@ -32,7 +30,7 @@ use Ubergeek\Log\Logger;
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2018-10-31
  *
- * @todo Garbage collection implementieren!
+ * @todo Automatische Garbage collection implementieren!
  */
 class FileCache implements CacheInterface {
 
@@ -43,28 +41,28 @@ class FileCache implements CacheInterface {
      *
      * @var null|string
      */
-    private $cachedir = null;
+    private $cachedir;
 
     /**
      * Zeit-Intervall in Sekunden, nach dem die Cache-Einträge ablaufen sollen
      *
      * @var int
      */
-    private $lifetime = 0;
+    private $lifetime;
 
     /**
      * Optionales Präfix für die im Cache-Verzeichnis verwalteten Dateien
      *
      * @var string
      */
-    private $filePrefix = '';
+    private $filePrefix;
 
     /**
      * Optionale Logger-Instanz
      *
      * @var Logger
      */
-    private $log = null;
+    private $log;
 
     // </editor-fold>
 
@@ -125,7 +123,7 @@ class FileCache implements CacheInterface {
      */
     public function put(string $key, $value) {
         $fname = $this->createCacheFileName($key);
-        if ($this->log != null) {
+        if ($this->log !== null) {
             $this->log->debug("Putting value to cache for key $key");
         }
         try {
@@ -147,7 +145,7 @@ class FileCache implements CacheInterface {
     public function touch(string $key) {
         $fname = $this->createCacheFileName($key);
         if (file_exists($fname)) {
-            if ($this->log != null) {
+            if ($this->log !== null) {
                 $this->log->debug("Touching cache entry $key for file $fname");
             }
             try {
@@ -175,8 +173,9 @@ class FileCache implements CacheInterface {
         $dh = opendir($this->cachedir);
         if ($dh !== false) {
             while (($fname = readdir($dh)) !== false) {
+                $this->log->debug("Checking file for deletion: $fname");
                 if ($fname != '.' && $fname != '..') {
-                    if ($this->filePrefix == '' || substr($fname, 0, mb_strlen($this->filePrefix)) == $this->filePrefix) {
+                    if ($this->filePrefix === '' || substr($fname, 0, mb_strlen($this->filePrefix)) === $this->filePrefix) {
                         $fullname = $this->cachedir . DIRECTORY_SEPARATOR . $fname;
                         if ($this->log != null) {
                             $this->log->debug("Removing file $fullname");
@@ -205,7 +204,7 @@ class FileCache implements CacheInterface {
     public function unset(string $key) {
         $fname = $this->createCacheFileName($key);
         if (file_exists($fname)) {
-            if ($this->log != null) {
+            if ($this->log !== null) {
                 $this->log->debug("Unsetting cache entry $key / removing file $fname");
             }
             try {
@@ -238,13 +237,13 @@ class FileCache implements CacheInterface {
         $dh = opendir($this->cachedir);
         if ($dh !== false) {
             while (($fname = readdir($dh)) !== false) {
-                if ($fname != '.' && $fname != '..') {
-                    if ($this->filePrefix == '' || substr($fname, 0, mb_strlen($this->filePrefix)) == $this->filePrefix) {
+                if ($fname !== '.' && $fname !== '..') {
+                    if ($this->filePrefix === '' || substr($fname, 0, mb_strlen($this->filePrefix)) == $this->filePrefix) {
                         $fullname = $this->cachedir . DIRECTORY_SEPARATOR . $fname;
                         $diff = time() -filemtime($fullname);
 
                         if ($diff > $this->lifetime) {
-                            if ($this->log != null) $this->log->debug("Removing expired file $fullname");
+                            if ($this->log !== null) $this->log->debug("Removing expired file $fullname");
                             try {
                                 unlink($fullname);
                             } catch (\Exception $ex) {
@@ -267,11 +266,11 @@ class FileCache implements CacheInterface {
      * @param $filename Der zu prüfende Dateiname
      * @return bool true, wenn der Cache-Eintrag bereits abgelaufen ist
      */
-    private function isCacheFileExpired($filename) {
+    private function isCacheFileExpired($filename) : bool {
         if (!file_exists($filename)) return true;
         $diff = time() -filemtime($filename);
         if ($diff > $this->lifetime) {
-            if ($this->log != null) {
+            if ($this->log !== null) {
                 $this->log->debug("Entry $filename is expired (diff: $diff)");
             }
             return true;
@@ -300,13 +299,13 @@ class FileCache implements CacheInterface {
         }
 
         if (!file_exists($this->cachedir)) {
-            if (!mkdir($this->cachedir)) {
+            if (!mkdir($concurrentDirectory = $this->cachedir) && !is_dir($concurrentDirectory)) {
                 throw new InvalidConfigurationException("Could not create cache directory: $this->cachedir");
             }
         }
 
-        $fname = $this->cachedir . DIRECTORY_SEPARATOR . (string)$this->filePrefix . md5($key);
-        if ($this->log != null) {
+        $fname = $this->cachedir . DIRECTORY_SEPARATOR . $this->filePrefix . md5($key);
+        if ($this->log !== null) {
             $this->log->debug("Cache file for key $key is $fname");
         }
         return $fname;

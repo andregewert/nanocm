@@ -411,6 +411,18 @@ fieldset legend {
     font-weight: bold;
 }
 
+fieldset label {
+    width: 30%;
+    display: inline-block;
+}
+
+fieldset input.text {
+    display: inline-block;
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
+}
+
 /* </editor-fold> */
 
 
