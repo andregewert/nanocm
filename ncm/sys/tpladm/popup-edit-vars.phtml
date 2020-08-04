@@ -3,30 +3,32 @@
     $vars = json_decode($this->getParam('vars'), true);
     if (!is_array($vars)) $vars = array();
 ?>
-<table class="list" id="editvars_list">
-    <tr>
-        <th>Variable</th>
-        <th>Wert</th>
-        <th></th>
-    </tr>
-    <?php foreach ($vars as $key => $value) : ?>
-        <tr class="entry">
-            <td>
-                <input style="width: 100%" type="text" class="key" value="<?php echo $this->htmlEncode($key); ?>">
-            </td>
-            <td>
-                <input style="width: 100%" type="text" class="value" value="<?php echo $this->htmlEncode($value); ?>">
-            </td>
-            <td style="text-align: center">
-                <a href="javascript:void(0);" onclick="editVars.removeRow(this)"><img src="ncm/img/fatcow/16/delete.png" width="16" height="16" style="vertical-align: middle"></a>
-            </td>
+<div class="mx-4 my-2">
+    <table class="list" id="editvars_list">
+        <tr>
+            <th>Variable</th>
+            <th>Wert</th>
+            <th></th>
         </tr>
-    <?php endforeach; ?>
-</table>
-<div style="text-align: right">
-    <a href="javascript:void(0);" onclick="editVars.addRow();">
-        <img src="ncm/img/fatcow/16/add.png" width="16" height="16" style="vertical-align: middle">Hinzuf&uuml;gen
-    </a>
+        <?php foreach ($vars as $key => $value) : ?>
+            <tr class="entry">
+                <td>
+                    <input style="width: 100%" type="text" class="key" value="<?php echo $this->htmlEncode($key); ?>">
+                </td>
+                <td>
+                    <input style="width: 100%" type="text" class="value" value="<?php echo $this->htmlEncode($value); ?>">
+                </td>
+                <td style="text-align: center">
+                    <a href="javascript:void(0);" onclick="editVars.removeRow(this)"><img src="ncm/img/fatcow/16/delete.png" width="16" height="16" style="vertical-align: middle"></a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+    <div style="text-align: right">
+        <a href="javascript:void(0);" onclick="editVars.addRow();">
+            <img src="ncm/img/fatcow/16/add.png" width="16" height="16" style="vertical-align: middle">Hinzuf&uuml;gen
+        </a>
+    </div>
 </div>
 
 <script type="text/javascript">

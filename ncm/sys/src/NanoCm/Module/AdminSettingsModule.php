@@ -115,6 +115,14 @@ class AdminSettingsModule extends AbstractAdminModule {
                 $this->setContentType('text/html');
 
                 switch ($this->getRelativeUrlPart(3)) {
+                    case 'phpinfo':
+                        $content = $this->renderUserTemplate('content-settings-phpinfo.phtml');
+                        break;
+
+                    case 'phpinfo2':
+                        $content = $this->renderUserTemplate('content-settings-phpinfo2.phtml');
+                        break;
+
                     case 'edit':
                         $this->setting = $this->orm->getSetting($this->getParam('key', ''));
                         if ($this->setting == null) {

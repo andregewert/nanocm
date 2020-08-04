@@ -2,41 +2,43 @@
     /* @var $this \Ubergeek\NanoCm\Module\AdminCommentsModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
-<div class="row">
-    <label for="edit_comment_creation_timestamp">Datum</label>
-    <input type="text" id="edit_comment_creation_timestamp" readonly="readonly" value="<?php echo $this->comment->creation_timestamp->format('Y-m-d H:i'); ?>">
-</div>
-<div class="row">
-    <label for="edit_comment_article_headline">Artikel</label>
-    <input type="text" id="edit_comment_article_headline" readonly="readonly" value="<?php echo $this->htmlEncode($this->orm->getArticleHeadlineById($this->comment->article_id)); ?>">
-</div>
-<div class="row">
-    <label for="edit_comment_username">Name</label>
-    <input type="text" id="edit_comment_username" value="<?php echo $this->htmlEncode($this->comment->username); ?>">
-</div>
-<div class="row">
-    <label for="edit_comment_email">E-Mail</label>
-    <input type="text" id="edit_comment_email" value="<?php echo $this->htmlEncode($this->comment->email); ?>">
-</div>
-<div class="row">
-    <label for="edit_comment_status_code">Status</label>
-    <select id="edit_comment_status_code" size="1">
-        <?php foreach ($this->availableStatusCodes as $code) : ?>
-            <option value="<?php echo $code; ?>" <?php if ($this->comment->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
-<div class="row">
-    <label for="edit_comment_use_gravatar">Gravatar anzeigen</label>
-    <input type="checkbox" style="width: auto; vertical-align: middle" value="1" id="edit_comment_use_gravatar" <?php if ($this->comment->use_gravatar) echo ' checked="checked"'; ?>/>
-</div>
-<div class="row">
-    <label for="edit_comment_headline">Headline</label>
-    <input type="text" id="edit_comment_headline" class="autofocus" value="<?php echo $this->htmlEncode($this->comment->headline); ?>">
-</div>
-<div class="row">
-    <label for="edit_comment_content">Kommentar</label>
-</div>
-<div class="row">
-    <textarea style="width: 100%; height: 200px" id="edit_comment_content"><?php echo $this->htmlEncode($this->comment->content); ?></textarea>
+<div class="mx-4 my-2">
+    <div class="row">
+        <label for="edit_comment_creation_timestamp">Datum</label>
+        <input type="text" id="edit_comment_creation_timestamp" readonly="readonly" value="<?php echo $this->comment->creation_timestamp->format('Y-m-d H:i'); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_comment_article_headline">Artikel</label>
+        <input type="text" id="edit_comment_article_headline" readonly="readonly" value="<?php echo $this->htmlEncode($this->orm->getArticleHeadlineById($this->comment->article_id)); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_comment_username">Name</label>
+        <input type="text" id="edit_comment_username" value="<?php echo $this->htmlEncode($this->comment->username); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_comment_email">E-Mail</label>
+        <input type="text" id="edit_comment_email" value="<?php echo $this->htmlEncode($this->comment->email); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_comment_status_code">Status</label>
+        <select id="edit_comment_status_code" size="1">
+            <?php foreach ($this->availableStatusCodes as $code) : ?>
+                <option value="<?php echo $code; ?>" <?php if ($this->comment->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="row">
+        <label for="edit_comment_use_gravatar">Gravatar anzeigen</label>
+        <input type="checkbox" style="width: auto; vertical-align: middle" value="1" id="edit_comment_use_gravatar" <?php if ($this->comment->use_gravatar) echo ' checked="checked"'; ?>/>
+    </div>
+    <div class="row">
+        <label for="edit_comment_headline">Headline</label>
+        <input type="text" id="edit_comment_headline" class="autofocus" value="<?php echo $this->htmlEncode($this->comment->headline); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_comment_content">Kommentar</label>
+    </div>
+    <div class="row">
+        <textarea style="width: 100%; height: 200px" id="edit_comment_content"><?php echo $this->htmlEncode($this->comment->content); ?></textarea>
+    </div>
 </div>

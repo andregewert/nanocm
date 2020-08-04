@@ -5,11 +5,6 @@
 <script type="text/javascript" src="ncm/js/ArticlesEdit.js"></script>
 <div class="container spacing">
     <form>
-        <?php if ($this->article->id > 0) : ?>
-            <h1>Artikel bearbeiten</h1>
-        <?php else : ?>
-            <h1>Artikel hinzuf&uuml;gen</h1>
-        <?php endif; ?>
         <input type="hidden" id="input_article_id" value="<?php echo intval($this->article->id); ?>" />
 
         <div class="toolbar">

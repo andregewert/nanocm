@@ -2,39 +2,41 @@
     /* @var $this \Ubergeek\NanoCm\Module\AdminListsModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
-<input type="hidden" id="edit_listitem_userlist_id" value="<?php echo intval($this->listItem->userlist_id); ?>">
-<input type="hidden" id="edit_listitem_parent_id" value="<?php echo intval($this->listItem->parent_id); ?>">
-<?php if ($this->listItem->id != null) : ?>
+<div class="mx-4 my-2">
+    <input type="hidden" id="edit_listitem_userlist_id" value="<?php echo intval($this->listItem->userlist_id); ?>">
+    <input type="hidden" id="edit_listitem_parent_id" value="<?php echo intval($this->listItem->parent_id); ?>">
+    <?php if ($this->listItem->id != null) : ?>
+        <div class="row">
+            <label for="edit_listitem_creation_timestamp">Erstellungsdatum</label>
+            <input type="text" id="edit_listitem_creation_timestamp" readonly="readonly" value="<?php echo $this->listItem->creation_timestamp->format('Y-m-d H:i'); ?>">
+        </div>
+        <div class="row">
+            <label for="edit_listitem_modification_timestamp">Letzte &Auml;nderung</label>
+            <input type="text" id="edit_listitem_modification_timestamp" readonly="readonly" value="<?php echo $this->listItem->modification_timestamp->format('Y-m-d H:i'); ?>">
+        </div>
+    <?php endif; ?>
     <div class="row">
-        <label for="edit_listitem_creation_timestamp">Erstellungsdatum</label>
-        <input type="text" id="edit_listitem_creation_timestamp" readonly="readonly" value="<?php echo $this->listItem->creation_timestamp->format('Y-m-d H:i'); ?>">
+        <label for="edit_listitem_title">Titel</label>
+        <input type="text" id="edit_listitem_title" class="autofocus" value="<?php echo $this->htmlEncode($this->listItem->title); ?>">
     </div>
     <div class="row">
-        <label for="edit_listitem_modification_timestamp">Letzte &Auml;nderung</label>
-        <input type="text" id="edit_listitem_modification_timestamp" readonly="readonly" value="<?php echo $this->listItem->modification_timestamp->format('Y-m-d H:i'); ?>">
+        <label for="edit_listitem_content">Inhalt</label>
+        <input type="text" id="edit_listitem_content" value="<?php echo $this->htmlEncode($this->listItem->content); ?>">
     </div>
-<?php endif; ?>
-<div class="row">
-    <label for="edit_listitem_title">Titel</label>
-    <input type="text" id="edit_listitem_title" class="autofocus" value="<?php echo $this->htmlEncode($this->listItem->title); ?>">
-</div>
-<div class="row">
-    <label for="edit_listitem_content">Inhalt</label>
-    <input type="text" id="edit_listitem_content" value="<?php echo $this->htmlEncode($this->listItem->content); ?>">
-</div>
-<div class="row">
-    <label for="edit_listitem_parameters">Parameter</label>
-    <input type="text" id="edit_listitem_parameters" value="<?php echo $this->htmlEncode($this->listItem->parameters); ?>">
-</div>
-<div class="row">
-    <label for="edit_listitem_sorting_code">Sortiercode</label>
-    <input type="text" id="edit_listitem_sorting_code" value="<?php echo $this->htmlEncode($this->listItem->sorting_code); ?>">
-</div>
-<div class="row">
-    <label for="edit_listitem_status_code">Status</label>
-    <select id="edit_listitem_status_code" size="1">
-        <?php foreach ($this->availableStatusCodes as $code) : ?>
-            <option value="<?php echo $code; ?>" <?php if ($this->listItem->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
-        <?php endforeach; ?>
-    </select>
+    <div class="row">
+        <label for="edit_listitem_parameters">Parameter</label>
+        <input type="text" id="edit_listitem_parameters" value="<?php echo $this->htmlEncode($this->listItem->parameters); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_listitem_sorting_code">Sortiercode</label>
+        <input type="text" id="edit_listitem_sorting_code" value="<?php echo $this->htmlEncode($this->listItem->sorting_code); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_listitem_status_code">Status</label>
+        <select id="edit_listitem_status_code" size="1">
+            <?php foreach ($this->availableStatusCodes as $code) : ?>
+                <option value="<?php echo $code; ?>" <?php if ($this->listItem->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 </div>

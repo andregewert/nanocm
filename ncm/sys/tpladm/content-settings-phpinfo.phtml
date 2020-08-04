@@ -1,0 +1,10 @@
+<div class="phpinfo mx-4 my-2">
+<?php
+ob_start();
+phpinfo();
+$c = ob_get_contents();
+ob_end_clean();
+preg_match('/<div class="center">(.+)<\/div>/ims', $c, $matches);
+echo $matches[1];
+?>
+</div>

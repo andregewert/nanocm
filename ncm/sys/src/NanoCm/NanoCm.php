@@ -120,7 +120,6 @@ class NanoCm {
     /**
      * Absoluter Dateipfad zum öffentlichen Verzeichnis der Installationsbasis
      * (in der Regel das Document Root)
-     *
      * @var string
      */
     public $pubdir;
@@ -150,21 +149,18 @@ class NanoCm {
     
     /**
      * Absoluter Dateipfad zum Verzeichnis mit den Systemdateien des NCM
-     *
      * @var string
      */
     public $sysdir;
 
     /**
      * Absoluter Dateipfad für den Cache
-     *
      * @var string
      */
     public $cachedir;
 
     /**
      * Absoluter Dateipfad für die Ablage von Mediendateien
-     *
      * @var string
      */
     public $mediadir;

@@ -1,17 +1,19 @@
 <?php /* @var $this \Ubergeek\NanoCm\Module\AdminMediaModule */ ?>
-<div class="row">
-    <label for="edit_medium_filename">Ordername</label>
-    <input type="text" id="edit_medium_filename" class="autofocus" value="<?php echo $this->htmlEncode($this->medium->filename); ?>">
-</div>
-<div class="row">
-    <label for="edit_medium_title">Titel</label>
-    <input type="text" id="edit_medium_title" value="<?php echo $this->htmlEncode($this->medium->title); ?>">
-</div>
-<div class="row">
-    <label for="edit_medium_description">Beschreibung</label>
-    <input type="text" id="edit_medium_description" value="<?php echo $this->htmlEncode($this->medium->description); ?>">
-</div>
-<div class="row">
-    <label for="edit_medium_tags">Schlagworte</label>
-    <input type="text" id="edit_medium_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php if (is_array($this->medium->tags)) echo $this->htmlEncode(join(', ', $this->medium->tags)); ?>">
+<div class="mx-4 my-2">
+    <div class="row">
+        <label for="edit_medium_filename">Ordername</label>
+        <input type="text" id="edit_medium_filename" class="autofocus" value="<?php echo $this->htmlEncode($this->medium->filename); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_medium_title">Titel</label>
+        <input type="text" id="edit_medium_title" value="<?php echo $this->htmlEncode($this->medium->title); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_medium_description">Beschreibung</label>
+        <input type="text" id="edit_medium_description" value="<?php echo $this->htmlEncode($this->medium->description); ?>">
+    </div>
+    <div class="row">
+        <label for="edit_medium_tags">Schlagworte</label>
+        <input type="text" id="edit_medium_tags" placeholder="Schlagworte (mit Komma getrennt)" value="<?php if (is_array($this->medium->tags)) echo $this->htmlEncode(join(', ', $this->medium->tags)); ?>">
+    </div>
 </div>

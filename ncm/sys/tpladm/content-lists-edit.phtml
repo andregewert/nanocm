@@ -2,29 +2,31 @@
     /* @var $this \Ubergeek\NanoCm\Module\AdminListsModule */
     use Ubergeek\NanoCm\StatusCode;
 ?>
-<?php if ($this->list->id != null) : ?>
+<div class="mx-4 my-2">
+    <?php if ($this->list->id != null) : ?>
+        <div class="row">
+            <label>Erstellungsdatum</label>
+            <span><?php echo $this->list->creation_timestamp->format('Y-m-d H:i'); ?></span>
+        </div>
+        <div class="row">
+            <label>Letzte &Auml;nderung</label>
+            <span><?php echo $this->list->modification_timestamp->format('Y-m-d H:i'); ?></span>
+        </div>
+    <?php endif; ?>
     <div class="row">
-        <label>Erstellungsdatum</label>
-        <span><?php echo $this->list->creation_timestamp->format('Y-m-d H:i'); ?></span>
+        <label for="edit_list_title">Name der Liste</label>
+        <input type="text" id="edit_list_title" value="<?php echo $this->htmlEncode($this->list->title); ?>" class="autofocus">
     </div>
     <div class="row">
-        <label>Letzte &Auml;nderung</label>
-        <span><?php echo $this->list->modification_timestamp->format('Y-m-d H:i'); ?></span>
+        <label for="edit_list_key">Eindeutiger Schl&uuml;ssel</label>
+        <input type="text" id="edit_list_key" value="<?php echo $this->htmlEncode($this->list->key); ?>">
     </div>
-<?php endif; ?>
-<div class="row">
-    <label for="edit_list_title">Name der Liste</label>
-    <input type="text" id="edit_list_title" value="<?php echo $this->htmlEncode($this->list->title); ?>" class="autofocus">
-</div>
-<div class="row">
-    <label for="edit_list_key">Eindeutiger Schl&uuml;ssel</label>
-    <input type="text" id="edit_list_key" value="<?php echo $this->htmlEncode($this->list->key); ?>">
-</div>
-<div class="row">
-    <label for="edit_list_status_code">Status</label>
-    <select id="edit_list_status_code" size="1">
-        <?php foreach ($this->availableStatusCodes as $code) : ?>
-            <option value="<?php echo $code; ?>" <?php if ($this->list->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
-        <?php endforeach; ?>
-    </select>
+    <div class="row">
+        <label for="edit_list_status_code">Status</label>
+        <select id="edit_list_status_code" size="1">
+            <?php foreach ($this->availableStatusCodes as $code) : ?>
+                <option value="<?php echo $code; ?>" <?php if ($this->list->status_code == $code) echo ' selected="selected"'; ?>><?php echo StatusCode::convertStatusId($code); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 </div>

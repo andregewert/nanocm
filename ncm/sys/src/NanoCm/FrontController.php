@@ -85,6 +85,7 @@ class FrontController extends HttpController {
                         case 'basicsettings':
                         case 'definitions':
                         case 'articleseries':
+                        case 'installation':
                         case 'meta':
                             $moduleName = 'Admin' . ucfirst(strtolower($this->getRelativeUrlPart(1))) . 'Module';
                             break;

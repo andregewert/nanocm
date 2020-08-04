@@ -4,89 +4,90 @@ use Ubergeek\NanoCm\Setting;
 ?>
 
 <script type="text/javascript" src="ncm/js/Basicsettings.js"></script>
-<div class="container spacing">
-    <h1>Grundlegende Einstellungen verwalten</h1>
-
-    <form onsubmit="module.refresh(); return false;">
+    <div class="container spacing">
         <div class="toolbar">
-            <span class="left">
-                <a id="button_extendedsettings" class="button" href="admin/settings/" role="button" title="Erweiterte Einstellungen">
-                    <img src="ncm/img/fatcow/16/setting_tools.png" alt="" width="16" height="16">Erweiterte Einstellungen
-                </a>
-            </span>
+                <span class="left">
+                    <a id="button_extendedsettings" class="button" href="admin/settings/" role="button" title="Erweiterte Einstellungen">
+                        <img src="ncm/img/fatcow/16/setting_tools.png" alt="" width="16" height="16">Erweiterte Einstellungen
+                    </a>
+                </span>
             <span class="right" style="float: right">
-                <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif" />
+                    <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif" />
 
-                <a id="button_save" class="button spaceleft" role="button" title="Einstellungen speichern" href="javascript:void(0)">
-                    <img class="imageonly" src="ncm/img/fatcow/16/save_as.png" alt="" width="16" height="16">Speichern
-                </a>
-            </span>
+                    <a id="button_save" class="button spaceleft" role="button" title="Einstellungen speichern" href="javascript:void(0)">
+                        <img class="imageonly" src="ncm/img/fatcow/16/save_as.png" alt="" width="16" height="16">Speichern
+                    </a>
+                </span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="column-6 spacing">
+            <fieldset class="mt-3">
+                <legend>Seiteninformationen</legend>
+                <div class="row">
+                    <label for="input_system_pagetitle">Titel der Website</label>
+                    <input class="text" type="text" id="input_system_pagetitle" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_PAGETITLE]->value); ?>" placeholder="Seitentitel" required>
+                </div>
+                <div class="row">
+                    <label for="input_system_lang">Sprache der Website</label>
+                    <input class="text" type="text" id="input_system_lang" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_LANG]->value); ?>" placeholder="de" required>
+                </div>
+                <div class="row">
+                    <label for="input_system_copyrightnotice">Urheberrechts-Hinweis</label>
+                    <input class="text" type="text" id="input_system_copyrightnotice" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_COPYRIGHTNOTICE]->value); ?>">
+                </div>
+            </fieldset>
+
+            <fieldset class="mt-3">
+                <legend>Seitenbetreiber</legend>
+                <div class="row">
+                    <label for="input_webmaster_name">Name(n) des Seitenbetreibers</label>
+                    <input class="text" type="text" id="input_system_webmaster_name" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_WEBMASTER_NAME]->value); ?>" placeholder="Max Mustermann" required>
+                </div>
+                <div class="row">
+                    <label for="input_webmaster_email">E-Mail-Adresse des Seitenbetreibers</label>
+                    <input class="text" type="email" id="input_system_webmaster_email" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_WEBMASTER_EMAIL]->value); ?>" placeholder="max.mustermann@example.com" required>
+                </div>
+                <div class="row">
+                    <label for="input_webmaster_url">Website des Seitenbetreibers (optional)</label>
+                    <input class="text" type="url" id="input_system_webmaster_url" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_WEBMASTER_URL]->value); ?>">
+                </div>
+            </fieldset>
         </div>
 
-        <fieldset>
-            <legend>Seiteninformationen</legend>
-            <div class="row">
-                <label for="input_system_pagetitle">Titel der Website</label>
-                <input class="text" type="text" id="input_system_pagetitle" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_PAGETITLE]->value); ?>" placeholder="Seitentitel" required>
-            </div>
-            <div class="row">
-                <label for="input_system_lang">Sprache der Website</label>
-                <input class="text" type="text" id="input_system_lang" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_LANG]->value); ?>" placeholder="de" required>
-            </div>
-            <div class="row">
-                <label for="input_system_copyrightnotice">Urheberrechts-Hinweis</label>
-                <input class="text" type="text" id="input_system_copyrightnotice" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_COPYRIGHTNOTICE]->value); ?>">
-            </div>
-        </fieldset>
+        <div class="column-6 spacing">
+            <fieldset class="mt-3">
+                <legend>Darstellung</legend>
+                <div class="row">
+                    <label for="input_system_template_path">Seiten-Template</label>
+                    <select id="input_system_template_path" size="1">
+                        <?php foreach ($this->availableTemplates as $templateInfo) : ?>
+                            <option value="<?php echo $this->htmlEncode($templateInfo->dirname); ?>"
+                            <?php if ($this->currentSettings[Setting::SYSTEM_TEMPLATE_PATH]->value == $templateInfo->dirname) echo ' selected="selected"'; ?>><?php echo $this->htmlEncode($templateInfo->title); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-        <fieldset>
-            <legend>Seitenbetreiber</legend>
-            <div class="row">
-                <label for="input_webmaster_name">Name(n) des Seitenbetreibers</label>
-                <input class="text" type="text" id="input_system_webmaster_name" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_WEBMASTER_NAME]->value); ?>" placeholder="Max Mustermann" required>
-            </div>
-            <div class="row">
-                <label for="input_webmaster_email">E-Mail-Adresse des Seitenbetreibers</label>
-                <input class="text" type="email" id="input_system_webmaster_email" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_WEBMASTER_EMAIL]->value); ?>" placeholder="max.mustermann@example.com" required>
-            </div>
-            <div class="row">
-                <label for="input_webmaster_url">Website des Seitenbetreibers (optional)</label>
-                <input class="text" type="url" id="input_system_webmaster_url" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_WEBMASTER_URL]->value); ?>">
-            </div>
-        </fieldset>
+                <div class="row">
+                    <label for="input_system_admin_pagelength">Max. Anzahl Eintr&auml;ge pro Seite</label>
+                    <input class="text" id="input_system_admin_pagelength" type="number" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_ADMIN_PAGELENGTH]->value); ?>" required />
+                </div>
+            </fieldset>
 
-        <fieldset>
-            <legend>Darstellung</legend>
-            <div class="row">
-                <label for="input_system_template_path">Seiten-Template</label>
-                <select id="input_system_template_path" size="1">
-                    <?php foreach ($this->availableTemplates as $templateInfo) : ?>
-                        <option value="<?php echo $this->htmlEncode($templateInfo->dirname); ?>"
-                        <?php if ($this->currentSettings[Setting::SYSTEM_TEMPLATE_PATH]->value == $templateInfo->dirname) echo ' selected="selected"'; ?>><?php echo $this->htmlEncode($templateInfo->toDisplayString()); ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+            <fieldset class="mt-3">
+                <legend>Kommentare und Trackbacks</legend>
+                <div class="row">
+                    <label for="input_system_enablecomments">Kommentare zulassen</label>
+                    <input class="checkbox" id="input_system_enablecomments" type="checkbox" value="1" <?php if ($this->currentSettings[Setting::SYSTEM_ENABLECOMMENTS]->value == 1) echo ' checked="checked"'; ?>>
+                </div>
+                <div class="row">
+                    <label for="input_system_enabletrackbacks">Trackbacks zulassen</label>
+                    <input class="checkbox" id="input_system_enabletrackbacks" type="checkbox" value="1" <?php if ($this->currentSettings[Setting::SYSTEM_ENABLETRACKBACKS]->value == 1) echo ' checked="checked"'; ?>>
+                </div>
+            </fieldset>
+        </div>
 
-            <div class="row">
-                <label for="input_system_admin_pagelength">Max. Anzahl Eintr&auml;ge pro Seite</label>
-                <input class="text" id="input_system_admin_pagelength" type="number" value="<?php echo $this->htmlEncode($this->currentSettings[Setting::SYSTEM_ADMIN_PAGELENGTH]->value); ?>" required />
-            </div>
-        </fieldset>
-
-        <fieldset>
-            <legend>Kommentare und Trackbacks</legend>
-            <div class="row">
-                <label for="input_system_enablecomments">Kommentare zulassen</label>
-                <input class="checkbox" id="input_system_enablecomments" type="checkbox" value="1" <?php if ($this->currentSettings[Setting::SYSTEM_ENABLECOMMENTS]->value == 1) echo ' checked="checked"'; ?>>
-            </div>
-            <div class="row">
-                <label for="input_system_enabletrackbacks">Trackbacks zulassen</label>
-                <input class="checkbox" id="input_system_enabletrackbacks" type="checkbox" value="1" <?php if ($this->currentSettings[Setting::SYSTEM_ENABLETRACKBACKS]->value == 1) echo ' checked="checked"'; ?>>
-            </div>
-        </fieldset>
-    </form>
-</div>
-
+    </div>
 <script type="text/javascript">
     $(document).ready(function() {
         module = new Basicsettings();

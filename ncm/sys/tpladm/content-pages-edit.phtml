@@ -5,11 +5,6 @@
 <script type="text/javascript" src="ncm/js/PagesEdit.js"></script>
 <div class="container">
     <form>
-        <?php if ($this->page->id > 0) : ?>
-            <h1>Seite bearbeiten</h1>
-        <?php else : ?>
-            <h1>Seite hinzuf&uuml;gen</h1>
-        <?php endif; ?>
         <input type="hidden" id="input_page_id" name="id" value="<?php echo intval($this->page->id); ?>" />
 
         <div class="toolbar">

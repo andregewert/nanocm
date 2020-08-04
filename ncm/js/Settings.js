@@ -42,6 +42,10 @@ function Settings() {
             app.clearCaches();
         });
 
+        $('#button_phpinfo').click(function() {
+            app.phpinfo();
+        });
+
         app.refresh();
     };
 
@@ -85,6 +89,25 @@ function Settings() {
     app.editClickedSetting = function(clickedLink) {
         let key = $(clickedLink).attr('data-key');
         app.editSetting(key);
+    };
+
+    app.phpinfo = function() {
+        let dlg = new ncm.InlinePopup(
+            'admin/settings/html/phpinfo/', {
+
+            }, {
+                headline:   'PHP-Informationen',
+                width:      900,
+                height:      750
+            }, {
+                close: {
+                    caption: 'Schließen',
+                    clicked: function() {
+                        dlg.close();
+                    }
+                }
+            }
+        );
     };
 
     app.editSetting = function(key) {

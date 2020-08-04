@@ -1,10 +1,6 @@
 <?php /* @var $this \Ubergeek\NanoCm\Module\AdminStatsModule */ ?>
 <script type="text/javascript" src="ncm/js/AccessLog.js"></script>
-
-<div class="container spacing">
-    <h1>Statistiken</h1>
-    <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
-</div>
+<input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo (int)$this->searchPage; ?>" />
 
 <?php if (!$this->statsEnabled) : ?>
     <div class="container spacing">

@@ -1,32 +1,7 @@
-/*!
- * NanoCM
- * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
-/* 
-    Created on : 03.10.2017, 21:55:30
-    Author     : André Gewert <agewert@ubergeek.de>
-*/
-
 $width-content:     1180px;
 $width-column:      $width-content /12;
 $font-headlines:    Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
 $font-text:         Lato, Trebuchet MS, Helvetica, Arial, sans-serif;
-/*$font-text:         Fira Sans, Roboto, DejaVu Sans Condensed, Lato, Trebuchet MS, Helvetica, Arial, sans-serif;*/
 $font-monospace:    Fira Mono, Monaco, Menlo, DejaVu Sans Mono, Droid Sans Mono, Consolas, monospace;
 $background-color:  #fff;
 $primary-color:     #333;
@@ -42,29 +17,72 @@ $toolbar-bg-header: #ddd;
 $border-color:      #ddd;
 $border-color-heavy: silver;
 $shading-color:     #eee;
+$spacing:           1rem;
+$fontsize-normal:   1rem;
+$fontsize-small:    0.9 *$fontsize-normal;
+$fontsize-lead:     1.1 *$fontsize-normal;
+$fontsize-large:     1.2 *$fontsize-normal;
 
 /* <editor-fold desc="Base elements"> */
 
 html {
-    font-size: 85%;
+    font-size: 90%;
 }
 
 body {
     margin: 0;
     padding: 0;
     font-family: $font-text;
+    font-size: 1rem;
     color: $primary-color;
     background-color: $background-color;
 }
 
+.fs-normal {
+    font-size: $fontsize-normal !important;
+}
+
+.fs-small {
+    font-size: $fontsize-small !important;
+}
+
+.fs-lead {
+    font-size: $fontsize-lead !important;
+}
+
+.fs-large {
+    font-size: $fontsize-large !important;
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-family: $font-headlines;
-    margin-top: 0.4em;
-    margin-bottom: 0.2em;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    line-height: 1.2em;
 }
 
 h1 {
-    margin-top: 1em;
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1.25rem;
+}
+
+h4 {
+    font-size: 1.1rem;
+}
+
+h5 {
+    font-size: 1rem;
+}
+
+h6 {
+    font-size: 1rem;
 }
 
 a {
@@ -75,6 +93,292 @@ a {
 a:hover {
     text-decoration: underline;
     color: $link-color-alt;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+.mb-1 {
+    margin-bottom: 0.25 *$spacing !important;
+}
+
+.mb-2 {
+    margin-bottom: 0.5 *$spacing !important;
+}
+
+.mb-3 {
+    margin-bottom: $spacing !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5 *$spacing !important;
+}
+
+.mb-5 {
+    margin-bottom: 3 *$spacing !important;
+}
+
+.mb-auto {
+    margin-bottom: auto !important;
+}
+
+.mt-0 {
+    margin-top: 0 !important;
+}
+
+.mt-1 {
+    margin-top: 0.25 *$spacing !important;
+}
+
+.mt-2 {
+    margin-top: 0.5 *$spacing !important;
+}
+
+.mt-3 {
+    margin-top: $spacing !important;
+}
+
+.mt-4 {
+    margin-top: 1.5 *$spacing !important;
+}
+
+.mt-5 {
+    margin-top: 3 *$spacing !important;
+}
+
+.mt-auto {
+    margin-top: auto !important;
+}
+
+.mx-0 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.mx-1 {
+    margin-left: 0.25 *$spacing !important;
+    margin-right: 0.25 *$spacing !important;
+}
+
+.mx-2 {
+    margin-left: 0.5 *$spacing !important;
+    margin-right: 0.5 *$spacing !important;
+}
+
+.mx-3 {
+    margin-left: $spacing !important;
+    margin-right: $spacing !important;
+}
+
+.mx-4 {
+    margin-left: 1.5 *$spacing !important;
+    margin-right: 1.5 *$spacing !important;
+}
+
+.mx-5 {
+    margin-left: 3 *$spacing !important;
+    margin-right: 3 *$spacing !important;
+}
+
+.mx-auto {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.my-0 {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.my-1 {
+    margin-top: 0.25 *$spacing !important;
+    margin-bottom: 0.25 *$spacing !important;
+}
+
+.my-2 {
+    margin-top: 0.5 *$spacing !important;
+    margin-bottom: 0.5 *$spacing !important;
+}
+
+.my-3 {
+    margin-top: $spacing !important;
+    margin-bottom: $spacing !important;
+}
+
+.my-4 {
+    margin-top: 1.5 *$spacing !important;
+    margin-bottom: 1.5 *$spacing !important;
+}
+
+.my-5 {
+    margin-top: 3 *$spacing !important;
+    margin-bottom: 3 *$spacing !important;
+}
+
+.my-auto {
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+}
+
+.m-0 {
+    margin: 0 !important;
+}
+
+.m-1 {
+    margin: 0.25 *$spacing !important;
+}
+
+.m-2 {
+    margin: 0.5 *$spacing !important;
+}
+
+.m-3 {
+    margin: 1 *$spacing !important;
+}
+
+.m-4 {
+    margin: 1.5 *$spacing !important;
+}
+
+.m-5 {
+    margin: 3 *$spacing !important;
+}
+
+.m-auto {
+    margin: auto !important;
+}
+
+.pb-0 {
+    padding-bottom: 0 !important;
+}
+
+.pb-1 {
+    padding-bottom: 0.25 *$spacing !important;
+}
+
+.pb-2 {
+    padding-bottom: 0.5 *$spacing !important;
+}
+
+.pb-3 {
+    padding-bottom: $spacing !important;
+}
+
+.pb-4 {
+    padding-bottom: 1.5 *$spacing !important;
+}
+
+.pb-5 {
+    padding-bottom: 3 *$spacing !important;
+}
+
+.pt-0 {
+    padding-top: 0 !important;
+}
+
+.pt-1 {
+    padding-bottom: 0.25 *$spacing !important;
+}
+
+.pt-2 {
+    padding-top: 0.5 *$spacing !important;
+}
+
+.pt-3 {
+    padding-top: $spacing !important;
+}
+
+.pt-4 {
+    padding-top: 1.5 *$spacing !important;
+}
+
+.pt-5 {
+    padding-top: 3 *$spacing !important;
+}
+
+.px-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.px-1 {
+    padding-left: 0.25 *$spacing !important;
+    padding-right: 0.25 *$spacing !important;
+}
+
+.px-2 {
+    padding-left: 0.5 *$spacing !important;
+    padding-right: 0.5 *$spacing !important;
+}
+
+.px-3 {
+    padding-left: $spacing !important;
+    padding-right: $spacing !important;
+}
+
+.px-4 {
+    padding-left: 1.5 *$spacing !important;
+    padding-right: 1.5 *$spacing !important;
+}
+
+.px-5 {
+    padding-left: 3 *$spacing !important;
+    padding-right: 3 *$spacing !important;
+}
+
+.py-0 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.py-1 {
+    padding-top: 0.25 *$spacing !important;
+    padding-bottom: 0.25 *$spacing !important;
+}
+
+.py-2 {
+    padding-top: 0.5 *$spacing !important;
+    padding-bottom: 0.5 *$spacing !important;
+}
+
+.py-3 {
+    padding-top: $spacing !important;
+    padding-bottom: $spacing !important;
+}
+
+.py-4 {
+    padding-top: 1.5 *$spacing !important;
+    padding-bottom: 1.5 *$spacing !important;
+}
+
+.py-5 {
+    padding-top: 3 *$spacing !important;
+    padding-bottom: 3 *$spacing !important;
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+.p-1 {
+    padding: 0.25 *$spacing !important;
+}
+
+.p-2 {
+    padding: 0.5 *$spacing !important;
+}
+
+.p-3 {
+    padding: $spacing !important;
+}
+
+.p-4 {
+    padding: 1.5 *$spacing !important;
+}
+
+.p-5 {
+    padding: 3 *$spacing !important;
 }
 
 /* </editor-fold> */
@@ -107,10 +411,8 @@ div.container {
 }
 
 div.spacing {
-    padding-left: 1em;
-    padding-left: 1rem;
-    padding-right: 1em;
-    padding-right: 1rem;
+    padding-left: 1 *$spacing !important;
+    padding-right: 1 *$spacing !important;
 }
 
 div.column-6 {
@@ -167,7 +469,7 @@ div.msgnote {
     border: solid black 1px;
     border-radius: 5px;
     background-color: beige;
-    font-size: 1.1rem;
+    font-size: $fontsize-lead;
     padding: 0.5rem 0.75rem;
     margin-bottom: 0.5rem;
     margin-top: 0.5rem
@@ -192,7 +494,7 @@ nav.main ul {
     list-style: none inside none;
     display: inline-block;
     vertical-align: middle;
-    margin: 0;
+    margin: 0 0 0 0.5rem;
     padding: 0;
 }
 
@@ -207,13 +509,15 @@ nav.main ul li a {
     text-decoration: none;
     color: $primary-color-inactive;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: $fontsize-large;
     padding: 0.5em 0.8em;
 }
 
 nav.main ul li a:hover,
 nav.main ul li.active a {
     color: $primary-color;
+    background-color: $background-color;
+    border-radius: 5px;
 }
 
 /* </editor-fold> */
@@ -293,7 +597,7 @@ ul.inlinemenu {
 }
 
 ul.inlinemenu li {
-    font-size: 1.1rem;
+    font-size: $fontsize-lead;
     font-weight: bold;
 }
 
@@ -328,7 +632,7 @@ div.dropzone.dragover {
 
 input, select, option, textarea {
     font-family: $font-text;
-    font-size: 1rem;
+    font-size: $fontsize-normal;
     line-height: 1.4em;
     box-sizing: border-box;
     border: 1px solid $border-color;
@@ -338,7 +642,7 @@ input, select, option, textarea {
 
 textarea {
     font-family: $font-monospace;
-    font-size: 1.1rem;
+    font-size: $fontsize-normal;
     border: 1px solid $border-color;
     resize: vertical;
 }
@@ -401,18 +705,14 @@ input.big {
 fieldset {
     border: solid $border-color 2px;
     border-radius: 4px;
-    margin: 0 0 1em 0;
-    padding: 0.5em;
-    font-size: 1.1rem;
 }
 
 fieldset legend {
-    font-size: 1.2rem;
     font-weight: bold;
 }
 
 fieldset label {
-    width: 30%;
+    width: 40%;
     display: inline-block;
 }
 
@@ -537,7 +837,6 @@ th.textcenter {
 td.pre,
 th.pre {
     font-family: $font-monospace;
-    font-size: 0.95em;
 }
 
 /* </editor-fold> */
@@ -556,7 +855,7 @@ th.pre {
     background-color: transparent;
     color: black;
     vertical-align: middle;
-    font-size: 0.9rem;
+    font-size: $fontsize-small;
     padding: 6px;
     line-height: 1em;
     border-color: transparent;
@@ -688,12 +987,17 @@ ul.imgtoolbar_keyboard li a:hover {
 }
 
 .inlinepopup div.popupcontent {
-    overflow: hidden;
-    padding: 0.4em 1em;
+    overflow: auto;
+/*    padding: 0.4em 1em;*/
+    padding: 0;
     height: auto;
-    top: 0;
-    bottom: 0;
-    margin-bottom: 38px;
+    top: 2.6rem;
+    bottom: 2.6rem;
+    left: 0;
+    right: 0;
+    position: absolute;
+/*    border: solid blue 3px;*/
+    max-height: 100%;
 }
 
 .inlinepopup div.buttons {
@@ -741,8 +1045,7 @@ ul.imgtoolbar_keyboard li a:hover {
 
 .inlinepopup div.info {
     background-color: $shading-color;
-    border: solid $shading-color 1px;
-    font-size: 0.95em;
+    font-size: $fontsize-normal;
     padding: 0.5em;
     border: solid $border-color 1px;
 }
@@ -786,6 +1089,26 @@ div.paging li a {
 
 div.paging li.selected {
     font-weight: bold;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="php info"> */
+
+div.phpinfo table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+div.phpinfo td.e,
+div.phpinfo td.v {
+    border: solid $border-color-heavy 1px;
+}
+
+div.phpinfo td.e {
+    background-color: $toolbar-bg-header;
 }
 
 /* </editor-fold> */

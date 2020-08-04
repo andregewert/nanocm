@@ -2143,7 +2143,7 @@ class Orm {
     public function searchMedia(Medium $filter = null, $parentId = 0, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $media = array();
         $params = array();
-        $limit = ($limit == null)? $this->pageLength : intval($limit);
+        $limit = ($limit == null)? $this->pageLength : (int)$limit;
 
         if ($countOnly) {
             $sql = 'SELECT COUNT(*) ';
@@ -2151,7 +2151,7 @@ class Orm {
             $sql = 'SELECT * ';
         }
         $sql .= ' FROM medium WHERE parent_id = :parent_id ';
-        $params['parent_id'] = intval($parentId);
+        $params['parent_id'] = (int)$parentId;
 
         // Filterbedingungen einfügen
         if ($filter instanceof Medium) {
@@ -2183,7 +2183,7 @@ class Orm {
         // Begrenzung der Ergebnismenge auf Anzeigeseiten
         if (!$countOnly) {
             $sql .= ' ORDER BY entrytype ASC, title ASC, filename ASC ';
-            $page = intval($page) -1;
+            $page = (int)$page -1;
             if ($page < 0) $page = 0;
             $offset = $page *$this->pageLength;
             $sql .= " LIMIT $offset, $limit ";

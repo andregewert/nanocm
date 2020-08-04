@@ -2,7 +2,6 @@
 <script type="text/javascript" src="ncm/js/Settings.js"></script>
 <div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
-        <h1>Erweiterte Einstellungen verwalten</h1>
         <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo intval($this->searchPage); ?>" />
 
         <div class="toolbar">
@@ -21,6 +20,9 @@
                 </a>
                 <a id="button_clearcaches" class="button button-secondary spaceleft" role="button" title="Zwischenspeicher leeren" href="javascript:void(0)">
                     <img class="imageonly" src="ncm/img/fatcow/16/save_as.png" alt="" width="16" height="16">Caches leeren
+                </a>
+                <a id="button_phpinfo" class="button button-secondary" role="button" title="Informationen zur PHP-Installation abrufen" href="javascript:void(0)">
+                    <img class="imageonly" src="ncm/img/fatcow/16/information.png" alt="" width="16" height="16">PHP-Info
                 </a>
             </span>
             <span class="right" style="float: right">

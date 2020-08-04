@@ -21,10 +21,43 @@ namespace Ubergeek\NanoCm;
 
 /**
  * Class BackupInfo
+ *
+ * Represents some metadata for a singe existing backup / snapshot of
+ * one nanoCM installation.
+ *
  * @package Ubergeek\NanoCm
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2020-07-31
  */
 class BackupInfo {
+
+    // <editor-fold desc="Properties">
+
+    /**
+     * @var DateTimte Creation time of this backup
+     */
+    public $creationDateTime;
+
+    /**
+     * @var string Version string for the included nanoCM installation
+     */
+    public $version;
+
+    /**
+     * @var int Size in bytes of this backup
+     */
+    public $filesize;
+
+    /**
+     * @var string Absolute path to the backup archive
+     */
+    public $filename;
+
+    /**
+     * @var array Includes the installation information from ncm/sys/version.info in an array
+     */
+    public $installationInfo;
+
+    // </editor-fold>
 
 }

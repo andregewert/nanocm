@@ -3,6 +3,7 @@
 /ncm/sys/db/stats.sqlite
 /ncm/sys/db/versions/version
 /ncm/sys/db/*.ini
+/ncm/sys/backup/*.zip
 /.idea/
 .DS_Store*
 emoji-test.txt*

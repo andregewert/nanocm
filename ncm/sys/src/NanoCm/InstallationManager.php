@@ -42,6 +42,16 @@ class InstallationManager {
      */
     public $updateFeed;
 
+    /**
+     * @var string Absolute path to the backup directory
+     */
+    public $backupPath;
+
+    /**
+     * @var string Absolute path to the user template directory
+     */
+    public $templatePath;
+
     // </editor-fold>
 
 
@@ -49,6 +59,8 @@ class InstallationManager {
 
     public function __construct(NanoCm $nanoCm) {
         $this->ncm = $nanoCm;
+        $this->backupPath = Util::createPath($this->ncm->sysdir, 'backup');
+        $this->templatePath = Util::createPath($this->ncm->pubdir, 'tpl');
     }
 
     // </editor-fold>
@@ -59,18 +71,16 @@ class InstallationManager {
     /**
      * Returns an array with information for every installed (available)
      * nano|cm template.
-     *
      * @return TemplateInfo[]
      */
-    public function getAvailableTemplates() {
+    public function getAvailableTemplates(): array {
         $templates = array();
-        $dir = Util::createPath($this->ncm->pubdir, 'tpl');
-        $dh = opendir($dir);
+        $dh = opendir($this->templatePath);
 
         if ($dh !== false) {
             while (($fname = readdir($dh)) !== false) {
                 if ($fname !== '.' && $fname !== '..') {
-                    $dirname = $dir . DIRECTORY_SEPARATOR . $fname;
+                    $dirname = $this->templatePath . DIRECTORY_SEPARATOR . $fname;
                     if (is_dir($dirname)) {
                         $info = $this->readTemplateInformation($fname);
                         if ($info !== null) $templates[$fname] = $info;
@@ -90,15 +100,96 @@ class InstallationManager {
         // TODO implementieren
     }
 
-    public function getAvailableBackups() {
-        // TODO implementieren
+    /**
+     * Returns an array with information for existing backups
+     * @param bool $countOnly Set to true if method should return number of entries only
+     * @param int|null $page Number of page to return
+     * @param int|null $limit Maximum number if entries to return
+     * @return BackupInfo[]|int Array of backup information or number of found backups
+     */
+    public function getAvailableBackups($countOnly = false, $page = null, $limit = null) {
+
+        /* @var $backups BackupInfo[] */
+        $backups = array();
+        $dh = opendir($this->backupPath);
+        $limit = ($limit === null)? $this->ncm->orm->pageLength : (int)$limit;
+
+        if ($dh !== false) {
+            while (($fname = readdir($dh)) !== false) {
+                if ($fname !== '.' && $fname !== '..') {
+                    if (preg_match('/^backup-(.+)\.zip$/i', $fname) > 0) {
+                        $absname = $this->backupPath . DIRECTORY_SEPARATOR . $fname;
+                        $backupInfo = new BackupInfo();
+                        $backupInfo->filename = $absname;
+                        $backupInfo->creationDateTime = new \DateTime();
+                        $backupInfo->creationDateTime->setTimestamp(filectime($absname));
+                        $backupInfo->filesize = filesize($absname);
+                        $backupInfo->version = 'unknown';
+                        $backups[$absname] = $backupInfo;
+                    }
+                }
+            }
+        }
+
+        uasort($backups,
+            /**
+             * @param BackupInfo $a
+             * @param BackupInfo $b
+             * @return int
+             */
+            function($a, $b) {
+                $r = 0;
+                if ($a->creationDateTime instanceof \DateTime
+                    && $b->creationDateTime instanceof \DateTime) {
+                    if ($a->creationDateTime != $b->creationDateTime) {
+                        $r = ($a->creationDateTime < $b->creationDateTime)? 1 : 0;
+                    }
+                }
+                return $r;
+            }
+        );
+
+        if (!$countOnly) {
+            $page = (int)$page -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$limit;
+            $backups = array_slice($backups, $offset, $limit, true);
+        }
+
+        if ($countOnly) return count($backups);
+
+        foreach ($backups as $backup) {
+            if (($info = $this->readInstallationInformationFromBackup($backup)) !== null) {
+                $backup->installationInfo = $info;
+                if (array_key_exists('version', $info)) $backup->version = $info['version'];
+            }
+        }
+
+        return $backups;
     }
 
-    public function createBackup() {
+    /**
+     * Creates a backup of the current installation
+     * @return BackupInfo|null Information for the created backup or null in case of an error
+     */
+    public function createBackup() : ?BackupInfo {
         // TODO implementieren
+        return null;
     }
 
+    /**
+     * Deletes a specific backup
+     * @param string $relativeFilename The backup to delete
+     */
     public function deleteBackup(string $relativeFilename) : void {
+        // TODO implementieren
+    }
+
+    /**
+     * Restores a specific backup
+     * @param BackupInfo $backupInfo The backup to restore
+     */
+    public function restoreBackup(BackupInfo $backupInfo) : void {
         // TODO implementieren
     }
 
@@ -107,13 +198,24 @@ class InstallationManager {
 
     // <editor-fold desc="Internal methods">
 
-    private function readTemplateInformation($tplDir) {
+    private function readTemplateInformation($tplDir): ?TemplateInfo {
         $versionFile = Util::createPath($this->ncm->pubdir, 'tpl', $tplDir, 'META-INF', 'version.json');
         if (!file_exists($versionFile)) return null;
         $infoArray = json_decode(file_get_contents($versionFile), true);
         $infoArray['dirname'] = $tplDir;
         if (is_array($infoArray)) return new TemplateInfo($infoArray);
         return null;
+    }
+
+    private function readInstallationInformationFromBackup(BackupInfo $backupInfo) : ?array {
+        $zip = new \ZipArchive();
+        $info = null;
+        if ($zip->open($backupInfo->filename) === true) {
+            if (($c = $zip->getFromName("ncm/sys/version.json")) !== false) {
+                $info = json_decode($c, true);
+            }
+        }
+        return $info;
     }
 
     // </editor-fold>
