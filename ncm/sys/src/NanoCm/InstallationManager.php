@@ -19,6 +19,13 @@
 
 namespace Ubergeek\NanoCm;
 
+use DateTime;
+use DirectoryIterator;
+use JsonException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ZipArchive;
+
 /**
  * Class InstallationManager
  *
@@ -33,24 +40,38 @@ class InstallationManager {
     // <editor-fold desc="Internal properties">
 
     /**
-     * @var NanoCm Reference to the current nanocm instance
+     * Reference to the current nanocm instance
+     * @var NanoCm
      */
     public $ncm;
 
     /**
-     * @var string URL for the atom feed listing available releases of nanoCM
+     * URL for the atom feed listing available releases of nanoCM
+     * @var string
      */
     public $updateFeed;
 
     /**
-     * @var string Absolute path to the backup directory
+     * Absolute path to the backup directory
+     * @var string
      */
     public $backupPath;
 
     /**
-     * @var string Absolute path to the user template directory
+     * Absolute path to the user template directory
+     * @var string
      */
     public $templatePath;
+
+    /**
+     * Absolute path to the installation base
+     * @var string
+     */
+    public $installationBasePath;
+
+    private $backupDirs = array(
+        'ncm/sys/db'
+    );
 
     // </editor-fold>
 
@@ -59,6 +80,7 @@ class InstallationManager {
 
     public function __construct(NanoCm $nanoCm) {
         $this->ncm = $nanoCm;
+        $this->installationBasePath = $this->ncm->pubdir;
         $this->backupPath = Util::createPath($this->ncm->sysdir, 'backup');
         $this->templatePath = Util::createPath($this->ncm->pubdir, 'tpl');
     }
@@ -121,7 +143,7 @@ class InstallationManager {
                         $absname = $this->backupPath . DIRECTORY_SEPARATOR . $fname;
                         $backupInfo = new BackupInfo();
                         $backupInfo->filename = $absname;
-                        $backupInfo->creationDateTime = new \DateTime();
+                        $backupInfo->creationDateTime = new DateTime();
                         $backupInfo->creationDateTime->setTimestamp(filectime($absname));
                         $backupInfo->filesize = filesize($absname);
                         $backupInfo->version = 'unknown';
@@ -139,8 +161,8 @@ class InstallationManager {
              */
             function($a, $b) {
                 $r = 0;
-                if ($a->creationDateTime instanceof \DateTime
-                    && $b->creationDateTime instanceof \DateTime) {
+                if ($a->creationDateTime instanceof DateTime
+                    && $b->creationDateTime instanceof DateTime) {
                     if ($a->creationDateTime != $b->creationDateTime) {
                         $r = ($a->creationDateTime < $b->creationDateTime)? 1 : 0;
                     }
@@ -170,19 +192,81 @@ class InstallationManager {
 
     /**
      * Creates a backup of the current installation
+     * @param null $filename Optional filename
      * @return BackupInfo|null Information for the created backup or null in case of an error
      */
-    public function createBackup() : ?BackupInfo {
-        // TODO implementieren
-        return null;
+    public function createBackup($filename = null) : ?BackupInfo {
+        $now = new DateTime();
+        if ($filename === null) {
+            $filename = 'backup-' . $now->format('Y-m-d H:i:s') . '.zip';
+        }
+        $filename = basename($filename);
+
+        $backupInfo = new BackupInfo();
+        $backupInfo->creationDateTime = $now;
+        $backupInfo->installationInfo = $this->ncm->versionInfo;
+        $backupInfo->version = $this->ncm->versionInfo->version;
+        $backupInfo->filename = $filename;
+
+        $zipFile = Util::createPath($this->backupPath, $filename);
+        $zipArchive = new ZipArchive();
+        $zipArchive->open($zipFile, ZipArchive::CREATE);
+
+        foreach ($this->backupDirs as $dir) {
+            $absDir = Util::createPath($this->installationBasePath, $dir);
+            /*
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($absDir), RecursiveIteratorIterator::SELF_FIRST
+            );
+            */
+
+            $files = new DirectoryIterator($absDir);
+
+            foreach ($files as $absoluteFilename) {
+
+                var_dump($absoluteFilename . '');
+
+                $basename = basename($absoluteFilename);
+                if ($basename === '.' || $basename === '..') continue;
+
+                $relativeFileName = str_replace(
+                    $this->installationBasePath,
+                    '',
+                    $absoluteFilename
+                );
+
+                var_dump($relativeFileName);
+
+                /*
+                if (is_dir($absoluteFilename)) {
+                    $zipArchive->addEmptyDir($relativeFileName);
+                } else {
+                    $zipArchive->addFromString(
+                        $relativeFileName,
+                        file_get_contents($absoluteFilename)
+                    );
+                }
+                */
+            }
+        }
+
+        $zipArchive->close();
+        return $backupInfo;
     }
 
     /**
      * Deletes a specific backup
      * @param string $relativeFilename The backup to delete
+     * @return void
      */
     public function deleteBackup(string $relativeFilename) : void {
-        // TODO implementieren
+        $zipFile = Util::createPath(
+            $this->backupPath,
+            basename($relativeFilename)
+        );
+        if (file_exists($zipFile)) {
+            unlink($zipFile);
+        }
     }
 
     /**
@@ -208,11 +292,14 @@ class InstallationManager {
     }
 
     private function readInstallationInformationFromBackup(BackupInfo $backupInfo) : ?array {
-        $zip = new \ZipArchive();
+        $zip = new ZipArchive();
         $info = null;
         if ($zip->open($backupInfo->filename) === true) {
             if (($c = $zip->getFromName("ncm/sys/version.json")) !== false) {
-                $info = json_decode($c, true);
+                try {
+                    $info = json_decode($c, true, 512, JSON_THROW_ON_ERROR);
+                } catch (JsonException $e) {
+                }
             }
         }
         return $info;

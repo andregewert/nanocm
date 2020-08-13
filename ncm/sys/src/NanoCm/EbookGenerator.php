@@ -1,22 +1,20 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\NanoCm;
 
@@ -83,10 +81,10 @@ class EbookGenerator {
      * @return string E-Pub-Inhalt in Form eines String
      * @throws \Exception Bei einem Fehler
      */
-    public function createEpubForArticle(Article $article) {
+    public function createEpubForArticle(Article $article): ?string {
         $cacheKey = 'ebook-article-' . $article->id;
         $ebook = $this->getContentFromEbookCache($cacheKey);
-        if ($ebook == null) {
+        if ($ebook === null) {
             $ebook = $this->createEpubForArticles(array($article), $article->headline);
             $this->putContentToEbookCache($cacheKey, $ebook);
         }
@@ -108,11 +106,11 @@ class EbookGenerator {
         $cacheKey = 'ebook-series-' . $id;
         $ebook = $this->getContentFromEbookCache($cacheKey);
 
-        if ($ebook == null) {
+        if ($ebook === null) {
             $series = $this->ncm->orm->getArticleseriesById($id);
             $articles = array();
 
-            if ($series == null) {
+            if ($series === null) {
                 // TODO Exception werfen
             }
 
@@ -144,7 +142,9 @@ class EbookGenerator {
                 $date = $article->publishing_timestamp;
             }
         }
-        if ($date == null) $date = new \DateTime('now');
+        if ($date == null) {
+            $date = new \DateTime('now');
+        }
         return $date;
     }
 
@@ -157,12 +157,12 @@ class EbookGenerator {
     private function getTagsAsStringFromArticles(array $articles) : string {
         $tags = array();
         foreach ($articles as $article) {
-            if ($article->tags != null) {
+            if ($article->tags !== null) {
                 $tags = array_unique(array_merge($tags, $article->tags));
             }
         }
         sort($tags);
-        return join(', ', $tags);
+        return implode(', ', $tags);
     }
 
     /**
@@ -174,7 +174,7 @@ class EbookGenerator {
     private function getCreatorInfoFromArticles(array $articles) : string {
         $authorIds = array();
         foreach ($articles as $article) {
-            if (!in_array($article->author_id, $authorIds)) {
+            if (!in_array($article->author_id, $authorIds, true)) {
                 $authorIds[] = $article->author_id;
             }
         }
@@ -182,14 +182,16 @@ class EbookGenerator {
         $authorStrings = array();
         foreach ($authorIds as $id) {
             $author = $this->ncm->orm->getUserById($id, true);
-            if ($author != null) {
+            if ($author !== null) {
                 $authorStrings[] = $author->getFullName();
             }
         }
 
-        if (count($authorStrings) == 1) {
+        if (count($authorStrings) === 1) {
             return $authorStrings[0];
-        } elseif (count($authorStrings) >= 2) {
+        }
+
+        if (count($authorStrings) >= 2) {
             return $authorStrings[0] . " et al.";
         }
 
@@ -202,7 +204,7 @@ class EbookGenerator {
      * @param string $cacheKey Eindeutiger Cache-Schlüssel für den gesuchten Inhalte
      * @return string|null Der Dateiinhalt als String oder null
      */
-    private function getContentFromEbookCache(string $cacheKey) {
+    private function getContentFromEbookCache(string $cacheKey): ?string {
         if ($this->ncm->ebookCache instanceof CacheInterface) {
             $book = $this->ncm->ebookCache->get($cacheKey);
             if ($book !== null) return $book;
@@ -217,7 +219,7 @@ class EbookGenerator {
      * @param string $content Der zu speichernde E-Book-Inhalt
      * @return void
      */
-    private function putContentToEbookCache(string $cacheKey, string $content) {
+    private function putContentToEbookCache(string $cacheKey, string $content): void {
         if ($this->ncm->ebookCache instanceof CacheInterface) {
             $this->ncm->ebookCache->put($cacheKey, $content);
         }
@@ -234,7 +236,7 @@ class EbookGenerator {
      * @return string E-Pub-Daten in String-Form
      * @throws \Exception
      */
-    private function createEpubForArticles(array $articles, string $title = '', string $description = '', $createCoverPage = true, $createTitlePage = true) {
+    private function createEpubForArticles(array $articles, string $title = '', string $description = '', $createCoverPage = true, $createTitlePage = true): string {
         $mappedUrls = array();
 
         $writer = new Epub3Writer($this->ncm->cachedir);
@@ -244,7 +246,7 @@ class EbookGenerator {
         $document->title = $title;
         $document->description = $description;
         $document->language = $this->ncm->lang;
-        $document->identifier = uniqid();
+        $document->identifier = uniqid('', true);
         $document->rights = $this->ncm->orm->getCopyrightNotice();
         $document->publisher = $this->ncm->orm->getSiteTitle();
         $document->date = $this->getLatestDateFromArticles($articles);
@@ -321,10 +323,10 @@ class EbookGenerator {
      *
      * @param Document $document Das E-Book-Dokument
      * @param string $content Der zu modifizierende Inhalt
-     * @param $mappedUrls Referenz auf die gemappten URLs
+     * @param &array $mappedUrls Referenz auf die gemappten URLs
      * @return string Der modifizierte Inhalt
      */
-    private function replaceLinkedContents(Document $document, string $content, &$mappedUrls) {
+    private function replaceLinkedContents(Document $document, string $content, &$mappedUrls): string {
         return preg_replace_callback('/((href=\"|src=\")([^\"]+)(\"))/i', function($matches) use ($document, &$mappedUrls) {
             if ($this->isAnchorLink($matches[3])) {
                 return $matches[1];
@@ -350,7 +352,7 @@ class EbookGenerator {
                     if (!empty($content)) {
                         $virtualUrl = basename($targetUrl);
                         $extension = $this->getDefaultFileExtensionByMimeType($mimeType);
-                        if (strtolower(substr($virtualUrl, -strlen($extension))) != $extension) {
+                        if (strtolower(substr($virtualUrl, -strlen($extension))) !== $extension) {
                             $virtualUrl .= ".$extension";
                         }
 
@@ -389,11 +391,11 @@ class EbookGenerator {
     /**
      * Überprüft, ob der Link einen Anker bezeichnet
      *
-     * @param $link Der zu prüfende Link
+     * @param string $link Der zu prüfende Link
      * @return bool true, wenn der Link (nur) auf einen Anker zeigt
      */
-    private function isAnchorLink($link) {
-        return substr($link, 0, 1) == '#';
+    private function isAnchorLink($link): bool {
+        return strpos($link, '#') === 0;
     }
 
     /**
@@ -401,20 +403,20 @@ class EbookGenerator {
      *
      * Die Überprüfung beschränkt sich darauf, ob der Link mit einer Protokollangabe
      * (HTTP, HTTPS, MAILTO etc.) beginnt.
-     * @param $link Der zu prüfende Link
+     * @param string $link Der zu prüfende Link
      * @return bool true, wenn es sich um einen externen Link handelt
      */
-    private function isExternalLink($link) {
-        return preg_match('/^([a-z]+\:)/i', $link) !== 0;
+    private function isExternalLink($link): bool {
+        return preg_match('/^([a-z]+:)/i', $link) !== 0;
     }
 
     /**
      * Überprüft, ob es sich beim übergebenen MIME-Type um einen in das E-Book einbettbares Dateiformat handelt
      *
-     * @param $mimeType Der zu prüfende MIME-Type
+     * @param string $mimeType Der zu prüfende MIME-Type
      * @return bool true, wenn es sich um einen einbettbaren Inhaltstyp handelt
      */
-    private function isMimeTypeEmbeddable($mimeType) {
+    private function isMimeTypeEmbeddable($mimeType): bool {
         $mimeType = strtolower($mimeType);
         $embeddable = array(
             'text/css',
@@ -430,12 +432,12 @@ class EbookGenerator {
     /**
      * Ermittelt die Standard-Dateiendung für den angegebenen MIME-Type
      *
-     * @param $mimeType Der zu prüfende MIME-Type
+     * @param string $mimeType Der zu prüfende MIME-Type
      * @return string Die zugehörige Standard-Dateiendung
      */
-    private function getDefaultFileExtensionByMimeType($mimeType) {
+    private function getDefaultFileExtensionByMimeType($mimeType): string {
         $mimeType = strtolower($mimeType);
-        if ($mimeType == 'image/svg+xml') return 'svg';
+        if ($mimeType === 'image/svg+xml') return 'svg';
         return strtolower(explode('/', $mimeType)[1]);
     }
 
@@ -445,7 +447,7 @@ class EbookGenerator {
      * @param string $url Zu überprüfende URL
      * @return string|null Der ermittelte MIME-Type oder null
      */
-    private function getMimeTypeByUrl(string $url) {
+    private function getMimeTypeByUrl(string $url): ?string {
         $type = null;
         $typeHeader = Fetch::getContentTypeHeaderForUrl($url);
         if ($typeHeader != null) {

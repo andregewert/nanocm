@@ -1,26 +1,26 @@
 <?php
-/**
- * NanoCM
- * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
+// NanoCM
+// Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\Epub;
 
+use DateTime;
 use DOMDocument;
+use Ubergeek\Epub\Exception\CouldNotCreateTempFileException;
 use ZipArchive;
 
 /**
@@ -44,7 +44,7 @@ class Epub3Writer {
     // <editor-fold desc="Constructor">
 
     public function __construct($tempDir = null) {
-        if ($tempDir != null) {
+        if ($tempDir !== null) {
             $this->tempDir = $tempDir;
         }
     }
@@ -92,7 +92,7 @@ class Epub3Writer {
      * @param string $content Der zu kodierende String
      * @return string Der XML-kodierte String
      */
-    private function quoteXmlContent(string $content) {
+    private function quoteXmlContent(string $content): string {
         return htmlspecialchars($content, ENT_COMPAT | ENT_XML1);
     }
 
@@ -110,7 +110,7 @@ class Epub3Writer {
 
         $i = 0;
         do {
-            if ($i == 0) {
+            if ($i === 0) {
                 $path = $this->tempDir . DIRECTORY_SEPARATOR . 'epub-temp';
             } else {
                 $path = $this->tempDir . DIRECTORY_SEPARATOR . 'epub-temp-' . $i;
@@ -118,7 +118,7 @@ class Epub3Writer {
             $i++;
         } while (file_exists($path) && $i <= 99);
 
-        if ($i == 99) {
+        if ($i === 99) {
             throw new CouldNotCreateTempFileException("Could not find unused file name!");
         }
 
@@ -152,34 +152,34 @@ class Epub3Writer {
         $idNode->appendChild($dom->createAttribute('id'))->nodeValue = 'pub-id';
         $metadata->appendChild($idNode);
         $metadata->appendChild($dom->createElement('dc:language'))->nodeValue = $this->quoteXmlContent($document->language);
-        if (strlen($document->description) > 0) {
+        if ($document->description !== '') {
             $metadata->appendChild($dom->createElement('dc:description'))->nodeValue = $this->quoteXmlContent($document->description);
         }
 
-        if ($document->creator != null) {
+        if ($document->creator !== null) {
             $metadata->appendChild($dom->createElement('dc:creator'))->nodeValue = $this->quoteXmlContent($document->creator);
         }
-        if ($document->publisher != null) {
+        if ($document->publisher !== null) {
             $metadata->appendChild($dom->createElement('dc:publisher'))->nodeValue = $this->quoteXmlContent($document->publisher);
         }
-        if ($document->rights != null) {
+        if ($document->rights !== null) {
             $metadata->appendChild($dom->createElement('dc:rights'))->nodeValue = $this->quoteXmlContent($document->rights);
         }
-        if ($document->subject != null) {
+        if ($document->subject !== null) {
             $metadata->appendChild($dom->createElement('dc:subject'))->nodeValue = $this->quoteXmlContent($document->subject);
         }
-        if ($document->date instanceof \DateTime) {
+        if ($document->date instanceof DateTime) {
             $metadata->appendChild($dom->createElement('dc:date'))->nodeValue = $document->date->format('Y-m-d');
         }
 
-        $modified = ($document->modified === null)? new \DateTime() : $document->modified;
+        $modified = $document->modified ?? new DateTime();
         $modifiedNode = $dom->createElement('meta');
         $modifiedNode->appendChild($dom->createAttribute('property'))->nodeValue = 'dcterms:modified';
         $modifiedNode->nodeValue = $modified->format('Y-m-d\TH:i:s\Z');
         $metadata->appendChild($modifiedNode);
 
         $coverImage = $document->getContentWithFilename('EBookCover.jpeg');
-        if ($coverImage != null) {
+        if ($coverImage !== null) {
             $imageNode = $metadata->appendChild($dom->createElement('meta'));
             $imageNode->appendChild($dom->createAttribute('name'))->nodeValue = 'cover';
             $imageNode->appendChild($dom->createAttribute('content'))->nodeValue = $coverImage->id;
@@ -196,7 +196,7 @@ class Epub3Writer {
                     if (in_array($property, $supportedSpineTypes)) $props[] = $property;
                 }
                 if (count($props) > 0) {
-                    $item->appendChild($dom->createAttribute('properties'))->nodeValue = join(' ', $props);
+                    $item->appendChild($dom->createAttribute('properties'))->nodeValue = implode(' ', $props);
                 }
             }
             $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
@@ -220,7 +220,7 @@ class Epub3Writer {
         $guide = $rootNode->appendChild($dom->createElement('guide'));
         foreach (array('cover', 'title-page', 'toc') as $type) {
             $content = $document->getFirstContentWithProperty($type);
-            if ($content != null) {
+            if ($content !== null) {
                 $item = $guide->appendChild($dom->createElement('reference'));
                 $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
                 $item->appendChild($dom->createAttribute('title'))->nodeValue = $this->quoteXmlContent($content->title);
@@ -229,7 +229,7 @@ class Epub3Writer {
         }
 
         $content = $document->getFirstNonSpecialContent();
-        if ($content != null) {
+        if ($content !== null) {
             $item = $guide->appendChild($dom->createElement('reference'));
             $item->appendChild($dom->createAttribute('href'))->nodeValue = $content->filename;
             $item->appendChild($dom->createAttribute('title'))->nodeValue = $this->quoteXmlContent($content->title);

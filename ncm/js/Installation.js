@@ -17,17 +17,42 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+/**
+ * Functions for the installation manager module
+ * @constructor
+ */
 function Installation() {
     let app = this;
 
+    /**
+     * Initializes event handlers etc.
+     * @returns {void}
+     */
     app.init = function() {
         app.page = $('#input_searchPage').val();
         $('#button_refresh').click(function() {
             app.refresh();
         });
+
+        $('#button_create').click(function()  {
+            app.openCreateBackupDialog();
+        });
+
+        $('#button_restore').click(function() {
+            // TODO not implemented yet
+        });
+
+        $('#button_delete').click(function() {
+            // TODO not implemented yet
+        });
+
         app.refresh();
     };
 
+    /**
+     * Refreshes the list of existing backups
+     * @param {number|undefined} page
+     */
     app.refresh = function(page) {
         ncm.showDefaultLoadingIndicator();
 
@@ -49,6 +74,46 @@ function Installation() {
         }).always(function() {
             ncm.hideDefaultLoadingIndicator();
         });
+    };
+
+    /**
+     * Opens the dialog for creating a new backup
+     * @returns {void}
+     */
+    app.openCreateBackupDialog = function() {
+        let dlg = new ncm.InlinePopup(
+            'admin/installation/html/createbackup', {
+            }, {
+                headline:   'Backup erstellen',
+                width:      600,
+                height:     300,
+                loaded:     function() {
+                    ncm.focusDefaultElement();
+                }
+            }, {
+                cancel:     {
+                    caption:    'Abbrechen',
+                    clicked:    function() {
+                        dlg.close();
+                    }
+                },
+                save:       {
+                    caption:    'Erstellen',
+                    clicked:    function() {
+                        ncm.showDefaultLoadingIndicator();
+                        $.ajax('admin/installation/ajax/createbackup', {
+                            cache:      false,
+                            type:       'POST',
+                            dataType:   'JSON'
+                        }).always(function() {
+                            ncm.hideDefaultLoadingIndicator();
+                            dlg.close();
+                            app.refresh();
+                        });
+                    }
+                }
+            }
+        );
     };
 
     app.init();

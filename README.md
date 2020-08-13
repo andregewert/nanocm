@@ -18,6 +18,12 @@ Weitere Ziele bei der Entwicklung von NanoCM waren und sind:
 - Service-orientierte Architektur, die eine einfache Anbindung zusätzlicher Clients ermöglicht
 - Clean Code: Die PHP-Quellen sollen klar strukturiert und einfach wartbar sein
 
+# Besondere Funktionen
+
+- Integrierte ePub-Generierung
+- Virtuelles Emoji-Keyboard
+- Unterstützung von austauschbaren Themes bzw. Templates
+
 # Fremdkomponenten
 
 NanoCM versucht bewusst, auf Abhängigkeiten von fremden Komponenten zu verzichten.
@@ -35,15 +41,18 @@ verwendet:
 # Mitmachen
 
 Der Autor freut sich über jede Person, die zu diesem Projekt beitragen möchte.
-Dafür ist das Code-Repository frei zugänglich; jede(r) kann also das Projekt
+Dafür ist das Code-Repository frei zugänglich; jede/r kann also das Projekt
 klonen und Pull Request einreichen. Gerne kann vorab auch Kontakt zum Autor
 hergestellt werden, um Ideen, offene Baustellen usw. zu besprechen.
 
 Als Entwicklungsumgebung wurde vom Autor ursprünglich Netbeans verwendet.
 Im weiteren Projektverlauf wurde vollständig auf JetBrains PHPStorm gewechselt.
-Die Entwicklung ist jedenfalls mit beiden IDEs gut möglich.
+Die Entwicklung ist jedenfalls mit beiden IDEs gut möglich, auch wenn das Netbeans-Projekt
+leider halbtot ist.
 
-// TODO Link auf das öffentliche Repo bereitstellen
+Das öffentlichte GIT-Repository ist über Github verfügbar:
+
+https://github.com/ubergewert/nanocm
 
 # Dokumentation
 
@@ -56,7 +65,9 @@ alleinstehende Anwendung verfügbar ist.
 
 # Voraussetzungen
 
-- PHP 7.1
+- PHP 7.3  
+Anmerkung: Ich habe erst spät im Laufe der Entwicklung den "language level" auf Version 7.3 gehoben.
+Vermutlich werden versionsspezifische Features noch an nur sehr wenigen Stellen genutzt.
 - PHP-Extension pdo_sqlite
 - PHP-Extension curl
 - Apache mit mod_rewrite

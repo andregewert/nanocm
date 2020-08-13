@@ -2,6 +2,7 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\NanoCm\AjaxResponse;
 use Ubergeek\NanoCm\BackupInfo;
 
 /**
@@ -16,15 +17,29 @@ class AdminInstallationModule extends AbstractAdminModule {
     // <editor-fold desc="Properties">
 
     /**
-     * @var BackupInfo[] Array with information of existing backups
+     * Array with information of existing backups
+     * @var BackupInfo[]
      */
     public $existingBackups;
+
+    /**
+     * Relative filename of the currently edited or created backup
+     * @var string
+     */
+    public $filename;
+
+    /**
+     * Contains the response data for ajax requests
+     * @var AjaxResponse
+     */
+    public $ajaxResponse;
 
     // </editor-fold>
 
 
     /**
      * @inheritDoc
+     * @throws \Exception
      */
     public function run() {
         $this->setTitle($this->getSiteTitle() . ' - Update und Backups verwalten');
@@ -37,6 +52,12 @@ class AdminInstallationModule extends AbstractAdminModule {
                 $this->setPageTemplate(self::PAGE_NONE);
                 switch ($this->getRelativeUrlPart(3)) {
 
+                    // Dialog for creating new backup
+                    case 'createbackup':
+                        $this->filename = 'backup-' . date('Y-m-d H:i:s') . '.zip';
+                        $content = $this->renderUserTemplate('content-installation-createbackup.phtml');
+                        break;
+
                     // List existing backups
                     case 'list':
                         $this->pageCount = ceil($this->ncm->installationManager->getAvailableBackups(true) /$this->orm->pageLength);
@@ -47,7 +68,32 @@ class AdminInstallationModule extends AbstractAdminModule {
                         $content = $this->renderUserTemplate('content-installation-list.phtml');
                         break;
                 }
+                break;
 
+            // AJAX requests
+            case 'ajax':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $this->setContentType('text/javascript');
+                $this->ajaxResponse = new AjaxResponse();
+
+                switch ($this->getRelativeUrlPart(3)) {
+                    // Delete backup
+                    case 'deletebackup':
+                        break;
+
+                    // Create a new backup
+                    case 'createbackup':
+                        $backupInfo = $this->ncm->installationManager->createBackup();
+                        $this->ajaxResponse->info = $backupInfo;
+                        $this->ajaxResponse->message = 'Backup created';
+                        break;
+
+                    // Restore existing backup
+                    case 'restorebackup':
+                        break;
+                }
+
+                $content = json_encode($this->ajaxResponse);
                 break;
 
             // Index page
