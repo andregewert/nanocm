@@ -19,6 +19,8 @@
 
 namespace Ubergeek\NanoCm;
 
+use Ubergeek\NanoCm\Util\DirectoryEntry;
+
 /**
  * Bietet einige statische Hilfmethoden
  * @author André Gewert <agewert@ubergeek.de>
@@ -230,8 +232,8 @@ final class Util {
      * @todo Für bessere Kompatibilität optional auf eine Minimal-Whitelist umstellbar machen
      */
     public static function getEmojiDictionary() {
-        $emojis = (array)json_decode(file_get_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'emoji-list.json'));
-        $blacklist = json_decode(file_get_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'emoji-blacklist.json'));
+        $emojis = (array)json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'emoji-list.json'));
+        $blacklist = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'emoji-blacklist.json'));
 
         foreach (array_keys($emojis) as $group) {
             $emojis[$group] = (array)$emojis[$group];
@@ -265,6 +267,18 @@ final class Util {
             }
         }
         return $emojis;
+    }
+
+    /**
+     * Reads the contents of a directory and returns an array of DirectoryEntry objects
+     * @param string $path Absolute path to the directory to read
+     * @param bool $recursive Decides if directory should be read recursively
+     * @param string $basePath Base path to build a relative filename
+     * @return DirectoryEntry[] Array with directory contents
+     */
+    private static function getDirectoryContents(string $path, bool $recursive = true, string $basePath = '') : array {
+        $entries = array();
+        return $entries;
     }
     
 }
