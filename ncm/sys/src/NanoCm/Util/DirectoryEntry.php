@@ -22,6 +22,7 @@ namespace Ubergeek\NanoCm\Util;
 
 /**
  * Represents an directory entry
+ *
  * @package Ubergeek\NanoCm\Util
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2020-08-23
@@ -65,6 +66,17 @@ class DirectoryEntry {
      * @var int
      */
     public $entryType;
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Methods">
+
+    public function __construct($absolutePath, $basePath = '', $entryType = self::TYPE_FILE) {
+        $this->absolutePath = $absolutePath;
+        $this->relativePath = substr($absolutePath, strlen($basePath) +1);
+        $this->entryType = $entryType;
+    }
 
     // </editor-fold>
 

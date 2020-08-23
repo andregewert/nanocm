@@ -20,10 +20,8 @@
 namespace Ubergeek\NanoCm;
 
 use DateTime;
-use DirectoryIterator;
 use JsonException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
+use Ubergeek\NanoCm\Util\DirectoryEntry;
 use ZipArchive;
 
 /**
@@ -69,9 +67,25 @@ class InstallationManager {
      */
     public $installationBasePath;
 
-    private $backupDirs = array(
-        'ncm/sys/db'
+    /**
+     * Paths to include into backups
+     * @var string[]
+     */
+    private $backupDirs = array('ncm', 'tpl');
+
+    /**
+     * Paths to exclude from backups
+     * @var string[]
+     */
+    private $backupExcludePaths = array(
+        'backup'
     );
+
+    /**
+     * Regular expression to check backup filenames
+     * @var string
+     */
+    private $backupFilenamePattern = '/^backup-(.+)\.zip$/i';
 
     // </editor-fold>
 
@@ -93,7 +107,8 @@ class InstallationManager {
     /**
      * Returns an array with information for every installed (available)
      * nano|cm template.
-     * @return TemplateInfo[]
+     *
+     * @return TemplateInfo[] An array containing information about installed templates
      */
     public function getAvailableTemplates(): array {
         $templates = array();
@@ -105,25 +120,35 @@ class InstallationManager {
                     $dirname = $this->templatePath . DIRECTORY_SEPARATOR . $fname;
                     if (is_dir($dirname)) {
                         $info = $this->readTemplateInformation($fname);
-                        if ($info !== null) $templates[$fname] = $info;
+                        if ($info !== null) {
+                            $templates[$fname] = $info;
+                        }
                     }
                 }
             }
         }
 
-        uasort($templates, function($a, $b) {
+        uasort($templates, static function($a, $b) {
             return strnatcasecmp($a->title, $b->title);
         });
 
         return $templates;
     }
 
+    /**
+     * Creates an array with information of available ncm releases by
+     * reading a remote feed
+     *
+     * @return array
+     */
     public function getAvailableVersionsFromServer() {
         // TODO implementieren
+        return array();
     }
 
     /**
      * Returns an array with information for existing backups
+     *
      * @param bool $countOnly Set to true if method should return number of entries only
      * @param int|null $page Number of page to return
      * @param int|null $limit Maximum number if entries to return
@@ -139,15 +164,9 @@ class InstallationManager {
         if ($dh !== false) {
             while (($fname = readdir($dh)) !== false) {
                 if ($fname !== '.' && $fname !== '..') {
-                    if (preg_match('/^backup-(.+)\.zip$/i', $fname) > 0) {
-                        $absname = $this->backupPath . DIRECTORY_SEPARATOR . $fname;
-                        $backupInfo = new BackupInfo();
-                        $backupInfo->filename = $absname;
-                        $backupInfo->creationDateTime = new DateTime();
-                        $backupInfo->creationDateTime->setTimestamp(filectime($absname));
-                        $backupInfo->filesize = filesize($absname);
-                        $backupInfo->version = 'unknown';
-                        $backups[$absname] = $backupInfo;
+                    $backupInfo = $this->readBackupInfoByRelativeFilename($fname);
+                    if ($backupInfo !== null) {
+                        $backups[] = $backupInfo;
                     }
                 }
             }
@@ -162,11 +181,10 @@ class InstallationManager {
             function($a, $b) {
                 $r = 0;
                 if ($a->creationDateTime instanceof DateTime
-                    && $b->creationDateTime instanceof DateTime) {
-                    if ($a->creationDateTime != $b->creationDateTime) {
+                    && $b->creationDateTime instanceof DateTime
+                    && $a->creationDateTime != $b->creationDateTime) {
                         $r = ($a->creationDateTime < $b->creationDateTime)? 1 : 0;
                     }
-                }
                 return $r;
             }
         );
@@ -179,19 +197,44 @@ class InstallationManager {
         }
 
         if ($countOnly) return count($backups);
-
-        foreach ($backups as $backup) {
-            if (($info = $this->readInstallationInformationFromBackup($backup)) !== null) {
-                $backup->installationInfo = $info;
-                if (array_key_exists('version', $info)) $backup->version = $info['version'];
-            }
-        }
-
         return $backups;
     }
 
     /**
+     * Reads metadata for the specified (relative) backup file
+     *
+     * The given file has to be located in the ncm backup directory.
+     * If the filename does not match the default pattern it is considered as invalid.
+     *
+     * @param string $relativeFilename Relative filename
+     * @return BackupInfo|null Metadata or null if the given filename is not valid
+     */
+    public function readBackupInfoByRelativeFilename(string $relativeFilename) : ?BackupInfo {
+        $absoluteFilename = $this->backupPath . DIRECTORY_SEPARATOR . $relativeFilename;
+        if (!file_exists($absoluteFilename)) return null;
+        if (preg_match($this->backupFilenamePattern, $relativeFilename) < 1) return null;
+
+        $backupInfo = new BackupInfo();
+        $backupInfo->filename = $absoluteFilename;
+        $backupInfo->creationDateTime = new DateTime();
+        $backupInfo->creationDateTime->setTimestamp(filectime($absoluteFilename));
+        $backupInfo->filesize = filesize($absoluteFilename);
+        $backupInfo->version = 'unknown';
+        if (($info = $this->readInstallationInformationFromBackup($backupInfo)) !== null) {
+            $backupInfo->installationInfo = $info;
+            if (array_key_exists('version', $info)) $backupInfo->version = $info['version'];
+        }
+
+        return $backupInfo;
+    }
+
+    /**
      * Creates a backup of the current installation
+     *
+     * The backup file (zip archive) is created in sys/backup. This method return
+     * an BackupInfo object containing information about the newly created backup.
+     * Throws an exception when an error occurs.
+     *
      * @param null $filename Optional filename
      * @return BackupInfo|null Information for the created backup or null in case of an error
      */
@@ -212,41 +255,31 @@ class InstallationManager {
         $zipArchive = new ZipArchive();
         $zipArchive->open($zipFile, ZipArchive::CREATE);
 
+        // Files within the installation root
+        $files = Util::getDirectoryContents($this->installationBasePath, false, $this->installationBasePath, $this->backupExcludePaths);
+        foreach ($files as $directoryEntry) {
+            if ($directoryEntry->entryType !== DirectoryEntry::TYPE_DIR) {
+                $zipArchive->addFromString(
+                    $directoryEntry->relativePath,
+                    file_get_contents($directoryEntry->absolutePath)
+                );
+            }
+        }
+
+        // Files from subdirs
         foreach ($this->backupDirs as $dir) {
             $absDir = Util::createPath($this->installationBasePath, $dir);
-            /*
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($absDir), RecursiveIteratorIterator::SELF_FIRST
-            );
-            */
+            $files = Util::getDirectoryContents($absDir, true, $this->installationBasePath, $this->backupExcludePaths);
 
-            $files = new DirectoryIterator($absDir);
-
-            foreach ($files as $absoluteFilename) {
-
-                var_dump($absoluteFilename . '');
-
-                $basename = basename($absoluteFilename);
-                if ($basename === '.' || $basename === '..') continue;
-
-                $relativeFileName = str_replace(
-                    $this->installationBasePath,
-                    '',
-                    $absoluteFilename
-                );
-
-                var_dump($relativeFileName);
-
-                /*
-                if (is_dir($absoluteFilename)) {
-                    $zipArchive->addEmptyDir($relativeFileName);
+            foreach ($files as $directoryEntry) {
+                if ($directoryEntry->entryType === DirectoryEntry::TYPE_DIR) {
+                    $zipArchive->addEmptyDir($directoryEntry->relativePath);
                 } else {
                     $zipArchive->addFromString(
-                        $relativeFileName,
-                        file_get_contents($absoluteFilename)
+                        $directoryEntry->relativePath,
+                        file_get_contents($directoryEntry->absolutePath)
                     );
                 }
-                */
             }
         }
 
@@ -255,26 +288,31 @@ class InstallationManager {
     }
 
     /**
-     * Deletes a specific backup
-     * @param string $relativeFilename The backup to delete
+     * Deletes the specified backup file
+     * @param BackupInfo $backupInfo Backup information
      * @return void
      */
-    public function deleteBackup(string $relativeFilename) : void {
-        $zipFile = Util::createPath(
-            $this->backupPath,
-            basename($relativeFilename)
-        );
-        if (file_exists($zipFile)) {
-            unlink($zipFile);
+    public function deleteBackup(BackupInfo $backupInfo) : void {
+        if (preg_match($this->backupFilenamePattern, basename($backupInfo->filename)) > 0) {
+            if (file_exists($backupInfo->filename)) {
+                unlink($backupInfo->filename);
+            }
         }
     }
 
     /**
      * Restores a specific backup
+     *
+     * Throws an exception when an error occurs.
      * @param BackupInfo $backupInfo The backup to restore
+     * @return void
      */
     public function restoreBackup(BackupInfo $backupInfo) : void {
-        // TODO implementieren
+        $zipArchive = new ZipArchive();
+        if ($zipArchive->open($backupInfo->filename) === true) {
+            $zipArchive->extractTo($this->installationBasePath);
+            $zipArchive->close();
+        }
     }
 
     // </editor-fold>

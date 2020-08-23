@@ -16,13 +16,13 @@ class AjaxResponse {
      * Status code "ok"
      * @var integer
      */
-    const STATUS_OK = 0;
+    public const STATUS_OK = 0;
 
     /**
      * Status code "error"
      * @var integer
      */
-    const STATUS_ERROR = 500;
+    public const STATUS_ERROR = 500;
 
     // </editor-fold>
 

@@ -29,6 +29,13 @@ use Ubergeek\NanoCm\Util\DirectoryEntry;
  */
 final class Util {
 
+    /**
+     * Creates the gravatar image url for the given mail address
+     *
+     * @param string $mail Mail address of the gravatar user
+     * @param int $size Image size
+     * @return string
+     */
     public static function getGravatarUserImageUrl($mail, $size = 50) : string {
         $hash = md5(trim($mail));
         $size = (int)$size;
@@ -83,6 +90,7 @@ final class Util {
 
     /**
      * Überprüft die übergebene E-Mail-Adresse auf Gültigkeit
+     *
      * Es wird eine formale Überprüfung vorgenommen; außerdem
      * wird die Domain auf einen MX-DNS-Eintrag überprüft.
      *
@@ -149,14 +157,14 @@ final class Util {
 
     /**
      * Kodiert einen String für die HTML-Ausgabe.
-     * Der Eingabestring muss UTF8-kodiert sein.
      *
+     * Der Eingabestring muss UTF8-kodiert sein.
      * Als Zielformate werden Constants::FORMAT_HTML und Constants::FORMAT_XHTML unterstützt.
      * Wird etwas anderes übergeben, so wird der unveränderte Ausgangsstring zurückgegeben.
      *
-     * @param string|null $string
-     * @param string $targetFormat Das gewünschte Zielformat
-     * @return string (X)HTML-kodierter String
+     * @param string|null $string Input string
+     * @param string $targetFormat Target format
+     * @return string (X)HTML encoded string
      */
     public static function htmlEncode($string, $targetFormat = Constants::FORMAT_HTML) : string {
         $string = (string)$string;
@@ -172,6 +180,7 @@ final class Util {
     /**
      * Vereinfacht einen String (bspw. eine Artikel-Headline) für die Darstellung
      * in der URL
+     *
      * @param string $string Ursprünglicher String
      * @return string Vereinfachter String
      */
@@ -271,13 +280,35 @@ final class Util {
 
     /**
      * Reads the contents of a directory and returns an array of DirectoryEntry objects
+     *
      * @param string $path Absolute path to the directory to read
      * @param bool $recursive Decides if directory should be read recursively
      * @param string $basePath Base path to build a relative filename
+     * @param array $exclude Optional array with relative file names to exclude
      * @return DirectoryEntry[] Array with directory contents
      */
-    private static function getDirectoryContents(string $path, bool $recursive = true, string $basePath = '') : array {
+    public static function getDirectoryContents(string $path, bool $recursive = true, string $basePath = '', array $exclude = array()) : array {
         $entries = array();
+
+        $dh = opendir($path);
+        if ($dh !== false) {
+            while (($fname = readdir($dh)) !== false) {
+                if ($fname !== '.' && $fname !== '..' && !in_array($fname, $exclude, true)) {
+
+                    $absoluteFileName = Util::createPath($path, $fname);
+                    $fileType = is_dir($absoluteFileName)? DirectoryEntry::TYPE_DIR : DirectoryEntry::TYPE_FILE;
+                    $directoryEntry = new DirectoryEntry($absoluteFileName, $basePath, $fileType);
+                    $entries[] = $directoryEntry;
+
+                    if ($fileType === DirectoryEntry::TYPE_DIR && $recursive) {
+                        foreach (self::getDirectoryContents($absoluteFileName, true, $basePath, $exclude) as $temp) {
+                            $entries[] = $temp;
+                        }
+                    }
+                }
+            }
+        }
+
         return $entries;
     }
     

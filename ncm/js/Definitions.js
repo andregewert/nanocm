@@ -123,8 +123,6 @@ function Definitions() {
      */
     app.editSelected = function() {
         let id = ncm.getFirstSelectedRowId();
-        console.log(id);
-        console.log(id.split(' ', 2));
         if (id != null) {
             app.editDefinition(id.split(' ', 2)[0], id.split(' ', 2)[1]);
         }

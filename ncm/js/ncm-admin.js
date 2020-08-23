@@ -334,7 +334,12 @@ function Ncm() {
     app.InlinePopup = function(url, params, options, buttonsRight, buttonsLeft) {
         let dlg = this;
         let dummy;
-        //let ch;
+        let enableClosing = true;
+
+        /**
+         * Holds references to all defined buttons
+         */
+        dlg.buttons = {};
 
         /**
          * Wird aufgerufen, wenn das Dialog-Fenster (tatsächlich) geschlossen worden ist
@@ -369,7 +374,6 @@ function Ncm() {
                     ncm.hideGlobalBlanker();
                 }
                 dlg._closed();
-                //delete dlg;
             }
         };
 
@@ -384,11 +388,21 @@ function Ncm() {
         };
 
         dlg.close = function() {
-            dlg._closing();
+            if (enableClosing) {
+                dlg._closing();
+            }
         };
 
         dlg.forceClose = function() {
             dlg._closing(true);
+        };
+
+        dlg.setClosingEnabled = function() {
+            enableClosing = true;
+        };
+
+        dlg.setClosingDisabled = function() {
+            enableClosing = false;
         };
 
         dlg.createButton = function(buttonDesc, type) {
@@ -406,6 +420,13 @@ function Ncm() {
             if (typeof buttonDesc.disabled !== 'undefined' && buttonDesc.disabled === true) {
                 b.setAttribute('disabled', 'disabled');
             }
+
+            if (buttonDesc.id !== 'undefined') {
+                dlg.buttons[buttonDesc.id] = b;
+            } else if (buttonDesc.caption !== 'undefined') {
+                dlg.buttons[buttonDesc.caption] = b;
+            }
+
             return b;
         };
 
@@ -461,7 +482,6 @@ function Ncm() {
             $(dummy).text(options.headline);
             dlg.headline.appendChild(dummy);
             dlg.container.appendChild(dlg.headline);
-            //ch = ch -32;
         } else {
             dlg.headline = null;
         }

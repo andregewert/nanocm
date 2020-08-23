@@ -8,10 +8,10 @@ use Ubergeek\NanoCm\Util;
         <thead>
             <tr>
                 <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
-                <th>Datum des Backups</th>
-                <th>Dateiname</th>
-                <th class="textright">Dateigr&ouml;&szlig;e</th>
-                <th class="textright">nanoCM-Version</th>
+                <th class="px-1">Datum des Backups</th>
+                <th class="px-1">Dateiname</th>
+                <th class="textright px-1">Dateigr&ouml;&szlig;e</th>
+                <th class="textright px-1">nanoCM-Version</th>
             </tr>
         </thead>
         <tbody>
@@ -21,16 +21,16 @@ use Ubergeek\NanoCm\Util;
                         <td style="text-align: center">
                             <input type="checkbox" class="selection" value="<?php echo basename($backupInfo->filename); ?>" style="text-align: center">
                         </td>
-                        <td class="textright pre">
+                        <td class="textright pre px-1">
                             <?php if ($backupInfo->creationDateTime instanceof \DateTime) : ?>
                                 <?php echo $backupInfo->creationDateTime->format('Y-m-d H:i:s'); ?>
                             <?php else : ?>
                                 &mdash;
                             <?php endif; ?>
                         </td>
-                        <td><?php echo $this->htmlEncode(basename($backupInfo->filename)); ?></td>
-                        <td class="pre textright"><?php echo Util::sizeHumanReadable($backupInfo->filesize); ?></td>
-                        <td class="pre textright"><?php echo $this->htmlEncode($backupInfo->version); ?></td>
+                        <td class="px-1"><?php echo $this->htmlEncode(basename($backupInfo->filename)); ?></td>
+                        <td class="pre textright px-1"><?php echo Util::sizeHumanReadable($backupInfo->filesize); ?></td>
+                        <td class="pre textright px-1"><?php echo $this->htmlEncode($backupInfo->version); ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else : ?>

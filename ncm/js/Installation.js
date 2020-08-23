@@ -39,11 +39,11 @@ function Installation() {
         });
 
         $('#button_restore').click(function() {
-            // TODO not implemented yet
+            app.openRestoreBackupDialog();
         });
 
         $('#button_delete').click(function() {
-            // TODO not implemented yet
+            app.deleteSelected();
         });
 
         app.refresh();
@@ -92,28 +92,113 @@ function Installation() {
                 }
             }, {
                 cancel:     {
+                    id:         'buttonCancel',
                     caption:    'Abbrechen',
                     clicked:    function() {
                         dlg.close();
                     }
                 },
                 save:       {
+                    id:         'buttonCreate',
                     caption:    'Erstellen',
                     clicked:    function() {
-                        ncm.showDefaultLoadingIndicator();
-                        $.ajax('admin/installation/ajax/createbackup', {
+                        $(dlg.buttons['buttonCreate']).prop('disabled', true);
+                        $(dlg.buttons['buttonCancel']).prop('disabled', true);
+                        dlg.setClosingDisabled();
+                        $('#infoWaiting').show();
+
+                        $.ajax('admin/installation/ajax/create', {
                             cache:      false,
                             type:       'POST',
                             dataType:   'JSON'
                         }).always(function() {
-                            ncm.hideDefaultLoadingIndicator();
-                            dlg.close();
+                            $('#infoWaiting').hide();
+                            dlg.forceClose();
                             app.refresh();
                         });
                     }
                 }
             }
         );
+    };
+
+    /**
+     * Opens the dialog for restoring a single backup
+     * @return {void}
+     */
+    app.openRestoreBackupDialog = function() {
+        let id = ncm.getFirstSelectedRowId();
+        if (id === null) return;
+
+        let dlg = new ncm.InlinePopup(
+            'admin/installation/html/restorebackup', {
+                key:            id
+            }, {
+                headline:       'Backup wiederherstellen',
+                width:          600,
+                height:         350,
+                loaded:         function() {
+                    ncm.focusDefaultElement();
+                }
+            }, {
+                cancel:     {
+                    id:         'buttonCancel',
+                    caption:    'Abbrechen',
+                    clicked:    function() {
+                        dlg.close();
+                    }
+                },
+                save:       {
+                    id:         'buttonRestore',
+                    caption:    'Wiederherstellen',
+                    clicked:    function() {
+                        if (confirm('Wollen Sie dieses Backup wirklich wiederherstellen? Es können dabei neuere Daten verloren gehen!')) {
+                            $(dlg.buttons['buttonCancel']).prop('disabled', true);
+                            $(dlg.buttons['buttonRestore']).prop('disabled', true);
+                            dlg.setClosingDisabled();
+                            $('#infoWaiting').show();
+
+                            $.ajax('admin/installation/ajax/restore', {
+                                cache:      false,
+                                type:       'POST',
+                                dataType:   'JSON',
+                                data:       {
+                                    key:    id
+                                }
+                            }).always(function() {
+                                $('#infoWaiting').hide();
+                                dlg.forceClose();
+                                app.refresh();
+                            });
+                        }
+                    }
+                }
+            }
+        );
+    };
+
+    /**
+     * Deletes the selected backup files
+     * @returns {void}
+     */
+    app.deleteSelected = function() {
+        let ids = ncm.getSelectedRowIds();
+        if (ids.length > 0) {
+            if (confirm('Wollen Sie die ausgewählten Backups wirklich unwiederbringlich löschen?')) {
+                ncm.showDefaultLoadingIndicator();
+                $.ajax('admin/installation/ajax/delete', {
+                    cache:      false,
+                    type:       'GET',
+                    dataType:   'JSON',
+                    data:       {
+                        keys:   ids
+                    }
+                }).always(function() {
+                    ncm.hideDefaultLoadingIndicator();
+                    app.refresh();
+                });
+            }
+        }
     };
 
     app.init();

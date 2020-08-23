@@ -1,0 +1,44 @@
+<?php
+/* @var $this \Ubergeek\NanoCm\Module\AdminInstallationModule */
+use Ubergeek\NanoCm\Util;
+?>
+<div class="mx-4 my-2">
+    <div class="row">
+        <div class="info">
+            <p>Hiermit stellen Sie die NanoCM-Installation aus einem Backup wieder her.</p>
+            <p>Bitte beachten Sie, dass <strong>alle</strong> Daten, die nach dem Zeitpunkt der Erstellung
+                des ausgew&auml;hlten Backups erzeugt (bspw. Statistiken und Kommentare) oder angelegt
+                worden sind (u.&nbsp;a. Artikel), bei Wiederherstellung des Backups gel&ouml;scht werden.</p>
+            <p>Das Wiederherstellen eines Backups kann mehrere Minuten in Anspruch nehmen.</p>
+
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td class="pr-4">Name des Backups</td>
+                    <td><?php echo $this->htmlEncode(basename($this->backupInfo->filename)); ?></td>
+                </tr>
+                <tr>
+                    <td class="pr-4">Gr&ouml;&szlig;e des Backups</td>
+                    <td><?php echo Util::sizeHumanReadable($this->backupInfo->filesize); ?></td>
+                </tr>
+                <tr>
+                    <td class="pr-4">Zeitpunkt des Backups</td>
+                    <td>
+                        <?php if ($this->backupInfo->creationDateTime instanceof \DateTime) : ?>
+                            <?php echo $this->backupInfo->creationDateTime->format('Y-m-d H:i:s'); ?>
+                        <?php else : ?>
+                            &mdash;
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="pr-4">NanoCM-Version</td>
+                    <td><?php echo $this->htmlEncode($this->backupInfo->version); ?></td>
+                </tr>
+            </table>
+        </div>
+        <div class="fs-large text-center mt-4 hidden" id="infoWaiting">
+            <span style="vertical-align: middle">Backup wird wiederhergestellt</span>
+            <img src="ncm/img/blocks-32.gif" width="32" height="32" alt="Bitte warten" title="" style="vertical-align: middle" />
+        </div>
+    </div>
+</div>
