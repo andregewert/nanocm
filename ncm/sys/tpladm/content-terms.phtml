@@ -1,20 +1,20 @@
 <?php
-/* @var $this \Ubergeek\NanoCm\Module\AdminDefinitionsModule */
+/* @var $this \Ubergeek\NanoCm\Module\AdminTermsModule */
 ?>
-<script type="text/javascript" src="ncm/js/Definitions.js"></script>
+<script type="text/javascript" src="ncm/js/Terms.js"></script>
 <div class="container spacing">
     <form onsubmit="module.refresh(); return false;">
         <input type="hidden" id="input_searchPage" name="searchPage" value="<?php echo (int)$this->searchPage; ?>" />
 
         <div class="toolbar">
             <span class="left">
-                <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Definition hinzuf&uuml;gen">
+                <a id="button_add" class="button" href="javascript:void(0)" role="button" title="Begriff hinzuf&uuml;gen">
                     <img src="ncm/img/fatcow/16/add.png" srcset="ncm/img/fatcow/32/add.png 2x" alt="" width="16" height="16">Neu
                 </a>
-                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlte Definition bearbeiten">
+                <a id="button_edit" class="button" href="javascript:void(0);" role="button" title="Ausgew&auml;hlten Begriff bearbeiten">
                     <img src="ncm/img/fatcow/16/toolbar_edit.png" srcset="ncm/img/fatcow/32/toolbar_edit.png 2x" alt="" width="16" height="16">Bearbeiten
                 </a>
-                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Definition l&ouml;schen">
+                <a id="button_delete" class="button button-secondary" href="javascript:void(0)" role="button" title="Ausgew&auml;hlte Begriff l&ouml;schen">
                     <img src="ncm/img/fatcow/16/toolbar_delete.png" srcset="ncm/img/fatcow/32/toolbar_delete.png 2x" alt="" width="16" height="16">L&ouml;schen
                 </a>
             </span>
@@ -39,6 +39,6 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        module = new Definitions();
+        module = new Terms();
     });
 </script>

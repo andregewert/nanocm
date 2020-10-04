@@ -10,22 +10,22 @@
         <div class="toolbar">
             <span class="left">
                 <a id="button_save" class="button" href="javascript:void(0);" title="Artikel speichern">
-                    <img src="ncm/img/fatcow/16/diskette.png" width="16" height="16" />Speichern
+                    <img src="ncm/img/fatcow/16/diskette.png" srcset="ncm/img/fatcow/32/diskette.png 2x" width="16" height="16" />Speichern
                 </a>
                 <a id="button_preview" class="button" href="javascript:void(0);" title="Artikelvorschau &ouml;ffnen">
-                    <img src="ncm/img/fatcow/16/eye.png" width="16" height="16" />Vorschau
+                    <img src="ncm/img/fatcow/16/eye.png" srcset="ncm/img/fatcow/32/eye.png 2x" width="16" height="16" />Vorschau
                 </a>
                 <a id="button_cancel" class="button button-secondary" href="javascript:void(0);" title="Bearbeitung abbrechen">
-                    <img src="ncm/img/fatcow/16/cancel.png" width="16" height="16" />Abbrechen
+                    <img src="ncm/img/fatcow/16/cancel.png" srcset="ncm/img/fatcow/32/cancel.png 2x" width="16" height="16" />Abbrechen
                 </a>
             </span>
             <span class="right" style="float: right; vertical-align: middle">
                 <img class="spinner" id="toolbar_spinner" src="ncm/img/spin.gif" />
                 <a id="button_toggle_settings" class="button" href="javascript:void(0)" title="Artikeleinstellungen anzeigen">
-                    <img src="ncm/img/fatcow/16/cog.png" width="16" height="16" />Einstellungen
+                    <img src="ncm/img/fatcow/16/cog.png" srcset="ncm/img/fatcow/32/cog.png 2x" width="16" height="16" />Einstellungen
                 </a>
                 <a id="button_publish" class="button" href="javascript:void(0)" title="&Auml;nderungen speichern und Artikel freischalten">
-                    <img src="ncm/img/fatcow/16/lock_open.png" width="16" height="16" />Freischalten
+                    <img src="ncm/img/fatcow/16/lock_open.png" srcset="ncm/img/fatcow/32/lock_open.png 2x" width="16" height="16" />Freischalten
                 </a>
             </span>
         </div>
@@ -81,7 +81,7 @@
                 <p>
                     <label title="Variablen zur Steuerung des Seiten-Templates">Template-Variablen</label>
                     <input type="text" id="input_article_templatevars" value="<?php if (is_array($this->article->templatevars)) echo $this->htmlEncode(json_encode($this->article->templatevars)); ?>">
-                    <a id="button_edit_vars" href="javascript:void(0)"><img src="ncm/img/fatcow/16/edit_button.png" width="16" height="16" style="vertical-align: middle"></a>
+                    <a id="button_edit_vars" href="javascript:void(0)"><img src="ncm/img/fatcow/16/edit_button.png" srcset="ncm/img/fatcow/32/edit_button.png 2x" width="16" height="16" style="vertical-align: middle"></a>
                 </p>
                 <p>
                     <label title="Kommentierung dieses Artikel zulassen" for="input_article_enable_comments">Kommentare zulasen</label>

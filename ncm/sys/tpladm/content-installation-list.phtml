@@ -19,7 +19,7 @@ use Ubergeek\NanoCm\Util;
                 <?php foreach ($this->existingBackups as $backupInfo) : ?>
                     <tr>
                         <td style="text-align: center">
-                            <input type="checkbox" class="selection" value="<?php echo basename($backupInfo->filename); ?>" style="text-align: center">
+                            <input type="checkbox" class="selection" value="<?php echo $this->htmlEncode(basename($backupInfo->filename)); ?>" style="text-align: center">
                         </td>
                         <td class="textright pre px-1">
                             <?php if ($backupInfo->creationDateTime instanceof \DateTime) : ?>
@@ -28,7 +28,9 @@ use Ubergeek\NanoCm\Util;
                                 &mdash;
                             <?php endif; ?>
                         </td>
-                        <td class="px-1"><?php echo $this->htmlEncode(basename($backupInfo->filename)); ?></td>
+                        <td class="px-1">
+                            <a href="admin/installation/download/<?php echo urlencode(basename($backupInfo->filename)); ?>"><?php echo $this->htmlEncode(basename($backupInfo->filename)); ?></a>
+                        </td>
                         <td class="pre textright px-1"><?php echo Util::sizeHumanReadable($backupInfo->filesize); ?></td>
                         <td class="pre textright px-1"><?php echo $this->htmlEncode($backupInfo->version); ?></td>
                     </tr>

@@ -1,0 +1,30 @@
+<?php /* @var $this \Ubergeek\NanoCm\Module\AdminTermsModule */ ?>
+<table class="list">
+    <thead>
+    <tr>
+        <th style="text-align: center" width="30"><input type="checkbox" class="selectall" /></th>
+        <th>Begriff</th>
+        <th>Daten</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php if (is_array($this->terms) && count($this->terms) > 0) : ?>
+        <?php foreach ($this->terms as $term) : ?>
+            <tr>
+                <td style="text-align: center">
+                    <input type="checkbox" class="selection" value="<?php echo $this->htmlEncode($term->getKey()); ?>" style="text-align: center">
+                </td>
+                <td><a href="javascript:void(0);"
+                       data-key="<?php echo $this->htmlEncode($term->key); ?>"
+                       onclick="module.editClickedTerm(this);"><?php echo $this->htmlEncode($term->term); ?></a></td>
+                <td><?php echo $this->htmlEncode($term->data); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <tr class="noresult">
+            <td colspan="4">Keine Begriffe gefunden</td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+</table>
+<?php $this->includeUserTemplate('blocks/list-paging.phtml'); ?>

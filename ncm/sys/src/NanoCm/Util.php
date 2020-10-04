@@ -29,6 +29,23 @@ use Ubergeek\NanoCm\Util\DirectoryEntry;
  */
 final class Util {
 
+    // <editor-fold desc="Constants">
+
+    /**
+     * Specifies that an operation should be done recursively
+     * @var bool
+     */
+    public const RECURSIVE = true;
+
+    /**
+     * Specifies that an operation should be done non-recursively
+     * @var bool
+     */
+    public const NON_RECURSIVE = false;
+
+    // </editor-fold>
+
+
     /**
      * Creates the gravatar image url for the given mail address
      *
@@ -119,6 +136,12 @@ final class Util {
         return $tweetUrl;
     }
 
+    /**
+     * Gets the size in bytes for the given directory
+     *
+     * @param string $path Absolute path to the directory
+     * @return int Size of the directory in bytes
+     */
     public static function getDirectorySize($path) : int {
         $bytestotal = 0;
         $path = realpath($path);
@@ -130,6 +153,11 @@ final class Util {
         return $bytestotal;
     }
 
+    /**
+     * Returns the extension of the given filename
+     * @param string $filename Filename
+     * @return string Extension
+     */
     public static function getFileExtension(string $filename) : string {
         if (preg_match("/\.([^\.]+?)$/i", $filename, $matches) > 0) {
             return strtolower($matches[1]);
@@ -137,6 +165,12 @@ final class Util {
         return '';
     }
 
+    /**
+     * Returns a "human readable" version of the given file size (in bytes)
+     * @param int $bytes Filesite in bytes
+     * @param int $decimals Number of decimals to show
+     * @return string Human readable file size
+     */
     public static function sizeHumanReadable($bytes, $decimals = 2) : string {
         $size = array('B','KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB');
         $factor = floor((strlen($bytes) - 1) / 3);
@@ -250,10 +284,10 @@ final class Util {
             foreach ($blacklist as $blacklistKey) {
                 $emojiKeys = array_keys($emojis[$group]);
                 $wildcard = null;
-                if (substr($blacklistKey, -1) == '*') {
+                if (substr($blacklistKey, -1) === '*') {
                     $wildcard = 'begin';
                     $blacklistKey = substr($blacklistKey, 0, -1);
-                } elseif (substr($blacklistKey, 0, 1) == '*') {
+                } elseif (substr($blacklistKey, 0, 1) === '*') {
                     $wildcard = 'end';
                     $blacklistKey = substr($blacklistKey, 1);
                 }
@@ -261,8 +295,8 @@ final class Util {
                 foreach ($emojiKeys as $emojiKey) {
                     if (
                         $blacklistKey == $emojiKey
-                        || ($wildcard == 'begin' && substr($emojiKey, 0, strlen($blacklistKey)) == $blacklistKey)
-                        || ($wildcard == 'end' && substr($emojiKey, -strlen($blacklistKey)) == $blacklistKey)
+                        || ($wildcard === 'begin' && substr($emojiKey, 0, strlen($blacklistKey)) == $blacklistKey)
+                        || ($wildcard === 'end' && substr($emojiKey, -strlen($blacklistKey)) == $blacklistKey)
                     ) {
                         unset($emojis[$group][$emojiKey]);
                     }

@@ -608,6 +608,63 @@ class Orm {
     // </editor-fold>
 
 
+    // <editor-fold desc="Terms">
+
+    /**
+     * Searches term definitions
+     *
+     * @param int|null $type
+     * @param string|null $searchterm
+     * @param bool $countOnly
+     * @param int|null $page
+     * @param int|null $limit
+     * @return array
+     */
+    public function searchTerms($type = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
+        $terms = array();
+        $params = array();
+        $limit = ($limit === null)? $this->pageLength : (int)$limit;
+
+        if ($countOnly) {
+            $sql = 'SELECT COUNT(*) ';
+        } else {
+            $sql = 'SELECT * ';
+        }
+        $sql .= 'FROM terms WHERE 1 = 1 ';
+
+        if (!empty($type)) {
+            $sql .= ' AND type = :type ';
+            $params['type'] = $type;
+        }
+
+        if (!empty($searchterm)) {
+            $like = "%$searchterm%";
+            $sql .= ' AND term LIKE :seach_term OR data LIKE :search_data ';
+            $params['search_term'] = $like;
+            $params['search_data'] = $like;
+        }
+
+        if (!$countOnly) {
+            $sql .= ' ORDER BY type ASC, term ASC ';
+            $page = (int)$page -1;
+            if ($page < 0) $page = 0;
+            $offset = $page *$this->pageLength;
+            $sql .= " LIMIT $offset, $limit ";
+        }
+
+        $stmt = $this->basedb->prepare($sql);
+        $stmt->execute($params);
+
+        if ($countOnly) return $stmt->fetchColumn();
+        while (($term = Term::fetchFromPdoStatement($stmt)) !== null) {
+            $terms[] = $term;
+        }
+        return $terms;
+    }
+
+    // </editor-fold>
+
+
     // <editor-fold desc="Definitions">
 
     /**
@@ -688,7 +745,7 @@ class Orm {
     public function searchDefinitions($type = null, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $definitions = array();
         $params = array();
-        $limit = ($limit == null)? $this->pageLength : intval($limit);
+        $limit = ($limit === null)? $this->pageLength : (int)$limit;
 
         if ($countOnly) {
             $sql = 'SELECT COUNT(*) ';
@@ -713,7 +770,7 @@ class Orm {
         // Begrenzung der Ergebnismenge auf Anzeigeseiten
         if (!$countOnly) {
             $sql .= ' ORDER BY definitiontype ASC, key ASC, title ASC, value ASC, parameters ASC ';
-            $page = intval($page) -1;
+            $page = (int)$page -1;
             if ($page < 0) $page = 0;
             $offset = $page *$this->pageLength;
             $sql .= " LIMIT $offset, $limit ";

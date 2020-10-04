@@ -256,7 +256,12 @@ class InstallationManager {
         $zipArchive->open($zipFile, ZipArchive::CREATE);
 
         // Files within the installation root
-        $files = Util::getDirectoryContents($this->installationBasePath, false, $this->installationBasePath, $this->backupExcludePaths);
+        $files = Util::getDirectoryContents(
+            $this->installationBasePath,
+            Util::NON_RECURSIVE,
+            $this->installationBasePath,
+            $this->backupExcludePaths
+        );
         foreach ($files as $directoryEntry) {
             if ($directoryEntry->entryType !== DirectoryEntry::TYPE_DIR) {
                 $zipArchive->addFromString(
@@ -269,7 +274,12 @@ class InstallationManager {
         // Files from subdirs
         foreach ($this->backupDirs as $dir) {
             $absDir = Util::createPath($this->installationBasePath, $dir);
-            $files = Util::getDirectoryContents($absDir, true, $this->installationBasePath, $this->backupExcludePaths);
+            $files = Util::getDirectoryContents(
+                $absDir,
+                Util::RECURSIVE,
+                $this->installationBasePath,
+                $this->backupExcludePaths
+            );
 
             foreach ($files as $directoryEntry) {
                 if ($directoryEntry->entryType === DirectoryEntry::TYPE_DIR) {
@@ -289,6 +299,7 @@ class InstallationManager {
 
     /**
      * Deletes the specified backup file
+     *
      * @param BackupInfo $backupInfo Backup information
      * @return void
      */
@@ -297,6 +308,18 @@ class InstallationManager {
             if (file_exists($backupInfo->filename)) {
                 unlink($backupInfo->filename);
             }
+        }
+    }
+
+    /**
+     * Returns the backup content (zip file) as a string
+     *
+     * @param BackupInfo $backupInfo Backup information
+     * @return string The backup zip file's contents
+     */
+    public function getBackupContents(BackupInfo $backupInfo) : string {
+        if (preg_match($this->backupFilenamePattern, basename($backupInfo->filename)) > 0) {
+            return file_get_contents($backupInfo->filename);
         }
     }
 

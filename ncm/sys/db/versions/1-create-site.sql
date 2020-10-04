@@ -715,6 +715,236 @@ CREATE UNIQUE INDEX user_id_uindex ON user (
                                             id
     );
 
+-- Table: terms
+CREATE TABLE terms (
+                       type INTEGER NOT NULL
+                                    DEFAULT (1),
+                       term TEXT    NOT NULL
+                                    DEFAULT (''),
+                       data TEXT    DEFAULT ('')
+                           NOT NULL,
+                       UNIQUE (
+                               type,
+                               term
+                           )
+                           ON CONFLICT REPLACE
+);
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'cialis',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'viagra',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'dating',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'adult',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'hydrochlorothiazide',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'chlorthalidone',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'levitra',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'capsules',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'prednisolone',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'pharmacy',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'prices',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'drug',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'porno',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'porn',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'pussy',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'visit',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'rolex',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'penis',
+           ''
+       );
+
+INSERT INTO terms (
+    type,
+    term,
+    data
+)
+VALUES (
+           1,
+           'casino',
+           ''
+       );
+
+
+-- Index: idx_primary
+CREATE UNIQUE INDEX idx_primary ON terms (
+                                          type,
+                                          term
+    );
 
 COMMIT TRANSACTION;
 PRAGMA foreign_keys = on;

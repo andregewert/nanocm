@@ -20,6 +20,7 @@ namespace Ubergeek\NanoCm\Module;
 
 use Ubergeek\NanoCm\AjaxResponse;
 use Ubergeek\NanoCm\BackupInfo;
+use Ubergeek\NanoCm\Medium;
 
 /**
  * This module manages backups and installed versions / updates of nanoCM.
@@ -101,6 +102,20 @@ class AdminInstallationModule extends AbstractAdminModule {
                 }
                 break;
 
+            // Download existing backup
+            case 'download':
+                $this->setPageTemplate(self::PAGE_NONE);
+                $key = urldecode($this->getRelativeUrlPart(3));
+                $backupInfo = $this->ncm->installationManager->readBackupInfoByRelativeFilename($key);
+
+                if ($backupInfo !== null) {
+                    $this->setContentType('application/zip');
+                    $this->replaceMeta('Content-Disposition', "attachment; filename=\"" . urlencode(basename($backupInfo->filename)) . "\"");
+                    $this->replaceMeta('Content-Length', $backupInfo->filesize);
+                    $content = $this->ncm->installationManager->getBackupContents($backupInfo);
+                }
+                break;
+
             // AJAX requests
             case 'ajax':
                 $this->setPageTemplate(self::PAGE_NONE);
@@ -117,7 +132,6 @@ class AdminInstallationModule extends AbstractAdminModule {
                                 foreach ($keys as $backupName) {
                                     $backupInfo = $this->ncm->installationManager->readBackupInfoByRelativeFilename($backupName);
                                     if ($backupInfo !== null) {
-                                        $this->log->debug("Delete backup " . $backupInfo->filename);
                                         $this->ncm->installationManager->deleteBackup($backupInfo);
                                     }
                                 }

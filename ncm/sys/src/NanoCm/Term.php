@@ -18,59 +18,41 @@
 
 namespace Ubergeek\NanoCm;
 
-/**
- * Bildet eine der frei definierbaren Definitionen ab
- * @package Ubergeek\NanoCm
- * @author André Gewert <agewert@ubergeek.de>
- * @created 2018-10-30
- */
-class Definition {
-
-    // <editor-fold desc="Constants">
-
-    /**
-     * Artikelarten
-     *
-     * @var string
-     */
-    public const TYPE_ARTICLE_TYPE = 'articletype';
-
-    /**
-     * Sortiermöglichkeiten für Artikelserien
-     *
-     * @var string
-     */
-    public const TYPE_ARTICLESERIES_SORT = 'articleseriessort';
-
-    // </editor-fold>
-
+class Term {
 
     // <editor-fold desc="Properties">
 
     /**
-     * @var string Definitionstyp
+     * @var int Type of term definition
      */
-    public $definitiontype;
+    public $type;
 
     /**
-     * @var string Schlüssel der Definition innerhalb des Definitionstyps
+     * @var string Term
      */
-    public $key;
+    public $term;
 
     /**
-     * @var string Titel bzw. Anzeigename der konkreten Definition
+     * @var string Optional data or description for this term
      */
-    public $title;
+    public $data;
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Constructor">
 
     /**
-     * @var string Optionaler zusätzlicher Wert zur Definition
+     * Term constructor.
+     * @param array|null $data Data to initialize with
      */
-    public $value;
-
-    /**
-     * @var string Optionale zusätzliche Parameter zur Definition
-     */
-    public $parameters;
+    public function __construct($data = null) {
+        if (is_array($data)) {
+            $this->type = (int)$data['type'];
+            $this->term = (string)$data['term'];
+            $this->data = (string)$data['data'];
+        }
+    }
 
     // </editor-fold>
 
@@ -78,9 +60,9 @@ class Definition {
     // <editor-fold desc="Methods">
 
     /**
-     * Erstellt ein Definition-Objekt anhand des übergebenen PDO-Statements
+     * Creates a term object based on the current dataset cursor of the given dbo statement object
      * @param \PDOStatement $stmt
-     * @return Definition
+     * @return mixed|null
      */
     public static function fetchFromPdoStatement(\PDOStatement $stmt) {
         if (($def = $stmt->fetchObject(__CLASS__)) !== false) {
@@ -89,5 +71,15 @@ class Definition {
         return null;
     }
 
+    /**
+     * Returns the primary key as a string
+     *
+     * @return string
+     */
+    public function getKey() {
+        return $this->type . '_' . $this->term;
+    }
+
     // </editor-fold>
+
 }

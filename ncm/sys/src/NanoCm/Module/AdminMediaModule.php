@@ -150,10 +150,10 @@ class AdminMediaModule extends AbstractAdminModule {
                 $this->setPageTemplate(self::PAGE_NONE);
                 $this->setContentType('binary/octet-stream');
 
-                $id = intval($this->getRelativeUrlPart(3));
+                $id = (int)$this->getRelativeUrlPart(3);
                 $file = $this->orm->getMediumById($id, Medium::TYPE_FILE, false);
-                if ($file != null) {
-                    if (strlen($file->type) > 0) {
+                if ($file !== null) {
+                    if ($file->type !== '') {
                         $this->setContentType($file->type);
                         $this->replaceMeta('Content-Disposition', "attachment; filename=\"" . urlencode($file->filename) . "\"");
                         $this->replaceMeta('Content-Length', $file->filesize);
