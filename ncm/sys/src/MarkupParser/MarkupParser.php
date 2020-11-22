@@ -480,9 +480,8 @@ class MarkupParser {
         return $input;
     }
 
-    protected function isLinkExternal($url) {
-        return mb_substr($url, 0, 4) == 'http';
-        // TODO Mit der aktuell konfigurierten Domain abgleichen
+    protected function isLinkExternal($url): bool {
+        return mb_strpos($url, 'http') === 0;
     }
 
     // </editor-fold>

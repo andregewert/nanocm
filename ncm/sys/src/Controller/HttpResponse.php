@@ -25,19 +25,19 @@ class HttpResponse {
      * HTTP-Statuscode
      * @var integer
      */
-    var $statusCode = 200;
+    public $statusCode = 200;
     
     /**
      * Zusätzlich zu sendende HTTP-Header
      * @var array
      */
-    var $headers;
+    public $headers;
 
     /**
      * Der gesamte als Antwort zu sendende Text
      * @var string
      */
-    var $content;
+    public $content;
     
     /**
      * Gibt die bis hierher gesammelten HTTP-Header aus

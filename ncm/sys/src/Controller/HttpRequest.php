@@ -18,7 +18,7 @@
  */
 
 namespace Ubergeek\Controller;
-use Ubergeek\Net;
+use Ubergeek\Net\Url;
 
 /**
  * Kapselt Informationen zu einen konkreten HTTP-Request
@@ -28,12 +28,12 @@ class HttpRequest {
 
     /**
      * Die angeforderte URL
-     * @var \Ubergeek\Net\Url
+     * @var Url
      */
     public $requestUri;
     
     public function __construct(string $requestUrl = null) {
-        $this->requestUri = new Net\Url($requestUrl);
+        $this->requestUri = new Url($requestUrl);
     }
 
 }

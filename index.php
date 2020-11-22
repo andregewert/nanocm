@@ -20,7 +20,7 @@
  */
 
 require 'ncm/sys/src/autoload.php';
-if ($_SERVER['HTTP_HOST'] == 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] == 'ubergeek.de') {
+if ($_SERVER['HTTP_HOST'] === 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] === 'ubergeek.de') {
     $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
 } else {
     $var = new Ubergeek\NanoCm\FrontController(__DIR__);

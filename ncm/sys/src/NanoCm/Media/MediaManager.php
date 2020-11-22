@@ -210,8 +210,11 @@ class MediaManager {
                 }
             }
 
-            //$srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/hqdefault.jpg");
+            // TODO Add some error handling here!
             $srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/maxresdefault.jpg");
+            if (empty($srcImgData)) {
+                $srcImgData = Fetch::fetchFromUrl("https://i.ytimg.com/vi/$youtubeId/hqdefault.jpg");
+            }
 
             $tgtImgData = $this->resizeImageDataToFormat($srcImgData, $format);
             if ($tgtImgData != null && $this->cache instanceof CacheInterface) {

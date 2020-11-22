@@ -30,24 +30,21 @@ namespace Ubergeek;
 class KeyValuePair {
     
     /**
-     * Schlüssel
-     *
+     * Key
      * @var string
      */
     public $key;
 
     /**
-     * Wert
-     *
+     * Value
      * @var mixed
      */
     public $value;
 
     /**
-     * Dem Konstruktor können optional direkt Schlüssel und Wert übergeben werden
-     *
-     * @param string $key Schlüssel
-     * @param object $value Wert
+     * Constructor can take key and value optionally
+     * @param string|null $key Key
+     * @param null $value Value
      */
     public function __construct(string $key = null, $value = null) {
         $this->key = $key;
