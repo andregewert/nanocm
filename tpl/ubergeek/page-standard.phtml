@@ -36,11 +36,11 @@
             <div class="container brand">
                 <a class="nonprint" href="<?php echo $this->htmlConvUrl('/'); ?>"><img src="<?php echo $this->htmlConvUrl('tpl/ubergeek/img/ubergeek-logo.png'); ?>" width="346" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" /></a>
                 <img class="printonly" src="<?php echo $this->htmlConvUrl('tpl/ubergeek/img/ubergeek-logo-black.png'); ?>" width="346" height="38" alt="<?php echo $this->htmlEncode($this->getSiteTitle()); ?>" />
-                <?php echo $this->includeUserTemplate('navigation-meta.phtml'); ?>
+                <?php $this->includeUserTemplate('navigation-meta.phtml'); ?>
             </div>
         </header>
 
-        <?php echo $this->includeUserTemplate('navigation-main.phtml'); ?>
+        <?php $this->includeUserTemplate('navigation-main.phtml'); ?>
 
         <?php if (!$this->ncm->hasCurrentUserAcceptedPrivacyPolicy()) : ?>
             <?php $this->includeUserTemplate('blocks/privacy.phtml') ?>
@@ -88,8 +88,9 @@
                     <?php endif; ?>
                 </div>
                 <div class="column-4 nonprint" style="padding-left: 0.25em">
-                    <h1>Soziale Medien</h1>
+                    <h1>Woanders</h1>
                     <ul class="nobullets">
+                        <li><a class="extern" href="https://github.com/andregewert">Github</a></li>
                         <li><a class="extern" href="http://instagram.com/agewert">Instagram</a></li>
                         <li><a class="extern" href="https://www.twitter.com/agewert">Twitter</a></li>
                     </ul>

@@ -21,6 +21,8 @@
 
 namespace Ubergeek\NanoCm\Module;
 
+use Exception;
+use InvalidArgumentException;
 use Ubergeek\Controller\ControllerInterface;
 use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Article;
@@ -28,6 +30,7 @@ use Ubergeek\NanoCm\Constants;
 use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
 use Ubergeek\NanoCm\Exception\AuthorizationException;
 use Ubergeek\NanoCm\Exception\ContentNotFoundException;
+use Ubergeek\NanoCm\FrontController;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\UserMessage;
 use Ubergeek\NanoCm\Util;
@@ -92,7 +95,7 @@ abstract class AbstractModule implements
      * zugänglich. Dazu gehören bspw. Datenbank-Mapping und Medien-Manager.
      * (Außerdem Konfiguration der zu verwendenden Pfade.)
      * 
-     * @var \Ubergeek\NanoCm\FrontController
+     * @var FrontController
      */
     public $frontController = null;
 
@@ -117,7 +120,7 @@ abstract class AbstractModule implements
     /**
      * Enthält eine Referenz auf die zuletzt aufgefangenge Exception.
      * Kann im Template für die Fehlerausgabe verwendet werden.
-     * @var \Exception
+     * @var Exception
      */
     public $exception;
     
@@ -180,10 +183,10 @@ abstract class AbstractModule implements
      * Dem Konstruktor wird eine Referenz auf den ausführenden FrontController
      * übergeben. Hierüber sind alle weiteren Ressourcen des NanoCM erreichbar.
      * 
-     * @param \Ubergeek\NanoCm\FrontController $frontController Referenz auf den
+     * @param FrontController $frontController Referenz auf den
      *      ausführenden Controller.
      */
-    public function __construct(\Ubergeek\NanoCm\FrontController $frontController) {
+    public function __construct(FrontController $frontController) {
         $this->frontController = $frontController;
         $this->ncm = $frontController->ncm;
         $this->orm = $frontController->ncm->orm;
@@ -278,13 +281,13 @@ abstract class AbstractModule implements
      * im Verzeichnis "user1/nanocm" unterhalb des Document Root installiert, so liefert diese Methode die URL
      * "user1/nanocm/index.html" zurück.
      *
-     * @param $relativeUrl Auf das Installationsverzeichnis von NanoCM bezogene relative URL
+     * @param string $relativeUrl Auf das Installationsverzeichnis von NanoCM bezogene relative URL
      * @return string Server-absolute URL
      */
     public function convUrl($relativeUrl) {
-        if (preg_match('/^[a-z]+\:/i', $relativeUrl)) return $relativeUrl;
+        if (preg_match('/^[a-z]+:/i', $relativeUrl)) return $relativeUrl;
         $url = $this->ncm->relativeBaseUrl;
-        if (substr($relativeUrl, 0, 1) == '/') {
+        if (substr($relativeUrl, 0, 1) === '/') {
             $relativeUrl = substr($relativeUrl, 1);
         }
         return $url . $relativeUrl;
@@ -296,7 +299,7 @@ abstract class AbstractModule implements
      * @param string $tplRelativeUrl Path or url relative to the current template dir
      */
     public function convTplUrl($tplRelativeUrl) {
-        if (preg_match('/^[a-z]+\:/i', $tplRelativeUrl)) return $tplRelativeUrl;
+        if (preg_match('/^[a-z]+:/i', $tplRelativeUrl)) return $tplRelativeUrl;
         $url = Util::createPath($this->ncm->relativeBaseUrl, 'tpl', $this->ncm->tplname) . '/';
 
         if (substr($tplRelativeUrl, 0, 1) === '/') {
@@ -401,7 +404,7 @@ abstract class AbstractModule implements
 
     /**
      * Formatiert eine Ganzzahl für die Ausgabe (mit Tausender-Trennzeichen)
-     * @param $int Ganzzahliger Wert
+     * @param integer $int Ganzzahliger Wert
      * @return string Für die Ausgabe formatierter Wert
      * @todo Konvertierung muss lokalisierbar sein!
      */
@@ -411,7 +414,7 @@ abstract class AbstractModule implements
 
     /**
      * Formatiert einen Dezimalbruch für die Ausgabe (mit Tausender- und Dezimaltrennzeichen)
-     * @param $float Dezimalbruch
+     * @param float $float Dezimalbruch
      * @param int $decimals Anzahl Nachkommastellen
      * @return string Für die Ausgabe formatierter Wert
      * @todo Konvertierung muss lokalisierbar sein!
@@ -423,7 +426,7 @@ abstract class AbstractModule implements
     /**
      * Bindet an Ort und Stelle ein Template ein
      * @param string $file Relativer Pfad zum betreffenden Template
-     * @throws \Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
+     * @throws Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
      */
     public function includeUserTemplate(string $file) {
         echo $this->renderUserTemplate($file);
@@ -434,7 +437,7 @@ abstract class AbstractModule implements
      * kann.
      * @param string $file Das zu rendernde Template (ohne Pfadangabe)
      * @return string Inhalt des gerenderten Templates
-     * @throws \Exception Exceptions, die bei der Ausführung des Templates
+     * @throws Exception Exceptions, die bei der Ausführung des Templates
      *      geworfen werden, werden weitergeworfen
      * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
      */
@@ -447,7 +450,7 @@ abstract class AbstractModule implements
         }
 
         if (!file_exists($fname)) {
-            throw new \Exception("Template file not found: $file");
+            throw new Exception("Template file not found: $file");
         }
         
         // Ermitteltes Template einbinden
@@ -455,7 +458,7 @@ abstract class AbstractModule implements
         try {
             include($fname);
             $c = ob_get_contents();
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             throw $ex;
         } finally {
             ob_end_clean();
@@ -498,7 +501,7 @@ abstract class AbstractModule implements
      * unkritischen Dingen - etwa der Übergabe von Such-Parametern - genutzt werden.
      *
      * @param string $name Name des Parameters
-     * @param $default Standardwert, falls Schlüssel weder im Request noch in der Session gesetzt
+     * @param mixed $default Standardwert, falls Schlüssel weder im Request noch in der Session gesetzt
      * @return mixed
      */
     public function getOrOverrideSessionVarWithParam(string $name, $default = null) {
@@ -530,7 +533,7 @@ abstract class AbstractModule implements
         if (!is_array($this->userMessages)) {
             $this->userMessages = array();
         }
-        array_push($this->userMessages, new UserMessage($message, $title, $type));
+        $this->userMessages[] = new UserMessage($message, $title, $type);
     }
 
     // </editor-fold>
@@ -573,7 +576,7 @@ abstract class AbstractModule implements
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unsupported target format: $this->targetFormat");
+                throw new InvalidArgumentException("Unsupported target format: $this->targetFormat");
         }
 
         return $output;
@@ -601,14 +604,14 @@ abstract class AbstractModule implements
                 $output = str_replace('...', '&hellip;', $output);
                 $output = str_replace(' -- ', '&nbsp;&ndash; ', $output);
                 $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
-                $output = preg_replace('/\_(.+?)\_/i', '<em>$1</em>', $output);
+                $output = preg_replace('/_(.+?)_/i', '<em>$1</em>', $output);
                 $output = preg_replace('/\*(.+?)\*/i', '<strong>$1</strong>', $output);
                 $output = preg_replace('/\(c\)/i', '&copy;', $output);
                 $output = trim($output);
                 break;
 
             default:
-                throw new \InvalidArgumentException("Unsupported target format: $this->targetFormat");
+                throw new InvalidArgumentException("Unsupported target format: $this->targetFormat");
         }
 
         return $output;
@@ -660,7 +663,7 @@ abstract class AbstractModule implements
         } catch (ContentNotFoundException $ex) {
             $this->exception = $ex;
             $this->render404Content();
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             $this->exception = $ex;
             $this->renderExceptionContent();
         }
@@ -755,31 +758,31 @@ abstract class AbstractModule implements
     
     // <editor-fold desc="LoggerInterface">
     
-    public function alert($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function alert($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->alert($data, $ex, $backtrace, $line);
     }
 
-    public function crit($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function crit($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->crit($data, $ex, $backtrace, $line);
     }
 
-    public function debug($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function debug($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->debug($data, $ex, $backtrace, $line);
     }
 
-    public function emerg($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function emerg($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->emerg($data, $ex, $backtrace, $line);
     }
 
-    public function err($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function err($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->err($data, $ex, $backtrace, $line);
     }
 
-    public function notice($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function notice($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->notice($data, $ex, $backtrace, $line);
     }
 
-    public function warn($data, \Exception $ex = null, array $backtrace = null, string $line = '') {
+    public function warn($data, Exception $ex = null, array $backtrace = null, string $line = '') {
         $this->log->warn($data, $ex, $backtrace, $line);
     }
     
