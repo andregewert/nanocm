@@ -2181,10 +2181,15 @@ class Orm {
      * Ermittelt alle Medieneinträge zu einem übergeordneten Ordner
      *
      * @param int $parenId Datensatz-ID des übergeordneten Ordners
+     * @param null $type Optionale Einschränkung auf einen Medientyp
      * @return Medium[] Einträge zum angegebenen Ordner
      */
-    public function getMediaByParentId(int $parenId) {
+    public function getMediaByParentId(int $parenId, $type = null): array {
         $sql = 'SELECT * FROM medium WHERE parent_id = :parent_id ';
+        if ($type !== null) {
+            $type = (int)$type;
+            $sql .= " AND entrytype = $type ";
+        }
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('parent_id', $parenId);
         $stmt->execute();

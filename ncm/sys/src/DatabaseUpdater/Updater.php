@@ -41,13 +41,13 @@ class Updater {
      * Script- bzw. Aktionstyp: Create
      * @var string
      */
-    const TYPE_CREATE = 'create';
+    public const TYPE_CREATE = 'create';
 
     /**
      * Script- bzw. Aktionstyp: Update
      * @var string
      */
-    const TYPE_UPDATE = 'update';
+    public const TYPE_UPDATE = 'update';
 
     // </editor-fold>
 
@@ -86,10 +86,10 @@ class Updater {
      * @param DatabaseInterface $databaseInterface Referenz auf die datenbankspezifischen Schnittstellen-Klasse
      * @param null|LoggerInterface $log Optionale Referenz auf einen zu verwendenden Logger
      */
-    public function __construct($ddlPath, $databaseInterface, $log = null) {
+    public function __construct(string $ddlPath, DatabaseInterface $databaseInterface, $log = null) {
         $this->ddlPath = $ddlPath;
         $this->databaseInterface = $databaseInterface;
-        if ($log == null) {
+        if ($log === null) {
             $log = new Logger(new NullWriter());
         }
         $this->log = $log;
@@ -103,10 +103,9 @@ class Updater {
     /**
      * Führt ein automatisches Update der Datenbankstrukturen auf die aktuellste verfügbare Version durch
      * @return integer Die neue Versionsnummer der Datenbank
-     * @todo Bessere Fehlerbehandlung implementieren!
      */
-    public function updateDatabaseToLatestVersion() {
-
+    public function updateDatabaseToLatestVersion(): ?int {
+        $latest = 0;
         if ($this->areUpdatesAvailable()) {
             $current = $this->getCurrentDatabaseVersion();
             $latest = $this->getLatestAvailableVersion();
@@ -114,7 +113,7 @@ class Updater {
             $this->log->info("Latest version is: $latest");
 
             // Auszuführende Scripts ermitteln
-            if ($current == 0) {
+            if ($current === 0) {
                 $scripts = $this->getScriptsSinceVersion($latest -1, self::TYPE_CREATE);
             }
             else {
@@ -133,7 +132,7 @@ class Updater {
 
             // Neue Versionsnummer schreiben
             $this->saveCurrentDatabaseVersion($latest);
-            if ($current == 0) {
+            if ($current === 0) {
                 $this->log->info("Created database with version $latest");
             } else {
                 $this->log->info("Updated database to version $latest");
@@ -148,14 +147,15 @@ class Updater {
     /**
      * Ermittelt die Versionsnummer der neuesten verfügbaren Datenbank-Definition.
      * Wenn keine Datenbank-Definitionsscripte gefgunden werden kann, wird null zurückgegeben.
+     *
      * @return int|null Versionsnummer oder null
      */
-    public function getLatestAvailableVersion() {
+    public function getLatestAvailableVersion(): ?int {
         $latest = null;
         if (($dh = opendir($this->ddlPath)) !== false) {
             while (($fname = readdir($dh)) !== false) {
-                if ($fname != '.' && $fname != '..' && preg_match("/^(\d+)\-(update|create)\-.+\.sql$/i", $fname, $matches) !== false) {
-                    $fileVersion = intval($matches[1]);
+                if ($fname !== '.' && $fname !== '..' && preg_match("/^(\d+)-(update|create)-.+\.sql$/i", $fname, $matches) !== false) {
+                    $fileVersion = (int)$matches[1];
                     if ($latest === null || $fileVersion > $latest) {
                         $latest = $fileVersion;
                     }
@@ -169,7 +169,7 @@ class Updater {
      * Ermittelt, ob für die installierte bzw. eingesetzte Datenbankstruktur Update verfügbar sind.
      * @return bool true, wenn Datenbank-Updates verfügbar sind
      */
-    public function areUpdatesAvailable() {
+    public function areUpdatesAvailable(): bool {
         $current = $this->getCurrentDatabaseVersion();
         $latest = $this->getLatestAvailableVersion();
         if ($latest === null) return false;
@@ -181,7 +181,10 @@ class Updater {
 
     // <editor-fold desc="Internal methods">
 
-    private function getVersionFilename() {
+    /**
+     * @return string Path and name of the file for saving version information
+     */
+    private function getVersionFilename(): string {
         return $this->ddlPath . DIRECTORY_SEPARATOR . 'version';
     }
 
@@ -189,7 +192,7 @@ class Updater {
      * Ermittelt die Versionsnummer für die aktuell installierte bzw. genutzte Datenbank
      * @return integer Die aktuell genutzte Datenbank-Version
      */
-    private function getCurrentDatabaseVersion() {
+    private function getCurrentDatabaseVersion(): int {
         $versionFile = $this->getVersionFilename();
         if (file_exists($versionFile)) {
             $version = (int)file_get_contents($versionFile);
@@ -205,7 +208,7 @@ class Updater {
      * @param integer $version Versionsnummer
      * @return void
      */
-    private function saveCurrentDatabaseVersion($version) {
+    private function saveCurrentDatabaseVersion(int $version): void {
         $versionFile = $this->getVersionFilename();
         file_put_contents($versionFile, $version);
     }
@@ -217,14 +220,16 @@ class Updater {
      * @param string $type
      * @return Script[]
      */
-    private function getScriptsSinceVersion($version, $type = self::TYPE_CREATE) {
-        $version = intval($version);
+    private function getScriptsSinceVersion(int $version, $type = self::TYPE_CREATE): array {
+        $version = (int)$version;
         $scripts = array();
-        if ($type != self::TYPE_CREATE && $type != self::TYPE_UPDATE) return $scripts;
+        if ($type !== self::TYPE_CREATE && $type !== self::TYPE_UPDATE) {
+            return $scripts;
+        }
 
         if (($dh = opendir($this->ddlPath)) !== false) {
             while (($fname = readdir($dh)) !== false) {
-                if ($fname != '.' && $fname != '..' && preg_match("/^(\d+)\-$type\-.+\.sql$/i", $fname, $matches) !== false) {
+                if ($fname !== '.' && $fname !== '..' && preg_match("/^(\d+)-$type-.+\.sql$/i", $fname, $matches) !== false) {
                     $fileVersion = (int)$matches[1];
                     if ($fileVersion > $version) {
                         $scripts[] = new Script($this->ddlPath . DIRECTORY_SEPARATOR . $fname);
@@ -238,10 +243,11 @@ class Updater {
 
     /**
      * Führt das angegebene Script aus
+     *
      * @param Script $script
      * @return void
      */
-    private function executeScript($script) {
+    private function executeScript(Script $script): void {
         $this->log->info("Running script $script->filename");
         $pdo = $this->databaseInterface->createDatabaseConnection($script->databaseName);
         $pdo->exec($script->contents);

@@ -13,7 +13,7 @@ $format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'
             <div class="imgcontainer">
                 <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
                     <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
-                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x">
+                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
                 </a>
             </div>
             <?php if (strlen($medium->attribution) > 0) : ?>

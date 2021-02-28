@@ -1,12 +1,13 @@
 <?php
 
-/* 
- * Copyright (C) 2017 André Gewert <agewert@ubergeek.de>
+/*
+ * NanoCM
+ * Copyright (c) 2017 - 2021 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +15,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\NanoCm\Module;
@@ -48,9 +50,6 @@ class SetupModule extends AbstractModule {
 
     // <editor-fold desc="Properties">
 
-    /** @var string Generierter Content */
-    private $content = null;
-
     /** @var string[] A list of missing php modules / extensions */
     public $missingPhpModules = array();
 
@@ -68,7 +67,7 @@ class SetupModule extends AbstractModule {
     }
 
     public function run() {
-        if ($this->getAction() == 'save') {
+        if ($this->getAction() === 'save') {
 
             // TODO Error handling!
 
@@ -107,13 +106,11 @@ class SetupModule extends AbstractModule {
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_WEBMASTER_NAME, $user->firstname . ' ' . $user->lastname);
             $this->ncm->orm->setSettingValue(Setting::SYSTEM_WEBMASTER_EMAIL, $user->email);
 
-            $this->content = $this->renderUserTemplate('content-setup-done.phtml');
-            
+            $content = $this->renderUserTemplate('content-setup-done.phtml');
         } else {
-            $this->content = $this->renderUserTemplate('content-setup.phtml');
+            $content = $this->renderUserTemplate('content-setup.phtml');
         }
-        
-        $this->setContent($this->content);
+        $this->setContent($content);
     }
 
     // </editor-fold>
@@ -121,7 +118,13 @@ class SetupModule extends AbstractModule {
 
     // <editor-fold desc="Internal methods">
 
-    private function checkRequiredPhpModules() {
+    /**
+     * Checks if required php modules are installed and returns an array
+     * with the names of missing modules
+     *
+     * @return array Names of missing php modules
+     */
+    private function checkRequiredPhpModules(): array {
         $missing = array();
 
         foreach (NanoCm::$requiredPhpModules as $moduleName) {

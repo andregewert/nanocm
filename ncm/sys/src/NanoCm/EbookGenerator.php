@@ -83,7 +83,8 @@ class EbookGenerator {
      */
     public function createEpubForArticle(Article $article): ?string {
         $cacheKey = 'ebook-article-' . $article->id;
-        $ebook = $this->getContentFromEbookCache($cacheKey);
+        //$ebook = $this->getContentFromEbookCache($cacheKey);
+        $ebook = null;
         if ($ebook === null) {
             $ebook = $this->createEpubForArticles(array($article), $article->headline);
             $this->putContentToEbookCache($cacheKey, $ebook);
@@ -350,11 +351,27 @@ class EbookGenerator {
                     $content = Fetch::fetchFromUrl($targetUrl);
 
                     if (!empty($content)) {
-                        $virtualUrl = basename($targetUrl);
                         $extension = $this->getDefaultFileExtensionByMimeType($mimeType);
-                        if (strtolower(substr($virtualUrl, -strlen($extension))) !== $extension) {
-                            $virtualUrl .= ".$extension";
-                        }
+                        $counter = 0;
+
+                        // Ensure that filename ($virtualUrl) is unique
+                        do {
+                            $fileExists = false;
+                            $virtualUrl = basename($targetUrl);
+                            if ($counter > 0) {
+                                $virtualUrl .= "-$counter";
+                            }
+                            if (strtolower(substr($virtualUrl, -strlen($extension))) !== $extension) {
+                                $virtualUrl .= ".$extension";
+                            }
+
+                            foreach ($mappedUrls as $mappedUrl) {
+                                if ($mappedUrl->virtualUrl === $virtualUrl) {
+                                    $fileExists = true;
+                                }
+                            }
+                            $counter++;
+                        } while ($fileExists);
 
                         $mappedContent = new MappedUrl();
                         $mappedContent->originalUrl = $sourceUrl;

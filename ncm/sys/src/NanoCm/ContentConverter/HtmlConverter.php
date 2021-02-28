@@ -1,8 +1,8 @@
 <?php
 
-/**
+/*
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (c) 2017 - 2021 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +22,6 @@
 namespace Ubergeek\NanoCm\ContentConverter;
 use Ubergeek\MarkupParser\MarkupParser;
 use Ubergeek\NanoCm\Module\AbstractModule;
-use Ubergeek\Net\Fetch;
 
 /**
  * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach HTML
@@ -49,7 +48,7 @@ class HtmlConverter extends DecoratedContentConverter {
      * auf das aktuell ausgeführte TinyCM-Modul angewiesen.
      *
      * @param AbstractModule $module
-     * @param ContentConverterInterface $decoratedConverter Der zu dekorierende Content-Converter
+     * @param ContentConverterInterface|null $decoratedConverter Der zu dekorierende Content-Converter
      */
     public function __construct(AbstractModule $module, ContentConverterInterface $decoratedConverter = null) {
         parent::__construct($decoratedConverter);
@@ -66,7 +65,7 @@ class HtmlConverter extends DecoratedContentConverter {
         $parser = new MarkupParser();
 
         foreach ($options as $key => $value) {
-            if ($key == 'converter.html.idPrefix') {
+            if ($key === 'converter.html.idPrefix') {
                 $parser->idPrefix = $value;
             }
         }
@@ -74,10 +73,11 @@ class HtmlConverter extends DecoratedContentConverter {
         $module = $this->module;
 
         // Erweiterte Platzhalter für die Medienverwaltung
-        $output = preg_replace_callback('/\<p\>\[(youtube|album|image|download|twitter)\:([^\]]+?)\]\<\/p\>$/ims', static function($matches) use ($module) {
+        $output = preg_replace_callback('/<p>\[(youtube|album|image|download|twitter):([^]]+?)]<\/p>$/im', static function($matches) use ($module) {
             $module->setVar('converter.placeholder', $matches[0]);
 
             switch (strtolower($matches[1])) {
+
                 // Youtube-Einbettungen (click-to-play)
                 case 'youtube':
                     if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
@@ -107,12 +107,10 @@ class HtmlConverter extends DecoratedContentConverter {
                 // Eingebettete Tweets
                 case 'twitter':
                     $info = $module->ncm->mediaManager->getTweetInfoByUrl($matches[2]);
-                    if ($info != null) {
-                        return preg_replace('/(\<script[^\>]*\>[^\>]*\<\/script\>)/i', '', $info->html);
-                    } else {
-                        return "<p>Einzubettenden Tweet nicht gefunden!</p>";
+                    if ($info !== null) {
+                        return preg_replace('/(<script[^>]*>[^>]*<\/script>)/i', '', $info->html);
                     }
-                    break;
+                    return "<p>Einzubettenden Tweet nicht gefunden!</p>";
             }
             return $matches[0];
         }, $output);
@@ -125,6 +123,7 @@ class HtmlConverter extends DecoratedContentConverter {
 
         return $output;
     }
+
 
     // <editor-fold desc="Internal methods">
 

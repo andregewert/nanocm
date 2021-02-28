@@ -315,8 +315,8 @@ class CoreModule extends AbstractModule {
 
                     switch ($parts[1]) {
                         case 'article':
-                            $article = $this->orm->getArticleById(intval($parts[2]), !$this->isPreviewEnabled);
-                            if ($article == null) {
+                            $article = $this->orm->getArticleById((int)$parts[2], !$this->isPreviewEnabled);
+                            if ($article === null) {
                                 throw new ContentNotFoundException("Could not find requested article!");
                             }
 

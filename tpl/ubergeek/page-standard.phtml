@@ -117,6 +117,39 @@
                 'resizeDuration':       250
             })
             hljs.initHighlightingOnLoad();
+            $(function() {
+                $('div.video-preview img').each(function() {
+                    let div = document.createElement('img');
+                    div.setAttribute('class', 'overlay');
+                    div.setAttribute('src', '<?php echo $this->htmlConvUrl('/tpl/ubergeek/img/VideoPlay.png'); ?>');
+                    $(div).insertBefore(this);
+                });
+
+                $('div.album').each(function() {
+                    let img = $(this).find('div.image');
+                    let count = img.length;
+                    let current = 0;
+                    let play = true;
+
+                    for (i = 1; i < count; i++) {
+                        $(img[i]).hide();
+                    }
+
+                    let showNext = function() {
+                        setTimeout(function() {
+                            if (play) {
+                                let next = (current + 1) % count;
+                                console.log(next);
+                                $(img[next]).fadeIn(2000);
+                                $(img[current]).fadeOut(2000, showNext);
+                                current = next;
+                            }
+                        }, 5000);
+                    };
+
+                    showNext();
+                });
+            });
         </script>
     </body>
 </html>
