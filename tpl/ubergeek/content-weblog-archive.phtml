@@ -9,7 +9,7 @@ $first = true;
     <?php if (is_array($this->articles) && count($this->articles) > 0) : ?>
         <?php foreach ($this->articles as $article) : ?>
             <?php $pubDate = ($article->publishing_timestamp == null)? $article->start_timestamp : $article->publishing_timestamp; ?>
-            <?php if ($pubDate->format('Y') != $lastYear || $pubDate->format('m') != $lastMonth) : ?>
+            <?php if ($first || $pubDate->format('Y') !== $lastYear || $pubDate->format('m') !== $lastMonth) : ?>
                 <?php if (!$first) : ?>
                     </ul>
                 <?php endif; ?>
