@@ -12,24 +12,24 @@ $format = $this->orm->getImageFormatByKey('preview');
 ?>
 
 <?php if ($format instanceof ImageFormat && $folder instanceof Medium && is_array($media) && count($media) > 0) : ?>
-
-<div class="album">
-    <div class="images">
-        <?php foreach ($media as $medium) : ?>
-            <div class="image">
-                <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview-album_<?php echo $folderId; ?>" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
-                    <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
-                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
-                </a>
+    <div class="shadow">
+        <div class="album">
+            <div class="images">
+                <?php foreach ($media as $medium) : ?>
+                    <div class="image">
+                        <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview-album_<?php echo $folderId; ?>" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                            <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
+                                 srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
+                        </a>
+                    </div>
+                <?php endforeach; ?>
             </div>
-        <?php endforeach; ?>
+            <div class="controls">
+                <p>
+                    <?php echo $this->htmlEncode($folder->title); ?>&nbsp;&middot;
+                    <?php echo count($media); ?> Bilder
+                </p>
+            </div>
+        </div>
     </div>
-    <div class="controls">
-        <p>
-            <?php echo $this->htmlEncode($folder->title); ?>&nbsp;&middot;
-            <?php echo count($media); ?> Bilder
-        </p>
-    </div>
-</div>
-
 <?php endif; ?>
