@@ -214,10 +214,15 @@ ol.comments li div.entry {
 ul.comments li h3,
 ol.comments li h3 {
   float: left;
-  color: #888;
+  color: #888 !important;
   font-style: italic;
   font-size: 1.8rem;
   font-weight: 600;
+}
+
+ul.comments li h3 a,
+ol.comments li h3 a {
+  color: #888 !important;
 }
 
 .smallcaps {

@@ -89,15 +89,15 @@ if (!empty($this->article->medium_id)) {
             <?php $i = 0; ?>
             <?php foreach ($this->comments as $comment) : ?>
                 <?php $i++; ?>
-                <li class="<?php echo ($i %2 == 0)? 'even' : 'odd'; ?>">
-                    <h3><a name="comment-<?php echo intval($comment->id); ?>"></a><?php echo $i; ?>.</h3>
+                <li class="<?php echo ($i %2 === 0)? 'even' : 'odd'; ?>">
+                    <h3><a id="comment-<?php echo $comment->id; ?>" href="#comment-<?php echo $comment->id; ?>"><?php echo $i; ?>.</a></h3>
                     <div class="entry">
                         <?php if ($comment->use_gravatar) : ?>
                             <div class="userimg"><img src="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 50)); ?>" srcset="<?php echo $this->htmlConvUrl(Util::getGravatarUserImageUrl($comment->email, 100)); ?> 2x" alt="" width="50" height="50" loading="lazy"></div>
                         <?php endif; ?>
                         <h4><?php echo $this->htmlEncode($comment->username . ': ' . $comment->headline); ?></h4>
 
-                        <p><?php echo $this->convertTextWithBasicMarkup($this->htmlEncode($comment->content)); ?></p>
+                        <p><?php echo $this->convertTextWithBasicMarkup($comment->content); ?></p>
 
                         <div class="details">
                             <p>Geschrieben am <?php echo $comment->creation_timestamp->format('d.m.y, H:i'); ?></p>
@@ -113,7 +113,7 @@ if (!empty($this->article->medium_id)) {
             <div class="nonprint" id="form_comment">
                 <h2><a name="comment"></a>Kommentar hinterlassen</h2>
 
-                <?php echo $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
+                <?php $this->includeUserTemplate('blocks/usermessages.phtml'); ?>
 
                 <div class="form-group">
                     <label for="input_n">Dein Name</label>
@@ -124,7 +124,7 @@ if (!empty($this->article->medium_id)) {
                     <input type="email" class="text form-control" id="input_e" name="_e" required value="<?php echo $this->htmlEncode($this->commentMail); ?>" maxlength="128">
                 </div>
                 <div class="form-group">
-                    <input type="checkbox" id="input_g" name="_g" value="1"<?php if ($this->commentUseGravatar == '1') echo ' checked="checked"'; ?>>
+                    <input type="checkbox" id="input_g" name="_g" value="1"<?php if ($this->commentUseGravatar === '1') echo ' checked="checked"'; ?>>
                     <label for="input_g">Ich m&ouml;chte, dass mein Gravatar angezeigt wird</label>
                 </div>
                 <div class="form-group">

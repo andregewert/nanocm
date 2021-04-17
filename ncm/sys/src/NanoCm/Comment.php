@@ -115,8 +115,4 @@ class Comment {
 
     // </editor-fold>
 
-
-    // <editor-fold desc="Internal methods">
-
-    // </editor-fold>
 }

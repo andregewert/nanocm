@@ -428,7 +428,7 @@ abstract class AbstractModule implements
      * @param string $file Relativer Pfad zum betreffenden Template
      * @throws Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
      */
-    public function includeUserTemplate(string $file) {
+    public function includeUserTemplate(string $file): void {
         echo $this->renderUserTemplate($file);
     }
     
@@ -585,6 +585,7 @@ abstract class AbstractModule implements
     /**
      * Wandelt einen Kommentartext bzw. einen Text mit simplen Formatierungsoptionen um in das aktuelle
      * Zielformat
+     *
      * @param string $input Der Eingabestring
      * @return string Ins Zielformat umgewandelter Text
      */
@@ -592,20 +593,17 @@ abstract class AbstractModule implements
         switch ($this->targetFormat) {
             case Constants::FORMAT_HTML:
             case Constants::FORMAT_XHTML:
-                if ($this->targetFormat == Constants::FORMAT_XHTML) {
+                if ($this->targetFormat === Constants::FORMAT_XHTML) {
                     $output = htmlentities($input, ENT_COMPAT | ENT_XHTML | ENT_SUBSTITUTE, 'UTF-8', false);
                 } else {
-                    $output = htmlentities($input, ENT_COMPAT | ENT_HTML5, 'UTF-8', false);
+                    $output = htmlentities($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
                 }
-                $output = preg_replace('/(https?:\/\/([^\s]+))/i', '<a href="$1">$2</a>', $output);
+                $output = preg_replace('/(https?:\/\/(\S+))/i', '<a href="$1">$2</a>', $output);
                 $output = $this->nl2br($output);
-                $output = str_replace("'", '&rsquo;', $output);
-                $output = str_replace(' ...', '&nbsp;&hellip;', $output);
-                $output = str_replace('...', '&hellip;', $output);
-                $output = str_replace(' -- ', '&nbsp;&ndash; ', $output);
+                $output = str_replace(array("'", ' ...', '...', ' -- '), array('&rsquo;', '&nbsp;&hellip;', '&hellip;', '&nbsp;&ndash; '), $output);
                 $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
-                $output = preg_replace('/_(.+?)_/i', '<em>$1</em>', $output);
-                $output = preg_replace('/\*(.+?)\*/i', '<strong>$1</strong>', $output);
+                $output = preg_replace('/_(.+?)_/', '<em>$1</em>', $output);
+                $output = preg_replace('/\*(.+?)\*/', '<strong>$1</strong>', $output);
                 $output = preg_replace('/\(c\)/i', '&copy;', $output);
                 $output = trim($output);
                 break;
