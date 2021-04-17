@@ -598,13 +598,28 @@ abstract class AbstractModule implements
                 } else {
                     $output = htmlentities($input, ENT_COMPAT | ENT_HTML401, 'UTF-8', false);
                 }
-                $output = preg_replace('/(https?:\/\/(\S+))/i', '<a href="$1">$2</a>', $output);
+
                 $output = $this->nl2br($output);
                 $output = str_replace(array("'", ' ...', '...', ' -- '), array('&rsquo;', '&nbsp;&hellip;', '&hellip;', '&nbsp;&ndash; '), $output);
                 $output = preg_replace('/&quot;(.+?)&quot;/i', '&bdquo;$1&ldquo;', $output);
                 $output = preg_replace('/_(.+?)_/', '<em>$1</em>', $output);
                 $output = preg_replace('/\*(.+?)\*/', '<strong>$1</strong>', $output);
                 $output = preg_replace('/\(c\)/i', '&copy;', $output);
+
+                // Simple url replacement
+                //$output = preg_replace('/(https?:\/\/(\S+))/i', '<a href="$1">$2</a>', $output);
+
+                // Advanced url replacement including youtube previews
+                $module = $this;
+                $output = preg_replace_callback('/(https?:\/\/([^\s\<\>]+))/i', static function($matches) use ($module) {
+                    if (preg_match('/(www\.)?youtube\.com\/watch\?v=(\w+)/i', $matches[2], $innerMatches)) {
+                        $module->setVar('comment.youtube.vid', $innerMatches[2]);
+                        return $module->renderUserTemplate('blocks/comment-youtube.phtml');
+                    }
+                    return '<a href="' . $matches[1] . '" target="_blank">' . $matches[2] . '</a>';
+                }, $output);
+
+                $output = preg_replace('/<\/div>\s?<br>/', '</div>', $output);
                 $output = trim($output);
                 break;
 
