@@ -6,6 +6,11 @@ $items = $this->orm->getReleasedUserListItemsByListKey('metanav');
     <nav class="metanavigation nonprint">
         <ul>
             <?php $first = true; ?>
+            <?php if ($this->ncm->isUserLoggedIn()) : ?>
+                <li><a href="<?php echo $this->htmlConvUrl('/admin/index.php'); ?>">Verwaltung</a></li>
+                <li>&middot;&nbsp;<a href="<?php echo $this->htmlConvUrl('/logout.php'); ?>">Abmelden</a></li>
+                <?php $first = false; ?>
+            <?php endif; ?>
             <?php foreach ($items as $listItem) : ?>
                 <li><?php if (!$first) echo ' &middot;&nbsp;'; ?><a href="<?php echo $this->htmlConvUrl($listItem->content); ?>"><?php echo $this->htmlEncode($listItem->title); ?></a></li>
                 <?php $first = false; ?>

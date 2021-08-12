@@ -95,16 +95,12 @@ class AtomWriter implements FeedWriterInterface  {
             $entryNode->addChild('updated', $entry->updated->format('c'));
         }
 
-        // Content
-        $node = $entryNode->addChild('content', htmlspecialchars($entry->content));
-        $node->addAttribute('type', $entry->contentType);
-
         // Summary
         if (!empty($entry->summary)) {
             $node = $entryNode->addChild('summary', htmlspecialchars($entry->summary));
             $node->addAttribute('type', $entry->contentType);
         }
-
+        
         // Kategorien / Tags
         if (is_array($entry->categories)) {
             foreach ($entry->categories as $category) {
@@ -135,6 +131,10 @@ class AtomWriter implements FeedWriterInterface  {
         if (!empty($entry->rights)) {
             $entryNode->addChild('rights', $entry->rights);
         }
+
+        // Content
+        $node = $entryNode->addChild('content', htmlspecialchars($entry->content));
+        $node->addAttribute('type', $entry->contentType);
     }
 
     private function createLinkNode(\SimpleXMLElement $parentNode, Link $link) {

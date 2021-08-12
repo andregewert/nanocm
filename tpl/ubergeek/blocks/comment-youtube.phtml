@@ -8,6 +8,6 @@ $format = $this->orm->getImageFormatByKey('ytthumb');
         <img src="<?php echo $this->htmlConvUrl($this->getYoutubeThumbnailUrl($vid, 'ytthumb')); ?>"
             <?php if ($format !== null && $format->width > 0) echo "width=\"$format->width\""; ?>
             <?php if ($format !== null && $format->height > 0) echo "height=\"$format->height\""; ?>
-             alt="Youtube">
+             alt="Youtube" title="Youtube-Vorschau">
     </a>
 </div>

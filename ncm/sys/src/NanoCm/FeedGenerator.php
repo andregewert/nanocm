@@ -53,7 +53,7 @@ class FeedGenerator
     /**
      * Erstellt ein Feed-Objekt für die übergebenen Artikel-Objekte
      *
-     * @param $articles Die in den Feed einzubindenden Artikel
+     * @param Article[] $articles Die in den Feed einzubindenden Artikel
      * @param string|null $feedUrl Die Abruf-URL für den Feed
      * @param string|null $title Optionaler Titel für den Feed. Wird keiner angegeben, so wird der Seitentitel verwendet.
      * @return Feed Der generierte Feed; nicht als String, sondern in Objekt-Form. Kann über passende Writer-Instanzen
@@ -109,8 +109,10 @@ class FeedGenerator
             $entry->content = $this->module->convertTextWithFullMarkup($article->content, Constants::FORMAT_HTML);
             $entry->contentType = 'html';
 
-            if (mb_strlen($article->teaser) > 0) {
-                $entry->summary = $this->module->convertTextWithFullMarkup($article->teaser, Constants::FORMAT_HTML);
+            if ($article->teaser != '') {
+                $summary = $this->module->convertTextWithFullMarkup($article->teaser, Constants::FORMAT_HTML);
+                $entry->summary = $summary;
+                $entry->content = $summary . $entry->content;
             }
 
             if (count($article->tags) > 0) {
@@ -140,7 +142,7 @@ class FeedGenerator
         $feed = new Feed();
         $feed->title = $title;
         $feed->links = array();
-        if ($feedUrl != null) {
+        if ($feedUrl !== null) {
             $feed->id = $feedUrl;
             $link = new Link();
             $link->href = $feedUrl;
@@ -175,11 +177,12 @@ class FeedGenerator
             if ($article != null) {
                 $entry = new Entry();
                 $entry->id = $this->module->convUrlToAbsolute($article->getCommentUrl($comment));
-                $entry->title = $comment->headline;
+                $entry->title = ($comment->headline == '')? $comment->username : $comment->headline;
                 $entry->updated = $dt;
                 $entry->published = $comment->creation_timestamp;
                 $entry->author = new Person();
                 $entry->author->name = $comment->username;
+                $entry->summary = $comment->username . ' zu ' . $article->headline;
                 $entry->content = $this->module->convertTextWithBasicMarkup($comment->content, Constants::FORMAT_HTML);
                 $entry->contentType = 'html';
                 $feed->entries[] = $entry;

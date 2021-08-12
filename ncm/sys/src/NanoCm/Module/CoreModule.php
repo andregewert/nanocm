@@ -113,6 +113,11 @@ class CoreModule extends AbstractModule {
     // </editor-fold>
 
 
+    /**
+     * Core functions for the public front end
+     * @throws ContentNotFoundException
+     * @throws \Exception
+     */
     public function run() {
         $parts = $this->getRelativeUrlParts();
 
@@ -192,7 +197,7 @@ class CoreModule extends AbstractModule {
 
                     // Accepting privacy policy / cookie usage
                     case 'privacypolicy':
-                        if (count($parts) >= 3 && $parts[2] == 'accept') {
+                        if (count($parts) >= 3 && $parts[2] === 'accept') {
                             $this->ncm->setPrivacyPolicyCookie();
                             $tempContent = array(
                                 'status' => 0
@@ -214,7 +219,7 @@ class CoreModule extends AbstractModule {
             case 'weblog':
 
                 // Artikel-Ansicht
-                if ($parts[1] == 'article') {
+                if ($parts[1] === 'article') {
                     $this->article = $this->orm->getArticleById(intval($parts[2]), !$this->isPreviewEnabled);
                     if ($this->article !== null) {
                         // Bestimmung Preview-Modus bei noch nicht freigeschalteten Artiklen
@@ -231,14 +236,14 @@ class CoreModule extends AbstractModule {
                 }
 
                 // Archiv
-                elseif ($parts[1] == 'archive') {
+                elseif ($parts[1] === 'archive') {
                     $this->setTitle($this->getSiteTitle() . ' - Archiv');
                     $this->articles = $this->orm->getArticleArchive();
                     $this->content = $this->renderUserTemplate('content-weblog-archive.phtml');
                 }
 
                 // Suche nach Artikeln mit bestimmten Tags
-                elseif ($parts[1] == 'tags') {
+                elseif ($parts[1] === 'tags') {
                     $this->setTitle($this->getSiteTitle() . ' - Aritkelsuche nach Stichworten');
                     $this->searchTags = Tag::splitTagsString(urldecode($parts[2]));
                     $filter = new Article();
@@ -249,10 +254,10 @@ class CoreModule extends AbstractModule {
                 }
 
                 // Verschiedene Atom-Feeds
-                elseif ($parts[1] == 'feed') {
+                elseif ($parts[1] === 'feed') {
 
                     // Neueste Artikel
-                    if (count($parts) >= 2 && $parts[2] == 'index.php') {
+                    if (count($parts) >= 2 && $parts[2] === 'index.php') {
                         $this->setPageTemplate(self::PAGE_NONE);
                         $this->setContentType('text/xml');
                         $generator = new FeedGenerator($this);
@@ -266,7 +271,7 @@ class CoreModule extends AbstractModule {
                     }
 
                     // Neueste Kommentare
-                    elseif (count($parts) >= 3 && $parts[2] == 'comments') {
+                    elseif (count($parts) >= 3 && $parts[2] === 'comments') {
                         $this->setPageTemplate(self::PAGE_NONE);
                         $this->setContentType('text/xml');
 
@@ -284,7 +289,7 @@ class CoreModule extends AbstractModule {
                     }
 
                     // Artikel zu bestimmten Schlagworten
-                    elseif (count($parts) >= 4 && $parts[2] == 'tags') {
+                    elseif (count($parts) >= 4 && $parts[2] === 'tags') {
                         $this->setPageTemplate(self::PAGE_NONE);
                         $this->setContentType('text/xml');
 
@@ -416,7 +421,7 @@ class CoreModule extends AbstractModule {
             case 'login.html':
             case 'login.php':
                 $this->setTitle($this->getSiteTitle() . ' - Anmelden');
-                if ($this->getAction() == 'login') {
+                if ($this->getAction() === 'login') {
                     $success = $this->ncm->tryToLoginUser(
                         $this->getParam('username', ''),
                         $this->getParam('password', '')

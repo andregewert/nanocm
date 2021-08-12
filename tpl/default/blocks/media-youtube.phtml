@@ -8,7 +8,7 @@ $format = $this->orm->getImageFormatByKey('ytthumb');
         <img src="<?php echo $this->htmlConvUrl($this->getYoutubeThumbnailUrl($vid, 'ytthumb')); ?>"
             <?php if ($format != null && $format->width > 0) echo "width=\"$format->width\""; ?>
             <?php if ($format != null && $format->height > 0) echo "height=\"$format->height\""; ?>
-            alt="Youtube">
-        <img src="<?php echo $this->htmlConvTplUrl('/img/VideoPlay.png'); ?>" class="overlay" width="280" height="187">
+            alt="Youtube" title="Youtube-Vorschau">
+        <!--<img src="<?php echo $this->htmlConvTplUrl('/img/VideoPlay.png'); ?>" class="overlay" width="280" height="187" alt="" title="">-->
     </a>
 </div>
