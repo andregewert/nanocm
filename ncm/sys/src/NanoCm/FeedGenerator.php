@@ -177,7 +177,7 @@ class FeedGenerator
             if ($article != null) {
                 $entry = new Entry();
                 $entry->id = $this->module->convUrlToAbsolute($article->getCommentUrl($comment));
-                $entry->title = ($comment->headline == '')? $comment->username : $comment->headline;
+                $entry->title = ($comment->headline == '')? $comment->username . ' zu ' . $article->headline : $comment->headline;
                 $entry->updated = $dt;
                 $entry->published = $comment->creation_timestamp;
                 $entry->author = new Person();

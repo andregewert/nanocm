@@ -20,50 +20,60 @@
  */
 
 namespace Ubergeek\NanoCm\ContentConverter;
+use Ubergeek\KeyValuePair;
 use Ubergeek\MarkupParser\MarkupParser;
+use Ubergeek\NanoCm\ContentConverter\Plugin\PluginInterface;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
- * Konvertiert den mit Auszeichnungselementen versehenen Eingabe-String nach HTML
- *
+ * Generates (X)HTML code from NanoCM markup.
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2017-11-04
  */
-class HtmlConverter extends DecoratedContentConverter {
+class HtmlConverter {
+
+    // <editor-fold desc="Properties">
 
     /**
-     * Referenz auf das aktuell ausgeführte TinyCM-Modul
-     * @var Ubergeek\NanoCm\Module\AbstractModule
+     * Reference to the currently executed NanoCM module
+     * @var AbstractModule
      */
     private $module;
 
     /**
-     * Gibt an, ob in der Ausgabe XHTML generiert werden soll (true) oder HTML5 (false)
+     * @var PluginInterface[] Array with content converter plugins
+     */
+    private $plugins;
+
+    /**
+     * Indicates if XHTML code should be generated (true) or HTML5 code (false).
      * @var bool
      */
     public $generateXhtml = false;
 
+    // </editor-fold>
+
+
+    // <editor-fold desc="Constructors">
+
     /**
-     * Der HTML-Converter ist zum korrekten Erzeugen von URLs etc. auf eine Refeferenz
-     * auf das aktuell ausgeführte TinyCM-Modul angewiesen.
-     *
+     * The converter functions require a reference to the current NanoCM module to create correct urls.
      * @param AbstractModule $module
-     * @param ContentConverterInterface|null $decoratedConverter Der zu dekorierende Content-Converter
      */
-    public function __construct(AbstractModule $module, ContentConverterInterface $decoratedConverter = null) {
-        parent::__construct($decoratedConverter);
+    public function __construct(AbstractModule $module) {
         $this->module = $module;
+        $this->plugins = $this->loadPlugins();
     }
+
+    // </editor-fold>
+
+
+    // </editor-fold desc="Public methods">
 
     public function convertFormattedText(string $input, array $options = array()): string {
 
-        if ($this->decoratedConverter !== null) {
-            $input = $this->decoratedConverter->convertFormattedText($input, $options);
-        }
-
-        // "Normales" Markup ersetzen
+        // Replace simple markup
         $parser = new MarkupParser();
-
         foreach ($options as $key => $value) {
             if ($key === 'converter.html.idPrefix') {
                 $parser->idPrefix = $value;
@@ -72,50 +82,79 @@ class HtmlConverter extends DecoratedContentConverter {
         $output = $parser->parse($input);
         $module = $this->module;
 
-        // Erweiterte Platzhalter für die Medienverwaltung
-        $output = preg_replace_callback('/<p>\[(youtube|album|image|download|twitter):([^]]+?)]<\/p>$/im', static function($matches) use ($module) {
-            $module->setVar('converter.placeholder', $matches[0]);
+        // Extended placeholders for media management
+        $output = preg_replace_callback(
 
-            switch (strtolower($matches[1])) {
+            '/<p>\[(youtube|album|image|download|twitter):([^]]+?)]<\/p>$/im',
 
-                // Youtube-Einbettungen (click-to-play)
-                case 'youtube':
-                    if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
-                        $vid = $im[1];
-                        $module->setVar('converter.youtube.vid', $vid);
-                        return $module->renderUserTemplate('blocks/media-youtube.phtml');
-                    }
-                    return '';
+            /**
+             * @throws \Exception
+             */
+            static function($matches) use ($module) {
+                $module->setVar('converter.placeholder', $matches[0]);
+                switch (strtolower($matches[1])) {
 
-                // Bildergalerie aus der Medienverwaltung
-                case 'album':
-                    $module->setVar('converter.album.id', (int)$matches[2]);
-                    return $module->renderUserTemplate('blocks/media-album.phtml');
+                    // Youtube-Einbettungen (click-to-play)
+                    case 'youtube':
+                        if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
+                            $vid = $im[1];
+                            $module->setVar('converter.youtube.vid', $vid);
+                            return $module->renderUserTemplate('blocks/media-youtube.phtml');
+                        }
+                        return '';
 
-                // Vorschaubild aus der Medienverwaltung
-                case 'image':
-                    list($id, $format) = explode(':', $matches[2], 2);
-                    $module->setVar('converter.image.id', (int)$id);
-                    $module->setVar('converter.image.format', $format);
-                    return $module->renderUserTemplate('blocks/media-image.phtml');
+                    // Bildergalerie aus der Medienverwaltung
+                    case 'album':
+                        $module->setVar('converter.album.id', (int)$matches[2]);
+                        return $module->renderUserTemplate('blocks/media-album.phtml');
 
-                // Download-Link aus der Medienverwaltung
-                case 'download':
-                    $module->setVar('converter.download.id', (int)$matches[2]);
-                    return $module->renderUserTemplate('blocks/media-download.phtml');
+                    // Vorschaubild aus der Medienverwaltung
+                    case 'image':
+                        list($id, $format) = explode(':', $matches[2], 2);
+                        $module->setVar('converter.image.id', (int)$id);
+                        $module->setVar('converter.image.format', $format);
+                        return $module->renderUserTemplate('blocks/media-image.phtml');
 
-                // Eingebettete Tweets
-                case 'twitter':
-                    $info = $module->ncm->mediaManager->getTweetInfoByUrl($matches[2]);
-                    if ($info !== null) {
-                        return preg_replace('/(<script[^>]*>[^>]*<\/script>)/i', '', $info->html);
-                    }
-                    return "<p>Einzubettenden Tweet nicht gefunden!</p>";
+                    // Download-Link aus der Medienverwaltung
+                    case 'download':
+                        $module->setVar('converter.download.id', (int)$matches[2]);
+                        return $module->renderUserTemplate('blocks/media-download.phtml');
+
+                    // Eingebettete Tweets
+                    case 'twitter':
+                        $info = $module->ncm->mediaManager->getTweetInfoByUrl($matches[2]);
+                        if ($info !== null) {
+                            return preg_replace('/(<script[^>]*>[^>]*<\/script>)/i', '', $info->html);
+                        }
+                        return "<p>Einzubettenden Tweet nicht gefunden!</p>";
+                }
+                return $matches[0];
+            },
+            $output
+        );
+
+        // Replace placeholders by plugins
+        $converter = $this;
+        $output = preg_replace_callback('/(<p>)?\[pl:([^]]+)]([^\[]*?)(\[\/pl:[^]]+])(<\/p>)?/ims', static function($matches) use ($converter) {
+            $placeholder = $matches[2];
+            $lines = preg_split('/<br\s*?\/?>/i', $matches[3]);
+            $params = array();
+
+            foreach ($lines as $line) {
+                if (!empty($line)) {
+                    list($key, $value) = preg_split('/(\s*:\s*)/i', $line, 2);
+                    $params[] = new KeyValuePair($key, $value);
+                }
             }
-            return $matches[0];
+
+            $plugin = $converter->getPluginByPlaceholder($placeholder);
+            if ($plugin !== null) {
+                return $plugin->replacePlaceholder($matches[0], $params);
+            }
+            return '';
         }, $output);
 
-        // Notlösung, um nachträglich XHTML-kompatiblen Output zu erzwingen ...
+        // Work around to create xhtml compatible code
         if ($this->generateXhtml) {
             $output = $this->closeOpenSingleTags($output);
             $output = $this->replaceNamedEntities($output);
@@ -124,6 +163,8 @@ class HtmlConverter extends DecoratedContentConverter {
         return $output;
     }
 
+    // </editor-fold>
+
 
     // <editor-fold desc="Internal methods">
 
@@ -131,10 +172,63 @@ class HtmlConverter extends DecoratedContentConverter {
         return preg_replace('/<(img|br|hr)([^>]*)([^\/])?>/i', "<$1$2$3 />", $input);
     }
 
+    /**
+     * Replaces named entities by the respective characters.
+     * @param string $input Input string
+     * @return string Converted string
+     */
     private function replaceNamedEntities(string $input) {
         $table = get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES);
         unset($table['<'], $table['>']);
         return str_replace(array_values($table), array_keys($table), $input);
+    }
+
+    /**
+     * Loads available converter plugins.
+     * @return PluginInterface[] List of loaded content converter plugins
+     */
+    private function loadPlugins() : array {
+        $plugins = array();
+        $dirname = __DIR__ . DIRECTORY_SEPARATOR . 'Plugin';
+        if (($dh = opendir($dirname)) !== false) {
+            while (($entry = readdir($dh)) !== false) {
+                if (preg_match('/Plugin\.php$/', $entry) === 1) {
+                    $className = '\\Ubergeek\\NanoCm\\ContentConverter\\Plugin\\';
+                    $className .= preg_replace('/\.php$/i', '', $entry);
+
+                    try {
+                        $pl = new $className();
+                        if ($pl instanceof PluginInterface) {
+                            $pl->setModule($this->module);
+                            $plugins[] = $pl;
+                        }
+                    } catch (\Exception $ex) {
+                        $this->module->log->warn("Could not load content converter plugin", $ex);
+                    }
+                }
+            }
+        }
+
+        usort($plugins, static function(PluginInterface $a, PluginInterface $b) {
+            if ($a->getPriority() === $b->getPriority()) {
+                return 0;
+            }
+            return ($a->getPriority() < $b->getPriority()) ? -1 : 1;
+        });
+
+        return $plugins;
+    }
+
+    /**
+     * Returns the content converter plugin with the given placeholder or null
+     * @param string $placeholder The placeholder
+     * @return PluginInterface|null
+     */
+    private function getPluginByPlaceholder(string $placeholder) : ?PluginInterface {
+        foreach ($this->plugins as $plugin) {
+            if ($plugin->getPlaceholder() === $placeholder) return $plugin;
+        }
+        return null;
     }
 
     // </editor-fold>

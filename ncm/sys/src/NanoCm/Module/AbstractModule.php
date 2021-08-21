@@ -606,10 +606,7 @@ abstract class AbstractModule implements
                 $output = preg_replace('/\*(.+?)\*/', '<strong>$1</strong>', $output);
                 $output = preg_replace('/\(c\)/i', '&copy;', $output);
 
-                // Simple url replacement
-                //$output = preg_replace('/(https?:\/\/(\S+))/i', '<a href="$1">$2</a>', $output);
-
-                // Advanced url replacement including youtube previews
+                // URL replacement including youtube previews
                 $module = $this;
                 $output = preg_replace_callback('/(https?:\/\/([^\s\<\>]+))/i', static function($matches) use ($module) {
                     if (preg_match('/(www\.)?youtube\.com\/watch\?v=(\w+)/i', $matches[2], $innerMatches)) {

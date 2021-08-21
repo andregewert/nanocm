@@ -1,12 +1,13 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
 $items = $this->orm->getReleasedUserListItemsByListKey('metanav');
+$loggedIn = $this->ncm->isUserLoggedIn();
 ?>
-<?php if (count($items) > 0) : ?>
+<?php if ($loggedIn || count($items) > 0) : ?>
     <nav class="metanavigation nonprint">
         <ul>
             <?php $first = true; ?>
-            <?php if ($this->ncm->isUserLoggedIn()) : ?>
+            <?php if ($loggedIn) : ?>
                 <li><a href="<?php echo $this->htmlConvUrl('/admin/index.php'); ?>">Verwaltung</a></li>
                 <li>&middot;&nbsp;<a href="<?php echo $this->htmlConvUrl('/logout.php'); ?>">Abmelden</a></li>
                 <?php $first = false; ?>
