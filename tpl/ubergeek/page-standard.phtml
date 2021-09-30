@@ -139,7 +139,6 @@
                         setTimeout(function() {
                             if (play) {
                                 let next = (current + 1) % count;
-                                console.log(next);
                                 $(img[next]).fadeIn(2000);
                                 $(img[current]).fadeOut(2000, showNext);
                                 current = next;

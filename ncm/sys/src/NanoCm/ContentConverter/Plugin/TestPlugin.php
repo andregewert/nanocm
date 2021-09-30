@@ -31,8 +31,7 @@ class TestPlugin extends PluginAdapter {
      * @inheritDoc
      */
     function replacePlaceholder(string $placeholder, array $parameters) : string {
-        //return '<p>' . $this->getModule()->htmlEncode($this->getDescription()) . '</p>';
-        $output = '<p>';
+        $output = '<p>Params:</p>';
         $output .= '<ul>' . "\n";
         foreach ($parameters as $param) {
             $output .= '<li>';
@@ -41,22 +40,33 @@ class TestPlugin extends PluginAdapter {
             $output .= '</li>' . "\n";
         }
         $output .= '</ul>' . "\n";
-        $output .= '</p>';
         return $output;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getName(): string {
         return 'Test';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getDescription(): string {
-        return 'Just a test plugin äöüß';
+        return 'Just a simple test plugin';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getVersion(): string {
         return '1.0';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getPlaceholder(): string {
         return 'test';
     }

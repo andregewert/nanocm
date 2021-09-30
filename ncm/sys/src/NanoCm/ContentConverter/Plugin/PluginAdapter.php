@@ -20,7 +20,6 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
-use Ubergeek\KeyValuePair;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
@@ -30,11 +29,28 @@ use Ubergeek\NanoCm\Module\AbstractModule;
  */
 abstract class PluginAdapter implements PluginInterface {
 
+    // <editor-fold desc="Properties">
+
     /**
      * Reference to the currently executed NanoCM module
      * @var AbstractModule Currently executed NanoCm module
      */
     private $module;
+
+    /**
+     * Execution priority
+     * @var int
+     */
+    private $priority = 0;
+
+    /**
+     * True if this plugin is enabled
+     * @var bool
+     */
+    private $enabled = true;
+
+    // </editor-fold>
+
 
     /**
      * @inheritDoc
@@ -54,17 +70,60 @@ abstract class PluginAdapter implements PluginInterface {
      * @inheritDoc
      */
     public function getPriority(): int {
-        return 0;
+        return $this->priority;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function setPriority(int $newPriority): void {
+        $this->priority = $newPriority;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isEnabled(): bool {
+        return $this->enabled;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setEnabled(bool $enabled): void {
+        $this->enabled = $enabled;
+    }
+
+    /**
+     * @inheritDoc
+     */
     abstract public function replacePlaceholder(string $placeholder, array $parameters): string;
 
+    /**
+     * @inheritDoc
+     */
     abstract public function getName(): string;
 
+    /**
+     * @inheritDoc
+     */
     abstract public function getDescription(): string;
 
+    /**
+     * @inheritDoc
+     */
     abstract public function getVersion(): string;
 
+    /**
+     * @inheritDoc
+     */
     abstract public function getPlaceholder(): string;
+
+    /**
+     * @inheritDoc
+     */
+    public function getAvailableParameters(): array {
+        return array();
+    }
 
 }

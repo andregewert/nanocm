@@ -23,6 +23,7 @@ namespace Ubergeek\NanoCm\ContentConverter;
 use Ubergeek\KeyValuePair;
 use Ubergeek\MarkupParser\MarkupParser;
 use Ubergeek\NanoCm\ContentConverter\Plugin\PluginInterface;
+use Ubergeek\NanoCm\ContentConverter\Plugin\PluginParameter;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
@@ -91,33 +92,33 @@ class HtmlConverter {
              * @throws \Exception
              */
             static function($matches) use ($module) {
-                $module->setVar('converter.placeholder', $matches[0]);
+                $module->setVar($module::VAR_CONVERTER_PLACEHOLDER, $matches[0]);
                 switch (strtolower($matches[1])) {
 
                     // Youtube-Einbettungen (click-to-play)
                     case 'youtube':
                         if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
                             $vid = $im[1];
-                            $module->setVar('converter.youtube.vid', $vid);
+                            $module->setVar($module::VAR_CONVERTER_YOUTUBE_VID, $vid);
                             return $module->renderUserTemplate('blocks/media-youtube.phtml');
                         }
                         return '';
 
                     // Bildergalerie aus der Medienverwaltung
                     case 'album':
-                        $module->setVar('converter.album.id', (int)$matches[2]);
+                        $module->setVar($module::VAR_CONVERTER_ALBUM_ID, (int)$matches[2]);
                         return $module->renderUserTemplate('blocks/media-album.phtml');
 
                     // Vorschaubild aus der Medienverwaltung
                     case 'image':
                         list($id, $format) = explode(':', $matches[2], 2);
-                        $module->setVar('converter.image.id', (int)$id);
-                        $module->setVar('converter.image.format', $format);
+                        $module->setVar($module::VAR_CONVERTER_IMAGE_ID, (int)$id);
+                        $module->setVar($module::VAR_CONVERTER_IMAGE_FORMAT, $format);
                         return $module->renderUserTemplate('blocks/media-image.phtml');
 
                     // Download-Link aus der Medienverwaltung
                     case 'download':
-                        $module->setVar('converter.download.id', (int)$matches[2]);
+                        $module->setVar($module::VAR_CONVERTER_DOWNLOAD_ID, (int)$matches[2]);
                         return $module->renderUserTemplate('blocks/media-download.phtml');
 
                     // Eingebettete Tweets
@@ -135,24 +136,36 @@ class HtmlConverter {
 
         // Replace placeholders by plugins
         $converter = $this;
-        $output = preg_replace_callback('/(<p>)?\[pl:([^]]+)]([^\[]*?)(\[\/pl:[^]]+])(<\/p>)?/ims', static function($matches) use ($converter) {
-            $placeholder = $matches[2];
-            $lines = preg_split('/<br\s*?\/?>/i', $matches[3]);
-            $params = array();
+        $output = preg_replace_callback('/(<p>)?\[pl:([^]]+)]([^\[]*?)(\[\/pl:[^]]+])(<\/p>)?/ims',
 
-            foreach ($lines as $line) {
-                if (!empty($line)) {
-                    list($key, $value) = preg_split('/(\s*:\s*)/i', $line, 2);
-                    $params[] = new KeyValuePair($key, $value);
+            static function($matches) use ($converter, $module) {
+                $placeholder = $matches[2];
+                $lines = preg_split('/<br\s*?\/?>/i', $matches[3]);
+                $params = array();
+
+                $plugin = $converter->getPluginByPlaceholder($placeholder);
+                if ($plugin !== null && $plugin->isEnabled()) {
+
+                    $availableParameters = $plugin->getAvailableParameters();
+
+                    foreach ($lines as $line) {
+                        if (empty($line)) continue;
+                        list($key, $value) = preg_split('/(\s*:\s*)/i', $line, 2);
+                        if (in_array($key, array_keys($availableParameters))) {
+                            $param = $availableParameters[$key];
+                            $param->value = $value;
+                            $params[$key] = $param;
+                        } else {
+                            $module->warn("Parameter '$key' is not supported by plugin $placeholder");
+                        }
+                    }
+
+                    return $plugin->replacePlaceholder($matches[0], $params);
                 }
-            }
-
-            $plugin = $converter->getPluginByPlaceholder($placeholder);
-            if ($plugin !== null) {
-                return $plugin->replacePlaceholder($matches[0], $params);
-            }
-            return '';
-        }, $output);
+                return '';
+            },
+            $output
+        );
 
         // Work around to create xhtml compatible code
         if ($this->generateXhtml) {
@@ -186,6 +199,7 @@ class HtmlConverter {
     /**
      * Loads available converter plugins.
      * @return PluginInterface[] List of loaded content converter plugins
+     * @todo The properties isEnabled and priority should be set with values from some user configuration
      */
     private function loadPlugins() : array {
         $plugins = array();
@@ -200,6 +214,7 @@ class HtmlConverter {
                         $pl = new $className();
                         if ($pl instanceof PluginInterface) {
                             $pl->setModule($this->module);
+                            // TODO Set isEnbaled / priority
                             $plugins[] = $pl;
                         }
                     } catch (\Exception $ex) {

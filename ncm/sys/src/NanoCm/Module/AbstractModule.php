@@ -32,6 +32,7 @@ use Ubergeek\NanoCm\Exception\AuthorizationException;
 use Ubergeek\NanoCm\Exception\ContentNotFoundException;
 use Ubergeek\NanoCm\FrontController;
 use Ubergeek\NanoCm\Medium;
+use Ubergeek\NanoCm\Orm;
 use Ubergeek\NanoCm\UserMessage;
 use Ubergeek\NanoCm\Util;
 
@@ -82,7 +83,49 @@ abstract class AbstractModule implements
      * @var string
      */
     const PAGE_NONE = 'none';
-    
+
+    /**
+     * Module variable: Placeholder to be replaced by the currently executed template
+     * @var string
+     * @deprecated Should be replaced by local rendering variables
+     */
+    const VAR_CONVERTER_PLACEHOLDER = 'converter.placeholder';
+
+    /**
+     * Module variable: Youtube video id to be replaced.
+     * @var string
+     * @deprecated Should be replaced by local rendering variables
+     */
+    const VAR_CONVERTER_YOUTUBE_VID = 'converter.youtube.vid';
+
+    /**
+     * Module variable: ID of the media folder to be rendered.
+     * @var string
+     * @deprecated Should be replaced by local rendering variables
+     */
+    const VAR_CONVERTER_ALBUM_ID = 'converter.album.id';
+
+    /**
+     * Module variable: ID of the image to be displayed
+     * @var string
+     * @deprecated Should be replaced by local rendering variables
+     */
+    const VAR_CONVERTER_IMAGE_ID = 'converter.image.id';
+
+    /**
+     * Module variable: image format
+     * @var string
+     * @deprecated Should be replaced by local rendering variables
+     */
+    const VAR_CONVERTER_IMAGE_FORMAT = 'converter.image.format';
+
+    /**
+     * Module variable: media id of the download to be rendered
+     * @var string
+     * @deprecated Should be replaced by local rendering variables
+     */
+    const VAR_CONVERTER_DOWNLOAD_ID = 'converter.download.id';
+
     // </editor-fold>
     
     
@@ -108,6 +151,7 @@ abstract class AbstractModule implements
     /**
      * Referenz auf den OR-Mapper
      * @var \Ubergeek\NanoCm\Orm
+     * @todo Should be made private
      */
     public $orm = null;
     
@@ -196,8 +240,21 @@ abstract class AbstractModule implements
         $this->replaceMeta('Cache-control', 'no-cache, no-store');
     }
 
+
+    // <editor-fold desc="Accessors">
+
+    /**
+     * Returns a reference to the current ORM instance
+     * @return Orm|null
+     */
+    public function getOrm() {
+        return $this->orm;
+    }
+
+    // </editor-fold>
+
     
-    // <editor-fold desc="Grundlegende Ausgabe-Funktionalität">
+    // <editor-fold desc="Basic output functions">
 
     public function getAction() {
         return $this->getParam('action');
@@ -287,7 +344,7 @@ abstract class AbstractModule implements
     public function convUrl($relativeUrl) {
         if (preg_match('/^[a-z]+:/i', $relativeUrl)) return $relativeUrl;
         $url = $this->ncm->relativeBaseUrl;
-        if (substr($relativeUrl, 0, 1) === '/') {
+        if ($relativeUrl[0] === '/') {
             $relativeUrl = substr($relativeUrl, 1);
         }
         return $url . $relativeUrl;
@@ -298,11 +355,11 @@ abstract class AbstractModule implements
      *
      * @param string $tplRelativeUrl Path or url relative to the current template dir
      */
-    public function convTplUrl($tplRelativeUrl) {
+    public function convTplUrl(string $tplRelativeUrl): string {
         if (preg_match('/^[a-z]+:/i', $tplRelativeUrl)) return $tplRelativeUrl;
         $url = Util::createPath($this->ncm->relativeBaseUrl, 'tpl', $this->ncm->tplname) . '/';
 
-        if (substr($tplRelativeUrl, 0, 1) === '/') {
+        if ($tplRelativeUrl[0] === '/') {
             $tplRelativeUrl = substr($tplRelativeUrl, 1);
         }
         return $url . $tplRelativeUrl;
@@ -348,7 +405,7 @@ abstract class AbstractModule implements
      * @param string $key Name der Option
      * @param mixed $value Neuer Wert der Option
      */
-    public function setTemplateOption(string $key, $value) {
+    public function setTemplateOption(string $key, $value): void {
         if (!is_array($this->templateOptions)) {
             $this->templateOptions = array();
         }
@@ -376,7 +433,7 @@ abstract class AbstractModule implements
      * 
      * @param string $pageTemplate
      */
-    public function setPageTemplate(string $pageTemplate) {
+    public function setPageTemplate(string $pageTemplate): void {
         $this->pageTemplate = $pageTemplate;
     }
 
@@ -385,7 +442,7 @@ abstract class AbstractModule implements
      * Content-Type.
      * @param string $contentType
      */
-    public function setContentType(string $contentType) {
+    public function setContentType(string $contentType): void {
         $this->replaceMeta('content-type', $contentType);
     }
 
@@ -393,13 +450,13 @@ abstract class AbstractModule implements
      * Kodiert einen String für die HTML-Ausgabe.
      * Der Eingabestring muss UTF8-kodiert sein.
      *
-     * @param string $string
-     * @param string $overrideTargetFormat Zielformat angeben, um dieses zu erzwingen
+     * @param mixed $string
+     * @param string|null $overrideTargetFormat Zielformat angeben, um dieses zu erzwingen
      * @return string HTML-kodierter String
      */
-    public function htmlEncode($string, $overrideTargetFormat = null) : string {
-        $format = ($overrideTargetFormat == null)? $this->targetFormat : $overrideTargetFormat;
-        return Util::htmlEncode($string, $format);
+    public function htmlEncode($string, string $overrideTargetFormat = null) : string {
+        $format = $overrideTargetFormat ?? $this->targetFormat;
+        return Util::htmlEncode((string)$string, $format);
     }
 
     /**
@@ -408,8 +465,8 @@ abstract class AbstractModule implements
      * @return string Für die Ausgabe formatierter Wert
      * @todo Konvertierung muss lokalisierbar sein!
      */
-    public function formatInt($int) : string {
-        return number_format(intval($int), 0, ',', '.');
+    public function formatInt(int $int) : string {
+        return number_format($int, 0, ',', '.');
     }
 
     /**
@@ -419,29 +476,30 @@ abstract class AbstractModule implements
      * @return string Für die Ausgabe formatierter Wert
      * @todo Konvertierung muss lokalisierbar sein!
      */
-    public function formatFloat($float, $decimals = 2) : string {
-        return number_format(floatval($float), $decimals, ',', '.');
+    public function formatFloat(float $float, int $decimals = 2) : string {
+        return number_format($float, $decimals, ',', '.');
     }
 
     /**
      * Bindet an Ort und Stelle ein Template ein
      * @param string $file Relativer Pfad zum betreffenden Template
+     * @param array $params Optional array with parameters which could be used by the template
      * @throws Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
      */
-    public function includeUserTemplate(string $file): void {
-        echo $this->renderUserTemplate($file);
+    public function includeUserTemplate(string $file, array $params = array()): void {
+        echo $this->renderUserTemplate($file, $params);
     }
     
     /**
      * Rendert ein Template, das installations-spezifisch überschrieben werden
      * kann.
      * @param string $file Das zu rendernde Template (ohne Pfadangabe)
+     * @param array $params Optional array with parameters which could be used by the template
      * @return string Inhalt des gerenderten Templates
      * @throws Exception Exceptions, die bei der Ausführung des Templates
      *      geworfen werden, werden weitergeworfen
-     * @todo Möglichkeit, ein spezifisches Template-Verzeichnis zu konfigurieren
      */
-    public function renderUserTemplate(string $file) : string {
+    public function renderUserTemplate(string $file, array $params = array()) : string {
         $c = '';
         $fname = Util::createPath($this->templateDir, $file);
 
@@ -458,8 +516,6 @@ abstract class AbstractModule implements
         try {
             include($fname);
             $c = ob_get_contents();
-        } catch (Exception $ex) {
-            throw $ex;
         } finally {
             ob_end_clean();
         }
@@ -508,13 +564,15 @@ abstract class AbstractModule implements
         $value = $default;
         if ($this->isParamExisting($name)) {
             $value = $this->getParam($name, $default);
-            if ($value == '') $value = null;
-        } elseif ($this->ncm->session != null && $this->ncm->session->isVarExisting($name)) {
+            if ($value === '') {
+                $value = null;
+            }
+        } elseif ($this->ncm->session !== null && $this->ncm->session->isVarExisting($name)) {
             $value = $this->ncm->session->getVar($name, $default);
-            if ($value == '') $value = null;
+            if ($value === '') $value = null;
         }
 
-        if ($this->ncm->session != null) {
+        if ($this->ncm->session !== null) {
             $this->ncm->session->setVar($name, $value);
         }
 
@@ -529,7 +587,7 @@ abstract class AbstractModule implements
      * @param string $type Der Nachrichtentyp
      * @return void
      */
-    public function addUserMessage($message, $title = null, $type = UserMessage::TYPE_INFO) {
+    public function addUserMessage(?string $message, ?string $title = null, string $type = UserMessage::TYPE_INFO): void {
         if (!is_array($this->userMessages)) {
             $this->userMessages = array();
         }
@@ -569,7 +627,7 @@ abstract class AbstractModule implements
             case Constants::FORMAT_HTML:
             case Constants::FORMAT_XHTML:
                 $converter = new HtmlConverter($this);
-                if ($this->targetFormat == Constants::FORMAT_XHTML) {
+                if ($this->targetFormat === Constants::FORMAT_XHTML) {
                     $converter->generateXhtml = true;
                 }
                 $output = $converter->convertFormattedText($input);
@@ -632,30 +690,39 @@ abstract class AbstractModule implements
 
     // <editor-fold desc="Internal methods">
 
-    private function render404Content() {
+    /**
+     * @throws Exception
+     */
+    private function render404Content(array $params = array()) {
         http_response_code(404);
         $this->setContentType('text/html');
         $this->replaceMeta('content-disposition', 'inline');
         $this->targetFormat = Constants::FORMAT_HTML;
         $this->setPageTemplate(self::PAGE_STANDARD);
         $this->setTitle($this->getSiteTitle() . ' - Seite nicht gefunden!');
-        $this->setContent($this->renderUserTemplate('error-404.phtml'));
+        $this->setContent($this->renderUserTemplate('error-404.phtml', $params));
     }
 
-    private function renderExceptionContent() {
+    /**
+     * @throws Exception
+     */
+    private function renderExceptionContent(array $params = array()) {
         $this->setContentType('text/html');
         $this->replaceMeta('content-disposition', 'inline');
         $this->targetFormat = Constants::FORMAT_HTML;
         $this->setPageTemplate(self::PAGE_STANDARD);
-        $this->setContent($this->renderUserTemplate('exception.phtml'));
+        $this->setContent($this->renderUserTemplate('exception.phtml', $params));
     }
 
-    private function renderAuthorizationExceptionContent() {
+    /**
+     * @throws Exception
+     */
+    private function renderAuthorizationExceptionContent(array $params = array()) {
         $this->setContentType('text/html');
         $this->replaceMeta('content-disposition', 'inline');
         $this->targetFormat = Constants::FORMAT_HTML;
         $this->setPageTemplate(self::PAGE_STANDARD);
-        $this->setContent($this->renderUserTemplate('exception-authorization.phtml'));
+        $this->setContent($this->renderUserTemplate('exception-authorization.phtml', $params));
     }
 
     // </editor-fold>

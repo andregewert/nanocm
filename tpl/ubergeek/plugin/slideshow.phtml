@@ -1,0 +1,104 @@
+<?php
+use Ubergeek\NanoCm\Media\ImageFormat;
+use Ubergeek\NanoCm\Medium;
+
+/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
+/* @var $params array */
+
+$folderId = $params['folderid'];
+$folder = $params['folder'];
+$media = $params['media'];
+$format = $params['format'];
+?>
+
+<script type="text/javascript">
+
+    $('div.slideshow').each(function() {
+        let img = $(this).find('div.image');
+        let count = img.length;
+        let current = 0;
+        let play = true;
+
+        for (i = 1; i < count; i++) {
+            $(img[i]).hide();
+        }
+    });
+
+    /*
+    $('div.album').each(function() {
+        let img = $(this).find('div.image');
+        let count = img.length;
+        let current = 0;
+        let play = true;
+
+        for (i = 1; i < count; i++) {
+            $(img[i]).hide();
+        }
+
+        let showNext = function() {
+            setTimeout(function() {
+                if (play) {
+                    let next = (current + 1) % count;
+                    $(img[next]).fadeIn(2000);
+                    $(img[current]).fadeOut(2000, showNext);
+                    current = next;
+                }
+            }, 5000);
+        };
+
+        showNext();
+    });
+    */
+</script>
+
+<style>
+    div.slideshow {
+        max-width: 600px;
+        height: 600px;
+        overflow: hidden;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    div.slideshow div.image {
+        position: relative;
+    }
+
+    div.slideshow div.image div.caption {
+        background-color: #0dbed9;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 0.25rem 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+</style>
+
+<?php if ($format instanceof ImageFormat && $folder instanceof Medium && is_array($media) && count($media) > 0) : ?>
+    <div class="shadow">
+        <div class="slideshow">
+            <div class="images">
+                <?php foreach ($media as $medium) : ?>
+                    <div class="image">
+                        <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview-album_<?php echo $folderId; ?>" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                            <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
+                                 srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
+                        </a>
+                        <div class="caption">
+                            // TODO
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="controls">
+                <p>
+                    <?php echo $this->htmlEncode($folder->title); ?>&nbsp;&middot;
+                    <?php echo count($media); ?> Bilder
+                </p>
+            </div>
+        </div>
+    </div>
+<?php else : ?>
+    <p>[Wrong data]</p>
+<?php endif; ?>

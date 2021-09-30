@@ -32,7 +32,9 @@ use Ubergeek\NanoCm\Module\AbstractModule;
 interface PluginInterface {
 
     /**
-     * Replaces a placeholder
+     * Replaces a placeholder.
+     * The given keys and values in the parameter list are already HTML / XHTML converted! To avoid problems plugins
+     * should not use any XML special characters for their parameter keys.
      * @param string $placeholder The whole placeholder
      * @param KeyValuePair[] $parameters List of parsed parameters
      * @return string The generated content
@@ -45,6 +47,25 @@ interface PluginInterface {
      * @return int Priority
      */
     public function getPriority() : int;
+
+    /**
+     * Sets the priority for the plugin's execution order
+     * @param int $newPriority New priority as a value from -127 to 127
+     */
+    public function setPriority(int $newPriority): void;
+
+    /**
+     * Checks if this plugin is enabled and should be executed when converting markup.
+     * @return bool true if this plugin is enabled
+     */
+    public function isEnabled(): bool;
+
+    /**
+     * Enables or disables this plugin.
+     * Only enabled plugins should be executed while converting markup.
+     * @param bool $active New enabled state
+     */
+    public function setEnabled(bool $enabled): void;
 
     /**
      * Gets the name of this plugin.
@@ -85,5 +106,11 @@ interface PluginInterface {
      * @return AbstractModule Reference to the currently executed module.
      */
     public function getModule() : AbstractModule;
+
+    /**
+     * Return an array with the description of available parameters this plugin supports or expects
+     * @return PluginParameter[]
+     */
+    public function getAvailableParameters() : array;
 
 }
