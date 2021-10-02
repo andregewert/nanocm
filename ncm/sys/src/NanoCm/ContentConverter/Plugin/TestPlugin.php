@@ -70,4 +70,12 @@ class TestPlugin extends PluginAdapter {
     public function getPlaceholder(): string {
         return 'test';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function isEnabled(): bool {
+        return false;
+    }
+
 }

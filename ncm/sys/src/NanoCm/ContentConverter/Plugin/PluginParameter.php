@@ -107,12 +107,12 @@ class PluginParameter {
         $param = new PluginParameter();
         foreach ($data as $key => $value) {
             $key = strtolower($key);
-            if ($key == 'key') $param->key = $value;
-            if ($key == 'value') $param->value = $value;
-            if ($key == 'type') $param->type = $value;
-            if ($key == 'required') $param->required = $value;
-            if ($key == 'options') $param->options = $value;
-            if ($key == 'default') $param->default = $value;
+            if ($key === 'key') $param->key = $value;
+            if ($key === 'value') $param->value = $value;
+            if ($key === 'type') $param->type = $value;
+            if ($key === 'required') $param->required = $value;
+            if ($key === 'options') $param->options = $value;
+            if ($key === 'default') $param->default = $value;
         }
         return $param;
     }

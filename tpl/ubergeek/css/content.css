@@ -452,6 +452,53 @@ blockquote.twitter-tweet {
   box-sizing: border-box;
 }
 
+div.slideshow {
+  position: relative;
+}
+
+div.slideshow div.frame {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+div.slideshow div.frame a {
+  display: block;
+  line-height: 0.1em;
+}
+
+div.slideshow div.controls {
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  color: white;
+  line-height: 3em;
+  line-height: 3rem;
+}
+
+div.slideshow div.controls img {
+  vertical-align: middle;
+  display: inline-block;
+  padding: 0.5em 1em;
+}
+
+div.slideshow div.attribution {
+  background-color: #000;
+  color: white;
+  opacity: 0.8;
+  font-size: 0.8em;
+  font-size: 0.8rem;
+  line-height: 1.2em;
+  padding: 0.25em 0.5em;
+}
+
+div.slideshow div.caption {
+  font-size: 0.9em;
+  font-size: 0.9rem;
+  line-height: 1.2em;
+  padding: 0.25em 0.5em;
+}
+
 /* </editor-fold> */
 /* <editor-fold desc="Forms"> */
 .captcha {
