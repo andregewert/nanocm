@@ -289,6 +289,10 @@ div.lead {
   line-height: 1.4em;
 }
 
+div.lead em {
+  font-style: normal;
+}
+
 .alert {
   background-color: blanchedalmond;
   padding: 0.25em 0.5em;
