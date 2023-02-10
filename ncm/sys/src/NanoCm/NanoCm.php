@@ -444,6 +444,7 @@ class NanoCm {
      * @return bool
      */
     public function hasCurrentUserAcceptedPrivacyPolicy() {
+        if (!array_key_exists('privacypolicy_accepted', $_COOKIE)) return false;
         return $_COOKIE['privacypolicy_accepted'] == 1;
     }
 

@@ -27,6 +27,7 @@ namespace Ubergeek\NanoCm;
  * @package Ubergeek\NanoCm
  * @created 2017-10-27
  */
+#[\AllowDynamicProperties]
 class Article {
     
     // <editor-fold desc="Properties">
@@ -37,7 +38,7 @@ class Article {
      * @var int
      */
     public $id;
-    
+
     /**
      * Erstellungszeitpunkt
      *
@@ -212,7 +213,7 @@ class Article {
     }
 
     public function getCommentUrl(Comment $comment) : string {
-        return $this->getArticleUrl() . '#comment-' . intval($comment->id);
+        return $this->getArticleUrl() . '#comment-' . $comment->id;
     }
 
     public function getTagSearchUrl(string $tag) : string {

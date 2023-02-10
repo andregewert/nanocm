@@ -3,6 +3,14 @@
 $lastYear = null;
 $lastMonth = null;
 $first = true;
+$fmt = datefmt_create(
+    $this->ncm->lang,
+    IntlDateFormatter::FULL,
+    IntlDateFormatter::FULL,
+    'Europe/Berlin',
+    IntlDateFormatter::GREGORIAN,
+    'MMMM Y'
+);
 ?>
 <div class="container">
     <h1>Archiv</h1>
@@ -13,7 +21,7 @@ $first = true;
                 <?php if (!$first) : ?>
                     </ul>
                 <?php endif; ?>
-                <h2><?php echo $this->htmlEncode(strftime('%B %Y', $pubDate->getTimestamp())) ?></h2>
+                <h2><?php echo $this->htmlEncode(datefmt_format($fmt, $pubDate->getTimestamp())) ?></h2>
                 <ul class="nobullets" style="margin-bottom: 1em">
             <?php endif; ?>
             <li>

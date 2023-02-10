@@ -2447,7 +2447,7 @@ class Orm {
     public function searchArticles(Article $filter = null, $releasedOnly = true, $searchterm = null, $countOnly = false, $page = null, $limit = null) {
         $articles = array();
         $params = array();
-        $limit = ($limit == null)? $this->pageLength : intval($limit);
+        $limit = ($limit == null)? $this->pageLength : (int)$limit;
 
         // Ergebnis oder Anzahl Ergebnisse
         if ($countOnly) {
@@ -2459,13 +2459,14 @@ class Orm {
 
         // Suche nach bestimmten Schlagworten / Tags
         if ($filter instanceof Article && is_array($filter->tags)) {
+            $tagCount = count($filter->tags);
             $sql .= '
                 INNER JOIN (
                 SELECT article_id, count(*) AS c
                 FROM
                 tag_article
                 WHERE (1 = 0 ';
-            for ($i = 0; $i < count($filter->tags); $i++) {
+            for ($i = 0; $i < $tagCount; $i++) {
                 $sql .= " OR tag = :tag_$i ";
                 $params["tag_$i"] = $filter->tags[$i];
             }
@@ -2510,7 +2511,7 @@ class Orm {
                         publishing_timestamp IS NOT NULL THEN publishing_timestamp
                         ELSE start_timestamp
                     END DESC ';
-            $page = intval($page) -1;
+            $page = (int)$page -1;
             if ($page < 0) $page = 0;
             $offset = $page *$this->pageLength;
             $sql .= " LIMIT $offset, $limit ";
