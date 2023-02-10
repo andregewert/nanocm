@@ -103,7 +103,7 @@
             <tr>
                 <td><?php echo $this->htmlEncode($os['osname']); ?></td>
                 <td class="textright pre"><?php echo $this->formatInt($os['sumcount']); ?></td>
-                <td class="textright pre"><?php echo $this->formatInt(($os['sumcount'] /$sum) *100); ?></td>
+                <td class="textright pre"><?php echo $this->formatInt((int)($os['sumcount'] /$sum) *100); ?></td>
             </tr>
             <?php $sumPercent += ($os['sumcount'] /$sum) *100; ?>
         <?php endforeach; ?>
@@ -141,7 +141,6 @@
         <?php foreach ($this->statsCountry as $country) : ?>
             <tr>
                 <td><?php echo $this->htmlEncode($country['country']); ?></td>
-                <!--<td><?php echo $this->htmlEncode($country['regionname']); ?></td>-->
                 <td class="textright pre"><?php echo $this->formatInt($country['sumcount']); ?></td>
                 <td class="textright pre"><?php echo $this->formatFloat(($country['sumcount'] /$sum) *100); ?></td>
             </tr>

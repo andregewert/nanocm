@@ -18,6 +18,7 @@
 
 namespace Ubergeek\NanoCm;
 
+use Exception;
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Epub\Document;
 use Ubergeek\Epub\Epub3Writer;
@@ -78,8 +79,8 @@ class EbookGenerator {
      * Hierbei sollte es sich im Normalfall um einen langfristigen (mehrtägigen) Cache handeln.
      *
      * @param Article $article Der als E-Pub zu schreibende Artikel
-     * @return string E-Pub-Inhalt in Form eines String
-     * @throws \Exception Bei einem Fehler
+     * @return string|null E-Pub-Inhalt in Form eines String
+     * @throws Exception Bei einem Fehler
      */
     public function createEpubForArticle(Article $article): ?string {
         $cacheKey = 'ebook-article-' . $article->id;
@@ -101,7 +102,7 @@ class EbookGenerator {
      *
      * @param int $id ID der Artikelserie
      * @return string Generierte ePub-Datei in einem String
-     * @throws \Exception
+     * @throws Exception
      */
     public function createEpubForArticleSeriesWithId(int $id) {
         $cacheKey = 'ebook-series-' . $id;
@@ -134,7 +135,7 @@ class EbookGenerator {
      *
      * @param Article[] $articles Die zu durchsuchenden Artikel
      * @return \DateTime Das jüngste enthaltene Veröffentlichungsdatum
-     * @throws \Exception
+     * @throws Exception
      */
     private function getLatestDateFromArticles(array $articles) : \DateTime {
         $date = null;
@@ -235,7 +236,7 @@ class EbookGenerator {
      * @param bool $createCoverPage Gibt an, ob eine Seite mit dem Buch-Umschlag bzw. -Titel erstellt werden soll
      * @param bool $createTitlePage Gibt an, ob eine Titelseite vor dem Buch-Inhalt erstellt werden soll
      * @return string E-Pub-Daten in String-Form
-     * @throws \Exception
+     * @throws Exception
      */
     private function createEpubForArticles(array $articles, string $title = '', string $description = '', $createCoverPage = true, $createTitlePage = true): string {
         $mappedUrls = array();
@@ -434,6 +435,10 @@ class EbookGenerator {
      * @return bool true, wenn es sich um einen einbettbaren Inhaltstyp handelt
      */
     private function isMimeTypeEmbeddable($mimeType): bool {
+        if (!is_string($mimeType)) {
+            return false;
+        }
+
         $mimeType = strtolower($mimeType);
         $embeddable = array(
             'text/css',
@@ -443,6 +448,7 @@ class EbookGenerator {
             'image/bmp',
             'image/svg+xml',
         );
+
         return $mimeType != null && in_array($mimeType, $embeddable);
     }
 

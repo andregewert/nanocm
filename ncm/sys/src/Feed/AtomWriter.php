@@ -39,7 +39,7 @@ class AtomWriter implements FeedWriterInterface  {
     public function writeFeed(Feed $feed): string {
         $xml = new \SimpleXMLElement("<?xml version=\"1.0\" encoding=\"utf-8\" ?><feed xmlns=\"http://www.w3.org/2005/Atom\"></feed>");
         $xml->addChild('title', $feed->title);
-        if (mb_strlen($feed->subtitle) > 0) {
+        if (!empty($feed->subtitle)) {
             $xml->addChild('subtitle', $feed->subtitle);
         }
         $xml->addChild('id', $feed->id);
@@ -159,10 +159,10 @@ class AtomWriter implements FeedWriterInterface  {
         /* @var $node \SimpleXMLElement */
         $node = $parentNode->addChild($name);
         $node->addChild('name', $person->name);
-        if (mb_strlen($person->email) > 0) {
+        if (!empty($person->email)) {
             $node->addChild('email', $person->email);
         }
-        if (mb_strlen($person->uri) > 0) {
+        if (!empty($person->uri)) {
             $node->addChild('uri', $person->uri);
         }
     }
