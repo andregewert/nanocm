@@ -66,11 +66,16 @@ alleinstehende Anwendung verfügbar ist.
 # Voraussetzungen
 
 - PHP 7.3  
-Anmerkung: Ich habe erst spät im Laufe der Entwicklung den "language level" auf Version 7.3 gehoben.
-Vermutlich werden versionsspezifische Features noch an nur sehr wenigen Stellen genutzt.
+Anmerkung: Ich habe erst spät im Laufe der Entwicklung den "language level" auf Version
+7.3 und noch später auf PHP 8 gehoben.
 - PHP-Extension pdo_sqlite
 - PHP-Extension curl
 - Apache mit mod_rewrite
+
+# TODO
+
+- PSR-kompatibles Logging implementieren
+- Zusätzliche Order für Root-Namespace hinzufügen
 
 # Autor
 

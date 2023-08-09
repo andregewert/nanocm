@@ -169,7 +169,7 @@ class AdminMediaModule extends AbstractAdminModule {
                 $file = $this->getParam('file');
 
                 if ($file != null) {
-                    $data = utf8_decode($file['fileData']);
+                    $data = base64_decode($file['fileData']);
                     $medium = new Medium();
                     $medium->entrytype = Medium::TYPE_FILE;
                     $medium->parent_id = intval($this->getParam('parent_id'));

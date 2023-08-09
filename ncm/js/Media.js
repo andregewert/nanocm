@@ -48,7 +48,7 @@ function Media() {
                 senddata.type = files[0].type;
 
                 reader.onload = function (fileData) {
-                    senddata.fileData = fileData.target.result;
+                    senddata.fileData = btoa(fileData.target.result);
                     ncm.showDefaultLoadingIndicator();
 
                     // TODO Auf Fehler bzw. negative Antworten reagieren!
