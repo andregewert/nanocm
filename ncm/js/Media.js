@@ -40,7 +40,7 @@ function Media() {
             let files = e.originalEvent.dataTransfer.files;
             if (files.length > 0) {
                 let reader = new FileReader();
-                let senddata = new Object();
+                let senddata = {};
 
                 senddata.name = files[0].name;
                 senddata.date = files[0].lastModified;
@@ -199,7 +199,7 @@ function Media() {
      */
     app.editMedium = function(id) {
         id = parseInt(id, 10);
-        if (id == 0) return;
+        if (id === 0) return;
 
         let dlg = new ncm.InlinePopup(
             'admin/media/html/editmedium', {

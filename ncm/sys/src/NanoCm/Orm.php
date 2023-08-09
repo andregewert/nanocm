@@ -1829,9 +1829,9 @@ class Orm {
     // <editor-fold desc="Medium">
 
     /**
-     * Liest den im Dateisystem abgelegten Inhalt einer Mediendatei aus und gibt ihn als String zurück
+     * Liest den im Dateisystem abgelegten Inhalt einer Mediendatei aus und gibt ihn als String zurück.
      *
-     * @param $id Datensatz-ID der auszulesenden Mediendatei
+     * @param int $id Datensatz-ID der auszulesenden Mediendatei
      * @return false|string Dateiinhalt bei Erfolg oder False bei Misserfolg
      */
     public function getMediumFileContents($id) {
@@ -1840,7 +1840,7 @@ class Orm {
     }
 
     /**
-     * Überprüft, ob das konfigurierte Medienverzeichnis (durch den aktuellen Prozess / User) schreibbar ist
+     * Überprüft, ob das konfigurierte Medienverzeichnis (durch den aktuellen Prozess / User) schreibbar ist.
      *
      * @return bool true, wenn das konfigurierte Medienverzeichnis schreibbar ist
      */
