@@ -19,6 +19,7 @@
 
 namespace Ubergeek\NanoCm;
 
+use PDO;
 use Ubergeek\Log\Logger;
 use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Exception\InvalidDataException;
@@ -56,45 +57,41 @@ class Orm {
 
     /**
      * Handle für die Basis-Datenbank
-     *
-     * @var \PDO
+     * @var PDO
      */
-    private $basedb;
+    private PDO $basedb;
 
     /**
      * PDO-Handle für die Statistik-Datenbank
-     *
-     * @var \PDO
+     * @var PDO
      */
-    private $statsdb;
+    private PDO $statsdb;
 
     /**
      * Verzeichnis für die Ablage von Mediendateien
      *
      * @var string
      */
-    private $mediadir;
+    private string $mediadir;
     
     /**
      * Optionale Log-Instanz
-     *
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
     /**
      * Seitenlänge für Suchergebnisse
-     *
      * @var int
      */
-    public $pageLength = 5;
+    public int $pageLength = 5;
 
     /**
      * Cache für den User-ID-Converter
      *
      * @var User[]
      */
-    private static $userCache;
+    private static array $userCache = array();
 
     // </editor-fold>
 
@@ -105,12 +102,12 @@ class Orm {
      * Dem Konstruktor muss das Datenbank-Handle für die Basis-Systemdatenbank
      * übergeben werden.
      *
-     * @param \PDO $dbhandle PDO-Handle für die Site-Datenbank
-     * @param \PDO $statshandle PDO-Handle für die Statistik-Datenbank
+     * @param PDO $dbhandle PDO-Handle für die Site-Datenbank
+     * @param PDO $statshandle PDO-Handle für die Statistik-Datenbank
      * @param string $mediadir Absoluter Pfad zum Ablageverzeichnis für die Medienverwaltung
      * @param LoggerInterface|null $log
      */
-    public function __construct(\PDO $dbhandle, \PDO $statshandle, string $mediadir, LoggerInterface $log = null) {
+    public function __construct(PDO $dbhandle, PDO $statshandle, string $mediadir, LoggerInterface $log = null) {
         $this->basedb = $dbhandle;
         $this->statsdb = $statshandle;
         $this->mediadir = $mediadir;
@@ -128,11 +125,9 @@ class Orm {
 
     /**
      * Ermittelt die in den Statistiktabellen vorhandenen Kalenderjahre
-     *
-     * @param bool $includeCurrentYear Gibt an, ob das aktuelle Kalenderjahr ausgeschlossen werden soll
      * @return int[] Eine Liste der Jahreszahlen, die in den Statistiktabellen auftauchen
      */
-    public function getStatisticYears(bool $includeCurrentYear = true) {
+    public function getStatisticYears(): array {
         $sql = '
             SELECT * FROM (
                 SELECT DISTINCT year
@@ -166,13 +161,13 @@ class Orm {
      * @param int $year Jahreszahl (vierstellig)
      * @param int $month Monatszahl (1-12)
      * @param bool $countOnly
-     * @param null|int $page
-     * @param null|int $limit
+     * @param int|null $page
+     * @param int|null $limit
      * @return array|mixed
      */
-    public function searchAccessLog($year, $month, $countOnly = false, $page = null, $limit = null) {
+    public function searchAccessLog(int $year, int $month, bool $countOnly = false, int $page = null, int $limit = null): mixed {
         $stats = array();
-        $limit = ($limit == null)? $this->pageLength : intval($limit);
+        $limit = ($limit == null)? $this->pageLength : $limit;
 
         if ($countOnly) {
             $sql = 'SELECT COUNT(*) ';
@@ -194,8 +189,8 @@ class Orm {
 
         // Parameter setzen
         $stmt = $this->statsdb->prepare($sql);
-        $stmt->bindValue('year', $year, \PDO::PARAM_STR);
-        $stmt->bindValue('month', $month, \PDO::PARAM_STR);
+        $stmt->bindValue('year', $year);
+        $stmt->bindValue('month', $month);
         $stmt->execute();
 
         // Ergebnis auslesen
@@ -214,7 +209,7 @@ class Orm {
      * @param int $month Monatszahl (1-12)
      * @return array Zugriffszahlen für den angegebenen Monat
      */
-    public function getMonthlyBrowserStats($year, $month) {
+    public function getMonthlyBrowserStats(int $year, int $month): array {
         $sql = 'SELECT year, month, browsername, sum(count) AS sumcount
                 FROM monthlybrowser
                 WHERE year = :year AND month = :month
@@ -224,9 +219,8 @@ class Orm {
         $stmt->bindValue('year', $year);
         $stmt->bindValue('month', $month);
         $stmt->execute();
-
         $stats = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
         return $stats;
@@ -251,7 +245,7 @@ class Orm {
         $stmt->execute();
 
         $stats = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
         return $stats;
@@ -276,7 +270,7 @@ class Orm {
         $stmt->execute();
 
         $stats = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
         return $stats;
@@ -301,7 +295,7 @@ class Orm {
         $stmt->execute();
 
         $stats = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
         return $stats;
@@ -327,7 +321,7 @@ class Orm {
         $stmt->execute();
 
         $stats = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
         return $stats;
@@ -348,12 +342,12 @@ class Orm {
                 WHERE  strftime(\'%Y\', accesstime) = :year 
                 AND CAST(strftime(\'%m\', accesstime) AS INT) = :month ';
         $stmt = $this->statsdb->prepare($sql);
-        $stmt->bindValue('year', $year, \PDO::PARAM_STR);
-        $stmt->bindValue('month', $month, \PDO::PARAM_STR);
+        $stmt->bindValue('year', $year, PDO::PARAM_STR);
+        $stmt->bindValue('month', $month, PDO::PARAM_STR);
         $stmt->execute();
 
         $stats = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $stats[] = $row;
         }
         return $stats;
@@ -399,14 +393,6 @@ class Orm {
      */
     public function logSimplifiedStats(AccessLogEntry $entry, bool $enableGeolocation = false) {
         $this->log->debug('logSimplifiedStats');
-
-        if (rand(0, 99) %97 <= 3) {
-            //$this->removeOldStatistics();
-            // TODO Evtl. auch auf den vereinfachten Statistiken eine automatische Garbage Collection durchführen
-        } else {
-            //$this->log->debug("Skipping garbage collection");
-        }
-
         try {
             $this->countMonthlyBrowserStats($entry->accesstime, $entry->browsername, $entry->browserversion);
             $this->countMonthlyOsStats($entry->accesstime, $entry->osname, $entry->osversion);
@@ -832,7 +818,7 @@ class Orm {
         $stmt->bindValue('name', $name);
         $stmt->execute();
         
-        if (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        if (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $setting = new Setting();
             $setting->key = $row['name'];
             $setting->value = $row['setting'];
@@ -885,10 +871,11 @@ class Orm {
 
     /**
      * Löscht die Einstellung mit dem angegebenen Key
-     * @param $key Key der zu löschenden Einstellung
+     * @param string $key Key der zu löschenden Einstellung
      * @return bool
      */
-    public function deleteSettingByKey($key) {
+    public function deleteSettingByKey(string $key): bool
+    {
         try {
             $sql = 'DELETE FROM setting WHERE name = :key ';
             $stmt = $this->basedb->prepare($sql);
@@ -948,10 +935,7 @@ class Orm {
         }
         $sql .= 'FROM setting WHERE 1 = 1 ';
 
-        // Filterbedingungen einfügen
-        if ($filter instanceof Setting) {
-            // TODO implementieren
-        }
+        // TODO Filterbedingungen einfügen?
 
         // Feier Suchbegriff
         if (!empty($searchterm)) {
@@ -1198,11 +1182,11 @@ class Orm {
 
     /**
      * Setzt den Status-Code für ein bestimmtes Benutzerkonto auf den angegebenen Wert
-     * @param $id Datensatz-ID des zu ändernden Benutzerkontos
-     * @param $statusCode Neuer Status-Code
+     * @param int $id Datensatz-ID des zu ändernden Benutzerkontos
+     * @param int $statusCode Neuer Status-Code
      * @return void
      */
-    public function setUserStatusCodeById($id, $statusCode) {
+    public function setUserStatusCodeById(int $id, int $statusCode): void {
         $sql = 'UPDATE user SET status_code = :status_code WHERE id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('status_code', $statusCode);
@@ -1213,7 +1197,7 @@ class Orm {
     /**
      * Setzt den Status-Code mehrerer Benutzerkonten auf den angegebenen Wert
      * @param int[] $ids Datensatz-IDs der zu ändernden Benutzerkonten
-     * @param $statusCode Neuer Status-Code
+     * @param $int statusCode Neuer Status-Code
      */
     public function setUserStatusCodeByIds(array $ids, $statusCode) {
         foreach ($ids as $id) {
@@ -1223,10 +1207,10 @@ class Orm {
 
     /**
      * Löscht das Benutzerkonto mit der angegebenen ID
-     * @param $id Datensatz-ID des zu löschenden Benutzerkontos
+     * @param int $id Datensatz-ID des zu löschenden Benutzerkontos
      * @return void
      */
-    public function deleteUserById($id) {
+    public function deleteUserById($id): void {
         $sql = 'DELETE FROM user WHERE id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $id);
@@ -1317,11 +1301,11 @@ class Orm {
      * Weist die übergebenen Tags einem bestimmten Artikel zu.
      * Hinweis: Alle bestehenden Zuweisungen werden durch die übergebenen Zuweisungen *ersetzt*.
      *
-     * @param $articleId Datensatz-ID des betreffenden Artikels
+     * @param int $articleId Datensatz-ID des betreffenden Artikels
      * @param string[] $tags Die zuzuweisenden Tags
      * @return void
      */
-    public function assignTagsToArticle($articleId, array $tags) {
+    public function assignTagsToArticle(int $articleId, array $tags): void {
         $sql = 'DELETE FROM tag_article WHERE article_id = :article_id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('article_id', $articleId);
@@ -1341,11 +1325,11 @@ class Orm {
      * Weist die übergebenen Tags einem bestimmten Medien-Datensatz zu.
      * Hinweis: Alle bestehenden Zuweisungen werden durch die übergebenen Zuweisungen *ersetzt*.
      *
-     * @param $mediumId ID des betreffenden Medien-Datensatzes
+     * @param int $mediumId ID des betreffenden Medien-Datensatzes
      * @param string[] $tags Die zuzuweisenden Tags
      * @return void
      */
-    public function assignTagsToMedium($mediumId, array $tags) {
+    public function assignTagsToMedium(int $mediumId, array $tags): void {
         $sql = 'DELETE FROM tag_medium WHERE medium_id = :medium_id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('medium_id', $mediumId);
@@ -1529,10 +1513,10 @@ class Orm {
 
     /**
      * Löscht einen Kommentar anhand seiner Datensatz-ID
-     * @param $commentId ID des zu löschenden Kommentares
+     * @param int $commentId ID des zu löschenden Kommentares
      * @return void
      */
-    public function deleteCommentById($commentId) {
+    public function deleteCommentById(int $commentId): void {
         $sql = 'DELETE FROM comment WHERE id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('id', $commentId);
@@ -1544,7 +1528,7 @@ class Orm {
      * @param array $commentIds IDs der zu löschenden Kommentare
      * @return void
      */
-    public function deleteCommentsById(array $commentIds) {
+    public function deleteCommentsById(array $commentIds): void {
         foreach ($commentIds as $id) {
             $this->deleteCommentById($id);
         }
@@ -1621,7 +1605,7 @@ class Orm {
         $sql = 'SELECT * FROM articleseries WHERE 1 = 1 ';
         if ($releasedOnly) {
             $sql .= ' AND status_code = :status_code ';
-            $params[status_code] = StatusCode::ACTIVE;
+            $params['status_code'] = StatusCode::ACTIVE;
         }
 
         $stmt = $this->basedb->prepare($sql);
@@ -1860,12 +1844,12 @@ class Orm {
     /**
      * Speichert die eigentliche Datei zum Medieneintrag mit der übergebenen ID
      *
-     * @param $id Datensatz-ID der Mediendatei
-     * @param $data Eigentlicher Dateiinhalt
+     * @param int $id Datensatz-ID der Mediendatei
+     * @param string $data Eigentlicher Dateiinhalt
      * @return void
      * @throws MediaException Wenn ein Fehler beim Speichern auftritt
      */
-    protected function saveMediumFile($id, $data) {
+    protected function saveMediumFile(int $id, string $data): void {
         try {
             // Gegebenenfalls das Medienverzeichnis anlegen
             if (!file_exists($this->mediadir)) {
@@ -1883,11 +1867,11 @@ class Orm {
     /**
      * Löscht die im Dateisystem gespeicherte Mediendatei mit der angegebenen ID
      *
-     * @param $id Datensatz-ID der zu löschenden Mediendatei
+     * @param int $id Datensatz-ID der zu löschenden Mediendatei
      * @return void
      * @throws MediaException Wenn beim Löschen der Datei ein Fehler auftritt
      */
-    protected function deleteMediumFile($id) {
+    protected function deleteMediumFile(int $id): void {
         try {
             $filename = Util::createPath($this->mediadir, $id);
             $this->log->debug("Lösche Mediendatei $filename");
@@ -1981,7 +1965,7 @@ class Orm {
      * @param string $data
      * @return int Datensatz-ID
      */
-    public function insertInitialMedium($medium, $data) {
+    public function insertInitialMedium(Medium $medium, string $data): int {
         $sql = 'INSERT INTO medium (
                     entrytype, parent_id, status_code, filename, filesize, extension, type, title, hash
                 ) VALUES (
@@ -2011,15 +1995,15 @@ class Orm {
     }
 
     /**
-     * Löscht die Mediendatei mit der angegebenen Datensatz_ID
+     * Löscht die Mediendatei mit der angegebenen Datensatz-ID.
      *
      * Wenn es sich bei dem betreffenden Eintrag um einen Ordner, so erfolgt eine rekursive Löschung
      * aller enthaltenen Dateien und Ordner.
      *
-     * @param $id Datensatz-ID der zu löschenden Mediendatei
+     * @param int $id Datensatz-ID der zu löschenden Mediendatei
      * @return void
      */
-    public function deleteMediumById($id) {
+    public function deleteMediumById(int $id): void {
         $medium = $this->getMediumById($id, null, false);
         if ($medium != null) {
             $this->log->debug("Deleting medium entry with id $id");
@@ -2055,7 +2039,7 @@ class Orm {
      * @param array $ids Datensatz-IDs der zu löschenden Mediendateien
      * @return void
      */
-    public function deleteMediaByIds(array $ids) {
+    public function deleteMediaByIds(array $ids): void {
         foreach ($ids as $id) {
             $this->deleteMediumById($id);
         }
@@ -2064,11 +2048,11 @@ class Orm {
     /**
      * Setzt den Status-Code für die Mediendatei mit der angegebenen Datensatz-ID
      *
-     * @param $id Datensatz-ID der zu ändernden Mediendatei
+     * @param int $id Datensatz-ID der zu ändernden Mediendatei
      * @param int $statusCode Neuer Status-Code
      * @void void
      */
-    public function setMediumStatusCodeById($id, $statusCode) {
+    public function setMediumStatusCodeById(int $id, int $statusCode): void {
         $sql = 'UPDATE medium SET status_code = :status_code WHERE entrytype = :entrytype AND id = :id ';
         $stmt = $this->basedb->prepare($sql);
         $stmt->bindValue('status_code', $statusCode);
@@ -2093,10 +2077,10 @@ class Orm {
     /**
      * Ermittelt alle übergeordneten Ordner für eine bestimmte Mediendatei
      *
-     * @param $entryId Datensatz-ID der betreffenden Mediendatei
+     * @param int $entryId Datensatz-ID der betreffenden Mediendatei
      * @return Medium[] Eine Liste der übergordneten Ordner
      */
-    public function getParentFolders($entryId) {
+    public function getParentFolders(int $entryId): array {
         $parents = array();
         $startentry = $this->getMediumById($entryId, null, false);
         $entry = $startentry;
@@ -2295,7 +2279,7 @@ class Orm {
         $stmt->execute();
 
         $usage = array();
-        while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        while (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             $usage[] = $row;
         }
         return $usage;
@@ -2602,10 +2586,10 @@ class Orm {
     /**
      * Löscht den Artikel mit der angegebenen ID
      *
-     * @param $id Datensatz-ID des zu löschenden Artikels
+     * @param int $id Datensatz-ID des zu löschenden Artikels
      * @return bool
      */
-    public function deleteArticleById($id) {
+    public function deleteArticleById(int $id): bool {
         try {
             $this->unassignTagsFromArticle($id);
             $sql = 'DELETE FROM article WHERE id = :article_id ';
@@ -2935,11 +2919,11 @@ class Orm {
      * Standardmäßig werden ausschließlich freigeschaltete Einträge berücksichtigt.
      * Dieses Verhalten kann mit dem Parameter $releasedOnly gesteuert werden.
      *
-     * @param $id Datensatz-ID des gesuchten Listeneintrags
+     * @param int $id Datensatz-ID des gesuchten Listeneintrags
      * @param bool $releasedOnly Gibt ab, ob ausschließlich freigeschaltete Einträge berücksichtigt werden sollen
      * @return null|UserListItem Der gesuchte Datensatz oder null
      */
-    public function getUserListItemById($id, $releasedOnly = true) {
+    public function getUserListItemById(int $id, bool $releasedOnly = true): ?UserListItem {
         $params = array();
         $params['id'] = $id;
 
