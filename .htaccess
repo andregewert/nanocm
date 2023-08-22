@@ -8,7 +8,9 @@
 RewriteEngine On
 RewriteBase /
 
-RewriteRule "ncm/sys/" "/index.php" [NC,R,L]
+RewriteRule "ncm/sys/" "/" [NC,R,L]
+RewriteRule "dockerfile" "/" [NC,R,L]
+RewriteRule "docker-compose.yml" "/" [NC,R,L]
 
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-s

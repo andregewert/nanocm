@@ -10,4 +10,6 @@ RUN apt-get update \
 	&& docker-php-ext-install -j$(nproc) gd \
 	&& docker-php-ext-install zip \
 	&& docker-php-ext-install intl \
-	&& a2enmod rewrite
+	&& a2enmod rewrite \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug

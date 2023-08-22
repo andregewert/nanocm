@@ -65,9 +65,7 @@ alleinstehende Anwendung verfügbar ist.
 
 # Voraussetzungen
 
-- PHP 7.3  
-Anmerkung: Ich habe erst spät im Laufe der Entwicklung den "language level" auf Version
-7.3 und noch später auf PHP 8 gehoben.
+- PHP 8
 - PHP-Extensions pdo_sqlite, curl, gd, zip, intl
 - Apache mit mod_rewrite
 

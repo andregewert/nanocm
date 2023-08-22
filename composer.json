@@ -1,0 +1,19 @@
+{
+    "name": "ubergeek/nanocm",
+    "description": "Simple zero config content management system",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Ubergeek\\": "ncm/sys/src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "André Gewert",
+            "email": "agewert@ubergeek.de"
+        }
+    ],
+    "require": {
+    }
+}

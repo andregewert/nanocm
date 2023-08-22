@@ -5,5 +5,9 @@ services:
     build: . 
     ports:
       - 80:80
+    extra_hosts:
+      - host.docker.internal:host-gateway
     volumes:
       - .:/var/www/html
+      - ./ncm/sys/etc/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./ncm/sys/etc/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini

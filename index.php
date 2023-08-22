@@ -18,8 +18,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-ini_set('display_errors', 1);
-require 'ncm/sys/src/autoload.php';
+
+require 'vendor/autoload.php';
+
 if ($_SERVER['HTTP_HOST'] === 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] === 'ubergeek.de') {
     $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
 } else {
