@@ -68,8 +68,7 @@ alleinstehende Anwendung verfügbar ist.
 - PHP 7.3  
 Anmerkung: Ich habe erst spät im Laufe der Entwicklung den "language level" auf Version
 7.3 und noch später auf PHP 8 gehoben.
-- PHP-Extension pdo_sqlite
-- PHP-Extension curl
+- PHP-Extensions pdo_sqlite, curl, gd, zip, intl
 - Apache mit mod_rewrite
 
 # TODO
