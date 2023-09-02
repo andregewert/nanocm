@@ -1,7 +1,7 @@
 <?php
-/**
+/*
  * NanoCM
- * Copyright (C) 2017 - 2019 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,62 +26,63 @@ namespace Ubergeek\NanoCm\Media;
  * @package Ubergeek\NanoCm\Media
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2019-01-02
+ * @deprecated Twitter is dead, do not use this class any more!
  */
 class TweetInfo
 {
     /**
      * @var string
      */
-    public $url;
+    public string $url;
 
     /**
      * @var string
      */
-    public $author_name;
+    public string $author_name;
 
     /**
      * @var string
      */
-    public $author_url;
+    public string $author_url;
 
     /**
      * @var string
      */
-    public $html;
+    public string $html;
 
     /**
      * @var int
      */
-    public $width;
+    public int $width;
 
     /**
      * @var int
      */
-    public $height;
+    public int $height;
 
     /**
      * @var string
      */
-    public $type;
+    public string $type;
 
     /**
      * @var int
      */
-    public $cache_age;
+    public int $cache_age;
 
     /**
      * @var string
      */
-    public $provider_name;
+    public string $provider_name;
 
     /**
      * @var string
      */
-    public $provider_url;
+    public string $provider_url;
 
     /**
      * @var float
      */
-    public $version;
+    public float $version;
 
 }

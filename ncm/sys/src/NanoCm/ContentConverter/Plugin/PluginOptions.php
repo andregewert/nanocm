@@ -1,5 +1,4 @@
 <?php
-
 /*
  * NanoCM
  * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
@@ -19,11 +18,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-require 'vendor/autoload.php';
+namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
-if ($_SERVER['HTTP_HOST'] === 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] === 'ubergeek.de') {
-    $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
-} else {
-    $var = new Ubergeek\NanoCm\FrontController(__DIR__);
+use Ubergeek\Dictionary;
+
+/**
+ * Encapsulates all option which are passed to the template when rendering the contents by a plugin.
+ *
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2023-09-02
+ */
+class PluginOptions {
+
+    /**
+     * Reference to the plugin which is being executed.
+     * @var PluginInterface
+     */
+    public PluginInterface $plugin;
+
+    /**
+     * The complete placeholder which is being replaced.
+     * @var string
+     */
+    public string $placeholder;
+
+    /**
+     * An array of KeyValuePair with the parsed options.
+     * @var Dictionary
+     */
+    public Dictionary $arguments;
+
+    /**
+     * Plugin specific extended information.
+     * @var Dictionary
+     */
+    public Dictionary $extended;
+
 }
-$var->execute();

@@ -21,6 +21,7 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
+use Ubergeek\Dictionary;
 use Ubergeek\KeyValuePair;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
@@ -36,10 +37,10 @@ interface PluginInterface {
      * The given keys and values in the parameter list are already HTML / XHTML converted! To avoid problems plugins
      * should not use any XML special characters for their parameter keys.
      * @param string $placeholder The whole placeholder
-     * @param KeyValuePair[] $parameters List of parsed parameters
+     * @param Dictionary $arguments List of parsed arguments
      * @return string The generated content
      */
-    public function replacePlaceholder(string $placeholder, array $parameters) : string;
+    public function replacePlaceholder(string $placeholder, Dictionary $arguments) : string;
 
     /**
      * Gets the priority of this plugin.
@@ -108,7 +109,8 @@ interface PluginInterface {
     public function getModule() : AbstractModule;
 
     /**
-     * Return an array with the description of available parameters this plugin supports or expects
+     * Return an array with the description of available parameters this plugin supports or expects.
+     * This can be utilised by a generic user interface to insert placeholders.
      * @return PluginParameter[]
      */
     public function getAvailableParameters() : array;

@@ -2,7 +2,7 @@
 
 /*
  * NanoCM
- * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,21 +55,21 @@ class MediaManager {
      *
      * @var CacheInterface
      */
-    private $cache;
+    private ?CacheInterface $cache;
 
     /**
      * Optionale Logger-Instanz
      *
      * @var LoggerInterface
      */
-    private $log;
+    private Logger|LoggerInterface|null $log;
 
     /**
      * Enthält eine Liste der unterstützten Eingangsformate in Form von MIME-Types
      *
      * @var string[]
      */
-    private $supportedTypes = array(
+    private array $supportedTypes = array(
         'image/jpeg',
         'image/gif',
         'image/png'
@@ -83,10 +83,10 @@ class MediaManager {
     /**
      * MediaManager constructor.
      *
-     * @param CacheInterface $cache Optional zu verwendender Cache
-     * @param null|LoggerInterface $log Optionale Logger-Instanz
+     * @param CacheInterface|null $cache Optional zu verwendender Cache
+     * @param LoggerInterface|null $log Optionale Logger-Instanz
      */
-    public function __construct($cache = null, $log = null) {
+    public function __construct(CacheInterface $cache = null, LoggerInterface $log = null) {
         $this->cache = $cache;
         $this->log = $log;
 
@@ -101,12 +101,13 @@ class MediaManager {
     // <editor-fold desc="Public methods">
 
     /**
-     * Ermittelt über die öffentliche Twitter-API Informationen zu dem Tweet mit der angegebenen ID
+     * Fetches information about a single tweet (identified by it's id) via public twitter api.
      *
-     * @param $id Tweet-ID
-     * @return TweetInfo|null Verfügbare Tweet-Informationen
+     * @param string $id Tweet id
+     * @return TweetInfo|null Available tweet information
+     * @deprecated Twitter is dead, we shouldn't need this function any more
      */
-    public function getTweetInfoById($id) {
+    public function getTweetInfoById($id): ?TweetInfo {
         $cacheKey = 'twitter-' . $id;
         if ($this->cache instanceof CacheInterface) {
             $tweetInfo = $this->cache->get($cacheKey);
@@ -143,12 +144,13 @@ class MediaManager {
     }
 
     /**
-     * Ermittelt anhand einer Tweet-URL die verfügbaren Tweet-Informationen
+     * Fetches information about a single tweet (identified by it's url) via public twitter api.
      *
-     * @param $url Tweet-URL
-     * @return TweetInfo|null Verfügbare Tweet-Informationen
+     * @param string $url Tweet url
+     * @return TweetInfo|null Available tweet information
+     * @deprecated Twitter is dead, do not use this any more
      */
-    public function getTweetInfoByUrl($url) {
+    public function getTweetInfoByUrl($url): ?TweetInfo {
         if (preg_match('/twitter.com\/[^\/]+\/status\/(\d+)/i', $url, $matches)) {
             $id = $matches[1];
             return $this->getTweetInfoById($id);

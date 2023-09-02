@@ -1,5 +1,4 @@
 <?php
-
 /*
  * NanoCM
  * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
@@ -19,11 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-require 'vendor/autoload.php';
+namespace Ubergeek\NanoCm\Exception;
 
-if ($_SERVER['HTTP_HOST'] === 'www.ubergeek.de' || $_SERVER['HTTP_HOST'] === 'ubergeek.de') {
-    $var = new Ubergeek\NanoCm\FrontController(substr(__DIR__, strlen('/data')));
-} else {
-    $var = new Ubergeek\NanoCm\FrontController(__DIR__);
+use Exception;
+
+class InvalidStateException
+    extends Exception
+    implements ExceptionInterface {
 }
-$var->execute();

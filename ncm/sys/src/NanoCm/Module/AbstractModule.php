@@ -494,12 +494,12 @@ abstract class AbstractModule implements
      * Rendert ein Template, das installations-spezifisch überschrieben werden
      * kann.
      * @param string $file Das zu rendernde Template (ohne Pfadangabe)
-     * @param array $params Optional array with parameters which could be used by the template
+     * @param mixed $params Optional array with parameters which could be used by the template
      * @return string Inhalt des gerenderten Templates
      * @throws Exception Exceptions, die bei der Ausführung des Templates
      *      geworfen werden, werden weitergeworfen
      */
-    public function renderUserTemplate(string $file, array $params = array()) : string {
+    public function renderUserTemplate(string $file, $params = array()) : string {
         $c = '';
         $fname = Util::createPath($this->templateDir, $file);
 
@@ -646,6 +646,7 @@ abstract class AbstractModule implements
      *
      * @param string $input Der Eingabestring
      * @return string Ins Zielformat umgewandelter Text
+     * @throws Exception
      */
     public function convertTextWithBasicMarkup(string $input) : string {
         switch ($this->targetFormat) {

@@ -1,7 +1,7 @@
 <?php
 /*
  * NanoCM
- * Copyright (c) 2017 - 2021 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
+use Ubergeek\Dictionary;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
@@ -35,22 +36,24 @@ abstract class PluginAdapter implements PluginInterface {
      * Reference to the currently executed NanoCM module
      * @var AbstractModule Currently executed NanoCm module
      */
-    private $module;
+    private AbstractModule $module;
 
     /**
      * Execution priority
      * @var int
      */
-    private $priority = 0;
+    private int $priority = 0;
 
     /**
      * True if this plugin is enabled
      * @var bool
      */
-    private $enabled = true;
+    private bool $enabled = true;
 
     // </editor-fold>
 
+
+    // <editor-fold desc="Interface implementation">
 
     /**
      * @inheritDoc
@@ -95,9 +98,21 @@ abstract class PluginAdapter implements PluginInterface {
     }
 
     /**
+     * The base implementation should be reusable. It just passed the needed options to
+     * the template renderer. The template file is named by the plugin.
      * @inheritDoc
      */
-    abstract public function replacePlaceholder(string $placeholder, array $parameters): string;
+    public function replacePlaceholder(string $placeholder, Dictionary $arguments): string {
+        try {
+            $templateName = 'plugin' . DIRECTORY_SEPARATOR . strtolower($this->getPlaceholder()) . '.phtml';
+            $options = $this->preparePluginOptions($placeholder, $arguments);
+            $content = $this->getModule()->renderUserTemplate($templateName, $options);
+        } catch (\Exception $ex) {
+            $content = '[Error while rendering plugin]';
+            $this->getModule()->err('Error while rendering plugin', $ex);
+        }
+        return $content;
+    }
 
     /**
      * @inheritDoc
@@ -125,5 +140,27 @@ abstract class PluginAdapter implements PluginInterface {
     public function getAvailableParameters(): array {
         return array();
     }
+
+    // </editor-fold>
+
+
+    // <editor-fold desc="Additional methods">
+
+    /**
+     * Prepares the options which are passed to the template renderer.
+     * @param string $placeholder
+     * @param Dictionary $arguments
+     * @return PluginOptions
+     */
+    protected function preparePluginOptions(string $placeholder, Dictionary $arguments): PluginOptions {
+        $options = new PluginOptions();
+        $options->plugin = $this;
+        $options->placeholder = $placeholder;
+        $options->arguments = $arguments;
+        $options->extended = new Dictionary();
+        return $options;
+    }
+
+    // </editor-fold>
 
 }

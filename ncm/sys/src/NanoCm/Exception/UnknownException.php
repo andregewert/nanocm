@@ -1,7 +1,7 @@
 <?php
-/**
+/*
  * NanoCM
- * Copyright (C) 2017 - 2020 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +20,8 @@
 
 namespace Ubergeek\NanoCm\Exception;
 
+use Exception;
+
 /**
  * Kann für allgemeine bzw. sonstige Fehler verwendet werden
  *
@@ -28,7 +30,6 @@ namespace Ubergeek\NanoCm\Exception;
  * @created 2020-02-12
  */
 class UnknownException
-    extends \Exception
+    extends Exception
     implements ExceptionInterface {
-
 }

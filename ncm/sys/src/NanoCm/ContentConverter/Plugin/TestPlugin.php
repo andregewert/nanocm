@@ -1,7 +1,7 @@
 <?php
 /*
  * NanoCM
- * Copyright (c) 2017 - 2021 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +20,8 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
+use Ubergeek\Dictionary;
+
 /**
  * Plugin to demonstrate the implementation of content converter plugins
  * @author André Gewert <agewert@ubergeek.de>
@@ -30,10 +32,10 @@ class TestPlugin extends PluginAdapter {
     /**
      * @inheritDoc
      */
-    function replacePlaceholder(string $placeholder, array $parameters) : string {
+    function replacePlaceholder(string $placeholder, Dictionary $arguments) : string {
         $output = '<p>Params:</p>';
         $output .= '<ul>' . "\n";
-        foreach ($parameters as $param) {
+        foreach ($arguments as $param) {
             $output .= '<li>';
             $output .= $this->getModule()->htmlEncode($param->key) . ': ';
             $output .= $this->getModule()->htmlEncode($param->value);

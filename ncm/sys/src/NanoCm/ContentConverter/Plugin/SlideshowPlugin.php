@@ -1,7 +1,7 @@
 <?php
 /*
  * NanoCM
- * Copyright (c) 2017 - 2021 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,43 +20,36 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
+use Ubergeek\Dictionary;
+use Ubergeek\KeyValuePair;
+use Ubergeek\NanoCm\Exception\InvalidStateException;
 use Ubergeek\NanoCm\Medium;
 
 /**
  * Imlements a simple slideshow which displays images from a media folder.
+ *
  * The slideshow is intended to show full size (full content width) images including
  * their descriptive texts.
  */
 class SlideshowPlugin extends PluginAdapter {
 
     /**
-     * @inheritDoc
+     * @param string $placeholder
+     * @param Dictionary $arguments
+     * @return PluginOptions
+     * @throws InvalidStateException
      */
-    public function replacePlaceholder(string $placeholder, array $parameters): string {
+    protected function preparePluginOptions(string $placeholder, Dictionary $arguments): PluginOptions {
         $orm = $this->getModule()->getOrm();
-        if ($orm === null) return '';
-
-        try {
-            $folderId = (int)$parameters['folderid']->value;
-            $folder = $orm->getMediumById($folderId, Medium::TYPE_FOLDER);
-            $media = $orm->getMediaByParentId($folderId, Medium::TYPE_FILE);
-            $format = $this->getModule()->getOrm()->getImageFormatByKey('preview');
-
-            $params = array(
-                'plugin'                => $this,
-                'plugin.placeholder'    => $placeholder,
-                'plugin.parameters'     => $parameters,
-                'folderid'              => $folderId,
-                'folder'                => $folder,
-                'media'                 => $media,
-                'format'                => $format
-            );
-            $content = $this->getModule()->renderUserTemplate('plugin/slideshow.phtml', $params);
-        } catch (\Exception $ex) {
-            $content = '[Error while rendering slideshow]';
-            $this->getModule()->err('Error while rendering slideshow', $ex);
+        if ($orm === null) {
+            throw new InvalidStateException('No orm instance configured');
         }
-        return $content;
+        $folderId = (int)$arguments->getValue('folderid');
+        $options = parent::preparePluginOptions($placeholder, $arguments);
+        $options->extended->set('folder', $orm->getMediumById($folderId, Medium::TYPE_FOLDER));
+        $options->extended->set('media', $orm->getMediaByParentId($folderId, Medium::TYPE_FILE));
+        $options->extended->set('format', $orm->getImageFormatByKey('preview'));
+        return $options;
     }
 
     /**
@@ -77,7 +70,7 @@ class SlideshowPlugin extends PluginAdapter {
      * @inheritDoc
      */
     public function getVersion(): string {
-        return '0.9';
+        return '0.91';
     }
 
     /**
@@ -97,11 +90,10 @@ class SlideshowPlugin extends PluginAdapter {
             'type'      => PluginParameter::TYPE_MEDIAFOLDER,
             'required'  => true
         ));
-        $params['type'] = PluginParameter::fromArray(array(
-            'key'       => 'type',
-            'type'      => PluginParameter::TYPE_SELECTION,
-            'options'   => array('standard'),
-            'default'   => 'standard',
+        $params['format'] = PluginParameter::fromArray(array(
+            'key'       => 'format',
+            'type'      => PluginParameter::TYPE_STRING,
+            'default'   => 'preview',
             'required'  => false
         ));
         return $params;
