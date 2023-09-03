@@ -143,18 +143,16 @@ class HtmlConverter {
                 $placeholder = $matches[2];
                 $lines = preg_split('/<br\s*?\/?>/i', $matches[3]);
                 $arguments = new Dictionary();
-
                 $plugin = $converter->getPluginByPlaceholder($placeholder);
+
                 if ($plugin !== null && $plugin->isEnabled()) {
-
                     $supportedParameters = $plugin->getAvailableParameters();
-
                     foreach ($lines as $line) {
                         if (empty($line)) continue;
                         list($key, $value) = preg_split('/(\s*:\s*)/i', $line, 2);
-                        if (in_array($key, array_keys($supportedParameters))) {
-                            $arguments->set($key, $value);
-                        } else {
+                        $arguments->set($key, $value);
+
+                        if (!in_array($key, array_keys($supportedParameters))) {
                             $module->warn("Parameter '$key' is not supported by plugin $placeholder");
                         }
                     }

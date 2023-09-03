@@ -36,7 +36,7 @@ abstract class PluginAdapter implements PluginInterface {
      * Reference to the currently executed NanoCM module
      * @var AbstractModule Currently executed NanoCm module
      */
-    private AbstractModule $module;
+    protected AbstractModule $module;
 
     /**
      * Execution priority
@@ -91,7 +91,7 @@ abstract class PluginAdapter implements PluginInterface {
     public function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments): string {
         $this->module = $callingModule;
         try {
-            $templateName = 'plugin' . DIRECTORY_SEPARATOR . strtolower($this->getPlaceholder()) . '.phtml';
+            $templateName = 'blocks' . DIRECTORY_SEPARATOR . 'plugin-' . strtolower($this->getPlaceholder()) . '.phtml';
             $options = $this->preparePluginOptions($placeholder, $arguments);
             $content = $this->getModule()->renderUserTemplate($templateName, $options);
         } catch (\Exception $ex) {

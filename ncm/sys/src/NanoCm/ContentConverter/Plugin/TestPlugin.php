@@ -37,6 +37,7 @@ class TestPlugin extends PluginAdapter {
      * @inheritDoc
      */
     function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments) : string {
+        $this->module = $callingModule;
         $output = '<p>Params:</p>';
         $output .= '<ul>' . "\n";
         foreach ($arguments as $param) {

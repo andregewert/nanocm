@@ -442,10 +442,10 @@ abstract class AbstractModule implements
     /**
      * Bindet an Ort und Stelle ein Template ein
      * @param string $file Relativer Pfad zum betreffenden Template
-     * @param Dictionary|null $params Optional Dictionary with parameters which could be used by the template
+     * @param mixed $params Optional Dictionary with parameters which could be used by the template
      * @throws Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
      */
-    public function includeUserTemplate(string $file, Dictionary $params = null): void {
+    public function includeUserTemplate(string $file, mixed $params = null): void {
         echo $this->renderUserTemplate($file, $params);
     }
 
@@ -453,11 +453,11 @@ abstract class AbstractModule implements
      * Rendert ein Template, das installations-spezifisch überschrieben werden
      * kann.
      * @param string $file Das zu rendernde Template (ohne Pfadangabe)
-     * @param Dictionary|null $params Optional Dictionary with parameters which could be used by the template
+     * @param mixed|null $params Optional Dictionary with parameters which could be used by the template
      * @return string Inhalt des gerenderten Templates
      * @throws Exception Exceptions, die bei der Ausführung des Templates geworfen werden, werden weitergeworfen
      */
-    public function renderUserTemplate(string $file, Dictionary $params = null) : string {
+    public function renderUserTemplate(string $file, mixed $params = null) : string {
         $c = '';
         $fname = Util::createPath($this->templateDir, $file);
 
