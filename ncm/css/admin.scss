@@ -797,7 +797,8 @@ div.row + div.row {
     border-right-width: 1px;
     height: 100%;
     margin: 0;
-    padding: 0 1rem;
+    padding: 1rem;
+    box-shadow: 0 0 45px #222;
 }
 
 .editform_sidebar_right input,
@@ -989,6 +990,7 @@ th.pre {
 
 .imgtoolbar a.button span {
     padding: 0 0 0 4px;
+    vertical-align: middle;
 }
 
 .imgtoolbar span.separator {

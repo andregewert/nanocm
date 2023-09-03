@@ -21,7 +21,6 @@
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
 use Ubergeek\Dictionary;
-use Ubergeek\KeyValuePair;
 use Ubergeek\NanoCm\Exception\InvalidStateException;
 use Ubergeek\NanoCm\Medium;
 
@@ -34,6 +33,11 @@ use Ubergeek\NanoCm\Medium;
 class SlideshowPlugin extends PluginAdapter {
 
     /**
+     * Loads addtional information according to the given placeholder options and fills three "extended" fields.
+     *
+     * 'folder' contains the medium dataset for the selected folder; 'media' containts an array of the included media and
+     * 'format' contains information about the selected image (preview) format.
+     *
      * @param string $placeholder
      * @param Dictionary $arguments
      * @return PluginOptions
@@ -85,14 +89,14 @@ class SlideshowPlugin extends PluginAdapter {
      */
     public function getAvailableParameters(): array {
         $params = array();
-        $params['folderid'] = PluginParameter::fromArray(array(
+        $params['folderid'] = PluginParameterDefinition::fromArray(array(
             'key'       => 'folderid',
-            'type'      => PluginParameter::TYPE_MEDIAFOLDER,
+            'type'      => PluginParameterDefinition::TYPE_MEDIAFOLDER,
             'required'  => true
         ));
-        $params['format'] = PluginParameter::fromArray(array(
+        $params['format'] = PluginParameterDefinition::fromArray(array(
             'key'       => 'format',
-            'type'      => PluginParameter::TYPE_STRING,
+            'type'      => PluginParameterDefinition::TYPE_STRING,
             'default'   => 'preview',
             'required'  => false
         ));

@@ -18,6 +18,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 namespace Ubergeek\NanoCm;
+use PDO;
 use Ubergeek\Cache\CacheInterface;
 use Ubergeek\Cache\FileCache;
 use Ubergeek\Controller\HttpRequest;
@@ -72,14 +73,14 @@ class NanoCm {
     /**
      * Handle für die Basis-Datenbank
      *
-     * @var \PDO
+     * @var PDO
      */
     public $basedb;
 
     /**
      * PDO-Handle für die Statistik-Datenbank
      *
-     * @var \PDO
+     * @var PDO
      */
     public $statsdb;
     
@@ -358,14 +359,14 @@ class NanoCm {
     /**
      * Gibt das Datenbank-Handle für die Standard-System-Datenbank zurück
      *
-     * @return \PDO
+     * @return PDO
      */
-    private function getDbHandle() : \PDO {
+    private function getDbHandle() : PDO {
         if ($this->basedb == null) {
-            $this->basedb = new \PDO(
+            $this->basedb = new PDO(
                 'sqlite:' . $this->getSiteDbFilename()
             );
-            $this->basedb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->basedb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         return $this->basedb;
     }
@@ -373,14 +374,14 @@ class NanoCm {
     /**
      * Gibt das PDO-Handle für die Statistik-Datenbank zurück
      *
-     * @return \PDO
+     * @return PDO
      */
-    private function getStatsDbHandle() : \PDO {
+    private function getStatsDbHandle() : PDO {
         if ($this->statsdb == null) {
-            $this->statsdb = new \PDO(
+            $this->statsdb = new PDO(
                 'sqlite:' . $this->getStatsDbFilename()
             );
-            $this->statsdb->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->statsdb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         return $this->statsdb;
     }
@@ -388,17 +389,17 @@ class NanoCm {
     /**
      * Überprüft, ob in einer SQLite-Datenbank eine bestimmte Tabelle vorhanden
      * ist
-     * @param \PDO $pdo Datenbank-Handle
+     * @param PDO $pdo Datenbank-Handle
      * @param string $tableName Zu prüfender Tabellenname
      * @return boolean true, wenn die genannte Tabelle vorhanden ist, ansonsten
      *      false
      */
-    private function isTableExisting(\PDO $pdo, string $tableName) {
+    private function isTableExisting(PDO $pdo, string $tableName) {
         $stmt = $pdo->prepare('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=:name ');
         $stmt->bindValue('name', $tableName);
         $stmt->execute();
         
-        if (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
+        if (($row = $stmt->fetch(PDO::FETCH_ASSOC)) !== false) {
             return true;
         }
         return false;

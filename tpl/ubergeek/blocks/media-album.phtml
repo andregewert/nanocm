@@ -1,11 +1,14 @@
 <?php
 
+use Ubergeek\Dictionary;
 use Ubergeek\NanoCm\Media\ImageFormat;
 use Ubergeek\NanoCm\Medium;
+use Ubergeek\NanoCm\Module\AbstractModule;
 
-/* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
+/* @var $this AbstractModule */
+/* @var $params Dictionary */
 
-$folderId = $this->getVar('converter.album.id');
+$folderId = $params->getValue('albumid');
 $folder = $this->orm->getMediumById($folderId, Medium::TYPE_FOLDER);
 $media = $this->orm->getMediaByParentId($folderId, Medium::TYPE_FILE);
 $format = $this->orm->getImageFormatByKey('preview');

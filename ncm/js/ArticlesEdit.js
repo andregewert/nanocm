@@ -71,10 +71,11 @@ function ArticlesEdit() {
      * Blendet das Panel mit den Detail-Einstellungen ein oder aus
      */
     app.toggleSettings = function() {
-        if ($('#article_settings_sidebar').is(':visible')) {
-            $('#article_settings_sidebar').hide();
+        let sidebar = $('#article_settings_sidebar');
+        if (sidebar.is(':visible')) {
+            sidebar.hide();
         } else {
-            $('#article_settings_sidebar').show();
+            sidebar.show();
         }
     };
 

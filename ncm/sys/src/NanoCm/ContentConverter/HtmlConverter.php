@@ -19,6 +19,7 @@
  */
 
 namespace Ubergeek\NanoCm\ContentConverter;
+use Exception;
 use Ubergeek\Dictionary;
 use Ubergeek\KeyValuePair;
 use Ubergeek\MarkupParser\MarkupParser;
@@ -71,7 +72,7 @@ class HtmlConverter {
      */
     public function __construct(AbstractModule $module) {
         $this->module = $module;
-        $this->plugins = $this->loadPlugins();
+        $this->plugins = self::loadAvailableContentPlugins();
     }
 
     // </editor-fold>
@@ -97,38 +98,37 @@ class HtmlConverter {
             '/<p>\[(youtube|album|image|download|twitter):([^]]+?)]<\/p>$/im',
 
             /**
-             * @throws \Exception
+             * @throws Exception
              */
             static function($matches) use ($module) {
-                $module->setVar($module::VAR_CONVERTER_PLACEHOLDER, $matches[0]);
+                $params = new Dictionary();
+
                 switch (strtolower($matches[1])) {
 
                     // Youtube-Einbettungen (click-to-play)
                     case 'youtube':
                         if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
-                            $vid = $im[1];
-                            $module->setVar($module::VAR_CONVERTER_YOUTUBE_VID, $vid);
-                            return $module->renderUserTemplate('blocks/media-youtube.phtml');
+                            $params->add('videoid', $im[1]);
+                            return $module->renderUserTemplate('blocks/media-youtube.phtml', $params);
                         }
                         return '';
 
                     // Bildergalerie aus der Medienverwaltung
                     case 'album':
-                        $module->setVar($module::VAR_CONVERTER_ALBUM_ID, (int)$matches[2]);
-                        return $module->renderUserTemplate('blocks/media-album.phtml');
+                        $params->add('albumid', (int)$matches[2]);
+                        return $module->renderUserTemplate('blocks/media-album.phtml', $params);
 
                     // Vorschaubild aus der Medienverwaltung
                     case 'image':
-                        list($id, $format) = explode(':', $matches[2], 2);
-                        $module->setVar($module::VAR_CONVERTER_IMAGE_ID, (int)$id);
-                        $module->setVar($module::VAR_CONVERTER_IMAGE_FORMAT, $format);
-                        return $module->renderUserTemplate('blocks/media-image.phtml');
+                        list($id, $formatid) = explode(':', $matches[2], 2);
+                        $params->add('imageid', (int)$id);
+                        $params->add('formatid', $formatid);
+                        return $module->renderUserTemplate('blocks/media-image.phtml', $params);
 
                     // Download-Link aus der Medienverwaltung
                     case 'download':
-                        $module->setVar($module::VAR_CONVERTER_DOWNLOAD_ID, (int)$matches[2]);
-                        return $module->renderUserTemplate('blocks/media-download.phtml');
-
+                        $params->add('downloadid', (int)$matches[2]);
+                        return $module->renderUserTemplate('blocks/media-download.phtml', $params);
                 }
                 return $matches[0];
             },
@@ -168,7 +168,7 @@ class HtmlConverter {
                         }
                     }
 
-                    return $plugin->replacePlaceholder($matches[0], $arguments);
+                    return $plugin->replacePlaceholder($module, $matches[0], $arguments);
                 }
                 return '';
             },
@@ -220,7 +220,7 @@ class HtmlConverter {
      * @todo The properties isEnabled and priority should be set with values from some user configuration
      * @todo There should be ways to register plugins from other namespaces
      */
-    private function loadPlugins() : array {
+    public static function loadAvailableContentPlugins() : array {
         $plugins = array();
         $dirname = __DIR__ . DIRECTORY_SEPARATOR . 'Plugin';
         if (($dh = opendir($dirname)) !== false) {
@@ -232,12 +232,10 @@ class HtmlConverter {
                     try {
                         $pl = new $className();
                         if ($pl instanceof PluginInterface) {
-                            $pl->setModule($this->module);
                             // TODO Set isEnbaled / priority
                             $plugins[] = $pl;
                         }
-                    } catch (\Exception $ex) {
-                        $this->module->log->warn("Could not load content converter plugin", $ex);
+                    } catch (Exception) {
                     }
                 }
             }

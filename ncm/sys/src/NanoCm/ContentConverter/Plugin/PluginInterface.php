@@ -36,11 +36,12 @@ interface PluginInterface {
      * Replaces a placeholder.
      * The given keys and values in the parameter list are already HTML / XHTML converted! To avoid problems plugins
      * should not use any XML special characters for their parameter keys.
+     * @param AbstractModule $callingModule The nano cm module which is executing / calling the content converter
      * @param string $placeholder The whole placeholder
      * @param Dictionary $arguments List of parsed arguments
      * @return string The generated content
      */
-    public function replacePlaceholder(string $placeholder, Dictionary $arguments) : string;
+    public function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments) : string;
 
     /**
      * Gets the priority of this plugin.
@@ -97,21 +98,9 @@ interface PluginInterface {
     public function getPlaceholder() : string;
 
     /**
-     * Sets the reference to the currently executed NanoCM module
-     * @param AbstractModule $module Currently executed module
-     */
-    public function setModule(AbstractModule $module) : void;
-
-    /**
-     * Gets the reference to the currently executed NanoCM module.
-     * @return AbstractModule Reference to the currently executed module.
-     */
-    public function getModule() : AbstractModule;
-
-    /**
      * Return an array with the description of available parameters this plugin supports or expects.
      * This can be utilised by a generic user interface to insert placeholders.
-     * @return PluginParameter[]
+     * @return PluginParameterDefinition[]
      */
     public function getAvailableParameters() : array;
 

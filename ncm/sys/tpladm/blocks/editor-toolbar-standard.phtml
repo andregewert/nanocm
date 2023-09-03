@@ -10,9 +10,10 @@ use Ubergeek\NanoCm\Util;
     <a class="button edit_superscript" title="Hochgestellt" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_superscript.png" /></a>
     <a class="button edit_subscript" title="Tiefgestellt" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_subscript.png" /></a>
     <a class="button edit_caps" title="Kapit&auml;lchen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_smallcaps.png" /></a>
-    <a class="button edit_hr" title="Horizontaler Trennstrich" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_horizontalrule.png" /></a>
 
-    <!-- Sonderzeichen einfügen -->
+    <span class="separator"></span>
+
+    <a class="button edit_hr" title="Horizontaler Trennstrich" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_horizontalrule.png" /></a>
     <span class="imgtoolbar_popupbutton">
         <span class="imgtoolbar_popup" style="width: 300px; height: 180px; overflow: auto">
             <ul class="imgtoolbar_keyboard">
@@ -25,14 +26,6 @@ use Ubergeek\NanoCm\Util;
         </span>
         <a class="button" title="Sonderzeichen einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/text_letter_omega.png" /></a>
     </span>
-
-    <!-- TODO Dialogfenster für Bildauswahl öffnen -->
-    <a class="button edit_insert_image" title="Bild einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
-    <a class="button edit_insert_video" title="Youtube-Link einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/youtube.png" />Youtube</a>
-
-    <span class="separator"></span>
-
-    <!-- Emoji-Tastatur -->
     <span class="imgtoolbar_popupbutton">
         <span class="imgtoolbar_popup" style="width: 500px; height: 320px; overflow: auto">
             <?php foreach (Ubergeek\NanoCm\Util::getEmojiDictionary() as $group => $emojis) : ?>
@@ -48,4 +41,10 @@ use Ubergeek\NanoCm\Util;
         </span>
         <a class="button" title="Emoji-Tastatur einblenden" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/emotion_amazing.png" /></a>
     </span>
+
+    <span class="separator"></span>
+
+    <a class="button edit_insert_image" title="Bild einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/image_add.png" /><span>Bild</span></a>
+    <a class="button edit_insert_video" title="Youtube-Link einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/youtube.png" /><span>Youtube</span></a>
+    <a class="button edit_insert_plugin_content" title="Inhaltsblock einf&uuml;gen" href="javascript:void(0)" tabindex="10"><img src="ncm/img/fatcow/16/plugin.png" /><span>Inhalt</span></a>
 </div>

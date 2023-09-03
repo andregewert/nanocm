@@ -1,10 +1,9 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
-/* @var $medium \Ubergeek\NanoCm\Medium */
-/* @var $format \Ubergeek\NanoCm\Media\ImageFormat */
+/* @var $params \Ubergeek\Dictionary */
 
-$medium = $this->orm->getMediumById($this->getVar('converter.image.id'));
-$format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'));
+$medium = $this->orm->getMediumById($params->getValue('imageid'));
+$format = $this->orm->getImageFormatByKey($params->getValue('formatid'));
 ?>
 
 <?php if ($medium != null && $format != null) : ?>
@@ -13,7 +12,7 @@ $format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'
             <div class="imgcontainer">
                 <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
                     <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
-                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x">
+                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
                 </a>
             </div>
             <?php if (strlen($medium->attribution) > 0) : ?>
@@ -27,3 +26,4 @@ $format = $this->orm->getImageFormatByKey($this->getVar('converter.image.format'
         </div>
     </figure>
 <?php endif; ?>
+

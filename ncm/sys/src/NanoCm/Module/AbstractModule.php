@@ -1,8 +1,8 @@
 <?php
 
-/**
+/*
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@ namespace Ubergeek\NanoCm\Module;
 use Exception;
 use InvalidArgumentException;
 use Ubergeek\Controller\ControllerInterface;
+use Ubergeek\Dictionary;
 use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Constants;
@@ -83,48 +84,6 @@ abstract class AbstractModule implements
      * @var string
      */
     const PAGE_NONE = 'none';
-
-    /**
-     * Module variable: Placeholder to be replaced by the currently executed template
-     * @var string
-     * @deprecated Should be replaced by local rendering variables
-     */
-    const VAR_CONVERTER_PLACEHOLDER = 'converter.placeholder';
-
-    /**
-     * Module variable: Youtube video id to be replaced.
-     * @var string
-     * @deprecated Should be replaced by local rendering variables
-     */
-    const VAR_CONVERTER_YOUTUBE_VID = 'converter.youtube.vid';
-
-    /**
-     * Module variable: ID of the media folder to be rendered.
-     * @var string
-     * @deprecated Should be replaced by local rendering variables
-     */
-    const VAR_CONVERTER_ALBUM_ID = 'converter.album.id';
-
-    /**
-     * Module variable: ID of the image to be displayed
-     * @var string
-     * @deprecated Should be replaced by local rendering variables
-     */
-    const VAR_CONVERTER_IMAGE_ID = 'converter.image.id';
-
-    /**
-     * Module variable: image format
-     * @var string
-     * @deprecated Should be replaced by local rendering variables
-     */
-    const VAR_CONVERTER_IMAGE_FORMAT = 'converter.image.format';
-
-    /**
-     * Module variable: media id of the download to be rendered
-     * @var string
-     * @deprecated Should be replaced by local rendering variables
-     */
-    const VAR_CONVERTER_DOWNLOAD_ID = 'converter.download.id';
 
     // </editor-fold>
     
@@ -483,23 +442,22 @@ abstract class AbstractModule implements
     /**
      * Bindet an Ort und Stelle ein Template ein
      * @param string $file Relativer Pfad zum betreffenden Template
-     * @param array $params Optional array with parameters which could be used by the template
+     * @param Dictionary|null $params Optional Dictionary with parameters which could be used by the template
      * @throws Exception Exceptions, die vom Template geworfen werden, werden von dieser Methode weitergeworfen
      */
-    public function includeUserTemplate(string $file, array $params = array()): void {
+    public function includeUserTemplate(string $file, Dictionary $params = null): void {
         echo $this->renderUserTemplate($file, $params);
     }
-    
+
     /**
      * Rendert ein Template, das installations-spezifisch überschrieben werden
      * kann.
      * @param string $file Das zu rendernde Template (ohne Pfadangabe)
-     * @param mixed $params Optional array with parameters which could be used by the template
+     * @param Dictionary|null $params Optional Dictionary with parameters which could be used by the template
      * @return string Inhalt des gerenderten Templates
-     * @throws Exception Exceptions, die bei der Ausführung des Templates
-     *      geworfen werden, werden weitergeworfen
+     * @throws Exception Exceptions, die bei der Ausführung des Templates geworfen werden, werden weitergeworfen
      */
-    public function renderUserTemplate(string $file, $params = array()) : string {
+    public function renderUserTemplate(string $file, Dictionary $params = null) : string {
         $c = '';
         $fname = Util::createPath($this->templateDir, $file);
 
@@ -669,8 +627,9 @@ abstract class AbstractModule implements
                 $module = $this;
                 $output = preg_replace_callback('/(https?:\/\/([^\s\<\>]+))/i', static function($matches) use ($module) {
                     if (preg_match('/(www\.)?youtube\.com\/watch\?v=(\w+)/i', $matches[2], $innerMatches)) {
-                        $module->setVar('comment.youtube.vid', $innerMatches[2]);
-                        return $module->renderUserTemplate('blocks/comment-youtube.phtml');
+                        $params = new Dictionary();
+                        $params->add('videoid', $innerMatches[2]);
+                        return $module->renderUserTemplate('blocks/comment-youtube.phtml', $params);
                     }
                     return '<a href="' . $matches[1] . '" target="_blank">' . $matches[2] . '</a>';
                 }, $output);

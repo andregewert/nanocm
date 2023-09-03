@@ -21,6 +21,7 @@
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
 use Ubergeek\Dictionary;
+use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
  * Plugin to demonstrate the implementation of content converter plugins
@@ -30,9 +31,12 @@ use Ubergeek\Dictionary;
 class TestPlugin extends PluginAdapter {
 
     /**
+     * @param AbstractModule $callingModule
+     * @param string $placeholder
+     * @param Dictionary $arguments
      * @inheritDoc
      */
-    function replacePlaceholder(string $placeholder, Dictionary $arguments) : string {
+    function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments) : string {
         $output = '<p>Params:</p>';
         $output .= '<ul>' . "\n";
         foreach ($arguments as $param) {

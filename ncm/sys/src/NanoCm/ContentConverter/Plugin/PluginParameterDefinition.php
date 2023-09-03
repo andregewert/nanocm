@@ -20,7 +20,7 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
-class PluginParameter {
+class PluginParameterDefinition {
 
     // <editor-fold desc="Constants">
 
@@ -103,8 +103,8 @@ class PluginParameter {
 
     // <editor-fold desc="Methods">
 
-    public static function fromArray(array $data) : PluginParameter {
-        $param = new PluginParameter();
+    public static function fromArray(array $data) : PluginParameterDefinition {
+        $param = new PluginParameterDefinition();
         foreach ($data as $key => $value) {
             $key = strtolower($key);
             if ($key === 'key') $param->key = $value;

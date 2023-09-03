@@ -399,7 +399,7 @@ div.column-6 {
   box-sizing: border-box; }
 
 div.column-4 {
-  width: 393.33333px;
+  width: 393.3333333333px;
   display: inline-block;
   float: left;
   -moz-box-sizing: border-box;
@@ -415,7 +415,7 @@ div.column-3 {
   box-sizing: border-box; }
 
 div.column-2 {
-  width: 196.66667px;
+  width: 196.6666666667px;
   display: inline-block;
   float: left;
   -moz-box-sizing: border-box;
@@ -608,7 +608,8 @@ div.row + div.row {
   border-right-width: 1px;
   height: 100%;
   margin: 0;
-  padding: 0 1rem; }
+  padding: 1rem;
+  box-shadow: 0 0 45px #222; }
 
 .editform_sidebar_right input,
 .editform_sidebar_right textarea,
@@ -660,7 +661,7 @@ div.toolbar .spaceleft {
 hr {
   border: 0;
   height: 1px;
-  background-image: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.75), transparent);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
   margin: 2em 0; }
 
 .placeholder {
@@ -759,7 +760,8 @@ th.pre {
   margin: 0 0 0 0; }
 
 .imgtoolbar a.button span {
-  padding: 0 0 0 4px; }
+  padding: 0 0 0 4px;
+  vertical-align: middle; }
 
 .imgtoolbar span.separator {
   display: inline-block;

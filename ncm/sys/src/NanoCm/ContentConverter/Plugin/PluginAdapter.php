@@ -58,20 +58,6 @@ abstract class PluginAdapter implements PluginInterface {
     /**
      * @inheritDoc
      */
-    public function setModule(AbstractModule $module) : void {
-        $this->module = $module;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getModule(): AbstractModule {
-        return $this->module;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getPriority(): int {
         return $this->priority;
     }
@@ -102,7 +88,8 @@ abstract class PluginAdapter implements PluginInterface {
      * the template renderer. The template file is named by the plugin.
      * @inheritDoc
      */
-    public function replacePlaceholder(string $placeholder, Dictionary $arguments): string {
+    public function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments): string {
+        $this->module = $callingModule;
         try {
             $templateName = 'plugin' . DIRECTORY_SEPARATOR . strtolower($this->getPlaceholder()) . '.phtml';
             $options = $this->preparePluginOptions($placeholder, $arguments);
@@ -159,6 +146,15 @@ abstract class PluginAdapter implements PluginInterface {
         $options->arguments = $arguments;
         $options->extended = new Dictionary();
         return $options;
+    }
+
+    /**
+     * Returns the reference to the calling module.
+     * This is set when replacePlaceholder() is called.
+     * @return AbstractModule
+     */
+    public function getModule(): AbstractModule {
+        return $this->module;
     }
 
     // </editor-fold>

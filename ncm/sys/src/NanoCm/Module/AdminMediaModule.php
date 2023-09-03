@@ -281,6 +281,11 @@ class AdminMediaModule extends AbstractAdminModule {
                     case 'insertvideolink':
                         $content = $this->renderUserTemplate('media-insertvideolink.phtml');
                         break;
+
+                    // Insert plugin content (placeholder)
+                    case 'insertplugincontent':
+                        $content = $this->renderUserTemplate('content-media-insertplugincontent.phtml');
+                        break;
                 }
                 break;
 

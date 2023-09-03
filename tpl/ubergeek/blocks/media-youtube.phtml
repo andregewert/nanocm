@@ -1,6 +1,7 @@
 <?php
 /* @var $this \Ubergeek\NanoCm\Module\AbstractModule */
-$vid = $this->getVar('converter.youtube.vid');
+/* @var $params \Ubergeek\Dictionary */
+$vid = $params->getValue('videoid');
 $format = $this->orm->getImageFormatByKey('ytthumb');
 ?>
 <div class="shadow">

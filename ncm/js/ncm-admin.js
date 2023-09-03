@@ -165,6 +165,10 @@ function Ncm() {
             app.openInsertVideoLinkPopup(textareaElem[0]);
         });
 
+        $(toolbarElem).find('.edit_insert_plugin_content').click(function() {
+            app.openInsertPluginContentPopup();
+        });
+
         $(toolbarElem).find('.edit_insert_image').click(function() {
             let dlg = new app.InlinePopup('admin/media/html/imageselection', {
                 param: 'param'
@@ -183,12 +187,41 @@ function Ncm() {
     };
 
     /**
+     * Opens the dialog for insert plugin contents
+     * @param textArea The text area to be modified
+     */
+    app.openInsertPluginContentPopup = function(textArea) {
+        let dlg = new app.InlinePopup('admin/media/html/insertplugincontent', {
+        }, {
+            headline:       'Inhaltsblock einfügen',
+            width:          500,
+            height:         300,
+            loaded:         function() {
+                ncm.focusDefaultElement();
+            }
+        }, {
+            cancel: {
+                caption:    'Abbrechen',
+                clicked:    function() {
+                    dlg.close();
+                }
+            },
+            insert: {
+                caption:    'Einfügen',
+                clicked:    function() {
+                    // TODO
+                    dlg.close();
+                }
+            }
+        });
+    };
+
+    /**
      * Öffnet das Dialog-Popup für das Einfügen von Videolinks
      * @param textArea Referenz auf die Textarea, in die der Link eingefügt werden soll
      */
     app.openInsertVideoLinkPopup = function(textArea) {
         let dlg = new app.InlinePopup('admin/media/html/insertvideolink', {
-            param:  'param'
         }, {
             headline:   'Videolink einfügen',
             width:      500,
