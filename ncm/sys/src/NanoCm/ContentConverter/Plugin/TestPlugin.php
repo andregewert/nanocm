@@ -74,7 +74,7 @@ class TestPlugin extends PluginAdapter {
     /**
      * @inheritDoc
      */
-    public function getPlaceholder(): string {
+    public function getKey(): string {
         return 'test';
     }
 

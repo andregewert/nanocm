@@ -30,8 +30,6 @@ function Ncm() {
      * @param {Node} blanker Das Blanker-Element
      */
     Ncm.prototype.showGlobalBlanker = function(blanker) {
-//    app.showGlobalBlanker = function(blanker) {
-        console.log('showGlobalBlanker');
         if (typeof blanker == 'undefined') {
             blanker = document.getElementById('globalblanker');
         }
@@ -113,7 +111,6 @@ function Ncm() {
         $('table.list').find('input.selection:checked').each(function() {
             ids.push($(this).val());
         });
-        console.log(ids);
         return ids;
     };
 
@@ -197,7 +194,10 @@ function Ncm() {
             width:          500,
             height:         300,
             loaded:         function() {
-                ncm.focusDefaultElement();
+                //ncm.focusDefaultElement();
+                $('.plugin-item').click(function() {
+                    let key = $(this).data('plugin-id');
+                });
             }
         }, {
             cancel: {

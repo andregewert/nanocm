@@ -91,11 +91,11 @@ interface PluginInterface {
     public function getVersion() : string;
 
     /**
-     * Gets the placeholder that should be replaced by this plugin.
-     * The placeholder should be unique over all plugins.
-     * @return string Placeholder that should be replaced by the plugin
+     * Gets the unique key (that is also used as placeholder) that identifies this plugin.
+     * The key is used as placeholder within the content.
+     * @return string Plugin-Key and placeholder
      */
-    public function getPlaceholder() : string;
+    public function getKey() : string;
 
     /**
      * Return an array with the description of available parameters this plugin supports or expects.

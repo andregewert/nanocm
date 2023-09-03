@@ -24,6 +24,7 @@ use Ubergeek\Dictionary;
 use Ubergeek\KeyValuePair;
 use Ubergeek\MarkupParser\MarkupParser;
 use Ubergeek\NanoCm\ContentConverter\Plugin\PluginInterface;
+use Ubergeek\NanoCm\Exception\InvalidConfigurationException;
 use Ubergeek\NanoCm\Module\AbstractModule;
 
 /**
@@ -214,11 +215,12 @@ class HtmlConverter {
     /**
      * Loads available converter plugins.
      *
+     * @param bool $includeDisabled Set to true if disabled plugins should be included.
      * @return PluginInterface[] List of loaded content converter plugins
      * @todo The properties isEnabled and priority should be set with values from some user configuration
      * @todo There should be ways to register plugins from other namespaces
      */
-    public static function loadAvailableContentPlugins() : array {
+    public static function loadAvailableContentPlugins(bool $includeDisabled = false) : array {
         $plugins = array();
         $dirname = __DIR__ . DIRECTORY_SEPARATOR . 'Plugin';
         if (($dh = opendir($dirname)) !== false) {
@@ -229,9 +231,11 @@ class HtmlConverter {
 
                     try {
                         $pl = new $className();
-                        if ($pl instanceof PluginInterface) {
-                            // TODO Set isEnbaled / priority
-                            $plugins[] = $pl;
+                        if ($pl instanceof PluginInterface && ($includeDisabled || $pl->isEnabled())) {
+                            if (array_key_exists($pl->getKey(), $plugins)) {
+                                throw new InvalidConfigurationException('Plugin key ' . $pl->getKey() . ' already registered!');
+                            }
+                            $plugins[$pl->getKey()] = $pl;
                         }
                     } catch (Exception) {
                     }
@@ -256,7 +260,7 @@ class HtmlConverter {
      */
     private function getPluginByPlaceholder(string $placeholder) : ?PluginInterface {
         foreach ($this->plugins as $plugin) {
-            if ($plugin->getPlaceholder() === $placeholder) return $plugin;
+            if ($plugin->getKey() === $placeholder) return $plugin;
         }
         return null;
     }

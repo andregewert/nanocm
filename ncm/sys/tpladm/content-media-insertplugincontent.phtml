@@ -3,8 +3,13 @@
 use Ubergeek\NanoCm\Module\AdminMediaModule;
 ?>
 <div class="mx-4 my-2">
-    <div class="row">
-    </div>
-    <div class="row">
-    </div>
+    <p>Inhaltstyp ausw&auml;hlen:</p>
+    <ul class="block-selection plugin-selection">
+        <?php foreach ($this->availableContentPlugins as $plugin) : ?>
+            <li class="plugin-item" data-plugin-id="<?php echo $this->htmlEncode($plugin->getKey()); ?>">
+                <p><strong><?php echo $this->htmlEncode($plugin->getName()); ?></strong></p>
+                <p><?php echo $this->htmlEncode($plugin->getDescription()); ?></p>
+            </li>
+        <?php endforeach; ?>
+    </ul>
 </div>

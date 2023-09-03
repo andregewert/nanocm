@@ -1083,7 +1083,6 @@ ul.imgtoolbar_keyboard li a:hover {
 
 .inlinepopup div.controls {
     position: absolute;
-    width: 100%;
     text-align: right;
     right: 8px;
     top: 10px;
@@ -1092,7 +1091,6 @@ ul.imgtoolbar_keyboard li a:hover {
 }
 
 .inlinepopup .headline {
-    margin: 0;
     padding: 0 1em;
     margin: 2px;
     background-color: $shading-color;
@@ -1107,7 +1105,6 @@ ul.imgtoolbar_keyboard li a:hover {
 
 .inlinepopup div.popupcontent {
     overflow: auto;
-/*    padding: 0.4em 1em;*/
     padding: 0;
     height: auto;
     top: 2.6rem;
@@ -1115,7 +1112,6 @@ ul.imgtoolbar_keyboard li a:hover {
     left: 0;
     right: 0;
     position: absolute;
-/*    border: solid blue 3px;*/
     max-height: 100%;
 }
 
@@ -1228,6 +1224,29 @@ div.phpinfo td.v {
 
 div.phpinfo td.e {
     background-color: $toolbar-bg-header;
+}
+
+/* </editor-fold> */
+
+
+/* <editor-fold desc="lists with selection blocks" */
+
+ul.block-selection {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.block-selection li {
+    display: block;
+    border: solid $border-color 1px;
+    cursor: pointer;
+    padding: 0.6rem;
+    background: linear-gradient(white, $shading-color);
+}
+
+ul.block-selection li:hover {
+    border-color: $border-color-heavy;
 }
 
 /* </editor-fold> */

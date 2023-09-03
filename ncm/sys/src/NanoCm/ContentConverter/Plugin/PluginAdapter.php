@@ -91,7 +91,7 @@ abstract class PluginAdapter implements PluginInterface {
     public function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments): string {
         $this->module = $callingModule;
         try {
-            $templateName = 'blocks' . DIRECTORY_SEPARATOR . 'plugin-' . strtolower($this->getPlaceholder()) . '.phtml';
+            $templateName = 'blocks' . DIRECTORY_SEPARATOR . 'plugin-' . strtolower($this->getKey()) . '.phtml';
             $options = $this->preparePluginOptions($placeholder, $arguments);
             $content = $this->getModule()->renderUserTemplate($templateName, $options);
         } catch (\Exception $ex) {
@@ -119,7 +119,7 @@ abstract class PluginAdapter implements PluginInterface {
     /**
      * @inheritDoc
      */
-    abstract public function getPlaceholder(): string;
+    abstract public function getKey(): string;
 
     /**
      * @inheritDoc

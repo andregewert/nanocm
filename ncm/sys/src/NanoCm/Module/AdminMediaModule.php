@@ -1,13 +1,13 @@
 <?php
 
-/**
+/*
  * NanoCM
- * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,11 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 namespace Ubergeek\NanoCm\Module;
 
+use Ubergeek\Dictionary;
+use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
+use Ubergeek\NanoCm\ContentConverter\Plugin\PluginInterface;
 use Ubergeek\NanoCm\Media\ImageFormat;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\StatusCode;
@@ -123,6 +127,12 @@ class AdminMediaModule extends AbstractAdminModule {
      * @var bool
      */
     public $isMediaDirWritable = false;
+
+    /**
+     * An array containing instances of all available and enabled content converter plugins.
+     * @var PluginInterface[]
+     */
+    public array $availableContentPlugins = array();
 
     // </editor-fold>
 
@@ -284,6 +294,7 @@ class AdminMediaModule extends AbstractAdminModule {
 
                     // Insert plugin content (placeholder)
                     case 'insertplugincontent':
+                        $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins();
                         $content = $this->renderUserTemplate('content-media-insertplugincontent.phtml');
                         break;
                 }
