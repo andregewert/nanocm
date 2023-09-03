@@ -163,7 +163,7 @@ function Ncm() {
         });
 
         $(toolbarElem).find('.edit_insert_plugin_content').click(function() {
-            app.openInsertPluginContentPopup();
+            app.openInsertPluginContentPopup(textareaElem[0]);
         });
 
         $(toolbarElem).find('.edit_insert_image').click(function() {
@@ -191,6 +191,7 @@ function Ncm() {
 
         var dialog;
         let page = 1;
+        let plugin = '';
 
         let validatePluginOptions = function() {
             let missingOptions = false;
@@ -200,10 +201,8 @@ function Ncm() {
                 let required = $(this).data('required');
                 let value = $(this).val();
 
-                if (type === 6) {
-                    if (!$(this).prop('checked')) {
-                        value = 0;
-                    }
+                if (type === 6 && !$(this).prop('checked')) {
+                    value = 0;
                 }
 
                 if (value == '' && required == '1') {
@@ -212,8 +211,6 @@ function Ncm() {
                 } else {
                     $(this).removeClass('invalid');
                 }
-
-                //console.log('Value: ' + value);
             });
             return !missingOptions;
         };
@@ -227,7 +224,18 @@ function Ncm() {
         };
 
         let refreshPluginPreview = function() {
-            // TODO not implemented yet
+            let preview = '[pl:' + plugin + ']\n';
+            $(dialog.content).find('.plugin_options_option').each(function() {
+                let type = $(this).data('type');
+                let key = $(this).data('key');
+                let value = $(this).val();
+                if (type === 6 && !$(this).prop('checked')) {
+                    value = 0;
+                }
+                preview += key + ': ' + value + '\n';
+            });
+            preview += '[/pl:' + plugin + ']\n';
+            $(dialog.content).find('.preview').val(preview);
         };
 
         let page1Loaded = function() {
@@ -237,19 +245,27 @@ function Ncm() {
                 app.replaceInlinePopupContents(dialog, 'admin/media/html/pluginoptions', {
                     pluginkey:  key
                 }, {
-                    loaded: page2loaded
+                    loaded: function() {
+                        page2loaded(key);
+                    }
                 });
             });
             updateButtonStatus();
         };
 
-        let page2loaded = function() {
+        let page2loaded = function(selectedPluginKey) {
             page = 2;
+            plugin = selectedPluginKey;
+            refreshPluginPreview();
             updateButtonStatus();
+            ncm.focusDefaultElement();
+
             $('.plugin_options_option').change(function() {
+                refreshPluginPreview();
                 updateButtonStatus();
             });
             $('.plugin_options_option').keyup(function() {
+                refreshPluginPreview();
                 updateButtonStatus();
             });
         };
@@ -258,7 +274,7 @@ function Ncm() {
         }, {
             headline:       'Inhaltsblock einfügen',
             width:          500,
-            height:         300,
+            height:         500,
             loaded:         page1Loaded
         }, {
             cancel: {
@@ -281,7 +297,7 @@ function Ncm() {
                 id:         'insert',
                 disabled:   true,
                 clicked:    function() {
-                    // TODO
+                    app.insertTextAtCaret(textArea, $(dialog.content).find('.preview').val());
                     dialog.close();
                 }
             }

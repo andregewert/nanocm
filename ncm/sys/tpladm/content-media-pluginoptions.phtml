@@ -16,7 +16,7 @@ $plugin = $this->selectedPlugin;
                 <label for="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"><?php echo $this->htmlEncode($parameter->label); ?></label>
                 <?php if ($parameter->type == PluginParameterDefinition::TYPE_SELECTION) : ?>
                     <select id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
-                            class="plugin_options_option"
+                            class="plugin_options_option autofocus"
                             data-type="<?php echo $parameter->type; ?>"
                             data-required="<?php echo (int)$parameter->required; ?>"
                             data-key="<?php echo $this->htmlEncode($parameter->key); ?>">
@@ -30,7 +30,7 @@ $plugin = $this->selectedPlugin;
                     </select>
                 <?php elseif ($parameter->type == PluginParameterDefinition::TYPE_MEDIAFORMAT) : ?>
                     <select id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
-                            class="plugin_options_option"
+                            class="plugin_options_option autofocus"
                             data-type="<?php echo $parameter->type; ?>"
                             data-required="<?php echo (int)$parameter->required; ?>"
                             data-key="<?php echo $this->htmlEncode($parameter->key); ?>">
@@ -44,7 +44,7 @@ $plugin = $this->selectedPlugin;
                     </select>
                 <?php elseif ($parameter->type == PluginParameterDefinition::TYPE_TOGGLE) : ?>
                     <input id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
-                           class="plugin_options_option"
+                           class="plugin_options_option autofocus"
                            type="checkbox"
                            value="1"
                            data-type="<?php echo $parameter->type; ?>"
@@ -53,7 +53,7 @@ $plugin = $this->selectedPlugin;
                         <?php if ($parameter->default == '1') echo ' checked="checked"'; ?>>
                 <?php else : ?>
                     <input type="text"
-                           class="plugin_options_option"
+                           class="plugin_options_option autofocus"
                            id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
                            data-type="<?php echo $parameter->type; ?>"
                            data-required="<?php echo (int)$parameter->required; ?>"
@@ -70,6 +70,6 @@ $plugin = $this->selectedPlugin;
         <label for="plugin_options_preview">Platzhalter-Vorschau</label>
     </div>
     <div class="row">
-        <textarea style="width: 100%; height: 5rem" id="plugin_options_preview"></textarea>
+        <textarea style="width: 100%; height: 12rem" id="plugin_options_preview" class="preview"></textarea>
     </div>
 </div>
