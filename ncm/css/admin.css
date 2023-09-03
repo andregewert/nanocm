@@ -531,6 +531,10 @@ span.badge {
   background-color: red;
   box-shadow: 0 0 0.2em #222; }
 
+input.invalid,
+select.invalid {
+  outline: solid red 1px !important; }
+
 /* </editor-fold> */
 /* <editor-fold desc="Inline menu lists" */
 ul.inlinemenu {
@@ -908,6 +912,16 @@ ul.imgtoolbar_keyboard li a:hover {
   font-size: 1rem;
   padding: 0.5em;
   border: solid #ddd 1px; }
+
+.inlinepopup .noresult {
+  padding: 1em;
+  text-align: center;
+  font-style: italic; }
+
+.inlinepopup input[type="checkbox"] {
+  width: auto !important;
+  display: inline !important;
+  vertical-align: baseline !important; }
 
 /* </editor-fold> */
 /* <editor-fold desc="Virtual Keyboard (Emojis) "> */

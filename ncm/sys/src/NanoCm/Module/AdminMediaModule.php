@@ -24,6 +24,7 @@ namespace Ubergeek\NanoCm\Module;
 use Ubergeek\Dictionary;
 use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
 use Ubergeek\NanoCm\ContentConverter\Plugin\PluginInterface;
+use Ubergeek\NanoCm\Exception\InvalidArgumentException;
 use Ubergeek\NanoCm\Media\ImageFormat;
 use Ubergeek\NanoCm\Medium;
 use Ubergeek\NanoCm\StatusCode;
@@ -133,6 +134,12 @@ class AdminMediaModule extends AbstractAdminModule {
      * @var PluginInterface[]
      */
     public array $availableContentPlugins = array();
+
+    /**
+     * The selected content converter plugin.
+     * @var PluginInterface|null
+     */
+    public ?PluginInterface $selectedPlugin = null;
 
     // </editor-fold>
 
@@ -296,6 +303,17 @@ class AdminMediaModule extends AbstractAdminModule {
                     case 'insertplugincontent':
                         $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins();
                         $content = $this->renderUserTemplate('content-media-insertplugincontent.phtml');
+                        break;
+
+                    case 'pluginoptions':
+                        $this->formats = $this->orm->getImageFormats();
+                        $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins();
+                        $pluginkey = $this->getParam('pluginkey');
+                        if (!array_key_exists($pluginkey, $this->availableContentPlugins)) {
+                            throw new InvalidArgumentException('Invalid plugin: ' . $pluginkey);
+                        }
+                        $this->selectedPlugin = $this->availableContentPlugins[$pluginkey];
+                        $content = $this->renderUserTemplate('content-media-pluginoptions.phtml');
                         break;
                 }
                 break;

@@ -3,7 +3,7 @@
 use Ubergeek\NanoCm\Module\AdminMediaModule;
 ?>
 <div class="mx-4 my-2">
-    <p>Inhaltstyp ausw&auml;hlen:</p>
+    <?php if (count($this->availableContentPlugins) > 0) : ?>
     <ul class="block-selection plugin-selection">
         <?php foreach ($this->availableContentPlugins as $plugin) : ?>
             <li class="plugin-item" data-plugin-id="<?php echo $this->htmlEncode($plugin->getKey()); ?>">
@@ -12,4 +12,7 @@ use Ubergeek\NanoCm\Module\AdminMediaModule;
             </li>
         <?php endforeach; ?>
     </ul>
+    <?php else : ?>
+        <p class="noresult">&ndash;&nbsp;Keine Content-Plugins verf&uuml;gbar&nbsp;&ndash;</p>
+    <?php endif; ?>
 </div>

@@ -1,20 +1,20 @@
 /*
  * NanoCM
- * Copyright (C) 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
 /**
@@ -188,29 +188,101 @@ function Ncm() {
      * @param textArea The text area to be modified
      */
     app.openInsertPluginContentPopup = function(textArea) {
-        let dlg = new app.InlinePopup('admin/media/html/insertplugincontent', {
+
+        var dialog;
+        let page = 1;
+
+        let validatePluginOptions = function() {
+            let missingOptions = false;
+            $(dialog.content).find('.plugin_options_option').each(function() {
+                let type = $(this).data('type');
+                let key = $(this).data('key');
+                let required = $(this).data('required');
+                let value = $(this).val();
+
+                if (type === 6) {
+                    if (!$(this).prop('checked')) {
+                        value = 0;
+                    }
+                }
+
+                if (value == '' && required == '1') {
+                    $(this).addClass('invalid')
+                    missingOptions = true;
+                } else {
+                    $(this).removeClass('invalid');
+                }
+
+                //console.log('Value: ' + value);
+            });
+            return !missingOptions;
+        };
+
+        let updateButtonStatus = function() {
+            if (page === 1 || !validatePluginOptions()) {
+                dialog.buttons['insert'].setAttribute('disabled', 'disabled');
+            } else {
+                dialog.buttons['insert'].removeAttribute('disabled');
+            }
+        };
+
+        let refreshPluginPreview = function() {
+            // TODO not implemented yet
+        };
+
+        let page1Loaded = function() {
+            page = 1;
+            $('.plugin-item').click(function() {
+                let key = $(this).data('plugin-id');
+                app.replaceInlinePopupContents(dialog, 'admin/media/html/pluginoptions', {
+                    pluginkey:  key
+                }, {
+                    loaded: page2loaded
+                });
+            });
+            updateButtonStatus();
+        };
+
+        let page2loaded = function() {
+            page = 2;
+            updateButtonStatus();
+            $('.plugin_options_option').change(function() {
+                updateButtonStatus();
+            });
+            $('.plugin_options_option').keyup(function() {
+                updateButtonStatus();
+            });
+        };
+
+        dialog = new app.InlinePopup('admin/media/html/insertplugincontent', {
         }, {
             headline:       'Inhaltsblock einfügen',
             width:          500,
             height:         300,
-            loaded:         function() {
-                //ncm.focusDefaultElement();
-                $('.plugin-item').click(function() {
-                    let key = $(this).data('plugin-id');
-                });
-            }
+            loaded:         page1Loaded
         }, {
             cancel: {
                 caption:    'Abbrechen',
+                id:         'cancel',
                 clicked:    function() {
-                    dlg.close();
+                    if (page === 2) {
+                        app.replaceInlinePopupContents(
+                            dialog, 'admin/media/html/insertplugincontent', null, {
+                                loaded: page1Loaded
+                            }
+                        );
+                    } else {
+                        dialog.close();
+                    }
                 }
             },
             insert: {
                 caption:    'Einfügen',
+                id:         'insert',
+                disabled:   true,
                 clicked:    function() {
                     // TODO
-                    dlg.close();
+                    dialog.close();
                 }
             }
         });
@@ -352,6 +424,29 @@ function Ncm() {
             $(element).mousedown(dragMouseDown);
         }
     };
+
+    /**
+     * Replaces the contents of a given inline dialog with the return of the specified http call.
+     * @param dialog
+     * @param url
+     * @param params
+     */
+    app.replaceInlinePopupContents = function(dialog, url, params, options) {
+        $.ajax(url, {
+            cache:          false,
+            type:           'POST',
+            dataType:       'html',
+            data:           params
+        } ).done(function(data) {
+            $(dialog.content).html(data);
+        } ).always(function() {
+            $(dialog.container).removeClass('loading');
+            dialog.loaded = true;
+            if (typeof options.loaded === 'function') {
+                options.loaded();
+            }
+        } );
+    }
 
     /**
      * Öffnet ein Inline-Popup, dessen Inhalt per AJAX dynamisch geladen wird
@@ -533,8 +628,9 @@ function Ncm() {
         dlg.buttonbar.appendChild(spacer);
 
         var i = 0;
+        var prop;
 
-        for (var prop in buttonsLeft) {
+        for (prop in buttonsLeft) {
             if (buttonsLeft.hasOwnProperty(prop)) {
                 spacer.appendChild(
                     dlg.createButton(buttonsLeft[prop], 'left')
@@ -543,7 +639,7 @@ function Ncm() {
             }
         }
 
-        for (var prop in buttonsRight) {
+        for (prop in buttonsRight) {
             if (buttonsRight.hasOwnProperty(prop)) {
                 spacer.appendChild(
                     dlg.createButton(buttonsRight[prop], 'right')
@@ -557,7 +653,7 @@ function Ncm() {
 
         // Auf Escape-Taste reagieren
         dlg.container.onkeyup = function(e) {
-            if (e.key == 'Escape') {
+            if (e.key === 'Escape') {
                 dlg.close();
             }
         };

@@ -1,0 +1,75 @@
+<?php
+/* @var $this AdminMediaModule */
+
+use Ubergeek\NanoCm\ContentConverter\Plugin\PluginParameterDefinition;
+use Ubergeek\NanoCm\Module\AdminMediaModule;
+$plugin = $this->selectedPlugin;
+?>
+<div class="mx-4 my-2">
+    <div class="row">
+        <p><strong><?php echo $this->htmlEncode($plugin->getName()); ?></strong></p>
+    </div>
+
+    <?php if (count($plugin->getAvailableParameters()) > 0) : ?>
+        <?php foreach ($plugin->getAvailableParameters() as $parameter) : ?>
+            <div class="row">
+                <label for="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"><?php echo $this->htmlEncode($parameter->label); ?></label>
+                <?php if ($parameter->type == PluginParameterDefinition::TYPE_SELECTION) : ?>
+                    <select id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
+                            class="plugin_options_option"
+                            data-type="<?php echo $parameter->type; ?>"
+                            data-required="<?php echo (int)$parameter->required; ?>"
+                            data-key="<?php echo $this->htmlEncode($parameter->key); ?>">
+                        <option value="">&ndash;&nbsp;Keine Auswahl&nbsp;&ndash;</option>
+                        <?php if (is_array($parameter->options)) : ?>
+                            <?php foreach ($parameter->options as $value => $label) : ?>
+                                <option value="<?php echo $this->htmlEncode($value); ?>"
+                                    <?php if ($value == $parameter->default) echo ' selected="selected"'; ?>><?php echo $this->htmlEncode($label); ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                <?php elseif ($parameter->type == PluginParameterDefinition::TYPE_MEDIAFORMAT) : ?>
+                    <select id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
+                            class="plugin_options_option"
+                            data-type="<?php echo $parameter->type; ?>"
+                            data-required="<?php echo (int)$parameter->required; ?>"
+                            data-key="<?php echo $this->htmlEncode($parameter->key); ?>">
+                        <option value="">&ndash;&nbsp;Keine Auswahl&nbsp;&ndash;</option>
+                        <?php if (is_array($this->formats)) : ?>
+                            <?php foreach ($this->formats as $format) : ?>
+                                <option value="<?php echo $this->htmlEncode($format->key); ?>"
+                                    <?php if ($parameter->default == $format->key) echo ' selected="selected"'; ?>><?php echo $this->htmlEncode($format->toString()); ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                <?php elseif ($parameter->type == PluginParameterDefinition::TYPE_TOGGLE) : ?>
+                    <input id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
+                           class="plugin_options_option"
+                           type="checkbox"
+                           value="1"
+                           data-type="<?php echo $parameter->type; ?>"
+                           data-required="<?php echo (int)$parameter->required; ?>"
+                           data-key="<?php echo $this->htmlEncode($parameter->key); ?>"
+                        <?php if ($parameter->default == '1') echo ' checked="checked"'; ?>>
+                <?php else : ?>
+                    <input type="text"
+                           class="plugin_options_option"
+                           id="plugin_options_<?php echo $this->htmlEncode($parameter->key); ?>"
+                           data-type="<?php echo $parameter->type; ?>"
+                           data-required="<?php echo (int)$parameter->required; ?>"
+                           data-key="<?php echo $this->htmlEncode($parameter->key); ?>"
+                           value="<?php echo $this->htmlEncode($parameter->default); ?>">
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <p class="noresult">&ndash;&nbsp;Dieses Plugin besitzt keine Parameter.&nbsp;&ndash;</p>
+    <?php endif; ?>
+
+    <div class="row">
+        <label for="plugin_options_preview">Platzhalter-Vorschau</label>
+    </div>
+    <div class="row">
+        <textarea style="width: 100%; height: 5rem" id="plugin_options_preview"></textarea>
+    </div>
+</div>

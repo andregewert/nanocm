@@ -1,7 +1,7 @@
 <?php
-/**
+/*
  * NanoCM
- * Copyright (C) 2017 - 2018 André Gewert <agewert@ubergeek.de>
+ * Copyright (C) 2017-2023 André Gewert <agewert@ubergeek.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -67,7 +67,7 @@ class ImageFormat
     // </editor-fold>
 
 
-    // <editor-fold desc="Method">
+    // <editor-fold desc="Methods">
 
     /**
      * Liest das Abfrageergebnis am aktuellen Cursor aus und erstellt daraus ein ImageFormat-Objekt
@@ -81,6 +81,16 @@ class ImageFormat
             return $imageFormat;
         }
         return null;
+    }
+
+    public function toString(): string {
+        $str = $this->title;
+        $str .= ' (';
+        $str .= ($this->width > 0)? $this->width : '-';
+        $str .= ' x ';
+        $str .= ($this->height > 0)? $this->height : '-';
+        $str .= ')';
+        return $str;
     }
 
     // </editor-fold>

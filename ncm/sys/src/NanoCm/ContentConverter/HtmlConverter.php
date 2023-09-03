@@ -243,7 +243,7 @@ class HtmlConverter {
             }
         }
 
-        usort($plugins, static function(PluginInterface $a, PluginInterface $b) {
+        uasort($plugins, static function(PluginInterface $a, PluginInterface $b) {
             if ($a->getPriority() === $b->getPriority()) {
                 return 0;
             }

@@ -56,6 +56,18 @@ class PluginParameterDefinition {
      */
     const TYPE_SET = 5;
 
+    /**
+     * Parameter type "toggle".
+     * @var int
+     */
+    const TYPE_TOGGLE = 6;
+
+    /**
+     * Parameter type "media format".
+     * @var int
+     */
+    const TYPE_MEDIAFORMAT = 7;
+
     // </editor-fold>
 
 
@@ -72,6 +84,12 @@ class PluginParameterDefinition {
      * @var mixed
      */
     public $value = '';
+
+    /**
+     * Display label for this parameter.s
+     * @var string
+     */
+    public $label = '';
 
     /**
      * Data type of this parameter.
@@ -109,6 +127,7 @@ class PluginParameterDefinition {
             $key = strtolower($key);
             if ($key === 'key') $param->key = $value;
             if ($key === 'value') $param->value = $value;
+            if ($key === 'label') $param->label = $value;
             if ($key === 'type') $param->type = $value;
             if ($key === 'required') $param->required = $value;
             if ($key === 'options') $param->options = $value;

@@ -91,14 +91,36 @@ class SlideshowPlugin extends PluginAdapter {
         $params = array();
         $params['folderid'] = PluginParameterDefinition::fromArray(array(
             'key'       => 'folderid',
+            'label'     => 'Ordner',
             'type'      => PluginParameterDefinition::TYPE_MEDIAFOLDER,
             'required'  => true
         ));
         $params['format'] = PluginParameterDefinition::fromArray(array(
             'key'       => 'format',
-            'type'      => PluginParameterDefinition::TYPE_STRING,
+            'label'     => 'Vorschau-Format',
+            'type'      => PluginParameterDefinition::TYPE_MEDIAFORMAT,
             'default'   => 'preview',
-            'required'  => false
+            'required'  => true
+        ));
+        $params['auswahl'] = PluginParameterDefinition::fromArray(array(
+            'key'       => 'auswahl',
+            'label'     => 'Test-Auswahl',
+            'type'      => PluginParameterDefinition::TYPE_SELECTION,
+            'options'   => array(
+                'oben'      => 'Oben',
+                'links'     => 'Links',
+                'unten'     => 'Unten',
+                'rechts'    => 'Rechts'
+            ),
+            'default'   => 'unten',
+            'required'  => true
+        ));
+        $params['auswahl2'] = PluginParameterDefinition::fromArray(array(
+            'key'       => 'auswahl2',
+            'label'     => 'Test-Auswahl 2',
+            'type'      => PluginParameterDefinition::TYPE_TOGGLE,
+            'default'   => 1,
+            'required'  => true
         ));
         return $params;
     }

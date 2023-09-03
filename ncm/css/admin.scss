@@ -702,6 +702,11 @@ span.badge {
     box-shadow: 0 0 0.2em #222;
 }
 
+input.invalid,
+select.invalid {
+    outline: solid red 1px !important;
+}
+
 /* </editor-fold> */
 
 
@@ -1163,6 +1168,18 @@ ul.imgtoolbar_keyboard li a:hover {
     font-size: $fontsize-normal;
     padding: 0.5em;
     border: solid $border-color 1px;
+}
+
+.inlinepopup .noresult {
+    padding: 1em;
+    text-align: center;
+    font-style: italic;
+}
+
+.inlinepopup input[type="checkbox"] {
+    width: auto !important;
+    display: inline !important;
+    vertical-align: baseline !important;
 }
 
 /* </editor-fold> */
