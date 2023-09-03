@@ -15,6 +15,8 @@
         }
     ],
     "require": {
-      "ext-gd": "*"
+      "ext-gd": "*",
+      "ext-pdo": "*",
+      "ext-zip": "*"
     }
 }
