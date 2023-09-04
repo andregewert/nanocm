@@ -24,8 +24,10 @@ use Ubergeek\Dictionary;
 use Ubergeek\KeyValuePair;
 use Ubergeek\MarkupParser\MarkupParser;
 use Ubergeek\NanoCm\ContentConverter\Plugin\PluginInterface;
+use Ubergeek\NanoCm\ContentConverter\Plugin\YoutubePluginOptions;
 use Ubergeek\NanoCm\Exception\InvalidConfigurationException;
 use Ubergeek\NanoCm\Module\AbstractModule;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
 
 /**
  * Generates (X)HTML code from NanoCM markup.
@@ -96,7 +98,7 @@ class HtmlConverter {
         // Extended placeholders for media management
         $output = preg_replace_callback(
 
-            '/<p>\[(youtube|album|image|download|twitter):([^]]+?)]<\/p>$/im',
+            '/<p>\[(youtube|album|image|download):([^]]+?)]<\/p>$/im',
 
             /**
              * @throws Exception
@@ -109,8 +111,11 @@ class HtmlConverter {
                     // Youtube-Einbettungen (click-to-play)
                     case 'youtube':
                         if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
-                            $params->add('videoid', $im[1]);
-                            return $module->renderUserTemplate('blocks/media-youtube.phtml', $params);
+                            $options = new YoutubePluginOptions();
+                            $options->videoId = $im[1];
+                            $options->previewImageFormat =  $module->orm->getImageFormatByKey('ytthumb');
+                            $renderer = new TemplateRenderer($module, true);
+                            return $renderer->renderUserTemplate('blocks/plugin-youtube.phtml', $options);
                         }
                         return '';
 

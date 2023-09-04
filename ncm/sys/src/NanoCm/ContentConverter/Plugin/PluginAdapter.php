@@ -22,6 +22,8 @@ namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
 use Ubergeek\Dictionary;
 use Ubergeek\NanoCm\Module\AbstractModule;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
+use Ubergeek\NanoCm\Module\TemplateRenderer\RendererOptions;
 
 /**
  * Adapter class for content converter plugins that implements basic functions.
@@ -90,10 +92,13 @@ abstract class PluginAdapter implements PluginInterface {
      */
     public function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments): string {
         $this->module = $callingModule;
+        $options = $this->createPluginOptions($arguments);
+        $this->fillDefaultPluginOptions($options, $placeholder, $arguments);
+
         try {
             $templateName = 'blocks' . DIRECTORY_SEPARATOR . 'plugin-' . strtolower($this->getKey()) . '.phtml';
-            $options = $this->preparePluginOptions($placeholder, $arguments);
-            $content = $this->getModule()->renderUserTemplate($templateName, $options);
+            $renderer = new TemplateRenderer($callingModule, true);
+            $content = $renderer->renderUserTemplate($templateName, $options);
         } catch (\Exception $ex) {
             $content = '[Error while rendering plugin]';
             $this->getModule()->err('Error while rendering plugin', $ex);
@@ -134,18 +139,25 @@ abstract class PluginAdapter implements PluginInterface {
     // <editor-fold desc="Additional methods">
 
     /**
-     * Prepares the options which are passed to the template renderer.
-     * @param string $placeholder
+     * Creates the options object which will be passed to the template (via TemplateRenderer/TemplateRenderer).
      * @param Dictionary $arguments
      * @return PluginOptions
      */
-    protected function preparePluginOptions(string $placeholder, Dictionary $arguments): PluginOptions {
-        $options = new PluginOptions();
-        $options->plugin = $this;
-        $options->placeholder = $placeholder;
-        $options->arguments = $arguments;
-        $options->extended = new Dictionary();
-        return $options;
+    protected function createPluginOptions(Dictionary $arguments): PluginOptions {
+        return new PluginOptions();
+    }
+
+    /**
+     * Fills the given plugin options which basic data which are available for every plugin.
+     * @param PluginOptions $pluginOptions
+     * @param string $placeholder
+     * @param Dictionary $arguments
+     * @return void
+     */
+    protected function fillDefaultPluginOptions(PluginOptions $pluginOptions, string $placeholder, Dictionary $arguments): void {
+        $pluginOptions->plugin = $this;
+        $pluginOptions->placeholder = $placeholder;
+        $pluginOptions->arguments = $arguments;
     }
 
     /**

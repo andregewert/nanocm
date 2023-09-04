@@ -20,33 +20,20 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
-use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\TemplateRenderer\RendererOptions;
+use Ubergeek\NanoCm\Media\ImageFormat;
 
-/**
- * Encapsulates all option which are passed to the template when rendering the contents by a plugin.
- *
- * @author André Gewert <agewert@ubergeek.de>
- * @created 2023-09-02
- */
-class PluginOptions extends RendererOptions {
+class YoutubePluginOptions extends PluginOptions {
 
     /**
-     * Reference to the plugin which is being executed.
-     * @var PluginInterface
-     */
-    public PluginInterface $plugin;
-
-    /**
-     * The complete placeholder which is being replaced.
+     * The youtube video id
      * @var string
      */
-    public string $placeholder;
+    public string $videoId = '';
 
     /**
-     * An array of KeyValuePair with the parsed options.
-     * @var Dictionary
+     * ImageFormat for the generated preview image.
+     * @var ImageFormat
      */
-    public Dictionary $arguments;
+    public ImageFormat $previewImageFormat;
 
 }

@@ -47,15 +47,7 @@ $articleText = $this->convertTextWithFullMarkup($articleText);
                 am
                 <?php echo $this->htmlEncode($this->article->publishing_timestamp->format('d.m.Y')); ?>&nbsp;&bullet;
                 <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comment">Kommentieren</a>&nbsp;&bullet;
-                <a href="<?php echo $this->htmlConvUrl($this->article->getEbookUrl()); ?>">ePub</a>&nbsp;&bullet;
-                <a href="<?php echo $this->htmlEncode(
-                    \Ubergeek\NanoCm\Util::getTweetThisUrl(
-                        $this->frontController->createAbsoluteSiteLink(
-                            $this->article->getArticleUrl()
-                        ),
-                        $this->article->headline
-                    )
-                ); ?>" target="_blank">Twittern</a>
+                <a href="<?php echo $this->htmlConvUrl($this->article->getEbookUrl()); ?>">ePub</a>
             </p>
             <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
                 Schlagworte:

@@ -1,28 +1,26 @@
 <?php
+
 use Ubergeek\NanoCm\ContentConverter\Plugin\PluginOptions;
+use Ubergeek\NanoCm\ContentConverter\Plugin\SlideshowPluginOptions;
 use Ubergeek\NanoCm\Media\ImageFormat;
 use Ubergeek\NanoCm\Medium;
-use Ubergeek\NanoCm\Module\AbstractModule;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
 
-/* @var $this AbstractModule */
-/* @var $params PluginOptions */
-
-$folderId = $params->arguments->getValue('folderid');
-$folder = $params->extended->getValue('folder');
-$media = $params->extended->getValue('media');
-$format = $params->extended->getValue('format');
+/* @var $this TemplateRenderer */
+/* @var $options SlideshowPluginOptions */
+$options = $this->options;
 ?>
 
-<?php if ($format instanceof ImageFormat && $folder instanceof Medium && is_array($media) && count($media) > 0) : ?>
-    <div class="shadow slideshow">
+<?php if ($options->format instanceof ImageFormat && $options->folder instanceof Medium && is_array($options->media) && count($options->media) > 0) : ?>
+    <div class="shadow slideshow<?php if ($options->autoplay) echo ' autoplay'; ?>">
         <div class="frame">
             <div class="images">
-                <?php foreach ($media as $i => $medium) : ?>
+                <?php foreach ($options->media as $i => $medium) : ?>
                     <div class="image">
-                        <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview-album_<?php echo $folderId; ?>" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
-                            <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
-                                 width="<?php echo $format->width; ?>" height="<?php echo $format->height; ?>"
-                                 srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="" title="">
+                        <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview-album_<?php echo $options->folder->id; ?>" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                            <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $options->format->key)); ?>"
+                                 width="<?php echo $options->format->width; ?>" height="<?php echo $options->format->height; ?>"
+                                 srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $options->format->key, 2)); ?> 2x" alt="" title="">
                         </a>
                         <?php if (strlen($medium->attribution) > 0) : ?>
                             <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>

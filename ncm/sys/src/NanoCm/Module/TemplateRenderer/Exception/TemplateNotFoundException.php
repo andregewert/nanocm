@@ -18,35 +18,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\ContentConverter\Plugin;
+namespace Ubergeek\NanoCm\Module\TemplateRenderer\Exception;
 
-use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\TemplateRenderer\RendererOptions;
+use RuntimeException;
 
 /**
- * Encapsulates all option which are passed to the template when rendering the contents by a plugin.
- *
+ * This exception is being thrown when a requested template file can not be found.
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2023-09-02
+ * @created 2023-09-04
  */
-class PluginOptions extends RendererOptions {
-
-    /**
-     * Reference to the plugin which is being executed.
-     * @var PluginInterface
-     */
-    public PluginInterface $plugin;
-
-    /**
-     * The complete placeholder which is being replaced.
-     * @var string
-     */
-    public string $placeholder;
-
-    /**
-     * An array of KeyValuePair with the parsed options.
-     * @var Dictionary
-     */
-    public Dictionary $arguments;
+class TemplateNotFoundException extends RuntimeException implements ExceptionInterface {
 
 }

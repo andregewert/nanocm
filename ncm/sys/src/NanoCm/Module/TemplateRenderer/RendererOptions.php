@@ -18,35 +18,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-namespace Ubergeek\NanoCm\ContentConverter\Plugin;
+namespace Ubergeek\NanoCm\Module\TemplateRenderer;
 
 use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\TemplateRenderer\RendererOptions;
 
 /**
- * Encapsulates all option which are passed to the template when rendering the contents by a plugin.
- *
+ * This class is utilised to pass abitrary options to the template being rendered.
+ * Wherever possible, sub classed should be used to be type safe.
+ * @created 2023-09-04
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2023-09-02
  */
-class PluginOptions extends RendererOptions {
-
+class RendererOptions
+{
     /**
-     * Reference to the plugin which is being executed.
-     * @var PluginInterface
-     */
-    public PluginInterface $plugin;
-
-    /**
-     * The complete placeholder which is being replaced.
-     * @var string
-     */
-    public string $placeholder;
-
-    /**
-     * An array of KeyValuePair with the parsed options.
+     * Abitrary options, organized in a dictionary.
      * @var Dictionary
      */
-    public Dictionary $arguments;
+    public Dictionary $misc;
+
+    public function __construct() {
+        $this->misc = new Dictionary();
+    }
+
+    /**
+     * Fills the "misc" dictionary with values from an array.
+     * @param array $array
+     * @return void
+     */
+    public function fillFromArray(array $array) {
+        foreach ($array as $key => $value) {
+            $this->misc->set($key, $value);
+        }
+    }
 
 }

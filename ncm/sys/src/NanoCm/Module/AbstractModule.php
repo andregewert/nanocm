@@ -29,10 +29,12 @@ use Ubergeek\Log\LoggerInterface;
 use Ubergeek\NanoCm\Article;
 use Ubergeek\NanoCm\Constants;
 use Ubergeek\NanoCm\ContentConverter\HtmlConverter;
+use Ubergeek\NanoCm\ContentConverter\Plugin\YoutubePluginOptions;
 use Ubergeek\NanoCm\Exception\AuthorizationException;
 use Ubergeek\NanoCm\Exception\ContentNotFoundException;
 use Ubergeek\NanoCm\FrontController;
 use Ubergeek\NanoCm\Medium;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
 use Ubergeek\NanoCm\Orm;
 use Ubergeek\NanoCm\UserMessage;
 use Ubergeek\NanoCm\Util;
@@ -158,6 +160,7 @@ abstract class AbstractModule implements
      * Systemdateien verwendet werden.
      * 
      * @var bool
+     * @deprecated Should be replaced by an option for the new TemplateRenderer class
      */
     public $allowUserTemplates = true;
 
@@ -242,6 +245,7 @@ abstract class AbstractModule implements
      * @param string $formatKey Schlüssel des gewünschten Ausgabeformats
      * @param integer $scaling Skalierung
      * @return string URL zum skalierten Bild
+     * @deprecated Use TemplateRenderer instead
      */
     public function getImageUrl(Medium $medium, string $formatKey, $scaling = 1) {
         return $medium->getImageUrl($formatKey, $scaling);
@@ -269,6 +273,7 @@ abstract class AbstractModule implements
      * @param string $youtubeId Die Youtube-Video-ID
      * @param string $formatKey Schlüssel für das gewünschte Bildformat
      * @return string Die URL zum Thumbnail
+     * @deprecated Use TemplateRenderer instead
      */
     public function getYoutubeThumbnailUrl(string $youtubeId, string $formatKey) {
         return "/media/$youtubeId/yt/$formatKey";
@@ -299,6 +304,7 @@ abstract class AbstractModule implements
      *
      * @param string $relativeUrl Auf das Installationsverzeichnis von NanoCM bezogene relative URL
      * @return string Server-absolute URL
+     * @deprecated TemplateRenderer should be used instead
      */
     public function convUrl($relativeUrl) {
         if (preg_match('/^[a-z]+:/i', $relativeUrl)) return $relativeUrl;
@@ -334,6 +340,7 @@ abstract class AbstractModule implements
      *
      * @param $relativeUrl string Auf das Installationsverzeichnis von NanoCM bezogene relative URL
      * @return string Server-absolute und HTML-kodierte URL
+     * @deprecated TemplateRenderer should be used instead
      */
     public function htmlConvUrl(string $relativeUrl) : string {
         return $this->htmlEncode($this->convUrl($relativeUrl));
@@ -412,6 +419,7 @@ abstract class AbstractModule implements
      * @param mixed $string
      * @param string|null $overrideTargetFormat Zielformat angeben, um dieses zu erzwingen
      * @return string HTML-kodierter String
+     * @deprecated TemplateRenderer should be used instead
      */
     public function htmlEncode($string, string $overrideTargetFormat = null) : string {
         $format = $overrideTargetFormat ?? $this->targetFormat;
@@ -462,7 +470,7 @@ abstract class AbstractModule implements
         $fname = Util::createPath($this->templateDir, $file);
 
         if ($this->allowUserTemplates && !file_exists($fname)) {
-            $fname = Util::createPath($this->ncm->pubdir, 'tpl', 'default');
+            $fname = Util::createPath($this->ncm->pubdir, 'tpl', 'default', $file);
         }
 
         if (!file_exists($fname)) {
@@ -562,6 +570,7 @@ abstract class AbstractModule implements
      *
      * @param string $string Eingabe-String
      * @return string Text mit durch <br>-Tag ersetzten Zeilenumbrüchen
+     * @deprecated TemplateRenderer should be used instead
      */
     public function nl2br(string $string) : string {
         $string = preg_replace('/(\n|\r\n|\n\r)/i', "<br>", $string);
@@ -605,6 +614,7 @@ abstract class AbstractModule implements
      * @param string $input Der Eingabestring
      * @return string Ins Zielformat umgewandelter Text
      * @throws Exception
+     * @deprecated TemplateRenderer should be used instead
      */
     public function convertTextWithBasicMarkup(string $input) : string {
         switch ($this->targetFormat) {
@@ -627,9 +637,11 @@ abstract class AbstractModule implements
                 $module = $this;
                 $output = preg_replace_callback('/(https?:\/\/([^\s\<\>]+))/i', static function($matches) use ($module) {
                     if (preg_match('/(www\.)?youtube\.com\/watch\?v=(\w+)/i', $matches[2], $innerMatches)) {
-                        $params = new Dictionary();
-                        $params->add('videoid', $innerMatches[2]);
-                        return $module->renderUserTemplate('blocks/comment-youtube.phtml', $params);
+                        $options = new YoutubePluginOptions();
+                        $options->videoId = $innerMatches[2];
+                        $options->previewImageFormat =  $module->orm->getImageFormatByKey('ytthumb');
+                        $renderer = new TemplateRenderer($module, true);
+                        return $renderer->renderUserTemplate('blocks/plugin-youtube.phtml', $options);
                     }
                     return '<a href="' . $matches[1] . '" target="_blank">' . $matches[2] . '</a>';
                 }, $output);

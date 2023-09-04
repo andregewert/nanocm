@@ -43,16 +43,21 @@ class SlideshowPlugin extends PluginAdapter {
      * @return PluginOptions
      * @throws InvalidStateException
      */
-    protected function preparePluginOptions(string $placeholder, Dictionary $arguments): PluginOptions {
+    protected function createPluginOptions(Dictionary $arguments): PluginOptions {
         $orm = $this->getModule()->getOrm();
         if ($orm === null) {
             throw new InvalidStateException('No orm instance configured');
         }
+
         $folderId = (int)$arguments->getValue('folderid');
-        $options = parent::preparePluginOptions($placeholder, $arguments);
-        $options->extended->set('folder', $orm->getMediumById($folderId, Medium::TYPE_FOLDER));
-        $options->extended->set('media', $orm->getMediaByParentId($folderId, Medium::TYPE_FILE));
-        $options->extended->set('format', $orm->getImageFormatByKey('preview'));
+        $formatKey = $arguments->getValue('format');
+        if (empty($formatKey)) $formatKey = 'preview';
+
+        $options = new SlideshowPluginOptions();
+        $options->folder = $orm->getMediumById($folderId);
+        $options->media = $orm->getMediaByParentId($folderId);
+        $options->format = $orm->getImageFormatByKey($formatKey);
+        $options->autoplay = $arguments->getValue('autoplay', false) == true;
         return $options;
     }
 
@@ -60,7 +65,7 @@ class SlideshowPlugin extends PluginAdapter {
      * @inheritDoc
      */
     public function getName(): string {
-        return 'Image slideshow';
+        return 'Slideshow';
     }
 
     /**
@@ -102,26 +107,12 @@ class SlideshowPlugin extends PluginAdapter {
             'default'   => 'preview',
             'required'  => true
         ));
-        $params['auswahl'] = PluginParameterDefinition::fromArray(array(
-            'key'       => 'auswahl',
-            'label'     => 'Test-Auswahl',
-            'type'      => PluginParameterDefinition::TYPE_SELECTION,
-            'options'   => array(
-                'oben'      => 'Oben',
-                'links'     => 'Links',
-                'unten'     => 'Unten',
-                'rechts'    => 'Rechts'
-            ),
-            'default'   => 'unten',
-            'required'  => true
-        ));
-        $params['auswahl2'] = PluginParameterDefinition::fromArray(array(
-            'key'       => 'auswahl2',
-            'label'     => 'Test-Auswahl 2',
+        $params['autoplay'] = PluginParameterDefinition::fromArray([
+            'key'       => 'autoplay',
+            'label'     => 'Automatisch abspielen',
             'type'      => PluginParameterDefinition::TYPE_TOGGLE,
-            'default'   => 1,
-            'required'  => true
-        ));
+            'default'   => 0
+        ]);
         return $params;
     }
 }

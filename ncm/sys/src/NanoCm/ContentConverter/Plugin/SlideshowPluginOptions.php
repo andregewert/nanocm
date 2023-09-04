@@ -20,33 +20,37 @@
 
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
-use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\TemplateRenderer\RendererOptions;
+use Ubergeek\NanoCm\Media\ImageFormat;
+use Ubergeek\NanoCm\Medium;
 
 /**
- * Encapsulates all option which are passed to the template when rendering the contents by a plugin.
- *
- * @author André Gewert <agewert@ubergeek.de>
- * @created 2023-09-02
+ * Options for slideshow content blocks.
+ * These options are passed to the template renderer.
  */
-class PluginOptions extends RendererOptions {
+class SlideshowPluginOptions extends PluginOptions {
 
     /**
-     * Reference to the plugin which is being executed.
-     * @var PluginInterface
+     * Meta data for the selected media folder.
+     * @var Medium
      */
-    public PluginInterface $plugin;
+    public Medium $folder;
 
     /**
-     * The complete placeholder which is being replaced.
-     * @var string
+     * The media files to be shown.
+     * @var Medium[]
      */
-    public string $placeholder;
+    public array $media;
 
     /**
-     * An array of KeyValuePair with the parsed options.
-     * @var Dictionary
+     * Meta data for the selected preview image format.
+     * @var ImageFormat
      */
-    public Dictionary $arguments;
+    public ImageFormat $format;
+
+    /**
+     * Specifies if the slideshow should be automatically played.
+     * @var bool
+     */
+    public bool $autoplay;
 
 }

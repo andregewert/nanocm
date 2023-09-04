@@ -44,7 +44,7 @@ initUbergeek = function(baseurl) {
         let current = 0;
         let play = true;
 
-        for (i = 1; i < count; i++) {
+        for (let i = 1; i < count; i++) {
             $(img[i]).hide();
         }
 
@@ -71,12 +71,12 @@ initUbergeek = function(baseurl) {
         let paused = !autoplay;
         let currentTimeout = null;
 
-        for (i = 1; i < count; i++) {
+        for (let i = 1; i < count; i++) {
             $(img[i]).hide();
         }
 
         let switchImage = function (dir, manually) {
-            let speed = (manually == true)? 500 : 2000;
+            let speed = manually? 500 : 2000;
             let nextIndex = current + dir;
             if (nextIndex < 0) nextIndex = count - 1;
             if (nextIndex + 1 > count) nextIndex = 0;
@@ -101,8 +101,8 @@ initUbergeek = function(baseurl) {
 
         let playPause = function() {
             paused = !paused;
-            imgPlayPause.setAttribute('src', (paused)? baseurl + '/img/play.gif' : baseurl + '/img/pause.gif');
-            imgPlayPause.setAttribute('title', (paused)? 'Abspielen' : 'Pausieren');
+            imgPlayPause.setAttribute('src', paused? baseurl + '/img/play.gif' : baseurl + '/img/pause.gif');
+            imgPlayPause.setAttribute('title', paused? 'Abspielen' : 'Pausieren');
             if (paused && currentTimeout != null) {
                 clearTimeout(currentTimeout);
             } else if (!paused) {

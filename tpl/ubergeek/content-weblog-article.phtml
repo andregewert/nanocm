@@ -60,15 +60,6 @@ if (!empty($this->article->medium_id)) {
                 <a href="<?php echo $this->htmlConvUrl($this->article->getArticleUrl()); ?>#comments">Kommentieren</a>
                 &bullet;
                 <a href="<?php echo $this->htmlConvUrl($this->article->getEbookUrl()); ?>">ePub</a>
-                &bullet;
-                <a href="<?php echo $this->htmlEncode(
-                    Util::getTweetThisUrl(
-                        $this->frontController->createAbsoluteSiteLink(
-                            $this->article->getArticleUrl()
-                        ),
-                        $this->article->headline
-                    )
-                ); ?>" target="_blank">Twittern</a>
             </p>
             <?php if (is_array($this->article->tags) && count($this->article->tags) > 0) : ?>
                 Schlagworte:

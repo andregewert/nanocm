@@ -1,12 +1,13 @@
 <?php
-use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\AbstractModule;
 
-/* @var $this AbstractModule */
-/* @var $params Dictionary */
+use Ubergeek\NanoCm\ContentConverter\Plugin\YoutubePluginOptions;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
 
-$vid = $params->getValue('videoid');
-$format = $this->orm->getImageFormatByKey('ytthumb');
+/* @var $this TemplateRenderer */
+/* @var $options YoutubePluginOptions */
+$options = $this->options;
+$vid = $options->videoId;
+$format = $options->previewImageFormat;
 ?>
 <div class="video-preview" data-vid="<?php echo $this->htmlEncode($vid); ?>" style="max-width: 600px">
     <a href="https://www.youtube.com/watch?v=<?php echo $this->htmlEncode($vid); ?>" target="_blank">
