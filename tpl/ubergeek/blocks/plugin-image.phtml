@@ -1,32 +1,28 @@
 <?php
-use Ubergeek\NanoCm\ContentConverter\Plugin\PluginOptions;
-use Ubergeek\NanoCm\Module\AbstractModule;
+use Ubergeek\NanoCm\ContentConverter\Plugin\ImagePluginOptions;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
 
-/* @var $this AbstractModule */
-/* @var $params PluginOptions */
-
-$medium = $this->orm->getMediumById($params->getValue('imageid'));
-$format = $this->orm->getImageFormatByKey($params->getValue('formatid'));
+/* @var $this TemplateRenderer */
+/* @var $options ImagePluginOptions */
+$medium = $options->medium;
+$format = $options->previewImageFormat;
 ?>
-
-<?php if ($medium != null && $format != null) : ?>
-    <figure>
-        <div class="figurecontainer" style="max-width: <?php echo (int)$format->width; ?>px">
-            <div class="imgcontainer">
-                <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
-                    <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
-                         srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
-                </a>
-            </div>
-            <?php if (strlen($medium->attribution) > 0) : ?>
-                <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
-            <?php endif; ?>
-            <?php if (strlen($medium->description) > 0) : ?>
-                <div class="caption shadow">
-                    <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>
-                </div>
-            <?php endif; ?>
+<figure>
+    <div class="figurecontainer" style="max-width: <?php echo $format->width; ?>px">
+        <div class="imgcontainer">
+            <a href="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, 'original')); ?>" data-lightbox="preview" data-title="<?php echo $this->htmlEncode($medium->title); ?>">
+                <img loading="lazy" src="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key)); ?>"
+                     srcset="<?php echo $this->htmlConvUrl($this->getImageUrl($medium, $format->key, 2)); ?> 2x" alt="">
+            </a>
         </div>
-    </figure>
-<?php endif; ?>
+        <?php if (strlen($medium->attribution) > 0) : ?>
+            <div class="attribution"><?php echo $this->convertTextWithBasicMarkup($medium->attribution); ?></div>
+        <?php endif; ?>
+        <?php if (strlen($medium->description) > 0) : ?>
+            <div class="caption shadow">
+                <figcaption><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></figcaption>
+            </div>
+        <?php endif; ?>
+    </div>
+</figure>
 

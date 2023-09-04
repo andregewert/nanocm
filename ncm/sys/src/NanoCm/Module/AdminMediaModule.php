@@ -301,13 +301,13 @@ class AdminMediaModule extends AbstractAdminModule {
 
                     // Insert plugin content (placeholder)
                     case 'insertplugincontent':
-                        $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins();
+                        $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins(false, true);
                         $content = $this->renderUserTemplate('content-media-insertplugincontent.phtml');
                         break;
 
                     case 'pluginoptions':
                         $this->formats = $this->orm->getImageFormats();
-                        $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins();
+                        $this->availableContentPlugins = HtmlConverter::loadAvailableContentPlugins(false, true);
                         $pluginkey = $this->getParam('pluginkey');
                         if (!array_key_exists($pluginkey, $this->availableContentPlugins)) {
                             throw new InvalidArgumentException('Invalid plugin: ' . $pluginkey);

@@ -126,13 +126,6 @@ abstract class PluginAdapter implements PluginInterface {
      */
     abstract public function getKey(): string;
 
-    /**
-     * @inheritDoc
-     */
-    public function getAvailableParameters(): array {
-        return array();
-    }
-
     // </editor-fold>
 
 

@@ -978,7 +978,8 @@ ul.block-selection li {
   border: solid #ddd 1px;
   cursor: pointer;
   padding: 0.6rem;
-  background: linear-gradient(white, #eee); }
+  background: linear-gradient(white, #eee);
+  margin: 0 0 1rem 0; }
 
 ul.block-selection li:hover {
   border-color: silver; }

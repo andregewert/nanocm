@@ -21,47 +21,27 @@
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
 use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\AbstractModule;
+use Ubergeek\NanoCm\Exception\InvalidStateException;
 
 /**
- * Plugin to demonstrate the implementation of content converter plugins
+ * This plugin is used to show download links for files which are manages by the Nano CM media manager.
  * @author André Gewert <agewert@ubergeek.de>
- * @created 2021-08-12
+ * @created 2023-09-05
  */
-class TestPlugin extends PluginAdapter {
-
-    /**
-     * @param AbstractModule $callingModule
-     * @param string $placeholder
-     * @param Dictionary $arguments
-     * @inheritDoc
-     */
-    function replacePlaceholder(AbstractModule $callingModule, string $placeholder, Dictionary $arguments) : string {
-        $this->module = $callingModule;
-        $output = '<p>Params:</p>';
-        $output .= '<ul>' . "\n";
-        foreach ($arguments as $param) {
-            $output .= '<li>';
-            $output .= $this->getModule()->htmlEncode($param->key) . ': ';
-            $output .= $this->getModule()->htmlEncode($param->value);
-            $output .= '</li>' . "\n";
-        }
-        $output .= '</ul>' . "\n";
-        return $output;
-    }
+class DownloadPlugin extends PluginAdapter {
 
     /**
      * @inheritDoc
      */
     public function getName(): string {
-        return 'Test';
+        return 'Download-Link';
     }
 
     /**
      * @inheritDoc
      */
     public function getDescription(): string {
-        return 'Just a simple test plugin';
+        return 'Bindet einen Download-Link in den Inhalt ein.';
     }
 
     /**
@@ -75,17 +55,36 @@ class TestPlugin extends PluginAdapter {
      * @inheritDoc
      */
     public function getKey(): string {
-        return 'test';
+        return 'download';
     }
 
     /**
      * @inheritDoc
      */
-    public function isEnabled(): bool {
-        return false;
+    public function getAvailableParameters(): array {
+        return [
+            'mediumid'      => PluginParameterDefinition::fromArray([
+                'key'       => 'mediumid',
+                'label'     => 'Download-Datei',
+                'type'      => PluginParameterDefinition::TYPE_MEDIAENTRY,
+                'required'  => true
+            ])
+        ];
     }
 
-    public function getAvailableParameters(): array {
-        return array();
+    /**
+     * @inheritDoc
+     * @throws InvalidStateException
+     */
+    protected function createPluginOptions(Dictionary $arguments): PluginOptions {
+        $orm = $this->getModule()->getOrm();
+        if ($orm === null) {
+            throw new InvalidStateException('No orm instance configured');
+        }
+
+        $mediumId = (int)$arguments->getValue('mediumid');
+        $options = new DownloadPluginOptions();
+        $options->medium = $orm->getMediumById($mediumId);
+        return $options;
     }
 }

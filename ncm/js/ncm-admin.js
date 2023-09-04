@@ -165,22 +165,6 @@ function Ncm() {
         $(toolbarElem).find('.edit_insert_plugin_content').click(function() {
             app.openInsertPluginContentPopup(textareaElem[0]);
         });
-
-        $(toolbarElem).find('.edit_insert_image').click(function() {
-            let dlg = new app.InlinePopup('admin/media/html/imageselection', {
-                param: 'param'
-            }, {
-                options: 'options',
-                headline: 'Bild einfügen'
-            }, {
-                close: {
-                    caption: 'Schließen',
-                    clicked: function() {
-                        dlg.close();
-                    }
-                }
-            });
-        });
     };
 
     /**

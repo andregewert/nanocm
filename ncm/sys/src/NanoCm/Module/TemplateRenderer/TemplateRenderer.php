@@ -264,6 +264,17 @@ class TemplateRenderer
         return $output;
     }
 
+    /**
+     * Returns the download link for a file from media manager.
+     * The returned URL is relative to the installation of Nano CM and should be converted to an absolute URL
+     * by convUrl() or htmlConvUrl().
+     * @param Medium $medium The medium to be linked.
+     * @return string Installation relative download link
+     */
+    public function getDownloadUrl(Medium $medium): string {
+        return '/media/' . $medium->hash . '/download/';
+    }
+
     // </editor-fold>
 
 }

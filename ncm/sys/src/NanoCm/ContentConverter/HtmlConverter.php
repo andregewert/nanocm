@@ -96,19 +96,17 @@ class HtmlConverter {
         $module = $this->module;
 
         // Extended placeholders for media management
+        // Youtube links are the only remaining placeholders which are supported by this mechanism.
+        // Other functionalities should be provided by the new, generic plugin mechanism.
         $output = preg_replace_callback(
 
-            '/<p>\[(youtube|album|image|download):([^]]+?)]<\/p>$/im',
+            '/<p>\[(youtube):([^]]+?)]<\/p>$/im',
 
             /**
              * @throws Exception
              */
             static function($matches) use ($module) {
-                $params = new Dictionary();
-
                 switch (strtolower($matches[1])) {
-
-                    // Youtube-Einbettungen (click-to-play)
                     case 'youtube':
                         if (preg_match('/v=([a-z0-9_\-]*)/i', $matches[2], $im) === 1) {
                             $options = new YoutubePluginOptions();
@@ -118,23 +116,6 @@ class HtmlConverter {
                             return $renderer->renderUserTemplate('blocks/plugin-youtube.phtml', $options);
                         }
                         return '';
-
-                    // Bildergalerie aus der Medienverwaltung
-                    case 'album':
-                        $params->add('albumid', (int)$matches[2]);
-                        return $module->renderUserTemplate('blocks/media-album.phtml', $params);
-
-                    // Vorschaubild aus der Medienverwaltung
-                    case 'image':
-                        list($id, $formatid) = explode(':', $matches[2], 2);
-                        $params->add('imageid', (int)$id);
-                        $params->add('formatid', $formatid);
-                        return $module->renderUserTemplate('blocks/media-image.phtml', $params);
-
-                    // Download-Link aus der Medienverwaltung
-                    case 'download':
-                        $params->add('downloadid', (int)$matches[2]);
-                        return $module->renderUserTemplate('blocks/media-download.phtml', $params);
                 }
                 return $matches[0];
             },
@@ -225,7 +206,7 @@ class HtmlConverter {
      * @todo The properties isEnabled and priority should be set with values from some user configuration
      * @todo There should be ways to register plugins from other namespaces
      */
-    public static function loadAvailableContentPlugins(bool $includeDisabled = false) : array {
+    public static function loadAvailableContentPlugins(bool $includeDisabled = false, bool $orderAlphabetically = false) : array {
         $plugins = array();
         $dirname = __DIR__ . DIRECTORY_SEPARATOR . 'Plugin';
         if (($dh = opendir($dirname)) !== false) {
@@ -248,7 +229,12 @@ class HtmlConverter {
             }
         }
 
-        uasort($plugins, static function(PluginInterface $a, PluginInterface $b) {
+        uasort($plugins, static function(PluginInterface $a, PluginInterface $b) use ($orderAlphabetically) {
+            if ($orderAlphabetically) {
+                $r = strnatcasecmp($a->getName(), $b->getName());
+                if ($r != 0) return $r;
+            }
+
             if ($a->getPriority() === $b->getPriority()) {
                 return 0;
             }

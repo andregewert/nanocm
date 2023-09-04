@@ -21,19 +21,20 @@
 namespace Ubergeek\NanoCm\ContentConverter\Plugin;
 
 use Ubergeek\NanoCm\Media\ImageFormat;
+use Ubergeek\NanoCm\Medium;
 
 /**
- * Encapsulates the options for the youtube (preview) content plugin.
+ * Encapsulates the options for the image content plugin.
  * @author André Gewert <agewert@ubergeek.de>
  * @created 2023-09-04
  */
-class YoutubePluginOptions extends PluginOptions {
+class ImagePluginOptions extends PluginOptions {
 
     /**
-     * The youtube video id
-     * @var string
+     * The medium manager image to be displayed.
+     * @var Medium
      */
-    public string $videoId = '';
+    public Medium $medium;
 
     /**
      * ImageFormat for the generated preview image.

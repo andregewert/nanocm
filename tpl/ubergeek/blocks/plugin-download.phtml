@@ -1,12 +1,11 @@
 <?php
-use Ubergeek\Dictionary;
-use Ubergeek\NanoCm\Module\AbstractModule;
+use Ubergeek\NanoCm\ContentConverter\Plugin\DownloadPluginOptions;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
 use Ubergeek\NanoCm\Util;
 
-/* @var $this AbstractModule */
-/* @var $params Dictionary */
-
-$medium = $this->orm->getMediumById($params->getValue('downloadid'));
+/* @var $this TemplateRenderer */
+/* @var $options DownloadPluginOptions */
+$medium = $options->medium;
 ?>
 <p><a href="<?php echo $this->htmlConvUrl($this->getDownloadUrl($medium)); ?>">Download: <?php echo $this->htmlEncode($medium->title); ?></a>
 (<?php echo Util::sizeHumanReadable($medium->filesize); ?>)

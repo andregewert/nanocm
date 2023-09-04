@@ -1,0 +1,12 @@
+<?php
+use Ubergeek\NanoCm\ContentConverter\Plugin\DownloadPluginOptions;
+use Ubergeek\NanoCm\Module\TemplateRenderer\TemplateRenderer;
+use Ubergeek\NanoCm\Util;
+
+/* @var $this TemplateRenderer */
+/* @var $options DownloadPluginOptions */
+$medium = $options->medium;
+?>
+<p><a href="<?php echo $this->htmlConvUrl($this->getDownloadUrl($medium)); ?>">Download: <?php echo $this->htmlEncode($medium->title); ?></a>
+    (<?php echo Util::sizeHumanReadable($medium->filesize); ?>)
+</p>

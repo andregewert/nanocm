@@ -29,6 +29,8 @@ use Ubergeek\NanoCm\Medium;
  *
  * The slideshow is intended to show full size (full content width) images including
  * their descriptive texts.
+ * @author André Gewert <agewert@ubergeek.de>
+ * @created 2023-09-01
  */
 class SlideshowPlugin extends PluginAdapter {
 
