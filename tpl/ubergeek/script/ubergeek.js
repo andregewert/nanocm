@@ -64,23 +64,51 @@ initUbergeek = function(baseurl) {
 
     // Clickable slideshows
     $('div.slideshow').each(function () {
+        let autoplay = $(this).hasClass('autoplay');
         let img = $(this).find('div.image');
         let count = img.length;
         let current = 0;
+        let paused = !autoplay;
+        let currentTimeout = null;
 
         for (i = 1; i < count; i++) {
             $(img[i]).hide();
         }
 
-        let switchImage = function (dir) {
+        let switchImage = function (dir, manually) {
+            let speed = (manually == true)? 500 : 2000;
             let nextIndex = current + dir;
             if (nextIndex < 0) nextIndex = count - 1;
             if (nextIndex + 1 > count) nextIndex = 0;
-            $(img[current]).hide();
-            $(img[nextIndex]).show();
+            $(img[current]).fadeOut(speed);
+            $(img[nextIndex]).fadeIn(speed);
             current = nextIndex;
             spanCurrentImage.innerText = current + 1;
-        }
+
+            if (!paused) {
+                startTimeout();
+            }
+        };
+
+        let startTimeout = function() {
+            if (currentTimeout != null) {
+                clearTimeout(currentTimeout);
+            }
+            currentTimeout = setTimeout(function () {
+                switchImage(1);
+            }, 5000);
+        };
+
+        let playPause = function() {
+            paused = !paused;
+            imgPlayPause.setAttribute('src', (paused)? baseurl + '/img/play.gif' : baseurl + '/img/pause.gif');
+            imgPlayPause.setAttribute('title', (paused)? 'Abspielen' : 'Pausieren');
+            if (paused && currentTimeout != null) {
+                clearTimeout(currentTimeout);
+            } else if (!paused) {
+                startTimeout();
+            }
+        };
 
         let controls = document.createElement('div');
         controls.setAttribute('class', 'controls');
@@ -89,7 +117,7 @@ initUbergeek = function(baseurl) {
         linkLeft.setAttribute('class', 'left');
         linkLeft.setAttribute('href', 'javascript:void(0)');
         linkLeft.onclick = function () {
-            switchImage(-1);
+            switchImage(-1, true);
         };
         let imgLeft = document.createElement('img');
         imgLeft.setAttribute('src', baseurl + '/img/left-white.gif');
@@ -106,11 +134,28 @@ initUbergeek = function(baseurl) {
         controls.appendChild(spanCurrentImage);
         controls.appendChild(document.createTextNode(' von ' + count));
 
+        let linkPlayPause = document.createElement('a');
+        linkPlayPause.setAttribute('class', 'playpause');
+        linkPlayPause.setAttribute('href', 'javascript:void(0)');
+        linkPlayPause.onclick = function() {
+            playPause();
+        };
+
+        let imgPlayPause = document.createElement('img');
+        imgPlayPause.setAttribute('src', (paused)? baseurl + '/img/play.gif' : baseurl + '/img/pause.gif');
+        imgPlayPause.setAttribute('title', (paused)? 'Abspielen' : 'Pausieren');
+        imgPlayPause.setAttribute('alt', '[Abspielen]');
+        imgPlayPause.setAttribute('width', '18');
+        imgPlayPause.setAttribute('height', '17');
+        imgPlayPause.setAttribute('class', 'playpause');
+        linkPlayPause.appendChild(imgPlayPause);
+        controls.appendChild(linkPlayPause);
+
         let linkRight = document.createElement('a');
         linkRight.setAttribute('class', 'right');
         linkRight.setAttribute('href', 'javascript:void(0)');
         linkRight.onclick = function () {
-            switchImage(1);
+            switchImage(1, true);
         }
         let imgRight = document.createElement('img');
         imgRight.setAttribute('src', baseurl + '/img/right-white.gif');
@@ -119,8 +164,13 @@ initUbergeek = function(baseurl) {
         imgRight.setAttribute('width', '9');
         imgRight.setAttribute('height', '17');
         linkRight.appendChild(imgRight);
+
         controls.appendChild(linkRight);
 
         $(controls).insertBefore($(this).find('div.frame'));
+
+        if (!paused) {
+            startTimeout();
+        }
     });
 }

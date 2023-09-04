@@ -105,7 +105,7 @@
 
 /* </editor-fold> */
 
-@import 'vars';
+@import 'vars.scss';
 
 html {
     font-size: $font-basesize;
@@ -489,12 +489,17 @@ div.slideshow div.controls {
     color: white;
     line-height: 3em;
     line-height: 3rem;
+    z-index: 10;
 }
 
 div.slideshow div.controls img {
     vertical-align: middle;
     display: inline-block;
     padding: 0.5em 1em;
+}
+
+div.slideshow div.controls img.playpause {
+    padding: 0.5em 0 0.5em 1em;
 }
 
 div.slideshow div.attribution {
@@ -512,6 +517,16 @@ div.slideshow div.caption {
     font-size: 0.9rem;
     line-height: 1.2em;
     padding: 0.25em 0.5em;
+}
+
+div.slideshow div.images {
+    display: grid;
+    column-count: 1;
+}
+
+div.slideshow div.image {
+    grid-column: 1;
+    grid-row: 1;
 }
 
 /* </editor-fold> */
