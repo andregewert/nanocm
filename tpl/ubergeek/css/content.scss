@@ -239,6 +239,12 @@ ol.comments li h3 a {
     font-variant: small-caps;
 }
 
+.small {
+    font-size: 0.8rem;
+    line-height: 1em;
+    margin-top: 0;
+}
+
 .articlefooter {
     font-size: 0.8em;
     font-size: 0.8rem;
@@ -527,6 +533,21 @@ div.slideshow div.images {
 div.slideshow div.image {
     grid-column: 1;
     grid-row: 1;
+}
+
+div.download div.icon {
+    border: solid transparent 1px;
+    margin: 0 auto;
+    width: 60%;
+    padding-left: 2.5rem;
+    background-image: url("../img/download_cloud.png");
+    background-repeat: no-repeat;
+    background-position: 0 1rem;
+}
+
+div.download a.download {
+    font-weight: bold;
+    font-size: 1.1rem;
 }
 
 /* </editor-fold> */

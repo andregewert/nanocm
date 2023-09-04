@@ -7,6 +7,14 @@ use Ubergeek\NanoCm\Util;
 /* @var $options DownloadPluginOptions */
 $medium = $options->medium;
 ?>
-<p><a href="<?php echo $this->htmlConvUrl($this->getDownloadUrl($medium)); ?>">Download: <?php echo $this->htmlEncode($medium->title); ?></a>
-(<?php echo Util::sizeHumanReadable($medium->filesize); ?>)
-</p>
+<div class="shadow download">
+    <div class="icon">
+        <p><a class="download" href="<?php echo $this->htmlConvUrl($this->getDownloadUrl($medium)); ?>">Download: <?php echo $this->htmlEncode($medium->title); ?></a><br>
+            Dateigr&ouml;&szlig;e: <?php echo Util::sizeHumanReadable($medium->filesize); ?><br>
+            &Auml;nderungsdatum: <?php echo $medium->modification_timestamp->format('Y-m-d H:i'); ?>
+        </p>
+        <?php if (!empty($medium->description)) : ?>
+            <p class="description small"><?php echo $this->convertTextWithBasicMarkup($medium->description); ?></p>
+        <?php endif; ?>
+    </div>
+</div>
