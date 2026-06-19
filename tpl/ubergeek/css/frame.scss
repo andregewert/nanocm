@@ -159,9 +159,9 @@ nav.mainnavigation ul li a:hover {
 nav.metanavigation {
     float: right;
     font-size: 0.9rem;
-    background-color: $color-metanavbg;
+/*    background-color: $color-metanavbg;*/
     color: $color-metanavfg;
-    margin-top: -1em;
+    margin-top: 0.5rem;
 }
 
 nav.metanavigation a {
@@ -188,8 +188,10 @@ div.column-4 {
     box-sizing: border-box;
 }
 
+/*
 @media screen and (max-width: 640px) {
     nav.metanavigation {
         display: none;
     }
 }
+*/
