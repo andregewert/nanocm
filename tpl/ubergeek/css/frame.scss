@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-@import 'vars';
+@import 'vars.scss';
 
 body {
     background-color: $color-contentbg;
@@ -29,8 +29,20 @@ body {
 header {
     background-color: $color-headerbg;
     color: $color-headerfg;
-    padding-top: 2em !important;
-    padding-bottom: 2em !important;
+    padding: 0;
+    background-image: url("../img/astro-header.png");
+    background-position: left top;
+    background-repeat: no-repeat;
+}
+
+header .brand {
+    position: relative;
+    height: 114px;
+}
+
+header .brand .logo {
+    position: absolute;
+    bottom: -1.4rem;
 }
 
 header .brand img {
@@ -45,6 +57,9 @@ footer {
     overflow: auto;
     padding-bottom: 2em !important;
     padding-top: 2em !important;
+    background-image: url("../img/astro-footer.png");
+    background-position: right top;
+    background-repeat: no-repeat;
 }
 
 footer a {

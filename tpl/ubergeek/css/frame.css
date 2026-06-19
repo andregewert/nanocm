@@ -50,8 +50,18 @@ body {
 header {
   background-color: #02111b;
   color: #0a94a9;
-  padding-top: 2em !important;
-  padding-bottom: 2em !important; }
+  padding: 0;
+  background-image: url("../img/astro-header.png");
+  background-position: left top;
+  background-repeat: no-repeat; }
+
+header .brand {
+  position: relative;
+  height: 114px; }
+
+header .brand .logo {
+  position: absolute;
+  bottom: -1.4rem; }
 
 header .brand img {
   max-width: 100%;
@@ -63,7 +73,10 @@ footer {
   color: #fff;
   overflow: auto;
   padding-bottom: 2em !important;
-  padding-top: 2em !important; }
+  padding-top: 2em !important;
+  background-image: url("../img/astro-footer.png");
+  background-position: right top;
+  background-repeat: no-repeat; }
 
 footer a {
   color: #aaa; }
@@ -163,7 +176,7 @@ nav.metanavigation li {
 
 /* </editor-fold> */
 div.column-4 {
-  width: 306.66667px;
+  width: 306.6666666667px;
   display: inline-block;
   float: left;
   -moz-box-sizing: border-box;

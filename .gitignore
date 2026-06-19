@@ -5,6 +5,7 @@
 /ncm/sys/db/versions/version
 /ncm/sys/db/*.ini
 /ncm/sys/backup/*.zip
+/ncm/sys/media/
 /.idea/
 .DS_Store*
 emoji-test.txt*
