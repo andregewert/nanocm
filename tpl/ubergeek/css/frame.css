@@ -72,7 +72,6 @@ footer {
   background-color: #02111b;
   color: #fff;
   overflow: auto;
-  padding-bottom: 2em !important;
   padding-top: 2em !important;
   background-image: url("../img/astro-footer.png");
   background-position: right top;
@@ -97,7 +96,7 @@ header,
 main,
 footer,
 nav.mainnavigation {
-  padding: 0 2em; }
+  padding: 0 2rem; }
 
 .container {
   max-width: 920px;

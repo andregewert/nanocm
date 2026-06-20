@@ -105,7 +105,7 @@
 /* Größenangaben */
 html {
   font-size: 110%;
-  line-height: 1.4em; }
+  line-height: 1.6em; }
 
 body {
   font-family: "Source Sans Pro", "Fira Sans", Lato, Helvetica, Arial, sans-serif; }
@@ -260,7 +260,7 @@ p.readmore {
 div.lead {
   font-size: 1.1rem;
   font-style: italic;
-  line-height: 1.4em; }
+  /*    line-height: 1.6em;*/ }
 
 div.lead em {
   font-style: normal; }
@@ -279,7 +279,7 @@ div.sidebar {
   background: #f0f0f0;
   padding: 0 1rem;
   font-size: 0.9rem;
-  line-height: 1.4em; }
+  /*    line-height: 1.4em;*/ }
 
 div.sidebar_right {
   width: 20rem;
@@ -422,7 +422,6 @@ div.slideshow div.controls {
   top: 0.5em;
   right: 0.5em;
   color: white;
-  line-height: 3em;
   line-height: 3rem;
   z-index: 10; }
 

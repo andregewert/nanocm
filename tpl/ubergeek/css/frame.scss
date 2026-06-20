@@ -55,7 +55,6 @@ footer {
     background-color: $color-footerbg;
     color: $color-footerfg;
     overflow: auto;
-    padding-bottom: 2em !important;
     padding-top: 2em !important;
     background-image: url("../img/astro-footer.png");
     background-position: right top;
@@ -84,7 +83,7 @@ header,
 main,
 footer,
 nav.mainnavigation {
-    padding: 0 2em;
+    padding: 0 2rem;
 }
 
 .container {
@@ -106,7 +105,6 @@ nav.mainnavigation {
     width: 100%;
     z-index: 5;
     margin-top: 2.5%;
-
     font-size: 10rem;
     height: 10rem;
     font-weight: bolder;
