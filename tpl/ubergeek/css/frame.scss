@@ -30,14 +30,14 @@ header {
     background-color: $color-headerbg;
     color: $color-headerfg;
     padding: 0;
-    background-image: url("../img/astro-header.png");
+    background-image: url("../img/astro2-header.png");
     background-position: left top;
     background-repeat: no-repeat;
 }
 
 header .brand {
     position: relative;
-    height: 114px;
+    height: 150px;
 }
 
 header .brand .logo {
@@ -56,8 +56,8 @@ footer {
     color: $color-footerfg;
     overflow: auto;
     padding-top: 2em !important;
-    background-image: url("../img/astro-footer.png");
-    background-position: right top;
+    background-image: url("../img/astro2-footer.png");
+    background-position: right bottom;
     background-repeat: no-repeat;
 }
 
